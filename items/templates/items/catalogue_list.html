@@ -1,0 +1,44 @@
+{% extends "baselayout.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-10">
+        <h1>Catalogues</h1>
+        {% if object_list %}
+            <div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>{% trans "Short title" %}</th>
+                            <th>{% trans "Year of publication" %}</th>
+                            <th>{% trans "Notes" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for catalogue in object_list %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'catalogue_detail' catalogue.pk %}">{{ catalogue.short_title }}</a>
+                                </td>
+                                <td>{{ catalogue.year_of_publication }}</td>
+                                <td>{{ catalogue.notes }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div>No catalogues.</div>
+        {% endif %}
+    </div>
+    <div class="col-xs-2">
+        <h3>Actions</h3>
+        <ul>
+            <li>
+                <a href="">Create new catalogue</a>
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

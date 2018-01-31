@@ -25,7 +25,7 @@ SECRET_KEY = 'gqj=#)n_cf6@98fk-e)v_6g#)ifng!(6y%fxa=__b6b-ly@^sf'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['131.174.132.80']
 
 
 # Application definition
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'bootstrap3',
     'rest_framework',
     'items',
 ]
@@ -51,12 +52,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'book_items.urls'
+ROOT_URLCONF = 'catalogues.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -69,7 +70,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'book_items.wsgi.application'
+WSGI_APPLICATION = 'catalogues.wsgi.application'
 
 
 # Database
@@ -81,6 +82,9 @@ DATABASES = {
         'USER': 'mediate_admin',
         'NAME': 'mediate_book_items',
         'PASSWORD': 'montoyahulsbosch',
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+        }
     }
 }
 
@@ -122,3 +126,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]

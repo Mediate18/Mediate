@@ -1,0 +1,35 @@
+{% extends "baselayout.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-10 col-xs-offset-1">
+    <h1>Book Items</h1>
+    {% if object_list %}
+        <div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>{% trans "Title of work" %}</th>
+                        <th>{% trans "Publisher" %}</th>
+                        <th>{% trans "Date of publication" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for bookitem in object_list %}
+                        <tr>
+                            <td>{{ bookitem.title_work.text }}</td>
+                            <td>{{ bookitem.publisher }}</td>
+                            <td>{{ bookitem.date_of_publication }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div>No book items.</div>
+    {% endif %}
+    </div>
+</div>
+
+{% endblock %}

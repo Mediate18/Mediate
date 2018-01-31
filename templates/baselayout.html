@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+{# Load the tag library #}
+{% load bootstrap3 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+
+{% load i18n %}
+{% load static %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block bootstrap3_title %}Mediate - Catalogues{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/mediate.css' %}">
+    <style>
+        body {
+            padding-top: 70px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- top bar -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+			<a class="navbar-brand navbar-img" href="http://www.ru.nl/" target="_blank"><img src="{% static 'img/ru.png' %}" alt="Radboud University" class="mini-logo"></a>
+		</div>
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Mediate</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="{% url 'catalogues' %}">{% trans "Catalogues" %}</a></li>
+            <li><a href="{% url 'catalogueitems' %}">{% trans "Catalogue items" %}</a></li>
+            <li><a href="{% url 'bookitems' %}">{% trans "Book items" %}</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><p class="navbar-text">- Login stuff -</p></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+    <!-- end top bar -->
+
+    <div class="container-fluid">
+        {% block content %}(no content){% endblock %}
+    </div>
+
+</body>
+</html>

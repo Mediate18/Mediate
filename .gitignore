@@ -1,0 +1,5 @@
+.idea/
+*.pyc
+/logs/
+/static/
+/catalogues-env/

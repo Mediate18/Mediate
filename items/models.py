@@ -7,7 +7,10 @@ class CatalogueType(models.Model):
     """
     The type of a catalogue
     """
-    name = models.CharField(_("Name of the catalogue type"), max_length=128)
+    name = models.CharField(_("Name of the catalogue type"), max_length=128, null=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Catalogue(models.Model):
@@ -16,15 +19,18 @@ class Catalogue(models.Model):
     """
 
     uuid = models.UUIDField()
-    short_title = models.CharField(_("Short title"), max_length=128)
-    full_title = models.TextField(_("Full title"))
-    preface_and_paratexts = models.TextField(_("Preface or prefatory / concluding text"))
-    type = models.ForeignKey(CatalogueType, on_delete=CASCADE)
-    year_of_publication_start = models.IntegerField(_("Year of publication (start of interval)"))
-    year_of_publication_end = models.IntegerField(_("Year of publication (end of interval)"))
-    year_of_publication_text = models.CharField(_("Year of publication text"), max_length=128)
-    notes = models.TextField(_("Notes for the Mediate project"))
-    bibliography = models.TextField(_("Bibliography"))
+    short_title = models.CharField(_("Short title"), max_length=128, null=True)
+    full_title = models.TextField(_("Full title"), null=True)
+    preface_and_paratexts = models.TextField(_("Preface or prefatory / concluding text"), null=True)
+    type = models.ForeignKey(CatalogueType, on_delete=CASCADE, null=True)
+    year_of_publication = models.IntegerField(_("Year of publication (start of interval)"), null=True)
+    year_of_publication_end = models.IntegerField(_("Year of publication (end of interval)"), null=True)
+    year_of_publication_text = models.CharField(_("Year of publication text"), max_length=128, null=True)
+    notes = models.TextField(_("Notes for the Mediate project"), null=True)
+    bibliography = models.TextField(_("Bibliography"), null=True)
+
+    def __str__(self):
+        return "{0} ({1})".format(self.short_title, self.uuid)
 
 
 class Place(models.Model):
@@ -32,15 +38,21 @@ class Place(models.Model):
     A geographical place
     """
 
-    name = models.CharField(_("Name of the place"), max_length=128)
+    name = models.CharField(_("Name of the place"), max_length=128, null=True)
     # type = models.ForeignKey(PlaceType)
+
+    def __str__(self):
+        return self.name
 
 
 class Publisher(models.Model):
     """
     A publisher of a book item
     """
-    name = models.CharField(_("Publisher name"), max_length=128)
+    name = models.CharField(_("Publisher name"), max_length=128, null=True)
+
+    def __str__(self):
+        return self.name
 
 
 class BookFormat(models.Model):
@@ -48,7 +60,10 @@ class BookFormat(models.Model):
     A book format
     """
 
-    name = models.CharField(_("Format name"), max_length=128)
+    name = models.CharField(_("Format name"), max_length=128, null=True)
+
+    def __str__(self):
+        return self.name
 
 
 class BindingMaterialDetails(models.Model):
@@ -56,7 +71,10 @@ class BindingMaterialDetails(models.Model):
     Binding material details
     """
 
-    text = models.CharField(_("Binding material details text"), max_length=128)
+    text = models.CharField(_("Binding material details text"), max_length=128, null=True)
+
+    def __str__(self):
+        return self.text
 
 
 class Language(models.Model):
@@ -83,15 +101,21 @@ class Person(models.Model):
     A person
     """
 
-    name = models.CharField(_("Name"), max_length=128)
-    viaf_id = models.CharField(_("VIAF ID (https://viaf.org)"), max_length=128)
+    name = models.CharField(_("Name"), max_length=128, null=True)
+    viaf_id = models.CharField(_("VIAF ID (https://viaf.org)"), max_length=128, null=True)
+
+    def __str__(self):
+        return self.name
 
 
 class PersonBookItemRelationType(models.Model):
     """
     A type for a person-book item relation
     """
-    name = models.CharField(_("Type of person-book item relation"), max_length=128)
+    name = models.CharField(_("Type of person-book item relation"), max_length=128, null=True)
+
+    def __str__(self):
+        return self.name
 
 
 class CatalogueItem(models.Model):
@@ -100,10 +124,14 @@ class CatalogueItem(models.Model):
     """
 
     uuid = models.UUIDField()
+    catalogue = models.ForeignKey(Catalogue, on_delete=CASCADE, null=True)
     bookseller_category_books = models.TextField(_("Heading / category used to describe books"))
     bookseller_category_non_books = models.TextField(_("Heading / category for other, non-book items"))
     number_in_catalogue = models.CharField(_("Number of items as listed in catalogue"), max_length=128)
     item_as_listed_in_catalogue = models.TextField(_("Full item description, exactly as in the catalogue"))
+
+    def __str__(self):
+        return self.item_as_listed_in_catalogue
 
 
 class TitleWork(models.Model):
@@ -112,6 +140,9 @@ class TitleWork(models.Model):
     """
 
     text = models.TextField(_("Text of the title of a work"))
+
+    def __str__(self):
+        return self.text
 
 
 class BookItem(models.Model):
@@ -132,6 +163,9 @@ class BookItem(models.Model):
     title_work = models.ForeignKey(TitleWork, on_delete=CASCADE)
     buyer = models.TextField(_("Buyer of a book item"))  #TODO Could this also be a list/ENUM/controlled vocabulary?
 
+    def __str__(self):
+        return self.title_work.text
+
 
 class PersonBookItemRelation(models.Model):
     """
@@ -148,6 +182,9 @@ class PersonCatalogueRelationType(models.Model):
     A type for a person-catalogue relation
     """
     name = models.CharField(_("Type of person-catalogue relation"), max_length=128)
+
+    def __str__(self):
+        return self.name
 
 
 class PersonCatalogueRelation(models.Model):

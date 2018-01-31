@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "book_items.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "catalogues.settings")
 
 application = get_wsgi_application()
