@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path
 
 from django.conf.urls import url, include
+from django.views.generic import RedirectView
 from rest_framework import routers
 from items import views
 import items.urls
@@ -48,7 +49,9 @@ router.register(r'titleworks', views.TitleWorkViewSet)
 
 
 urlpatterns = [
+    path(r'', RedirectView.as_view(url='items/')),
     path('admin/', admin.site.urls),
+    path('accounts/', include('django.contrib.auth.urls')),
     path(r'items/', include(items.urls)),
     url(r'^api/', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))

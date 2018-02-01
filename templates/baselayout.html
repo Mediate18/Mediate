@@ -48,7 +48,7 @@
             <li><a href="{% url 'bookitems' %}">{% trans "Book items" %}</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li><p class="navbar-text"><span class="glyphicon glyphicon-log-in"></span> Login</p></li>
+            {% include 'registration/accounts_menu.html' %}
           </ul>
         </div><!--/.nav-collapse -->
       </div>
