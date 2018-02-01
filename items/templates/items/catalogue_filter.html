@@ -4,6 +4,25 @@
 {% block content %}
 <div class="row">
     <div class="col-xs-10">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+              <h4 class="panel-title">
+                <a data-toggle="collapse" href="#collapse1">Filter</a>
+              </h4>
+            </div>
+            <div id="collapse1" class="panel-collapse collapse">
+              <div class="panel-body">
+                <form action="" method="get">
+                    {{ filter.form.as_p }}
+                <input type="submit" />
+                </form>
+              </div>
+            </div>
+          </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-10">
         <h1>Catalogues</h1>
         {% if object_list %}
             <div>

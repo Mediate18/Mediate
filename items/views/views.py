@@ -2,12 +2,17 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from items.models import Catalogue, CatalogueItem, BookItem
 
-class CatalogueListView(ListView):
+import django_filters
 
-    model = Catalogue
-    template_name = 'items/catalogue_list.html'
-    paginate_by = 10
 
+class CatalogueFilter(django_filters.FilterSet):
+
+    class Meta:
+        model = Catalogue
+        fields = {
+            'short_title': ['icontains'],
+            'year_of_publication': ['exact', 'lt', 'gt']
+        }
 
 class CatalogueDetailView(DetailView):
     model = Catalogue

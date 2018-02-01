@@ -5,7 +5,7 @@
 
 {# Load CSS and JavaScript #}
 {% bootstrap_css %}
-{% bootstrap_javascript %}
+{% bootstrap_javascript jquery=1 %}
 
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
@@ -48,7 +48,7 @@
             <li><a href="{% url 'bookitems' %}">{% trans "Book items" %}</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li><p class="navbar-text">- Login stuff -</p></li>
+            <li><p class="navbar-text"><span class="glyphicon glyphicon-log-in"></span> Login</p></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
