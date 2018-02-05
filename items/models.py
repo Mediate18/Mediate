@@ -2,6 +2,8 @@ from django.db import models
 from django.db.models.deletion import CASCADE, SET_NULL
 from django.utils.translation import ugettext_lazy as _
 
+import uuid
+
 
 class CatalogueType(models.Model):
     """
@@ -26,7 +28,7 @@ class Catalogue(models.Model):
     The catalogue a book item occurs in
     """
 
-    uuid = models.UUIDField()
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     source = models.ForeignKey(CatalogueSource, on_delete=SET_NULL, null=True)
     short_title = models.CharField(_("Short title"), max_length=128, null=True)
     full_title = models.TextField(_("Full title"), null=True)
@@ -131,7 +133,7 @@ class CatalogueItem(models.Model):
     Catalogue item
     """
 
-    uuid = models.UUIDField()
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     catalogue = models.ForeignKey(Catalogue, on_delete=CASCADE, null=True)
     bookseller_category_books = models.TextField(_("Heading / category used to describe books"))
     bookseller_category_non_books = models.TextField(_("Heading / category for other, non-book items"))
