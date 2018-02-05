@@ -166,6 +166,25 @@ class BookItem(models.Model):
         return self.title_work.text
 
 
+class YearInterval(models.Model):
+    """
+    An interval: start year - end year
+    """
+    start_year = models.IntegerField(_("Start year of interval"), null=False)
+    end_year = models.IntegerField(_("End year of inter"), null=False)
+
+
+class BookItemYearIntervalRelation(models.Model):
+    """
+    A book item - year interval relation
+    """
+    book_item = models.ForeignKey(BookItem, on_delete=CASCADE)
+    year_interval = models.ForeignKey(YearInterval, on_delete=CASCADE)
+
+    class Meta:
+        unique_together = (("book_item", "year_interval"),)  # Multiple identical relation would be redundant
+
+
 class PersonBookItemRelation(models.Model):
     """
     A person-book item relation (e.g. author, translator, illustrator, owner)
