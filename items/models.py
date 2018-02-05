@@ -23,9 +23,8 @@ class Catalogue(models.Model):
     full_title = models.TextField(_("Full title"), null=True)
     preface_and_paratexts = models.TextField(_("Preface or prefatory / concluding text"), null=True)
     type = models.ForeignKey(CatalogueType, on_delete=CASCADE, null=True)
-    year_of_publication = models.IntegerField(_("Year of publication (start of interval)"), null=True)
-    year_of_publication_end = models.IntegerField(_("Year of publication (end of interval)"), null=True)
-    year_of_publication_text = models.CharField(_("Year of publication text"), max_length=128, null=True)
+    year_of_publication = models.IntegerField(_("Year of publication"), null=True)
+    terminus_post_quem = models.IntegerField(_("Terminus post quem"), null=True)
     notes = models.TextField(_("Notes for the Mediate project"), null=True)
     bibliography = models.TextField(_("Bibliography"), null=True)
 
