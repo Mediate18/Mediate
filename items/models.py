@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models.deletion import CASCADE
+from django.db.models.deletion import CASCADE, SET_NULL
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -17,7 +17,7 @@ class CatalogueSource(models.Model):
     """
     A catalogue source
     """
-    name = models.CharField(_("Name of the source"), unique=True)
+    name = models.CharField(_("Name of the source"), max_length=128, unique=True)
     description = models.TextField(_("Description of the source"))
 
 
@@ -27,7 +27,7 @@ class Catalogue(models.Model):
     """
 
     uuid = models.UUIDField()
-    source = models.ForeignKey(CatalogueSource)
+    source = models.ForeignKey(CatalogueSource, on_delete=SET_NULL, null=True)
     short_title = models.CharField(_("Short title"), max_length=128, null=True)
     full_title = models.TextField(_("Full title"), null=True)
     preface_and_paratexts = models.TextField(_("Preface or prefatory / concluding text"), null=True)
