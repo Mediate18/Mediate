@@ -13,12 +13,21 @@ class CatalogueType(models.Model):
         return self.name
 
 
+class CatalogueSource(models.Model):
+    """
+    A catalogue source
+    """
+    name = models.CharField(_("Name of the source"), unique=True)
+    description = models.TextField(_("Description of the source"))
+
+
 class Catalogue(models.Model):
     """
     The catalogue a book item occurs in
     """
 
     uuid = models.UUIDField()
+    source = models.ForeignKey(CatalogueSource)
     short_title = models.CharField(_("Short title"), max_length=128, null=True)
     full_title = models.TextField(_("Full title"), null=True)
     preface_and_paratexts = models.TextField(_("Preface or prefatory / concluding text"), null=True)
