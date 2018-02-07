@@ -15,8 +15,10 @@
             <div id="collapse1" class="panel-collapse collapse">
               <div class="panel-body">
                 <form action="" method="get">
-                    {{ filter.form.as_p }}
-                <input type="submit" />
+                    <table class="table">
+                    {{ filter.form.as_table }}
+                    </table>
+                <input type="submit" class="btn pull-right"/>
                 </form>
               </div>
             </div>
