@@ -22,6 +22,11 @@ from rest_framework import routers
 from items import views
 import items.urls
 
+from django.contrib import admin
+from moderation.helpers import auto_discover
+admin.autodiscover()
+auto_discover()
+
 router = routers.DefaultRouter()
 # router.register(r'users', views.UserViewSet)
 # router.register(r'groups', views.GroupViewSet)

@@ -37,9 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'bootstrap3',
     'rest_framework',
     'django_filters',
+    'moderation',
     'items',
     'registration',
 ]
@@ -144,3 +146,5 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     )
 }
+
+SITE_ID = 1

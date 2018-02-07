@@ -1,7 +1,6 @@
 from django.contrib import admin
 from items.models import *
 
-# Register your models here.
 
 class BindingMaterialDetailsAdmin(admin.ModelAdmin):
     pass
