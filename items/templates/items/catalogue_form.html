@@ -1,0 +1,20 @@
+{% extends "baselayout.html" %}
+{% load i18n %}
+
+
+{% block content %}
+
+<div class="row">
+    <div class="col-xs-10">
+        <h1>Change catalogue</h1>
+        <form action="" method="post">
+            <table class="table">
+                {% csrf_token %}
+                {{ form.as_table }}
+            </table>
+        <input type="submit" class="btn pull-right"/>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
