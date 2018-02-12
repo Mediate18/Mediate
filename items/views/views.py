@@ -42,7 +42,8 @@ def change_catalogue(request, pk):
             return redirect('catalogues') # Redirect to the catalogues overview
 
     form = CatalogueModelForm(instance=catalogue)
-    return render(request, "items/catalogue_form.html", {"form": form, "user": request.user})
+    return render(request, "items/generic_form.html", {"form": form, "user": request.user,
+                                                         "action": "change", "object_name": "catalogue"})
 
 
 def add_catalogue(request):
@@ -59,7 +60,8 @@ def add_catalogue(request):
             return redirect('catalogues') # Redirect to the catalogues overview
 
     form = CatalogueModelForm()
-    return render(request, "items/catalogue_form.html", {"form": form, "user": request.user})
+    return render(request, "items/generic_form.html", {"form": form, "user": request.user,
+                                                         "action": "add", "object_name": "catalogue"})
 
 def delete_catalogue(request, pk):
     catalogue = get_object_or_404(Catalogue, pk=pk)
