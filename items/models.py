@@ -22,6 +22,9 @@ class CatalogueSource(models.Model):
     name = models.CharField(_("Name of the source"), max_length=128, unique=True)
     description = models.TextField(_("Description of the source"))
 
+    def __str__(self):
+        return self.name
+
 
 class Catalogue(models.Model):
     """

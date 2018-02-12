@@ -37,6 +37,13 @@ class BookItemAdmin(admin.ModelAdmin):
 admin.site.register(BookItem, BookItemAdmin)
 
 
+class CatalogueSourceAdmin(admin.ModelAdmin):
+    pass
+
+
+admin.site.register(CatalogueSource, CatalogueSourceAdmin)
+
+
 class CatalogueAdmin(admin.ModelAdmin):
     pass
 
