@@ -22,17 +22,11 @@
     </div>
     <div class="col-xs-2">
         <h3>Actions</h3>
-        <ul>
-            <li>
-                <a href="{% url 'change_catalogue' object.pk %}">Edit this catalogue</a>
-            </li>
-            <li>
-                <a href="" data-toggle="modal" data-target="#deleteModal">Delete this catalogue</a>
-            </li>
-            <li>
-                <a href="{% url 'add_catalogue' %}">Create new catalogue</a>
-            </li>
-        </ul>
+        <div class="list-group">
+            <a class="list-group-item" href="{% url 'change_catalogue' object.pk %}">Edit this catalogue</a>
+            <a class="list-group-item" href="" data-toggle="modal" data-target="#deleteModal">Delete this catalogue</a>
+            <a class="list-group-item" href="{% url 'add_catalogue' %}">Create new catalogue</a>
+        </div>
     </div>
 </div>
 
