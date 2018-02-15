@@ -145,7 +145,7 @@ class PersonBookItemRelationType(models.Model):
         return self.name
 
 
-class CatalogueItem(models.Model):
+class CatalogueEntry(models.Model):
     """
     Catalogue item
     """
@@ -177,7 +177,7 @@ class BookItem(models.Model):
     Book item
     """
 
-    catalogue_item = models.ForeignKey(CatalogueItem, on_delete=CASCADE)
+    catalogue_item = models.ForeignKey(CatalogueEntry, on_delete=CASCADE)
     place_of_publication = models.ForeignKey(Place, on_delete=CASCADE)
     publisher = models.ForeignKey(Publisher, on_delete=CASCADE)
     date_of_publication = models.DateField(_("Date of publication"))

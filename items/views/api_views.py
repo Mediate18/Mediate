@@ -32,9 +32,9 @@ class CatalogueViewSet(viewsets.ModelViewSet):
     serializer_class = CatalogueSerializer
 
 
-class CatalogueItemViewSet(viewsets.ModelViewSet):
-    queryset = CatalogueItem.objects.all()
-    serializer_class = CatalogueItemSerializer
+class CatalogueEntryViewSet(viewsets.ModelViewSet):
+    queryset = CatalogueEntry.objects.all()
+    serializer_class = CatalogueEntrySerializer
 
 
 class CatalogueTypeViewSet(viewsets.ModelViewSet):

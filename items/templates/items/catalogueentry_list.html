@@ -4,7 +4,7 @@
 {% block content %}
 <div class="row">
     <div class="col-xs-10 col-xs-offset-1">
-    <h1>Catalogue Items</h1>
+    <h1>Catalogue Entries</h1>
     {% if object_list %}
         <div>
             <table class="table">
@@ -16,18 +16,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for catalogueitem in object_list %}
+                    {% for catalogueentry in object_list %}
                         <tr>
-                            <td>{{ catalogueitem.number_in_catalogue }}</td>
-                            <td>{{ catalogueitem.item_as_listed_in_catalogue }}</td>
-                            <td>{{ catalogueitem.catalogue.short_title }}</td>
+                            <td>{{ catalogueentry.number_in_catalogue }}</td>
+                            <td>{{ catalogueentry.item_as_listed_in_catalogue }}</td>
+                            <td>{{ catalogueentry.catalogue.short_title }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     {% else %}
-        <div>No catalogue items.</div>
+        <div>No catalogue entries.</div>
     {% endif %}
     </div>
 </div>
