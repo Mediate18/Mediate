@@ -147,7 +147,7 @@ class PersonBookItemRelationType(models.Model):
 
 class CatalogueEntry(models.Model):
     """
-    Catalogue item
+    Catalogue Entry
     """
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
@@ -177,7 +177,7 @@ class BookItem(models.Model):
     Book item
     """
 
-    catalogue_item = models.ForeignKey(CatalogueEntry, on_delete=CASCADE)
+    catalogue_entry = models.ForeignKey(CatalogueEntry, on_delete=CASCADE)
     place_of_publication = models.ForeignKey(Place, on_delete=CASCADE)
     publisher = models.ForeignKey(Publisher, on_delete=CASCADE)
     date_of_publication = models.DateField(_("Date of publication"))
