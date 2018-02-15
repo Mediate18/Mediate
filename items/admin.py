@@ -65,6 +65,20 @@ class CatalogueTypeAdmin(admin.ModelAdmin):
 admin.site.register(CatalogueType, CatalogueTypeAdmin)
 
 
+class CollectionAdmin(admin.ModelAdmin):
+    pass
+
+
+admin.site.register(Collection, CollectionAdmin)
+
+
+class PersonCollectionRelationAdmin(admin.ModelAdmin):
+    pass
+
+
+admin.site.register(PersonCollectionRelation, PersonCollectionRelationAdmin)
+
+
 class LanguageAdmin(admin.ModelAdmin):
     pass
 

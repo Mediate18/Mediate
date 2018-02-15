@@ -5,6 +5,31 @@ from django.utils.translation import ugettext_lazy as _
 import uuid
 
 
+class Place(models.Model):
+    """
+    A geographical place
+    """
+
+    name = models.CharField(_("Name of the place"), max_length=128, null=True)
+    # type = models.ForeignKey(PlaceType)
+
+    def __str__(self):
+        return self.name
+
+
+class Collection(models.Model):
+    """
+    The collection a catalogue belongs to
+    """
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    name = models.CharField(_("Name of the source"), max_length=128, unique=True)
+    description = models.TextField(_("Description of the source"))
+    place = models.ForeignKey(Place, on_delete=SET_NULL, null=True)
+
+    def __str__(self):
+        return self.name
+
+
 class CatalogueType(models.Model):
     """
     The type of a catalogue
@@ -41,21 +66,10 @@ class Catalogue(models.Model):
     terminus_post_quem = models.IntegerField(_("Terminus post quem"), null=True)
     notes = models.TextField(_("Notes for the Mediate project"), null=True)
     bibliography = models.TextField(_("Bibliography"), null=True)
+    collection = models.ForeignKey(Collection, on_delete=SET_NULL, null=True)
 
     def __str__(self):
         return "{0} ({1})".format(self.short_title, self.uuid)
-
-
-class Place(models.Model):
-    """
-    A geographical place
-    """
-
-    name = models.CharField(_("Name of the place"), max_length=128, null=True)
-    # type = models.ForeignKey(PlaceType)
-
-    def __str__(self):
-        return self.name
 
 
 class Publisher(models.Model):
@@ -197,6 +211,17 @@ class BookItemYearIntervalRelation(models.Model):
 
     class Meta:
         unique_together = (("book_item", "year_interval"),)  # Multiple identical relation would be redundant
+
+
+class PersonCollectionRelation(models.Model):
+    """
+    A person-collection relation (i.e. collector)
+    """
+    person = models.ForeignKey(Person, on_delete=CASCADE)
+    collection = models.ForeignKey(Collection, on_delete=CASCADE)
+
+    class Meta:
+        unique_together = (("person", "collection"),)  # Multiple identical relation would be redundant
 
 
 class PersonBookItemRelation(models.Model):
