@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models.deletion import CASCADE, SET_NULL
 from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
 
 import uuid
 
@@ -177,7 +178,8 @@ class Item(models.Model):
     Item
     """
 
-    catalogue_entry = models.ForeignKey(CatalogueEntry, on_delete=CASCADE)
+    collection = models.ForeignKey(Collection, on_delete=CASCADE)
+    catalogue_entry = models.ForeignKey(CatalogueEntry, on_delete=CASCADE, null=True)
     place_of_publication = models.ForeignKey(Place, on_delete=CASCADE)
     publisher = models.ForeignKey(Publisher, on_delete=CASCADE)
     date_of_publication = models.DateField(_("Date of publication"))
@@ -192,6 +194,12 @@ class Item(models.Model):
 
     def __str__(self):
         return self.title_work.text
+
+    def clean(self):
+        if self.collection is not self.catalogue_entry.catalogue:
+            raise ValidationError({'collection':
+                _("The collection of this item and the collection of the catalogue of this item, are not the same.")
+                                   })
 
 
 class YearInterval(models.Model):
