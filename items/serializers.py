@@ -80,9 +80,9 @@ class PersonCatalogueRelationSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
-class PersonCatalogueRelationTypeSerializer(serializers.HyperlinkedModelSerializer):
+class PersonCatalogueRelationRoleSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = PersonCatalogueRelationType
+        model = PersonCatalogueRelationRole
         fields = "__all__"
 
 

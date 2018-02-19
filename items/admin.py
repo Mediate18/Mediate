@@ -114,11 +114,11 @@ class PersonCatalogueRelationAdmin(admin.ModelAdmin):
 admin.site.register(PersonCatalogueRelation, PersonCatalogueRelationAdmin)
 
 
-class PersonCatalogueRelationTypeAdmin(admin.ModelAdmin):
+class PersonCatalogueRelationRoleAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(PersonCatalogueRelationType, PersonCatalogueRelationTypeAdmin)
+admin.site.register(PersonCatalogueRelationRole, PersonCatalogueRelationRoleAdmin)
 
 
 class PlaceAdmin(admin.ModelAdmin):

@@ -67,9 +67,9 @@ class PersonCatalogueRelationViewSet(viewsets.ModelViewSet):
     serializer_class = PersonCatalogueRelationSerializer
 
 
-class PersonCatalogueRelationTypeViewSet(viewsets.ModelViewSet):
-    queryset = PersonCatalogueRelationType.objects.all()
-    serializer_class = PersonCatalogueRelationTypeSerializer
+class PersonCatalogueRelationRoleViewSet(viewsets.ModelViewSet):
+    queryset = PersonCatalogueRelationRole.objects.all()
+    serializer_class = PersonCatalogueRelationRoleSerializer
 
 
 class PlaceViewSet(viewsets.ModelViewSet):

@@ -234,7 +234,7 @@ class PersonItemRelation(models.Model):
     role = models.ForeignKey(PersonItemRelationRole, on_delete=CASCADE)
 
 
-class PersonCatalogueRelationType(models.Model):
+class PersonCatalogueRelationRole(models.Model):
     """
     A type for a person-catalogue relation
     """
@@ -251,7 +251,7 @@ class PersonCatalogueRelation(models.Model):
 
     person = models.ForeignKey(Person, on_delete=CASCADE)
     catalogue = models.ForeignKey(Catalogue, on_delete=CASCADE)
-    type = models.ForeignKey(PersonCatalogueRelationType, on_delete=CASCADE)
+    type = models.ForeignKey(PersonCatalogueRelationRole, on_delete=CASCADE)
 
 
 # EQUIVALENTS
