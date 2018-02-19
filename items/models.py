@@ -238,7 +238,7 @@ class PersonCatalogueRelationRole(models.Model):
     """
     A type for a person-catalogue relation
     """
-    name = models.CharField(_("Type of person-catalogue relation"), max_length=128)
+    name = models.CharField(_("Role name for a person-catalogue relation"), max_length=128)
 
     def __str__(self):
         return self.name
