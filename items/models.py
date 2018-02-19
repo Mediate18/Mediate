@@ -139,7 +139,7 @@ class PersonItemRelationRole(models.Model):
     """
     A role for a person-item relation
     """
-    name = models.CharField(_("Type of person-item relation"), max_length=128, null=True)
+    name = models.CharField(_("Role name for a person-item relation"), max_length=128, null=True)
 
     def __str__(self):
         return self.name
