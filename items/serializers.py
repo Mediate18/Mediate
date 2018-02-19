@@ -26,9 +26,9 @@ class BookFormatEquivalentSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
-class BookItemSerializer(serializers.HyperlinkedModelSerializer):
+class ItemSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = BookItem
+        model = Item
         fields = "__all__"
 
 
@@ -62,15 +62,15 @@ class PersonSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
-class PersonBookItemRelationSerializer(serializers.HyperlinkedModelSerializer):
+class PersonItemRelationSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = PersonBookItemRelation
+        model = PersonItemRelation
         fields = "__all__"
 
 
-class PersonBookItemRelationTypeSerializer(serializers.HyperlinkedModelSerializer):
+class PersonItemRelationTypeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = PersonBookItemRelationType
+        model = PersonItemRelationType
         fields = "__all__"
 
 

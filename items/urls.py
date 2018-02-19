@@ -9,7 +9,7 @@ urlpatterns = [
     path(r'catalogues/', login_required(FilterView.as_view(filterset_class=CatalogueFilter)), name="catalogues"),
     path(r'catalogues/<int:pk>', login_required(CatalogueDetailView.as_view()), name="catalogue_detail"),
     path(r'catalogueentries/', login_required(CatalogueEntryListView.as_view()), name="catalogueentries"),
-    path(r'bookitems/', login_required(BookitemListView.as_view()), name="bookitems"),
+    path(r'items/', login_required(ItemListView.as_view()), name="items"),
 
     # Edit forms
     path(r'catalogues/edit/<int:pk>', permission_required('items.change_catalogue')(change_catalogue),

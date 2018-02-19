@@ -30,11 +30,11 @@ class BookFormatEquivalentAdmin(admin.ModelAdmin):
 admin.site.register(BookFormatEquivalent, BookFormatEquivalentAdmin)
 
 
-class BookItemAdmin(admin.ModelAdmin):
+class ItemAdmin(admin.ModelAdmin):
     search_fields = ['title_work__text']
 
 
-admin.site.register(BookItem, BookItemAdmin)
+admin.site.register(Item, ItemAdmin)
 
 
 class CatalogueSourceAdmin(admin.ModelAdmin):
@@ -93,18 +93,18 @@ class PersonAdmin(admin.ModelAdmin):
 admin.site.register(Person, PersonAdmin)
 
 
-class PersonBookItemRelationAdmin(admin.ModelAdmin):
+class PersonItemRelationAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(PersonBookItemRelation, PersonBookItemRelationAdmin)
+admin.site.register(PersonItemRelation, PersonItemRelationAdmin)
 
 
-class PersonBookItemRelationTypeAdmin(admin.ModelAdmin):
+class PersonItemRelationTypeAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(PersonBookItemRelationType, PersonBookItemRelationTypeAdmin)
+admin.site.register(PersonItemRelationType, PersonItemRelationTypeAdmin)
 
 
 class PersonCatalogueRelationAdmin(admin.ModelAdmin):

@@ -53,7 +53,7 @@ class CatalogueSource(models.Model):
 
 class Catalogue(models.Model):
     """
-    The catalogue a book item occurs in
+    The catalogue an item occurs in
     """
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
@@ -74,7 +74,7 @@ class Catalogue(models.Model):
 
 class Publisher(models.Model):
     """
-    A publisher of a book item
+    A publisher of an item
     """
     name = models.CharField(_("Publisher name"), max_length=128, null=True)
 
@@ -135,11 +135,11 @@ class Person(models.Model):
         return self.name
 
 
-class PersonBookItemRelationType(models.Model):
+class PersonItemRelationType(models.Model):
     """
-    A type for a person-book item relation
+    A type for a person-item relation
     """
-    name = models.CharField(_("Type of person-book item relation"), max_length=128, null=True)
+    name = models.CharField(_("Type of person-item relation"), max_length=128, null=True)
 
     def __str__(self):
         return self.name
@@ -172,9 +172,9 @@ class TitleWork(models.Model):
         return self.text
 
 
-class BookItem(models.Model):
+class Item(models.Model):
     """
-    Book item
+    Item
     """
 
     catalogue_entry = models.ForeignKey(CatalogueEntry, on_delete=CASCADE)
@@ -188,7 +188,7 @@ class BookItem(models.Model):
     binding_material_details = models.ForeignKey(BindingMaterialDetails, on_delete=CASCADE)
     language = models.ForeignKey(Language, on_delete=CASCADE)
     title_work = models.ForeignKey(TitleWork, on_delete=CASCADE)
-    buyer = models.TextField(_("Buyer of a book item"))  #TODO Could this also be a list/ENUM/controlled vocabulary?
+    buyer = models.TextField(_("Buyer of an item"))  #TODO Could this also be a list/ENUM/controlled vocabulary?
 
     def __str__(self):
         return self.title_work.text
@@ -202,15 +202,15 @@ class YearInterval(models.Model):
     end_year = models.IntegerField(_("End year of inter"), null=False)
 
 
-class BookItemYearIntervalRelation(models.Model):
+class ItemYearIntervalRelation(models.Model):
     """
-    A book item - year interval relation
+    A item - year interval relation
     """
-    book_item = models.ForeignKey(BookItem, on_delete=CASCADE)
+    item = models.ForeignKey(Item, on_delete=CASCADE)
     year_interval = models.ForeignKey(YearInterval, on_delete=CASCADE)
 
     class Meta:
-        unique_together = (("book_item", "year_interval"),)  # Multiple identical relation would be redundant
+        unique_together = (("item", "year_interval"),)  # Multiple identical relation would be redundant
 
 
 class PersonCollectionRelation(models.Model):
@@ -224,14 +224,14 @@ class PersonCollectionRelation(models.Model):
         unique_together = (("person", "collection"),)  # Multiple identical relation would be redundant
 
 
-class PersonBookItemRelation(models.Model):
+class PersonItemRelation(models.Model):
     """
-    A person-book item relation (e.g. author, translator, illustrator, owner)
+    A person-item relation (e.g. author, translator, illustrator, owner)
     """
 
     person = models.ForeignKey(Person, on_delete=CASCADE)
-    book_item = models.ForeignKey(BookItem, on_delete=CASCADE)
-    type = models.ForeignKey(PersonBookItemRelationType, on_delete=CASCADE)
+    item = models.ForeignKey(Item, on_delete=CASCADE)
+    type = models.ForeignKey(PersonItemRelationType, on_delete=CASCADE)
 
 
 class PersonCatalogueRelationType(models.Model):

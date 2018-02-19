@@ -22,9 +22,9 @@ class BookFormatEquivalentViewSet(viewsets.ModelViewSet):
     serializer_class = BookFormatEquivalentSerializer
 
 
-class BookItemViewSet(viewsets.ModelViewSet):
-    queryset = BookItem.objects.all()
-    serializer_class = BookItemSerializer
+class ItemViewSet(viewsets.ModelViewSet):
+    queryset = Item.objects.all()
+    serializer_class = ItemSerializer
 
 
 class CatalogueViewSet(viewsets.ModelViewSet):
@@ -52,14 +52,14 @@ class PersonViewSet(viewsets.ModelViewSet):
     serializer_class = PersonSerializer
 
 
-class PersonBookItemRelationViewSet(viewsets.ModelViewSet):
-    queryset = PersonBookItemRelation.objects.all()
-    serializer_class = PersonBookItemRelationSerializer
+class PersonItemRelationViewSet(viewsets.ModelViewSet):
+    queryset = PersonItemRelation.objects.all()
+    serializer_class = PersonItemRelationSerializer
 
 
-class PersonBookItemRelationTypeViewSet(viewsets.ModelViewSet):
-    queryset = PersonBookItemRelationType.objects.all()
-    serializer_class = PersonBookItemRelationTypeSerializer
+class PersonItemRelationTypeViewSet(viewsets.ModelViewSet):
+    queryset = PersonItemRelationType.objects.all()
+    serializer_class = PersonItemRelationTypeSerializer
 
 
 class PersonCatalogueRelationViewSet(viewsets.ModelViewSet):

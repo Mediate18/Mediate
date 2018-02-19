@@ -1,4 +1,4 @@
-"""book_items URL Configuration
+"""Catalogues URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/2.0/topics/http/urls/
@@ -35,14 +35,14 @@ router.register(r'bindingmaterialdetails', views.BindingMaterialDetailsViewSet)
 router.register(r'bindingmaterialdetailsequivalents', views.BindingMaterialDetailsEquivalentViewSet)
 router.register(r'bookformats', views.BookFormatViewSet)
 router.register(r'bookformatequivalents', views.BookFormatEquivalentViewSet)
-router.register(r'bookitems', views.BookItemViewSet)
+router.register(r'items', views.ItemViewSet)
 router.register(r'catalogues', views.CatalogueViewSet)
 router.register(r'catalogueentries', views.CatalogueEntryViewSet)
 router.register(r'cataloguetypes', views.CatalogueTypeViewSet)
 router.register(r'languages', views.LanguageViewSet)
 router.register(r'persons', views.PersonViewSet)
-router.register(r'personbookitemrelations', views.PersonBookItemRelationViewSet)
-router.register(r'personbookitemrelationtypes', views.PersonBookItemRelationTypeViewSet)
+router.register(r'personitemrelations', views.PersonItemRelationViewSet)
+router.register(r'personitemrelationtypes', views.PersonItemRelationTypeViewSet)
 router.register(r'personcataloguerelations', views.PersonCatalogueRelationViewSet)
 router.register(r'personcataloguerelationtypes', views.PersonCatalogueRelationTypeViewSet)
 router.register(r'places', views.PlaceViewSet)

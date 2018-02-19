@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 
-from items.models import Catalogue, CatalogueEntry, BookItem
+from items.models import Catalogue, CatalogueEntry, Item
 from items.forms import CatalogueModelForm
 
 import django_filters
@@ -95,10 +95,10 @@ class CatalogueEntryListView(ListView):
 # end Catalogue detail views
 
 
-# Book item views
-class BookitemListView(ListView):
+# Item views
+class ItemListView(ListView):
 
-    model = BookItem
-    template_name = 'items/bookitem_list.html'
+    model = Item
+    template_name = 'items/item_list.html'
     paginate_by = 10
-# end Book item views
+# end Item views
