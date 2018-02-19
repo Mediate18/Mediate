@@ -1,5 +1,6 @@
 {% extends "baselayout.html" %}
 {% load i18n %}
+{% load render_table from django_tables2 %}
 
 
 {% block content %}
@@ -18,7 +19,10 @@
                     <table class="table">
                     {{ filter.form.as_table }}
                     </table>
-                <input type="submit" class="btn pull-right"/>
+                    <div class="pull-right">
+                        <input type="submit" class="btn"/>
+                        <a href='{{ request.path }}' class="btn">Clear</a>
+                    </div>
                 </form>
               </div>
             </div>
@@ -29,29 +33,9 @@
 <div class="row">
     <div class="col-xs-10">
         <h1>Catalogues</h1>
-        {% if object_list %}
-            <div>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>{% trans "Short title" %}</th>
-                            <th>{% trans "Year of publication" %}</th>
-                            <th>{% trans "Notes" %}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for catalogue in object_list %}
-                            <tr>
-                                <td>
-                                    <a href="{% url 'catalogue_detail' catalogue.pk %}">{{ catalogue.short_title }}</a>
-                                </td>
-                                <td>{{ catalogue.year_of_publication }}</td>
-                                <td>{{ catalogue.notes }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+        <div class="small">Displaying {{ filter.qs.count }} of {{ filter.queryset.count }} items.</div>
+        {% if table %}
+            {% render_table table %}
         {% else %}
             <div>No catalogues.</div>
         {% endif %}

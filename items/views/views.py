@@ -6,19 +6,27 @@ from django.utils.translation import ugettext_lazy as _
 
 from items.models import Catalogue, CatalogueEntry, Item
 from items.forms import CatalogueModelForm
+import items.tables
+from items.filters import CatalogueFilter
 
-import django_filters
+import django_tables2
 
 
 # Catalogue views
-class CatalogueFilter(django_filters.FilterSet):
+class CatalogueTableView(ListView):
+    model = Catalogue
 
-    class Meta:
-        model = Catalogue
-        fields = {
-            'short_title': ['icontains'],
-            'year_of_publication': ['exact', 'lt', 'gt']
-        }
+    def get_context_data(self, **kwargs):
+        context = super(CatalogueTableView, self).get_context_data(**kwargs)
+        filter = CatalogueFilter(self.request.GET, queryset=self.object_list)
+
+        table = items.tables.CatalogueTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        return context
 
 
 def change_catalogue(request, pk):

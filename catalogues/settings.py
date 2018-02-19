@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'moderation',
+    'django_tables2',
     'items',
     'registration',
 ]
@@ -148,3 +149,5 @@ REST_FRAMEWORK = {
 }
 
 SITE_ID = 1
+
+DJANGO_TABLES2_TEMPLATE = 'django_tables2/bootstrap-responsive.html'
