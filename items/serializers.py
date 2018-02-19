@@ -68,9 +68,9 @@ class PersonItemRelationSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
-class PersonItemRelationTypeSerializer(serializers.HyperlinkedModelSerializer):
+class PersonItemRelationRoleSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = PersonItemRelationType
+        model = PersonItemRelationRole
         fields = "__all__"
 
 

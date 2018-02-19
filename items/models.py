@@ -135,9 +135,9 @@ class Person(models.Model):
         return self.name
 
 
-class PersonItemRelationType(models.Model):
+class PersonItemRelationRole(models.Model):
     """
-    A type for a person-item relation
+    A role for a person-item relation
     """
     name = models.CharField(_("Type of person-item relation"), max_length=128, null=True)
 
@@ -231,7 +231,7 @@ class PersonItemRelation(models.Model):
 
     person = models.ForeignKey(Person, on_delete=CASCADE)
     item = models.ForeignKey(Item, on_delete=CASCADE)
-    type = models.ForeignKey(PersonItemRelationType, on_delete=CASCADE)
+    type = models.ForeignKey(PersonItemRelationRole, on_delete=CASCADE)
 
 
 class PersonCatalogueRelationType(models.Model):

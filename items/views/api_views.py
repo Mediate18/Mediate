@@ -57,9 +57,9 @@ class PersonItemRelationViewSet(viewsets.ModelViewSet):
     serializer_class = PersonItemRelationSerializer
 
 
-class PersonItemRelationTypeViewSet(viewsets.ModelViewSet):
-    queryset = PersonItemRelationType.objects.all()
-    serializer_class = PersonItemRelationTypeSerializer
+class PersonItemRelationRoleViewSet(viewsets.ModelViewSet):
+    queryset = PersonItemRelationRole.objects.all()
+    serializer_class = PersonItemRelationRoleSerializer
 
 
 class PersonCatalogueRelationViewSet(viewsets.ModelViewSet):
