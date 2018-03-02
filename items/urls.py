@@ -1,4 +1,6 @@
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from django.views.generic import RedirectView
 from django_filters.views import FilterView
 from django.contrib.auth.decorators import login_required, permission_required
@@ -18,4 +20,4 @@ urlpatterns = [
          name="add_catalogue"),
     path(r'catalogues/delete/<int:pk>', permission_required('items.delete_catalogue')(delete_catalogue),
          name="delete_catalogue")
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

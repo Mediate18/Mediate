@@ -1,0 +1,285 @@
+body {
+	background-image: url("../img/paper.png");
+	background-position: left top;
+	background-repeat: repeat;
+	font-size: medium;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: 'Raleway', sans-serif;
+}
+
+a, a:active, a:visited {
+	color: #b82b22;
+}
+
+a:focus, a:hover {
+	color: #b82b22;
+}
+
+.emailaddress, .emailaddress:hover {
+	color: white;
+}
+
+.navbar {
+	margin: 0;
+    border-radius: 0;
+    background: #b82b22;
+    color: white;
+    height: 51px;
+}
+
+.navbar-brand {
+	height: 40px;
+    color: white !important;
+}
+
+.navbar-default .navbar-nav > li > a, .navbar-default .navbar-nav > li > p {
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    color: white !important;
+}
+
+a.navbar-img {
+	padding: 4px 15px;
+}
+
+a.navbar-img > img.mini-logo {
+	height: 40px;
+    width: auto;
+    display: inline-block;
+    margin-left: 15px;
+}
+
+.jumbotron {
+	background: 0;
+	position: relative;
+	padding-bottom: 0px;
+}
+
+.jumbotron > img.stamp {
+	position: absolute;
+	top: 3px;
+	left: 15px;
+	width: auto;
+	height: 140px;
+}
+
+.jumbotron hr {
+	margin: 10px 0 0 0;
+}
+
+#tabs a, #tabs a:active, #tabs a:focus, #tabs a:hover, #tabs a:visited {
+	font-family: 'Raleway', sans-serif;
+	font-size: medium;
+	font-weight: 500;
+	background-color: inherit;
+	background-repeat: no-repeat;
+    background-position: 0 40px;
+    background-size: 100% 2px;
+}
+
+#tabs li.active a, #tabs li.active a:hover, #tabs li.active a:focus {
+    background-image: -webkit-linear-gradient(left, rgba(255,0,0,0), #b82b22, rgba(255,0,0,0)); /*Safari 5.1-6*/
+	background-image: -o-linear-gradient(right, rgba(255,0,0,0), #b82b22, rgba(255,0,0,0)); /*Opera 11.1-12*/
+	background-image: -moz-linear-gradient(right, rgba(255,0,0,0), #b82b22, rgba(255,0,0,0)); /*Fx 3.6-15*/
+	background-image: linear-gradient(to right, rgba(255,0,0,0), #b82b22, rgba(255,0,0,0)); /*Standard*/
+}
+
+#tabs li a:hover, #tabs li a:focus {
+    background-image: -webkit-linear-gradient(left, rgba(255,0,0,0), darkgray, rgba(255,0,0,0)); /*Safari 5.1-6*/
+	background-image: -o-linear-gradient(right, rgba(255,0,0,0), darkgray, rgba(255,0,0,0)); /*Opera 11.1-12*/
+	background-image: -moz-linear-gradient(right, rgba(255,0,0,0), darkgray, rgba(255,0,0,0)); /*Fx 3.6-15*/
+	background-image: linear-gradient(to right, rgba(255,0,0,0), darkgray, rgba(255,0,0,0)); /*Standard*/
+}
+
+.tab-pane {
+	padding: 20px 0;
+}
+
+.tab-pane p {
+	text-align: justify;
+    text-justify: inter-word;
+    font-family: 'Lora', serif;
+}
+
+.tab-pane p b {
+	color: #b82b22;
+}
+
+ol li, .page-content ul li {
+	margin-bottom: 5px;
+}
+
+.display-lg, .page-content, .panel {
+	margin-bottom: 30px;
+}
+
+.display-lg {
+	position: relative;
+}
+
+.display-lg img {
+    width: 100%;
+    height: auto;
+}
+
+.display-lg .banner {
+	position: absolute;
+	bottom: 10%;
+	left: 0;
+	background-color: rgba(184,43,34,0.8);
+	color: #fff;
+	font-weight: bold;
+	padding: 5px 60px 5px 20px;
+	min-width: 325px;
+}
+
+.display-lg .banner h1, .display-lg .banner h3, .display-lg .banner h4 {
+	width: auto;
+}
+
+.panel {
+	font-size: medium;
+	font-weight: 700;
+	text-align: justify;
+    text-justify: inter-word;
+}
+
+.panel b {
+	font-weight: bold;
+}
+
+.panel-primary {
+	border-color: #b82b22;
+}
+
+.footer {
+	background-color: #b82b22;
+	min-height: 200px;
+	color: white;
+    font-family: 'Lora', serif;
+    font-size: large;
+    font-weight: 700;
+    padding: 25px;
+    padding-bottom: 0;
+}
+
+.footer p.footer-text {
+	font-size: x-small;
+	font-weight: normal;
+    padding-top: 25px;
+	font-family: 'Raleway', sans-serif;
+}
+
+.footer ul {
+	margin: 25px 0;
+	display: flex;
+    justify-content: space-between;
+}
+
+.footer ul li {
+    vertical-align: middle;
+}
+
+.partner-logo {
+	width: 400px;
+	height: auto;
+}
+
+.partner-logo2 {
+	height: 60px;
+	width: auto;
+}
+
+.page-content {
+	min-height: 325px;
+}
+
+.page-content > h1 {
+	margin-bottom: 30px;
+}
+
+.team .panel {
+	vertical-align: top;
+}
+
+.team .panel .panel-body {
+	display: table-row;
+}
+
+.team .panel .panel-body h2 {
+	margin-top: 0;
+}
+
+.team .panel .panel-body > img, .team .panel .panel-body > div {
+	display: table-cell;
+	vertical-align: top;
+	padding: 0;
+}
+
+.team .panel .panel-body > div {
+	padding: 0 20px;
+}
+
+.team .panel img {
+	max-width: 100px;
+	min-width: 50px;
+	height: auto;
+}
+
+.team .panel .panel-body {
+	padding-left: 20px;
+}
+
+.ds {
+	background-image: url(../img/raster.png);
+    background-attachment: fixed;
+}
+
+.ds > .row > div {
+	background-image: url("../img/paper.png");
+}
+
+.diagonal-stripes {
+	background-size: 10px;
+	background-image: -webkit-linear-gradient(45deg, transparent 90%, rgba(255, 255, 255, .25) 50%);
+	background-image: -moz-linear-gradient(45deg 50%, transparent 90%, rgba(255, 255, 255, 0.25) 50%);
+	background-image: -ms-linear-gradient(45deg, transparent 90%, rgba(255, 255, 255, .25) 50%);
+	background-image: -o-linear-gradient(45deg, transparent 90%, rgba(255, 255, 255, .25) 50%);		
+}
+
+.news-main-image {
+	width: 100%;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	border: 1px solid grey;
+}
+
+textarea {
+    height: 90px;
+    width: 100%;
+}
+
+form {
+    font-size: 13px;
+}
+
+th {
+    text-align: left;
+}
+
+h1 {
+    text-align: center;
+}
+
+.alert {
+    margin: 0px 15px 15px;
+}
+
+.navbar-default .navbar-nav > li.active > a {
+    background-color: #d93d34;
+}
+
+.navbar-default .navbar-nav > li.active > a:hover {
+    background-color: #d93d34;
+}
