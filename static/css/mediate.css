@@ -350,3 +350,11 @@ h1 {
 /* !Descending */
 
 /* END TABLE SORTING */
+
+.select2, input {
+  min-width: 150px;
+}
+
+.select2-selection {
+  outline: 0;
+}
