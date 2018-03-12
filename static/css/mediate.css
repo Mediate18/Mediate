@@ -34,9 +34,13 @@ a:focus, a:hover {
     color: white !important;
 }
 
-.navbar-default .navbar-nav > li > a, .navbar-default .navbar-nav > li > p {
+.navbar-default .navbar-nav > li > a,
+.navbar-default .navbar-nav > li > p > a:active,
+.navbar-default .navbar-nav > li > p > a:visited,
+.navbar-default .navbar-nav > li > p {
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
     color: white !important;
+    outline: 0;
 }
 
 a.navbar-img {

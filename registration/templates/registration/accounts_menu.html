@@ -1,12 +1,30 @@
+{% load i18n %}
+
 {% if user.is_authenticated %}
 <li>
-    <p class="navbar-text"><span class="glyphicon glyphicon-user"> </span> {{ user.first_name }} {{ user.last_name }}</p>
-</li>
-<li>
-<a href="{% url 'logout' %}"><span class="glyphicon glyphicon-log-out"> </span> Logout</a>
+    <a href="#" class="user-popover" data-toggle="popover" data-trigger="focus"> <span class="glyphicon glyphicon-user"> </span>
+        {{ user.first_name }} {{ user.last_name }} </a>
+    <div id="popover_content_wrapper" class="hide">
+      <div><a href="{% url 'logout' %}"><span class="glyphicon glyphicon-log-out"> </span> Log out</a></div>
+      <div><a href="#"><span class="glyphicon glyphicon-dashboard"> </span> {% trans "Dashboard" %}</a></div>
+    </div>
 </li>
 {% else %}
 <li>
-    <a href="{% url 'login' %}"><span class="glyphicon glyphicon-log-in"></span> Login</a>
+    <a href="{% url 'login' %}"><span class="glyphicon glyphicon-log-in"></span> Log in</a>
 </li>
 {% endif %}
+
+{% block extrajs %}
+<script>
+$(document).ready(function(){
+  $('.user-popover').popover({
+    placement: 'bottom',
+    html : true,
+    content: function() {
+      return $('#popover_content_wrapper').html();
+    }
+  });
+});
+</script>
+{% endblock %}
