@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django_filters',
     'moderation',
     'django_tables2',
+    'django_select2',
     'items',
     'registration',
 ]

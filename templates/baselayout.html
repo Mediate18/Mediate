@@ -5,19 +5,22 @@
 
 {# Load CSS and JavaScript #}
 {% bootstrap_css %}
-{% bootstrap_javascript jquery=1 %}
+{% bootstrap_javascript jquery=False %}
 
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
 
 {% load i18n %}
 {% load static %}
+{% load staticfiles %}
 
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>{% block bootstrap3_title %}Mediate - Catalogues{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/mediate.css' %}">
+    <script src="https://code.jquery.com/jquery-2.x-git.min.js"></script>
+    <script src="{% static 'django_select2/django_select2.js' %}"></script>
     <style>
         body {
             padding: 70px 0px 15px;

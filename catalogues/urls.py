@@ -61,5 +61,6 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path(r'items/', include(items.urls)),
     url(r'^api/', include(router.urls)),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^select2/', include('django_select2.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
