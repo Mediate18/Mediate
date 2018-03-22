@@ -10,7 +10,7 @@ urlpatterns = [
     path(r'', RedirectView.as_view(url='catalogues/')),
     path(r'catalogues/', login_required(CatalogueTableView.as_view()), name="catalogues"),
     path(r'catalogues/<int:pk>', login_required(CatalogueDetailView.as_view()), name="catalogue_detail"),
-    path(r'catalogueentries/', login_required(CatalogueEntryListView.as_view()), name="catalogueentries"),
+    path(r'catalogueentries/', login_required(LotListView.as_view()), name="catalogueentries"),
     path(r'items/', login_required(ItemListView.as_view()), name="items"),
 
     # Edit forms

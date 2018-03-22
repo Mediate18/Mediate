@@ -38,9 +38,9 @@ class CatalogueSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
-class CatalogueEntrySerializer(serializers.HyperlinkedModelSerializer):
+class LotSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = CatalogueEntry
+        model = Lot
         fields = "__all__"
 
 

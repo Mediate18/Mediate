@@ -16,11 +16,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for catalogueentry in object_list %}
+                    {% for lot in object_list %}
                         <tr>
-                            <td>{{ catalogueentry.number_in_catalogue }}</td>
-                            <td>{{ catalogueentry.item_as_listed_in_catalogue }}</td>
-                            <td>{{ catalogueentry.catalogue.short_title }}</td>
+                            <td>{{ lot.number_in_catalogue }}</td>
+                            <td>{{ lot.item_as_listed_in_catalogue }}</td>
+                            <td>{{ lot.catalogue.short_title }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

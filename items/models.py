@@ -146,9 +146,9 @@ class PersonItemRelationRole(models.Model):
         return self.name
 
 
-class CatalogueEntry(models.Model):
+class Lot(models.Model):
     """
-    Catalogue Entry
+    Catalogue lot
     """
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
@@ -179,7 +179,7 @@ class Item(models.Model):
     """
 
     collection = models.ForeignKey(Collection, on_delete=CASCADE)
-    catalogue_entry = models.ForeignKey(CatalogueEntry, on_delete=CASCADE, null=True)
+    lot = models.ForeignKey(Lot, on_delete=CASCADE, null=True)
     place_of_publication = models.ForeignKey(Place, on_delete=CASCADE)
     publisher = models.ForeignKey(Publisher, on_delete=CASCADE)
     date_of_publication = models.DateField(_("Date of publication"))
@@ -196,7 +196,7 @@ class Item(models.Model):
         return self.title_work.text
 
     def clean(self):
-        if self.collection is not self.catalogue_entry.catalogue:
+        if self.collection is not self.lot.catalogue:
             raise ValidationError({'collection':
                 _("The collection of this item and the collection of the catalogue of this item, are not the same.")
                                    })

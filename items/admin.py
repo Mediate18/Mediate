@@ -51,11 +51,11 @@ class CatalogueAdmin(admin.ModelAdmin):
 admin.site.register(Catalogue, CatalogueAdmin)
 
 
-class CatalogueEntryAdmin(admin.ModelAdmin):
+class LotAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(CatalogueEntry, CatalogueEntryAdmin)
+admin.site.register(Lot, LotAdmin)
 
 
 class CatalogueTypeAdmin(admin.ModelAdmin):
