@@ -197,7 +197,7 @@ class Item(models.Model):
         return self.work.text
 
     def clean(self):
-        if self.collection is not self.lot.catalogue:
+        if self.collection is not self.lot.catalogue.collection:
             raise ValidationError({'collection':
                 _("The collection of this item and the collection of the catalogue of this item, are not the same.")
                                    })
