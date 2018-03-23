@@ -31,7 +31,7 @@ admin.site.register(BookFormatEquivalent, BookFormatEquivalentAdmin)
 
 
 class ItemAdmin(admin.ModelAdmin):
-    search_fields = ['title_work__text']
+    search_fields = ['work__text']
 
 
 admin.site.register(Item, ItemAdmin)
@@ -156,8 +156,8 @@ class PublisherEquivalentAdmin(admin.ModelAdmin):
 admin.site.register(PublisherEquivalent, PublisherEquivalentAdmin)
 
 
-class TitleWorkAdmin(admin.ModelAdmin):
+class WorkAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(TitleWork, TitleWorkAdmin)
+admin.site.register(Work, WorkAdmin)

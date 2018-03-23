@@ -116,7 +116,7 @@ class PublisherEquivalentSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
-class TitleWorkSerializer(serializers.HyperlinkedModelSerializer):
+class WorkSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = TitleWork
+        model = Work
         fields = "__all__"

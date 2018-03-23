@@ -97,6 +97,6 @@ class PublisherEquivalentViewSet(viewsets.ModelViewSet):
     serializer_class = PublisherEquivalentSerializer
 
 
-class TitleWorkViewSet(viewsets.ModelViewSet):
-    queryset = TitleWork.objects.all()
-    serializer_class = TitleWorkSerializer
+class WorkViewSet(viewsets.ModelViewSet):
+    queryset = Work.objects.all()
+    serializer_class = WorkSerializer

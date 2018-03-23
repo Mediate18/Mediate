@@ -52,7 +52,7 @@ router.register(r'placeequivalents', views.PlaceEquivalentViewSet)
 router.register(r'placetypes', views.PlaceTypeViewSet)
 router.register(r'publishers', views.PublisherViewSet)
 router.register(r'publisherequivalents', views.PublisherEquivalentViewSet)
-router.register(r'titleworks', views.TitleWorkViewSet)
+router.register(r'works', views.WorkViewSet)
 
 
 urlpatterns = [

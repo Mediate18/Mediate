@@ -162,7 +162,7 @@ class Lot(models.Model):
         return self.item_as_listed_in_catalogue
 
 
-class TitleWork(models.Model):
+class Work(models.Model):
     """
     A title of a work
     """
@@ -189,11 +189,11 @@ class Item(models.Model):
     book_format = models.ForeignKey(BookFormat, on_delete=CASCADE)
     binding_material_details = models.ForeignKey(BindingMaterialDetails, on_delete=CASCADE)
     language = models.ForeignKey(Language, on_delete=CASCADE)
-    title_work = models.ForeignKey(TitleWork, on_delete=CASCADE)
+    work = models.ForeignKey(Work, on_delete=CASCADE)
     buyer = models.TextField(_("Buyer of an item"))  #TODO Could this also be a list/ENUM/controlled vocabulary?
 
     def __str__(self):
-        return self.title_work.text
+        return self.work.text
 
     def clean(self):
         if self.collection is not self.lot.catalogue:
