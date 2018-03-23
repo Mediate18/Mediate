@@ -168,6 +168,7 @@ class Work(models.Model):
     """
 
     text = models.TextField(_("Text of the title of a work"))
+    viaf_id = models.CharField(_("VIAF ID of a work"), max_length=32, null=True)
 
     def __str__(self):
         return self.text
