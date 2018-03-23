@@ -64,7 +64,7 @@ class Catalogue(models.Model):
     preface_and_paratexts = models.TextField(_("Preface or prefatory / concluding text"), null=True)
     type = models.ForeignKey(CatalogueType, on_delete=CASCADE, null=True)
     year_of_publication = models.IntegerField(_("Year of publication"), null=True)
-    terminus_post_quem = models.IntegerField(_("Terminus post quem"), null=True)
+    terminus_post_quem = models.BooleanField(_("Terminus post quem"), default=False)
     notes = models.TextField(_("Notes for the Mediate project"), null=True)
     bibliography = models.TextField(_("Bibliography"), null=True)
     collection = models.ForeignKey(Collection, on_delete=SET_NULL, null=True)
