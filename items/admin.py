@@ -1,163 +1,109 @@
 from django.contrib import admin
-from items.models import *
+from .models import *
 
 
+@admin.register(BindingMaterialDetails)
 class BindingMaterialDetailsAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(BindingMaterialDetails, BindingMaterialDetailsAdmin)
-
-
-class BindingMaterialDetailsEquivalentAdmin(admin.ModelAdmin):
-    pass
-
-
-admin.site.register(BindingMaterialDetailsEquivalent, BindingMaterialDetailsEquivalentAdmin)
-
-
+@admin.register(BookFormat)
 class BookFormatAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(BookFormat, BookFormatAdmin)
-
-
-class BookFormatEquivalentAdmin(admin.ModelAdmin):
-    pass
-
-
-admin.site.register(BookFormatEquivalent, BookFormatEquivalentAdmin)
-
-
-class ItemAdmin(admin.ModelAdmin):
-    search_fields = ['work__text']
-
-
-admin.site.register(Item, ItemAdmin)
-
-
-class CatalogueSourceAdmin(admin.ModelAdmin):
-    pass
-
-
-admin.site.register(CatalogueSource, CatalogueSourceAdmin)
-
-
+@admin.register(Catalogue)
 class CatalogueAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(Catalogue, CatalogueAdmin)
-
-
-class LotAdmin(admin.ModelAdmin):
-    pass
-
-
-admin.site.register(Lot, LotAdmin)
-
-
+@admin.register(CatalogueType)
 class CatalogueTypeAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(CatalogueType, CatalogueTypeAdmin)
-
-
+@admin.register(Collection)
 class CollectionAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(Collection, CollectionAdmin)
+@admin.register(Item)
+class ItemAdmin(admin.ModelAdmin):
+    search_fields = ['work__text']
 
 
-class PersonCollectionRelationAdmin(admin.ModelAdmin):
+@admin.register(ItemYearIntervalRelation)
+class ItemYearIntervalRelationAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(PersonCollectionRelation, PersonCollectionRelationAdmin)
-
-
+@admin.register(Language)
 class LanguageAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(Language, LanguageAdmin)
-
-
-class PersonAdmin(admin.ModelAdmin):
+@admin.register(Lot)
+class LotAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(Person, PersonAdmin)
-
-
-class PersonItemRelationAdmin(admin.ModelAdmin):
-    pass
-
-
-admin.site.register(PersonItemRelation, PersonItemRelationAdmin)
-
-
-class PersonItemRelationRoleAdmin(admin.ModelAdmin):
-    pass
-
-
-admin.site.register(PersonItemRelationRole, PersonItemRelationRoleAdmin)
-
-
+@admin.register(PersonCatalogueRelation)
 class PersonCatalogueRelationAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(PersonCatalogueRelation, PersonCatalogueRelationAdmin)
-
-
+@admin.register(PersonCatalogueRelationRole)
 class PersonCatalogueRelationRoleAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(PersonCatalogueRelationRole, PersonCatalogueRelationRoleAdmin)
-
-
-class PlaceAdmin(admin.ModelAdmin):
+@admin.register(PersonCollectionRelation)
+class PersonCollectionRelationAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(Place, PlaceAdmin)
-
-
-class PlaceEquivalentAdmin(admin.ModelAdmin):
+@admin.register(PersonItemRelation)
+class PersonItemRelationAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(PlaceEquivalent, PlaceEquivalentAdmin)
-
-
-class PlaceTypeAdmin(admin.ModelAdmin):
+@admin.register(PersonItemRelationRole)
+class PersonItemRelationRoleAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(PlaceType, PlaceTypeAdmin)
+@admin.register(Publication)
+class PublicationAdmin(admin.ModelAdmin):
+    pass
 
 
+@admin.register(Publisher)
 class PublisherAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(Publisher, PublisherAdmin)
-
-
-class PublisherEquivalentAdmin(admin.ModelAdmin):
+@admin.register(Subject)
+class SubjectAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(PublisherEquivalent, PublisherEquivalentAdmin)
-
-
+@admin.register(Work)
 class WorkAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(Work, WorkAdmin)
+@admin.register(WorkAuthor)
+class WorkAuthorAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(WorkSubject)
+class WorkSubjectAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(YearInterval)
+class YearIntervalAdmin(admin.ModelAdmin):
+    pass
+
+

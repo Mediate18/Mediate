@@ -10,5 +10,5 @@ class CatalogueModelForm(forms.ModelForm):
         widgets = {
             'collection': Select2Widget,
             'type': Select2Widget,
-            'source': Select2Widget,
+            'transcription': Select2Widget,
         }

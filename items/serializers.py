@@ -8,27 +8,9 @@ class BindingMaterialDetailsSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
-class BindingMaterialDetailsEquivalentSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = BindingMaterialDetailsEquivalent
-        fields = "__all__"
-
-
 class BookFormatSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = BookFormat
-        fields = "__all__"
-
-
-class BookFormatEquivalentSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = BookFormatEquivalent
-        fields = "__all__"
-
-
-class ItemSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Item
         fields = "__all__"
 
 
@@ -38,15 +20,27 @@ class CatalogueSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
-class LotSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Lot
-        fields = "__all__"
-
-
 class CatalogueTypeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = CatalogueType
+        fields = "__all__"
+
+
+class CollectionSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Collection
+        fields = "__all__"
+
+
+class ItemSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Item
+        fields = "__all__"
+
+
+class ItemYearIntervalRelationSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = ItemYearIntervalRelation
         fields = "__all__"
 
 
@@ -56,21 +50,9 @@ class LanguageSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
-class PersonSerializer(serializers.HyperlinkedModelSerializer):
+class LotSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Person
-        fields = "__all__"
-
-
-class PersonItemRelationSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = PersonItemRelation
-        fields = "__all__"
-
-
-class PersonItemRelationRoleSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = PersonItemRelationRole
+        model = Lot
         fields = "__all__"
 
 
@@ -86,21 +68,27 @@ class PersonCatalogueRelationRoleSerializer(serializers.HyperlinkedModelSerializ
         fields = "__all__"
 
 
-class PlaceSerializer(serializers.HyperlinkedModelSerializer):
+class PersonCollectionRelationSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Place
+        model = PersonCollectionRelation
         fields = "__all__"
 
 
-class PlaceEquivalentSerializer(serializers.HyperlinkedModelSerializer):
+class PersonItemRelationSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = PlaceEquivalent
+        model = PersonItemRelation
         fields = "__all__"
 
 
-class PlaceTypeSerializer(serializers.HyperlinkedModelSerializer):
+class PersonItemRelationRoleSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = PlaceType
+        model = PersonItemRelationRole
+        fields = "__all__"
+
+
+class PublicationSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Publication
         fields = "__all__"
 
 
@@ -110,13 +98,31 @@ class PublisherSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
-class PublisherEquivalentSerializer(serializers.HyperlinkedModelSerializer):
+class SubjectSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = PublisherEquivalent
+        model = Subject
         fields = "__all__"
 
 
 class WorkSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Work
+        fields = "__all__"
+
+
+class WorkAuthorSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = WorkAuthor
+        fields = "__all__"
+
+
+class WorkSubjectSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = WorkSubject
+        fields = "__all__"
+
+
+class YearIntervalSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = YearInterval
         fields = "__all__"

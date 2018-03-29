@@ -45,7 +45,7 @@
           <ul class="nav navbar-nav">
             {% with url_name=request.resolver_match.url_name %}
             <li class="{% if url_name == 'catalogues' %}active{% endif %}"><a href="{% url 'catalogues' %}">{% trans "Catalogues" %}</a></li>
-            <li class="{% if url_name == 'catalogueentries' %}active{% endif %}"><a href="{% url 'catalogueentries' %}">{% trans "Catalogue entries" %}</a></li>
+            <li class="{% if url_name == 'lots' %}active{% endif %}"><a href="{% url 'lots' %}">{% trans "Lots" %}</a></li>
             <li class="{% if url_name == 'items' %}active{% endif %}"><a href="{% url 'items' %}">{% trans "Items" %}</a></li>
             {% endwith %}
           </ul>

@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'django_tables2',
     'django_select2',
     'items',
+    'transcriptions',
+    'persons',
     'registration',
 ]
 

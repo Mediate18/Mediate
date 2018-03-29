@@ -7,24 +7,9 @@ class BindingMaterialDetailsViewSet(viewsets.ModelViewSet):
     serializer_class = BindingMaterialDetailsSerializer
 
 
-class BindingMaterialDetailsEquivalentViewSet(viewsets.ModelViewSet):
-    queryset = BindingMaterialDetailsEquivalent.objects.all()
-    serializer_class = BindingMaterialDetailsEquivalentSerializer
-
-
 class BookFormatViewSet(viewsets.ModelViewSet):
     queryset = BookFormat.objects.all()
     serializer_class = BookFormatSerializer
-
-
-class BookFormatEquivalentViewSet(viewsets.ModelViewSet):
-    queryset = BookFormatEquivalent.objects.all()
-    serializer_class = BookFormatEquivalentSerializer
-
-
-class ItemViewSet(viewsets.ModelViewSet):
-    queryset = Item.objects.all()
-    serializer_class = ItemSerializer
 
 
 class CatalogueViewSet(viewsets.ModelViewSet):
@@ -32,14 +17,24 @@ class CatalogueViewSet(viewsets.ModelViewSet):
     serializer_class = CatalogueSerializer
 
 
-class LotViewSet(viewsets.ModelViewSet):
-    queryset = Lot.objects.all()
-    serializer_class = LotSerializer
-
-
 class CatalogueTypeViewSet(viewsets.ModelViewSet):
     queryset = CatalogueType.objects.all()
     serializer_class = CatalogueTypeSerializer
+
+
+class CollectionViewSet(viewsets.ModelViewSet):
+    queryset = Collection.objects.all()
+    serializer_class = CollectionSerializer
+
+
+class ItemViewSet(viewsets.ModelViewSet):
+    queryset = Item.objects.all()
+    serializer_class = ItemSerializer
+
+
+class ItemYearIntervalRelationViewSet(viewsets.ModelViewSet):
+    queryset = ItemYearIntervalRelation.objects.all()
+    serializer_class = ItemYearIntervalRelationSerializer
 
 
 class LanguageViewSet(viewsets.ModelViewSet):
@@ -47,19 +42,9 @@ class LanguageViewSet(viewsets.ModelViewSet):
     serializer_class = LanguageSerializer
 
 
-class PersonViewSet(viewsets.ModelViewSet):
-    queryset = Person.objects.all()
-    serializer_class = PersonSerializer
-
-
-class PersonItemRelationViewSet(viewsets.ModelViewSet):
-    queryset = PersonItemRelation.objects.all()
-    serializer_class = PersonItemRelationSerializer
-
-
-class PersonItemRelationRoleViewSet(viewsets.ModelViewSet):
-    queryset = PersonItemRelationRole.objects.all()
-    serializer_class = PersonItemRelationRoleSerializer
+class LotViewSet(viewsets.ModelViewSet):
+    queryset = Lot.objects.all()
+    serializer_class = LotSerializer
 
 
 class PersonCatalogueRelationViewSet(viewsets.ModelViewSet):
@@ -72,19 +57,24 @@ class PersonCatalogueRelationRoleViewSet(viewsets.ModelViewSet):
     serializer_class = PersonCatalogueRelationRoleSerializer
 
 
-class PlaceViewSet(viewsets.ModelViewSet):
-    queryset = Place.objects.all()
-    serializer_class = PlaceSerializer
+class PersonCollectionRelationViewSet(viewsets.ModelViewSet):
+    queryset = PersonCollectionRelation.objects.all()
+    serializer_class = PersonCollectionRelationSerializer
 
 
-class PlaceEquivalentViewSet(viewsets.ModelViewSet):
-    queryset = PlaceEquivalent.objects.all()
-    serializer_class = PlaceEquivalentSerializer
+class PersonItemRelationViewSet(viewsets.ModelViewSet):
+    queryset = PersonItemRelation.objects.all()
+    serializer_class = PersonItemRelationSerializer
 
 
-class PlaceTypeViewSet(viewsets.ModelViewSet):
-    queryset = PlaceType.objects.all()
-    serializer_class = PlaceTypeSerializer
+class PersonItemRelationRoleViewSet(viewsets.ModelViewSet):
+    queryset = PersonItemRelationRole.objects.all()
+    serializer_class = PersonItemRelationRoleSerializer
+
+
+class PublicationViewSet(viewsets.ModelViewSet):
+    queryset = Publication.objects.all()
+    serializer_class = PublicationSerializer
 
 
 class PublisherViewSet(viewsets.ModelViewSet):
@@ -92,11 +82,26 @@ class PublisherViewSet(viewsets.ModelViewSet):
     serializer_class = PublisherSerializer
 
 
-class PublisherEquivalentViewSet(viewsets.ModelViewSet):
-    queryset = PublisherEquivalent.objects.all()
-    serializer_class = PublisherEquivalentSerializer
+class SubjectViewSet(viewsets.ModelViewSet):
+    queryset = Subject.objects.all()
+    serializer_class = SubjectSerializer
 
 
 class WorkViewSet(viewsets.ModelViewSet):
     queryset = Work.objects.all()
     serializer_class = WorkSerializer
+
+
+class WorkAuthorViewSet(viewsets.ModelViewSet):
+    queryset = WorkAuthor.objects.all()
+    serializer_class = WorkAuthorSerializer
+
+
+class WorkSubjectViewSet(viewsets.ModelViewSet):
+    queryset = WorkSubject.objects.all()
+    serializer_class = WorkSubjectSerializer
+
+
+class YearIntervalViewSet(viewsets.ModelViewSet):
+    queryset = YearInterval.objects.all()
+    serializer_class = YearIntervalSerializer
