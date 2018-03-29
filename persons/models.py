@@ -117,11 +117,11 @@ class PersonPersonRelationType(models.Model):
     """
     Person-person relation type, e.g.
     * family relation
-      - married to (NOT directed)
-      - child of (directed)
+      - spouse (NOT directed)
+      - child (directed)
     * professional relation
-      - partner of (NOT directed)
-      - employee of (directed)
+      - partner (NOT directed)
+      - employee (directed)
     """
     name = models.CharField(_("Relation type name"), max_length=128)
     directed = models.BooleanField(_("Directed"), default=False)

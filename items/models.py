@@ -33,12 +33,21 @@ class Collection(models.Model):
     The collection a catalogue belongs to
     """
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
-    name = models.CharField(_("Name of the source"), max_length=128, unique=True)
-    description = models.TextField(_("Description of the source"))
-    place = models.ForeignKey(Place, on_delete=SET_NULL, null=True)
+    name = models.CharField(_("Name"), max_length=128, unique=True)
 
     def __str__(self):
         return self.name
+
+
+class CollectionYear(models.Model):
+    """
+    The recorded year of a collection
+    """
+    year = models.IntegerField(_("Year"))
+    collection = models.ForeignKey(Collection, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return "{}: {}".format(self.collection, self.year)
 
 
 class CatalogueType(models.Model):
@@ -46,6 +55,16 @@ class CatalogueType(models.Model):
     The type of a catalogue
     """
     name = models.CharField(_("Name of the catalogue type"), max_length=128, null=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Library(models.Model):
+    """
+    Library or institute that may hold one or more catalogues
+    """
+    name = models.CharField(_("The name of the library/institute"), max_length=128)
 
     def __str__(self):
         return self.name
@@ -70,6 +89,16 @@ class Catalogue(models.Model):
 
     def __str__(self):
         return "{0} ({1})".format(self.short_title, self.uuid)
+
+class CatalogueHeldBy(models.Model):
+    """
+    A library/institute where a catalogue is held 
+    """
+    library = models.ForeignKey(Library, on_delete=models.CASCADE)
+    catalogue = models.ForeignKey(Catalogue, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return _("{} held by {}").format(self.catalogue, self.library)
 
 
 class BookFormat(models.Model):
@@ -283,7 +312,7 @@ class PersonCatalogueRelation(models.Model):
 
     person = models.ForeignKey(Person, on_delete=CASCADE)
     catalogue = models.ForeignKey(Catalogue, on_delete=CASCADE)
-    type = models.ForeignKey(PersonCatalogueRelationRole, on_delete=CASCADE)
+    role = models.ForeignKey(PersonCatalogueRelationRole, on_delete=CASCADE)
 
     def __str__(self):
-        return _("{} is {} of {}").format(self.person, self.type, self.catalogue)
+        return _("{} is {} of {}").format(self.person, self.role, self.catalogue)
