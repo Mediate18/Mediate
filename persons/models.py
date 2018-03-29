@@ -21,6 +21,9 @@ class Religion(models.Model):
     name = models.CharField(_("Religion name"), max_length=128)
     description = models.TextField(_("Religion description"))
 
+    def __str__(self):
+        return self.name
+
 
 class Person(models.Model):
     """
@@ -63,6 +66,9 @@ class ReligiousAffiliation(models.Model):
     class Meta:
         unique_together = (('person', 'religion'),)
 
+    def __str__(self):
+        return _("{} is affiliated to {}").format(self.person, self.religion)
+
 
 class Residence(models.Model):
     """
@@ -92,6 +98,9 @@ class Profession(models.Model):
     name = models.CharField(_("Profession name"), max_length=128)
     description = models.TextField(_("Profession description"), blank=True)
 
+    def __str__(self):
+        return self.name
+
 
 class PersonProfession(models.Model):
     """
@@ -99,6 +108,9 @@ class PersonProfession(models.Model):
     """
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     profession = models.ForeignKey(Profession, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return _("Profession of {} is {}").format(self.person.short_name, self.profession.name)
 
 
 class PersonPersonRelationType(models.Model):
@@ -114,6 +126,10 @@ class PersonPersonRelationType(models.Model):
     name = models.CharField(_("Relation type name"), max_length=128)
     directed = models.BooleanField(_("Directed"), default=False)
 
+    def __str__(self):
+        return self.name
+
+
 
 class PersonPersonRelation(models.Model):
     """
@@ -122,10 +138,18 @@ class PersonPersonRelation(models.Model):
     """
     first_person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name="relations_when_first")
     second_person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name="relations_when_second")
-    type = models.ForeignKey(PersonPersonRelationType, on_delete=models.SET_NULL, null=True)
+    type = models.ForeignKey(PersonPersonRelationType, on_delete=models.PROTECT)
     start_year = models.IntegerField(_("Start year of interval"), null=True)
     end_year = models.IntegerField(_("End year of inter"), null=True)
 
     def clean(self):
-        # Check that the relation is not duplicated is some way
+        # TODO Check that the relation is not duplicated is some way
         pass
+
+    def __str__(self):
+        object_str = _("{} is {} of {}").format(self.first_person, self.type, self.second_person)
+        if self.start_year:
+            object_str = object_str + _(" from {}").format(self.start_year)
+        if self.end_year_year:
+            object_str = object_str + _(" until {}").format(self.end_year)
+        return object_str

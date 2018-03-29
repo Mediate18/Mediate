@@ -11,6 +11,9 @@ class SourceMaterial(models.Model):
      """
      name = models.CharField(_("Source material name"), max_length=128)
 
+     def __str__(self):
+         return self.name
+
 
 class Transcription(models.Model):
     """
@@ -22,6 +25,9 @@ class Transcription(models.Model):
     source_material = models.ForeignKey(SourceMaterial, on_delete=models.PROTECT)
     curator = models.CharField(_("Curator"), max_length=128)
 
+    def __str__(self):
+        return _("{} as transcribed by {}").format(self.source_material, self.author)
+
 
 class DocumentScan(models.Model):
     """
@@ -29,3 +35,6 @@ class DocumentScan(models.Model):
     """
     transcription = models.ForeignKey(Transcription, on_delete=models.SET_NULL, null=True, related_name="scans")
     scan = models.FileField()
+
+    def __str__(self):
+        return self.scan.name

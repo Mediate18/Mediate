@@ -114,10 +114,10 @@ class Subject(models.Model):
     """
     Subject class
     """
-    text = models.CharField(_("The text of the class"), max_length=128)
+    name = models.CharField(_("The text of the class"), max_length=128)
 
     def __str__(self):
-        return self.text
+        return self.name
 
 
 class Work(models.Model):
@@ -134,10 +134,13 @@ class Work(models.Model):
 
 class WorkSubject(models.Model):
     """
-    
+    Work-subject relation
     """
     work = models.ForeignKey(Work, on_delete=CASCADE)
     subject = models.ForeignKey(Subject, on_delete=CASCADE)
+
+    def __str__(self):
+        return "{}: {}".format(self.work, self.subject)
 
 
 class WorkAuthor(models.Model):
@@ -149,6 +152,9 @@ class WorkAuthor(models.Model):
 
     class Meta:
         unique_together = (("work", "author"),)
+
+    def __str__(self):
+        return _("{} wrote {}").format(self.author, self.work)
 
 
 class Item(models.Model):
@@ -200,7 +206,7 @@ class Publisher(models.Model):
         unique_together = (("publisher", "publication"),)
 
     def __str__(self):
-        return _("{}, published by {}").format(self.publication.item.work.title, self.publisher.name)
+        return _("{} published {}").format(self.publisher, self.publication)
 
 
 class YearInterval(models.Model):
@@ -232,6 +238,9 @@ class PersonCollectionRelation(models.Model):
     class Meta:
         unique_together = (("person", "collection"),)  # Multiple identical relation would be redundant
 
+    def __str__(self):
+        return _("{} is collector of {}").format(self.person, self.collection)
+
 
 class PersonItemRelationRole(models.Model):
     """
@@ -253,6 +262,9 @@ class PersonItemRelation(models.Model):
     item = models.ForeignKey(Item, on_delete=CASCADE)
     role = models.ForeignKey(PersonItemRelationRole, on_delete=CASCADE)
 
+    def __str__(self):
+        return _("{} is {} of {}").format(self.person, self.role, self.item)
+
 
 class PersonCatalogueRelationRole(models.Model):
     """
@@ -272,3 +284,6 @@ class PersonCatalogueRelation(models.Model):
     person = models.ForeignKey(Person, on_delete=CASCADE)
     catalogue = models.ForeignKey(Catalogue, on_delete=CASCADE)
     type = models.ForeignKey(PersonCatalogueRelationRole, on_delete=CASCADE)
+
+    def __str__(self):
+        return _("{} is {} of {}").format(self.person, self.type, self.catalogue)
