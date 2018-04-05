@@ -1,5 +1,5 @@
 .idea/
 *.pyc
 /logs/
-/mediate-env/
+/venv/
 /static_root/
