@@ -38,12 +38,6 @@ class ItemSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
-class ItemYearIntervalRelationSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = ItemYearIntervalRelation
-        fields = "__all__"
-
-
 class LanguageSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Language
@@ -119,10 +113,4 @@ class WorkAuthorSerializer(serializers.HyperlinkedModelSerializer):
 class WorkSubjectSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = WorkSubject
-        fields = "__all__"
-
-
-class YearIntervalSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = YearInterval
         fields = "__all__"

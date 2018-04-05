@@ -216,8 +216,9 @@ class Publication(models.Model):
     The publication information for an item
     """
     item = models.ForeignKey(Item, on_delete=models.PROTECT, related_name="publications")
-    year = models.DateField(_("Year of publication"))
+    year = models.IntegerField(_("Year of publication"))
     year_tag = models.CharField(_("Year of publication tag"), max_length=128)
+    terminus_post_quem = models.BooleanField(_("Terminus post quem"), default=False)
     place = models.ForeignKey(Place, on_delete=models.PROTECT)
 
     def __str__(self):
@@ -236,25 +237,6 @@ class Publisher(models.Model):
 
     def __str__(self):
         return _("{} published {}").format(self.publisher, self.publication)
-
-
-class YearInterval(models.Model):
-    """
-    An interval: start year - end year
-    """
-    start_year = models.IntegerField(_("Start year of interval"), null=False)
-    end_year = models.IntegerField(_("End year of inter"), null=False)
-
-
-class ItemYearIntervalRelation(models.Model):
-    """
-    A item - year interval relation
-    """
-    item = models.ForeignKey(Item, on_delete=CASCADE)
-    year_interval = models.ForeignKey(YearInterval, on_delete=CASCADE)
-
-    class Meta:
-        unique_together = (("item", "year_interval"),)  # Multiple identical relation would be redundant
 
 
 class PersonCollectionRelation(models.Model):

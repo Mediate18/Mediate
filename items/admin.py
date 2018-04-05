@@ -32,11 +32,6 @@ class ItemAdmin(admin.ModelAdmin):
     search_fields = ['work__text']
 
 
-@admin.register(ItemYearIntervalRelation)
-class ItemYearIntervalRelationAdmin(admin.ModelAdmin):
-    pass
-
-
 @admin.register(Language)
 class LanguageAdmin(admin.ModelAdmin):
     pass
@@ -99,11 +94,6 @@ class WorkAuthorAdmin(admin.ModelAdmin):
 
 @admin.register(WorkSubject)
 class WorkSubjectAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(YearInterval)
-class YearIntervalAdmin(admin.ModelAdmin):
     pass
 
 

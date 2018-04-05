@@ -32,11 +32,6 @@ class ItemViewSet(viewsets.ModelViewSet):
     serializer_class = ItemSerializer
 
 
-class ItemYearIntervalRelationViewSet(viewsets.ModelViewSet):
-    queryset = ItemYearIntervalRelation.objects.all()
-    serializer_class = ItemYearIntervalRelationSerializer
-
-
 class LanguageViewSet(viewsets.ModelViewSet):
     queryset = Language.objects.all()
     serializer_class = LanguageSerializer
@@ -100,8 +95,3 @@ class WorkAuthorViewSet(viewsets.ModelViewSet):
 class WorkSubjectViewSet(viewsets.ModelViewSet):
     queryset = WorkSubject.objects.all()
     serializer_class = WorkSubjectSerializer
-
-
-class YearIntervalViewSet(viewsets.ModelViewSet):
-    queryset = YearInterval.objects.all()
-    serializer_class = YearIntervalSerializer
