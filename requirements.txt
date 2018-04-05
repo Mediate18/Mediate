@@ -1,0 +1,11 @@
+Django==2.0
+django-appconf==1.0.2
+django-bootstrap3==9.1.0
+django-filter==1.1.0
+django-model-utils==3.1.1
+-e git+https://vanlummelhuizen@github.com/vanlummelhuizen/django-moderation.git@adda309097b9480e22dd0a63f2355e223990f84f#egg=django_moderation
+django-select2==6.0.2
+django-tables2==1.19.0
+djangorestframework==3.7.7
+mysqlclient==1.3.12
+python-decouple==3.1
