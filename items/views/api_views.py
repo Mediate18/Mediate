@@ -1,5 +1,5 @@
 from rest_framework import viewsets
-from items.serializers import *
+from ..serializers import *
 
 
 class BindingMaterialDetailsViewSet(viewsets.ModelViewSet):
@@ -10,16 +10,6 @@ class BindingMaterialDetailsViewSet(viewsets.ModelViewSet):
 class BookFormatViewSet(viewsets.ModelViewSet):
     queryset = BookFormat.objects.all()
     serializer_class = BookFormatSerializer
-
-
-class CatalogueViewSet(viewsets.ModelViewSet):
-    queryset = Catalogue.objects.all()
-    serializer_class = CatalogueSerializer
-
-
-class CatalogueTypeViewSet(viewsets.ModelViewSet):
-    queryset = CatalogueType.objects.all()
-    serializer_class = CatalogueTypeSerializer
 
 
 class CollectionViewSet(viewsets.ModelViewSet):
@@ -40,21 +30,6 @@ class LanguageViewSet(viewsets.ModelViewSet):
 class LotViewSet(viewsets.ModelViewSet):
     queryset = Lot.objects.all()
     serializer_class = LotSerializer
-
-
-class PersonCatalogueRelationViewSet(viewsets.ModelViewSet):
-    queryset = PersonCatalogueRelation.objects.all()
-    serializer_class = PersonCatalogueRelationSerializer
-
-
-class PersonCatalogueRelationRoleViewSet(viewsets.ModelViewSet):
-    queryset = PersonCatalogueRelationRole.objects.all()
-    serializer_class = PersonCatalogueRelationRoleSerializer
-
-
-class PersonCollectionRelationViewSet(viewsets.ModelViewSet):
-    queryset = PersonCollectionRelation.objects.all()
-    serializer_class = PersonCollectionRelationSerializer
 
 
 class PersonItemRelationViewSet(viewsets.ModelViewSet):

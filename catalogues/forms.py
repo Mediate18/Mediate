@@ -1,6 +1,6 @@
 from django import forms
 from django_select2.forms import Select2Widget
-from items.models import *
+from .models import *
 
 
 class CatalogueModelForm(forms.ModelForm):

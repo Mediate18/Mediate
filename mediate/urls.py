@@ -21,8 +21,8 @@ from django.conf.urls.static import static
 from django.conf.urls import url, include
 from django.views.generic import RedirectView
 from rest_framework import routers
-from items import views
 import items.urls
+import catalogues.urls
 import persons.urls
 import transcriptions.urls
 
@@ -35,26 +35,27 @@ router = routers.DefaultRouter()
 # router.register(r'users', views.UserViewSet)
 # router.register(r'groups', views.GroupViewSet)
 
-router.register(r'bindingmaterialdetails', views.BindingMaterialDetailsViewSet)
-router.register(r'bookformats', views.BookFormatViewSet)
-router.register(r'items', views.ItemViewSet)
-router.register(r'catalogues', views.CatalogueViewSet)
-router.register(r'lots', views.LotViewSet)
-router.register(r'cataloguetypes', views.CatalogueTypeViewSet)
-router.register(r'languages', views.LanguageViewSet)
-router.register(r'personitemrelations', views.PersonItemRelationViewSet)
-router.register(r'personitemrelationroles', views.PersonItemRelationRoleViewSet)
-router.register(r'personcataloguerelations', views.PersonCatalogueRelationViewSet)
-router.register(r'personcataloguerelationroles', views.PersonCatalogueRelationRoleViewSet)
-router.register(r'publishers', views.PublisherViewSet)
-router.register(r'works', views.WorkViewSet)
+router.register(r'bindingmaterialdetails', items.views.BindingMaterialDetailsViewSet)
+router.register(r'bookformats', items.views.BookFormatViewSet)
+router.register(r'items', items.views.ItemViewSet)
+# router.register(r'catalogues', items.views.CatalogueViewSet)
+# router.register(r'lots', items.views.LotViewSet)
+# router.register(r'cataloguetypes', items.views.CatalogueTypeViewSet)
+router.register(r'languages', items.views.LanguageViewSet)
+router.register(r'personitemrelations', items.views.PersonItemRelationViewSet)
+router.register(r'personitemrelationroles', items.views.PersonItemRelationRoleViewSet)
+# router.register(r'personcataloguerelations', items.views.PersonCatalogueRelationViewSet)
+# router.register(r'personcataloguerelationroles', items.views.PersonCatalogueRelationRoleViewSet)
+router.register(r'publishers', items.views.PublisherViewSet)
+router.register(r'works', items.views.WorkViewSet)
 
 
 urlpatterns = [
-    path(r'', RedirectView.as_view(url='items/')),
+    path(r'', RedirectView.as_view(url='catalogues/')),
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path(r'items/', include(items.urls)),
+    path(r'catalogues/', include(catalogues.urls)),
     # path(r'persons/', include(persons.urls)),
     # path(r'transcriptions/', include(transcriptions.urls)),
     url(r'^api/', include(router.urls)),

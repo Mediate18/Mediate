@@ -1,4 +1,4 @@
-from items.models import *
+from .models import *
 from rest_framework import serializers
 
 
@@ -11,18 +11,6 @@ class BindingMaterialDetailsSerializer(serializers.HyperlinkedModelSerializer):
 class BookFormatSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = BookFormat
-        fields = "__all__"
-
-
-class CatalogueSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Catalogue
-        fields = "__all__"
-
-
-class CatalogueTypeSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = CatalogueType
         fields = "__all__"
 
 
@@ -47,24 +35,6 @@ class LanguageSerializer(serializers.HyperlinkedModelSerializer):
 class LotSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Lot
-        fields = "__all__"
-
-
-class PersonCatalogueRelationSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = PersonCatalogueRelation
-        fields = "__all__"
-
-
-class PersonCatalogueRelationRoleSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = PersonCatalogueRelationRole
-        fields = "__all__"
-
-
-class PersonCollectionRelationSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = PersonCollectionRelation
         fields = "__all__"
 
 

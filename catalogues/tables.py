@@ -1,6 +1,6 @@
 import django_tables2 as tables
 from django_tables2.utils import A  # alias for Accessor
-from items.models import Catalogue
+from .models import Catalogue
 
 
 class CatalogueTable(tables.Table):

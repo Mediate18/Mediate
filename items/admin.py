@@ -12,21 +12,6 @@ class BookFormatAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(Catalogue)
-class CatalogueAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(CatalogueType)
-class CatalogueTypeAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(Collection)
-class CollectionAdmin(admin.ModelAdmin):
-    pass
-
-
 @admin.register(Item)
 class ItemAdmin(admin.ModelAdmin):
     search_fields = ['work__text']
@@ -39,21 +24,6 @@ class LanguageAdmin(admin.ModelAdmin):
 
 @admin.register(Lot)
 class LotAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(PersonCatalogueRelation)
-class PersonCatalogueRelationAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(PersonCatalogueRelationRole)
-class PersonCatalogueRelationRoleAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(PersonCollectionRelation)
-class PersonCollectionRelationAdmin(admin.ModelAdmin):
     pass
 
 

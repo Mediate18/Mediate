@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'items',
     'transcriptions',
     'persons',
+    'catalogues',
     'registration',
 ]
 

@@ -1,5 +1,5 @@
 import django_filters
-from items.models import Catalogue
+from .models import Catalogue
 
 class CatalogueFilter(django_filters.FilterSet):
 
