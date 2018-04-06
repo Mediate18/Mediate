@@ -1,6 +1,6 @@
 from django.views.generic.list import ListView
 
-from items.models import Lot, Item
+from ..models import Lot, Item
 
 
 # Catalogue detail views
