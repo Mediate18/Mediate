@@ -11,10 +11,10 @@ urlpatterns = [
     path(r'catalogues/<int:pk>', login_required(CatalogueDetailView.as_view()), name="catalogue_detail"),
 
     # Edit forms
-    path(r'catalogues/edit/<int:pk>', permission_required('items.change_catalogue')(change_catalogue),
+    path(r'catalogues/edit/<int:pk>', permission_required('catalogues.change_catalogue')(change_catalogue),
          name="change_catalogue"),
-    path(r'catalogues/add', permission_required('items.add_catalogue')(add_catalogue),
+    path(r'catalogues/add', permission_required('catalogues.add_catalogue')(add_catalogue),
          name="add_catalogue"),
-    path(r'catalogues/delete/<int:pk>', permission_required('items.delete_catalogue')(delete_catalogue),
+    path(r'catalogues/delete/<int:pk>', permission_required('catalogues.delete_catalogue')(delete_catalogue),
          name="delete_catalogue")
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
