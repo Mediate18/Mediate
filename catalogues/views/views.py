@@ -82,7 +82,7 @@ def delete_catalogue(request, pk):
 
     try:
         catalogue.delete()
-        messages.add_message(request, messages.SUCCESS, _("This catalogue is being reviewed by a moderator."))
+        messages.add_message(request, messages.SUCCESS, _("The catalogue was successfully deleted."))
     except:
         messages.add_message(request, messages.ERROR, _("The catalogue could not be deleted."))
     return redirect('catalogues')  # Redirect to the catalogues overview
@@ -93,3 +93,4 @@ class CatalogueDetailView(DetailView):
     model = Catalogue
     template_name = "catalogues/catalogue_detail.html"
 # end Catalogue views
+
