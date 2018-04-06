@@ -1,0 +1,33 @@
+{% extends "baselayout.html" %}
+{% load i18n %}
+
+
+{% block extracss %}
+{{ form.media.css }}
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-xs-10">
+        <h1>{% trans action|title %} {% trans object_name %}</h1>
+        <form action="" method="post">
+            <table class="table">
+                {% csrf_token %}
+                {{ form.as_table }}
+            </table>
+        <input type="submit" class="btn pull-right" value="{% trans 'Save' %}"/>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+{{ form.media.js }}
+<script>
+$(document).ready(function(){
+        $('.django-select2').djangoSelect2({placeholder: 'Select an option'});
+});
+</script>
+{% endblock %}
