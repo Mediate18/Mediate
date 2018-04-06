@@ -1,6 +1,10 @@
 from django.contrib import admin
 from .models import *
 
+# TODO The next bit should be in a more global place, but I could not find one (Micha, 2018-04-06)
+from django.contrib.auth.models import Permission
+admin.site.register(Permission)
+
 
 @admin.register(BindingMaterialDetails)
 class BindingMaterialDetailsAdmin(admin.ModelAdmin):
