@@ -1,35 +1,52 @@
 {% extends "baselayout.html" %}
 {% load i18n %}
+{% load render_table from django_tables2 %}
+
 
 {% block content %}
+
 <div class="row">
-    <div class="col-xs-10 col-xs-offset-1">
-    <h1>Items</h1>
-    {% if object_list %}
-        <div>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>{% trans "Title of work" %}</th>
-                        <th>{% trans "Publisher" %}</th>
-                        <th>{% trans "Date of publication" %}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in object_list %}
-                        <tr>
-                            <td>{{ item.work.text }}</td>
-                            <td>{{ item.publisher }}</td>
-                            <td>{{ item.date_of_publication }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% else %}
-        <div>No items.</div>
-    {% endif %}
+    <div class="col-xs-10">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+              <h4 class="panel-title">
+                <a data-toggle="collapse" href="#collapse1">Filter <span class="glyphicon glyphicon-chevron-down"></span></a>
+              </h4>
+            </div>
+            <div id="collapse1" class="panel-collapse collapse">
+              <div class="panel-body">
+                <form action="" method="get">
+                    <table class="table">
+                    {{ filter.form.as_table }}
+                    </table>
+                    <div class="pull-right">
+                        <input type="submit" class="btn"/>
+                        <a href='{{ request.path }}' class="btn">Clear</a>
+                    </div>
+                </form>
+              </div>
+            </div>
+          </div>
     </div>
 </div>
 
+<div class="row">
+    <div class="col-xs-10">
+        <h1>Items</h1>
+        <div class="small">Displaying {{ filter.qs.count }} of {{ filter.queryset.count }} items.</div>
+        {% if table %}
+            {% render_table table %}
+        {% else %}
+            <div>No items.</div>
+        {% endif %}
+    </div>
+    <div class="col-xs-2">
+        <h3>Actions</h3>
+        <ul>
+            <li>
+                <a href="{% url 'add_item' %}">Create new item</a>
+            </li>
+        </ul>
+    </div>
+</div>
 {% endblock %}
