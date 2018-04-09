@@ -1,12 +1,14 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+import uuid
+
 
 class Place(models.Model):
     """
     A geographical place
     """
-
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("Name of the place"), max_length=128, null=True)
     cerl_id = models.CharField(_("CERL ID of a place"), max_length=32, null=True)
 
@@ -18,6 +20,7 @@ class Religion(models.Model):
     """
     Religion
     """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("Religion name"), max_length=128)
     description = models.TextField(_("Religion description"))
 
@@ -42,6 +45,7 @@ class Person(models.Model):
         (UNKNOWN, 'Unknown'),
     )
 
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     short_name = models.CharField(_("Short name"), max_length=128, null=True)
     viaf_id = models.CharField(_("VIAF ID (https://viaf.org)"), max_length=128, null=True)
     surname = models.CharField(_("Surname"), max_length=128)
@@ -60,6 +64,7 @@ class ReligiousAffiliation(models.Model):
     """
     Religious affiliation of a person
     """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     religion = models.ForeignKey(Religion, on_delete=models.CASCADE)
 
@@ -74,6 +79,7 @@ class Residence(models.Model):
     """
     The residence of a person for a period of time
     """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     place = models.ForeignKey(Place, on_delete=models.CASCADE)
     start_year = models.IntegerField(_("Start year of interval"), null=True)
@@ -95,6 +101,7 @@ class Profession(models.Model):
     """
     Profession
     """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("Profession name"), max_length=128)
     description = models.TextField(_("Profession description"), blank=True)
 
@@ -106,6 +113,7 @@ class PersonProfession(models.Model):
     """
     Person-profession relation
     """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     profession = models.ForeignKey(Profession, on_delete=models.CASCADE)
 
@@ -123,6 +131,7 @@ class PersonPersonRelationType(models.Model):
       - partner (NOT directed)
       - employee (directed)
     """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("Relation type name"), max_length=128)
     directed = models.BooleanField(_("Directed"), default=False)
 
@@ -136,6 +145,7 @@ class PersonPersonRelation(models.Model):
     Person-person relation
     <first_person> is <type> <second_person> [from <start_year>] [until <end_year>]
     """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     first_person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name="relations_when_first")
     second_person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name="relations_when_second")
     type = models.ForeignKey(PersonPersonRelationType, on_delete=models.PROTECT)

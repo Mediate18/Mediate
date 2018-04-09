@@ -12,7 +12,7 @@ class Collection(models.Model):
     """
     The collection a catalogue belongs to
     """
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("Name"), max_length=128, unique=True)
 
     def __str__(self):
@@ -23,6 +23,7 @@ class CollectionYear(models.Model):
     """
     The recorded year of a collection
     """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     year = models.IntegerField(_("Year"))
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE)
 
@@ -34,6 +35,7 @@ class CatalogueType(models.Model):
     """
     The type of a catalogue
     """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("Name of the catalogue type"), max_length=128, null=True)
 
     def __str__(self):
@@ -44,6 +46,7 @@ class Library(models.Model):
     """
     Library or institute that may hold one or more catalogues
     """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("The name of the library/institute"), max_length=128)
 
     def __str__(self):
@@ -54,8 +57,7 @@ class Catalogue(models.Model):
     """
     The catalogue an item occurs in
     """
-
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     transcription = models.ForeignKey(Transcription, on_delete=SET_NULL, null=True)
     short_title = models.CharField(_("Short title"), max_length=128, null=True)
     full_title = models.TextField(_("Full title"), null=True)
@@ -75,6 +77,7 @@ class CatalogueHeldBy(models.Model):
     """
     A library/institute where a catalogue is held 
     """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     library = models.ForeignKey(Library, on_delete=models.CASCADE)
     catalogue = models.ForeignKey(Catalogue, on_delete=models.CASCADE)
 
@@ -86,8 +89,7 @@ class Lot(models.Model):
     """
     Catalogue lot
     """
-
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     catalogue = models.ForeignKey(Catalogue, on_delete=CASCADE, null=True)
     bookseller_category_books = models.TextField(_("Heading / category used to describe books"))
     bookseller_category_non_books = models.TextField(_("Heading / category for other, non-book items"))
@@ -102,6 +104,7 @@ class PersonCollectionRelation(models.Model):
     """
     A person-collection relation (i.e. collector)
     """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     person = models.ForeignKey(Person, on_delete=CASCADE)
     collection = models.ForeignKey(Collection, on_delete=CASCADE)
 
@@ -116,6 +119,7 @@ class PersonCatalogueRelationRole(models.Model):
     """
     A type for a person-catalogue relation
     """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("Role name for a person-catalogue relation"), max_length=128)
 
     def __str__(self):
@@ -126,7 +130,7 @@ class PersonCatalogueRelation(models.Model):
     """
     A person-catalogue item relation (e.g. author, translator, illustrator, owner)
     """
-
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     person = models.ForeignKey(Person, on_delete=CASCADE)
     catalogue = models.ForeignKey(Catalogue, on_delete=CASCADE)
     role = models.ForeignKey(PersonCatalogueRelationRole, on_delete=CASCADE)

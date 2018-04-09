@@ -90,7 +90,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'USER': 'mediate_admin',
-        'NAME': 'mediate_book_items',
+        'NAME': 'mediate',
         'PASSWORD': config('DB_PASSWORD'),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"

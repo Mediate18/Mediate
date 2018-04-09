@@ -6,20 +6,21 @@ import uuid
 
 
 class SourceMaterial(models.Model):
-     """
-     Source material
-     """
-     name = models.CharField(_("Source material name"), max_length=128)
+    """
+    Source material
+    """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(_("Source material name"), max_length=128)
 
-     def __str__(self):
-         return self.name
+    def __str__(self):
+        return self.name
 
 
 class Transcription(models.Model):
     """
     Transcription
     """
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     date = models.DateField(_("Creation date"))
     source_material = models.ForeignKey(SourceMaterial, on_delete=models.PROTECT)
@@ -33,6 +34,7 @@ class DocumentScan(models.Model):
     """
     Document scan
     """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     transcription = models.ForeignKey(Transcription, on_delete=models.SET_NULL, null=True, related_name="scans")
     scan = models.FileField()
 

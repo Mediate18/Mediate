@@ -13,7 +13,7 @@ class Language(models.Model):
     """
     A written language
     """
-
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=50)
     language_code_2char = models.CharField(max_length=7, unique=True, null=False, blank=False, help_text=_(
         """Language code (2 characters long) of a written language. This also includes codes of the form zh-Hans, cf. IETF BCP 47"""))
@@ -32,7 +32,7 @@ class BookFormat(models.Model):
     """
     A book format
     """
-
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("Format name"), max_length=128, null=True)
 
     def __str__(self):
@@ -43,7 +43,7 @@ class MaterialDetails(models.Model):
     """
     Material details
     """
-
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     description = models.CharField(_("Binding material details description"), max_length=128, null=True)
 
     def __str__(self):
@@ -54,6 +54,7 @@ class Subject(models.Model):
     """
     Subject class
     """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("The text of the class"), max_length=128)
 
     def __str__(self):
@@ -64,7 +65,7 @@ class Work(models.Model):
     """
     A title of a work
     """
-
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.TextField(_("Title of a work"))
     viaf_id = models.CharField(_("VIAF ID of a work"), max_length=32)
 
@@ -76,6 +77,7 @@ class WorkSubject(models.Model):
     """
     Work-subject relation
     """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     work = models.ForeignKey(Work, on_delete=CASCADE)
     subject = models.ForeignKey(Subject, on_delete=CASCADE)
 
@@ -87,6 +89,7 @@ class WorkAuthor(models.Model):
     """
     Author of a work
     """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     work = models.ForeignKey(Work, on_delete=CASCADE, related_name="authors")
     author = models.ForeignKey(Person, on_delete=CASCADE, related_name="works")
 
@@ -101,7 +104,7 @@ class Item(models.Model):
     """
     Item
     """
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     short_title = models.CharField(_("Short title"), max_length=128, null=True)
     lot = models.ForeignKey(Lot, on_delete=CASCADE, null=True)
     collection = models.ForeignKey(Collection, on_delete=CASCADE)
@@ -219,6 +222,7 @@ class Publication(models.Model):
     """
     The publication information for an item
     """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     item = models.ForeignKey(Item, on_delete=models.PROTECT, related_name="publications")
     year = models.IntegerField(_("Year of publication"))
     year_tag = models.CharField(_("Year of publication tag"), max_length=128)
@@ -233,6 +237,7 @@ class Publisher(models.Model):
     """
     Publisher of an item
     """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     publisher = models.ForeignKey(Person, on_delete=CASCADE)
     publication = models.ForeignKey(Publication, on_delete=CASCADE)
 
@@ -247,6 +252,7 @@ class PersonItemRelationRole(models.Model):
     """
     A role for a person-item relation
     """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("Role name for a person-item relation"), max_length=128, null=True)
 
     def __str__(self):
@@ -258,7 +264,7 @@ class PersonItemRelation(models.Model):
     A person-item relation (e.g. author, translator, illustrator, owner)
     Note that the publisher relation is handled by the Publication/Publisher models.
     """
-
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     person = models.ForeignKey(Person, on_delete=CASCADE)
     item = models.ForeignKey(Item, on_delete=CASCADE)
     role = models.ForeignKey(PersonItemRelationRole, on_delete=CASCADE)
