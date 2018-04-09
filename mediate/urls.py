@@ -35,7 +35,7 @@ router = routers.DefaultRouter()
 # router.register(r'users', views.UserViewSet)
 # router.register(r'groups', views.GroupViewSet)
 
-router.register(r'bindingmaterialdetails', items.views.BindingMaterialDetailsViewSet)
+router.register(r'materialdetails', items.views.MaterialDetailsViewSet)
 router.register(r'bookformats', items.views.BookFormatViewSet)
 router.register(r'items', items.views.ItemViewSet)
 # router.register(r'catalogues', items.views.CatalogueViewSet)
