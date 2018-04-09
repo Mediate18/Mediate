@@ -1,6 +1,11 @@
 from moderation import moderation
+import importlib
+import inspect
 
-from .models import Item, Publisher
+from . import models
 
-moderation.register(Item)  # Uses default moderation settings
-moderation.register(Publisher)  # Uses default moderation settings
+# Set all models as moderated
+models = importlib.import_module(models.__name__)
+for name, obj in inspect.getmembers(models, inspect.isclass):
+    if obj.__module__ == models.__name__:
+        moderation.register(obj)
