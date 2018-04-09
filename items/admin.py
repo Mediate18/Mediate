@@ -6,7 +6,7 @@ from django.contrib.auth.models import Permission
 admin.site.register(Permission)
 
 
-@admin.register(BindingMaterialDetails)
+@admin.register(MaterialDetails)
 class BindingMaterialDetailsAdmin(admin.ModelAdmin):
     pass
 

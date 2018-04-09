@@ -3,6 +3,8 @@ from django.db.models.deletion import CASCADE
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 
+import uuid
+
 from persons.models import Place, Person
 from catalogues.models import Collection, Lot
 
@@ -37,15 +39,15 @@ class BookFormat(models.Model):
         return self.name
 
 
-class BindingMaterialDetails(models.Model):
+class MaterialDetails(models.Model):
     """
-    Binding material details
+    Material details
     """
 
-    text = models.CharField(_("Binding material details text"), max_length=128, null=True)
+    description = models.CharField(_("Binding material details description"), max_length=128, null=True)
 
     def __str__(self):
-        return self.text
+        return self.description
 
 
 class Subject(models.Model):
@@ -99,16 +101,11 @@ class Item(models.Model):
     """
     Item
     """
-
-    collection = models.ForeignKey(Collection, on_delete=CASCADE)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    short_title = models.CharField(_("Short title"), max_length=128, null=True)
     lot = models.ForeignKey(Lot, on_delete=CASCADE, null=True)
+    collection = models.ForeignKey(Collection, on_delete=CASCADE)
     number_of_volumes = models.CharField(_("Number of volumes, as listed in the catalogue"), max_length=128)
-    sales_price = models.CharField(_("Sales price"), max_length=128)
-    book_format = models.ForeignKey(BookFormat, on_delete=CASCADE)
-    binding_material_details = models.ForeignKey(BindingMaterialDetails, on_delete=CASCADE)
-    language = models.ForeignKey(Language, on_delete=CASCADE)
-    work = models.ForeignKey(Work, on_delete=CASCADE)
-    buyer = models.TextField(_("Buyer of an item"))  #TODO Could this also be a list/ENUM/controlled vocabulary?
 
     def __str__(self):
         return self.work.title
@@ -118,6 +115,104 @@ class Item(models.Model):
             raise ValidationError({'collection':
                 _("The collection of this item and the collection of the catalogue of this item, are not the same.")
                                    })
+
+
+class ItemType(models.Model):
+    """
+    Item type
+    """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(_("Name of the item type"), max_length=128, null=True)
+
+    def __str__(self):
+        return self.name
+
+
+class ItemItemTypeRelation(models.Model):
+    """
+    Relation between Item and Item Type
+    """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    item = models.ForeignKey(Item, on_delete=CASCADE)
+    type = models.ForeignKey(ItemType, on_delete=CASCADE)
+
+    class Meta:
+        unique_together = (('item', 'type'),)
+
+
+class ItemAuthor(models.Model):
+    """
+    Author of a work
+    """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    item = models.ForeignKey(Item, on_delete=CASCADE, related_name='authors')
+    author = models.ForeignKey(Person, on_delete=CASCADE, related_name='items')
+
+    class Meta:
+        unique_together = (('item', 'author'),)
+
+    def __str__(self):
+        return _("{} wrote item {}").format(self.author, self.item)
+
+
+class ItemLanguageRelation(models.Model):
+    """
+    The language of an item
+    """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    item = models.ForeignKey(Item, on_delete=CASCADE, related_name='languages')
+    language = models.ForeignKey(Language, on_delete=CASCADE, related_name='items')
+
+    class Meta:
+        unique_together = (('item', 'language'),)
+
+    def __str__(self):
+        return _("{} is written in {}").format(self.item, self.language)
+
+
+class ItemBookFormatRelation(models.Model):
+    """
+    The book format of an item
+    """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    item = models.ForeignKey(Item, on_delete=CASCADE, related_name='book_formats')
+    book_format = models.ForeignKey(BookFormat, on_delete=CASCADE, related_name='items')
+
+    class Meta:
+        unique_together = (('item', 'book_format'),)
+
+    def __str__(self):
+        return _("Format of {}: {}").format(self.item, self.book_format)
+
+
+class ItemWorkRelation(models.Model):
+    """
+    An item containing a work
+    """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    item = models.ForeignKey(Item, on_delete=CASCADE, related_name='works')
+    work = models.ForeignKey(Work, on_delete=CASCADE, related_name='items')
+
+    class Meta:
+        unique_together = (('item', 'work'),)
+
+    def __str__(self):
+        return _("{} contains {}").format(self.item, self.work)
+
+
+class ItemMaterialDetailsRelation(models.Model):
+    """
+    An item containing a work
+    """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    item = models.ForeignKey(Item, on_delete=CASCADE)
+    material_details = models.ForeignKey(MaterialDetails, on_delete=CASCADE, related_name='items')
+
+    class Meta:
+        unique_together = (('item', 'material_details'),)
+
+    def __str__(self):
+        return _("{} contains {}").format(self.item, self.material_details)
 
 
 class Publication(models.Model):

@@ -3,7 +3,7 @@ from ..serializers import *
 
 
 class BindingMaterialDetailsViewSet(viewsets.ModelViewSet):
-    queryset = BindingMaterialDetails.objects.all()
+    queryset = MaterialDetails.objects.all()
     serializer_class = BindingMaterialDetailsSerializer
 
 
