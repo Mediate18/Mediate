@@ -7,7 +7,7 @@ admin.site.register(Permission)
 
 
 @admin.register(MaterialDetails)
-class BindingMaterialDetailsAdmin(admin.ModelAdmin):
+class MaterialDetailsAdmin(admin.ModelAdmin):
     pass
 
 

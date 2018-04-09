@@ -2,9 +2,9 @@ from rest_framework import viewsets
 from ..serializers import *
 
 
-class BindingMaterialDetailsViewSet(viewsets.ModelViewSet):
+class MaterialDetailsViewSet(viewsets.ModelViewSet):
     queryset = MaterialDetails.objects.all()
-    serializer_class = BindingMaterialDetailsSerializer
+    serializer_class = MaterialDetailsSerializer
 
 
 class BookFormatViewSet(viewsets.ModelViewSet):

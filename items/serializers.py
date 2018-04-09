@@ -2,7 +2,7 @@ from .models import *
 from rest_framework import serializers
 
 
-class BindingMaterialDetailsSerializer(serializers.HyperlinkedModelSerializer):
+class MaterialDetailsSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = MaterialDetails
         fields = "__all__"
