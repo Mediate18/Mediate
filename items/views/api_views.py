@@ -2,19 +2,9 @@ from rest_framework import viewsets
 from ..serializers import *
 
 
-class MaterialDetailsViewSet(viewsets.ModelViewSet):
-    queryset = MaterialDetails.objects.all()
-    serializer_class = MaterialDetailsSerializer
-
-
 class BookFormatViewSet(viewsets.ModelViewSet):
     queryset = BookFormat.objects.all()
     serializer_class = BookFormatSerializer
-
-
-class CollectionViewSet(viewsets.ModelViewSet):
-    queryset = Collection.objects.all()
-    serializer_class = CollectionSerializer
 
 
 class ItemViewSet(viewsets.ModelViewSet):
@@ -22,14 +12,49 @@ class ItemViewSet(viewsets.ModelViewSet):
     serializer_class = ItemSerializer
 
 
+class ItemAuthorViewSet(viewsets.ModelViewSet):
+    queryset = ItemAuthor.objects.all()
+    serializer_class = ItemAuthorSerializer
+
+
+class ItemBookFormatRelationViewSet(viewsets.ModelViewSet):
+    queryset = ItemBookFormatRelation.objects.all()
+    serializer_class = ItemBookFormatRelationSerializer
+
+
+class ItemItemTypeRelationViewSet(viewsets.ModelViewSet):
+    queryset = ItemItemTypeRelation.objects.all()
+    serializer_class = ItemItemTypeRelationSerializer
+
+
+class ItemLanguageRelationViewSet(viewsets.ModelViewSet):
+    queryset = ItemLanguageRelation.objects.all()
+    serializer_class = ItemLanguageRelationSerializer
+
+
+class ItemMaterialDetailsRelationViewSet(viewsets.ModelViewSet):
+    queryset = ItemMaterialDetailsRelation.objects.all()
+    serializer_class = ItemMaterialDetailsRelationSerializer
+
+
+class ItemTypeViewSet(viewsets.ModelViewSet):
+    queryset = ItemType.objects.all()
+    serializer_class = ItemTypeSerializer
+
+
+class ItemWorkRelationViewSet(viewsets.ModelViewSet):
+    queryset = ItemWorkRelation.objects.all()
+    serializer_class = ItemWorkRelationSerializer
+
+
 class LanguageViewSet(viewsets.ModelViewSet):
     queryset = Language.objects.all()
     serializer_class = LanguageSerializer
 
 
-class LotViewSet(viewsets.ModelViewSet):
-    queryset = Lot.objects.all()
-    serializer_class = LotSerializer
+class MaterialDetailsViewSet(viewsets.ModelViewSet):
+    queryset = MaterialDetails.objects.all()
+    serializer_class = MaterialDetailsSerializer
 
 
 class PersonItemRelationViewSet(viewsets.ModelViewSet):

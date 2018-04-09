@@ -2,21 +2,9 @@ from .models import *
 from rest_framework import serializers
 
 
-class MaterialDetailsSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = MaterialDetails
-        fields = "__all__"
-
-
 class BookFormatSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = BookFormat
-        fields = "__all__"
-
-
-class CollectionSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Collection
         fields = "__all__"
 
 
@@ -26,15 +14,57 @@ class ItemSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
+class ItemAuthorSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = ItemAuthor
+        fields = "__all__"
+
+
+class ItemBookFormatRelationSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = ItemBookFormatRelation
+        fields = "__all__"
+
+
+class ItemItemTypeRelationSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = ItemItemTypeRelation
+        fields = "__all__"
+
+
+class ItemLanguageRelationSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = ItemLanguageRelation
+        fields = "__all__"
+
+
+class ItemMaterialDetailsRelationSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = ItemMaterialDetailsRelation
+        fields = "__all__"
+
+
+class ItemTypeSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = ItemType
+        fields = "__all__"
+
+
+class ItemWorkRelationSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = ItemWorkRelation
+        fields = "__all__"
+
+
 class LanguageSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Language
         fields = "__all__"
 
 
-class LotSerializer(serializers.HyperlinkedModelSerializer):
+class MaterialDetailsSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Lot
+        model = MaterialDetails
         fields = "__all__"
 
 

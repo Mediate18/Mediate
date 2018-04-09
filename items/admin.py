@@ -6,11 +6,6 @@ from django.contrib.auth.models import Permission
 admin.site.register(Permission)
 
 
-@admin.register(MaterialDetails)
-class MaterialDetailsAdmin(admin.ModelAdmin):
-    pass
-
-
 @admin.register(BookFormat)
 class BookFormatAdmin(admin.ModelAdmin):
     pass
@@ -18,7 +13,42 @@ class BookFormatAdmin(admin.ModelAdmin):
 
 @admin.register(Item)
 class ItemAdmin(admin.ModelAdmin):
-    search_fields = ['work__text']
+    search_fields = ['work__title']
+
+
+@admin.register(ItemAuthor)
+class ItemAuthorAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(ItemBookFormatRelation)
+class ItemBookFormatRelationAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(ItemItemTypeRelation)
+class ItemItemTypeRelationAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(ItemLanguageRelation)
+class ItemLanguageRelationAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(ItemMaterialDetailsRelation)
+class ItemMaterialDetailsRelationAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(ItemType)
+class ItemTypeAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(ItemWorkRelation)
+class ItemWorkRelationAdmin(admin.ModelAdmin):
+    pass
 
 
 @admin.register(Language)
@@ -26,8 +56,8 @@ class LanguageAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(Lot)
-class LotAdmin(admin.ModelAdmin):
+@admin.register(MaterialDetails)
+class MaterialDetailsAdmin(admin.ModelAdmin):
     pass
 
 
