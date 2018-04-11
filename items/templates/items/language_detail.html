@@ -1,0 +1,55 @@
+{% extends "baselayout.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-xs-10">
+        <h1>Catalogue detail</h1>
+        <dl class="dl-horizontal">
+            <dt>{% trans "Name" %}</dt>
+            <dd>{{ object.name }}</dd>
+
+            <dt>{% trans "Description" %}</dt>
+            <dd>{{ object.description }}</dd>
+        </dl>
+    </div>
+    <div class="col-xs-2">
+        <h3>Actions</h3>
+        <div class="list-group">
+            <a class="list-group-item" href="{% url 'change_language' object.pk %}">Edit this language</a>
+            <a class="list-group-item" href="" data-toggle="modal" data-target="#deleteModal">Delete this language</a>
+            <a class="list-group-item" href="{% url 'add_language' %}">Create new language</a>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div id="deleteModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-warning-sign"></span> {% trans "Warning" %}</h4>
+      </div>
+      <div class="modal-body">
+        <p>{% trans "Are you sure you want to delete this language?" %}</p>
+      </div>
+      <div class="modal-footer">
+        <!-- Since the confirmation is done in this modal, the deletion is done using a POST.
+        A GET would trigger a confirm page. -->
+        <form id="delete-form" method="POST" action="{% url 'delete_language' object.pk %}">
+           {% csrf_token %}
+        </form>
+        <a class="btn btn-danger" href="{% url 'delete_language' object.pk %}"
+               onclick="document.getElementById('delete-form').submit(); return false;">{% trans "Yes" %}</a>
+        <button type="button" class="btn btn-success" data-dismiss="modal">{% trans "No" %}</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

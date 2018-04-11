@@ -15,3 +15,9 @@ class ItemModelForm(forms.ModelForm):
             'language': Select2Widget,
             'work': Select2Widget,
         }
+
+
+class LanguageModelForm(forms.ModelForm):
+    class Meta:
+        model = Language
+        fields = "__all__"
