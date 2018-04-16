@@ -17,6 +17,7 @@ Including another URLconf
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth.decorators import login_required
 
 from django.conf.urls import url, include
 from django.views.generic import RedirectView
@@ -25,6 +26,7 @@ import items.urls
 import catalogues.urls
 import persons.urls
 import transcriptions.urls
+from dashboard.views import view_dashboard
 
 from django.contrib import admin
 from moderation.helpers import auto_discover
@@ -58,6 +60,7 @@ urlpatterns = [
     path(r'catalogues/', include(catalogues.urls)),
     # path(r'persons/', include(persons.urls)),
     # path(r'transcriptions/', include(transcriptions.urls)),
+    path(r'dashboard/', view_dashboard),
     url(r'^api/', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^select2/', include('django_select2.urls')),

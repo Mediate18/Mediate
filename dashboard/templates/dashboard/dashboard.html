@@ -1,0 +1,10 @@
+{% extends "baselayout.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<h1>{% trans "Dashboard" %}</h1>
+
+<a href="{% url 'languages' %}">Languages</a>
+
+{% endblock %}

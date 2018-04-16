@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'transcriptions',
     'persons',
     'catalogues',
+    'dashboard',
     'registration',
 ]
 
