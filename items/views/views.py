@@ -12,19 +12,89 @@ from ..filters import *
 from ..tables import *
 
 
-class LotListView(ListView):
-    model = Lot
-    template_name = 'items/lot_list.html'
-    paginate_by = 10
+# BookFormat views
+class BookFormatTableView(ListView):
+    model = BookFormat
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return BookFormat.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(BookFormatTableView, self).get_context_data(**kwargs)
+        filter = BookFormatFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = BookFormatTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name'] = "bookformat"
+        context['add_url'] = reverse_lazy('add_bookformat')
+
+        return context
+
+
+class BookFormatDetailView(DetailView):
+    model = BookFormat
+
+
+class BookFormatCreateView(CreateView):
+    model = BookFormat
+    template_name = 'generic_form.html'
+    form_class = BookFormatModelForm
+    success_url = reverse_lazy('bookformats')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = "bookformat"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class BookFormatUpdateView(UpdateView):
+    model = BookFormat
+    template_name = 'generic_form.html'
+    form_class = BookFormatModelForm
+    success_url = reverse_lazy('bookformats')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("update")
+        context['object_name'] = "bookformat"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class BookFormatDeleteView(DeleteView):
+    model = BookFormat
+    success_url = reverse_lazy('bookformats')
 
 
 # Item views
 class ItemTableView(ListView):
     model = Item
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return Item.objects.all()
 
     def get_context_data(self, **kwargs):
         context = super(ItemTableView, self).get_context_data(**kwargs)
-        filter = ItemFilter(self.request.GET, queryset=self.object_list)
+        filter = ItemFilter(self.request.GET, queryset=self.get_queryset())
 
         table = ItemTable(filter.qs)
         django_tables2.RequestConfig(self.request, ).configure(table)
@@ -32,7 +102,15 @@ class ItemTableView(ListView):
         context['filter'] = filter
         context['table'] = table
 
+        context['action'] = _("add")
+        context['object_name'] = "item"
+        context['add_url'] = reverse_lazy('add_item')
+
         return context
+
+
+class ItemDetailView(DetailView):
+    model = Item
 
 
 class ItemCreateView(CreateView):
@@ -57,12 +135,12 @@ class ItemCreateView(CreateView):
 class ItemUpdateView(UpdateView):
     model = Item
     template_name = 'generic_form.html'
-    fields = ItemModelForm
+    form_class = ItemModelForm
     success_url = reverse_lazy('items')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['action'] = _("add")
+        context['action'] = _("update")
         context['object_name'] = "item"
         return context
 
@@ -71,11 +149,521 @@ class ItemUpdateView(UpdateView):
             messages.add_message(self.request, messages.SUCCESS,
                                  _("Your changes will be sent to a moderator for reviewing."))
         return super().form_valid(form)
-# end Item views
 
 
+class ItemDeleteView(DeleteView):
+    model = Item
+    success_url = reverse_lazy('items')
+
+
+# ItemAuthor views
+class ItemAuthorTableView(ListView):
+    model = ItemAuthor
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return ItemAuthor.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(ItemAuthorTableView, self).get_context_data(**kwargs)
+        filter = ItemAuthorFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = ItemAuthorTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name'] = "itemauthor"
+        context['add_url'] = reverse_lazy('add_itemauthor')
+
+        return context
+
+
+class ItemAuthorDetailView(DetailView):
+    model = ItemAuthor
+
+
+class ItemAuthorCreateView(CreateView):
+    model = ItemAuthor
+    template_name = 'generic_form.html'
+    form_class = ItemAuthorModelForm
+    success_url = reverse_lazy('itemauthors')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = "itemauthor"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class ItemAuthorUpdateView(UpdateView):
+    model = ItemAuthor
+    template_name = 'generic_form.html'
+    form_class = ItemAuthorModelForm
+    success_url = reverse_lazy('itemauthors')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("update")
+        context['object_name'] = "itemauthor"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class ItemAuthorDeleteView(DeleteView):
+    model = ItemAuthor
+    success_url = reverse_lazy('itemauthors')
+
+
+# ItemBookFormatRelation views
+class ItemBookFormatRelationTableView(ListView):
+    model = ItemBookFormatRelation
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return ItemBookFormatRelation.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(ItemBookFormatRelationTableView, self).get_context_data(**kwargs)
+        filter = ItemBookFormatRelationFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = ItemBookFormatRelationTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name'] = "itembookformatrelation"
+        context['add_url'] = reverse_lazy('add_itembookformatrelation')
+
+        return context
+
+
+class ItemBookFormatRelationDetailView(DetailView):
+    model = ItemBookFormatRelation
+
+
+class ItemBookFormatRelationCreateView(CreateView):
+    model = ItemBookFormatRelation
+    template_name = 'generic_form.html'
+    form_class = ItemBookFormatRelationModelForm
+    success_url = reverse_lazy('itembookformatrelations')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = "itembookformatrelation"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class ItemBookFormatRelationUpdateView(UpdateView):
+    model = ItemBookFormatRelation
+    template_name = 'generic_form.html'
+    form_class = ItemBookFormatRelationModelForm
+    success_url = reverse_lazy('itembookformatrelations')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("update")
+        context['object_name'] = "itembookformatrelation"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class ItemBookFormatRelationDeleteView(DeleteView):
+    model = ItemBookFormatRelation
+    success_url = reverse_lazy('itembookformatrelations')
+
+
+# ItemItemTypeRelation views
+class ItemItemTypeRelationTableView(ListView):
+    model = ItemItemTypeRelation
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return ItemItemTypeRelation.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(ItemItemTypeRelationTableView, self).get_context_data(**kwargs)
+        filter = ItemItemTypeRelationFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = ItemItemTypeRelationTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name'] = "itemitemtyperelation"
+        context['add_url'] = reverse_lazy('add_itemitemtyperelation')
+
+        return context
+
+
+class ItemItemTypeRelationDetailView(DetailView):
+    model = ItemItemTypeRelation
+
+
+class ItemItemTypeRelationCreateView(CreateView):
+    model = ItemItemTypeRelation
+    template_name = 'generic_form.html'
+    form_class = ItemItemTypeRelationModelForm
+    success_url = reverse_lazy('itemitemtyperelations')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = "itemitemtyperelation"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class ItemItemTypeRelationUpdateView(UpdateView):
+    model = ItemItemTypeRelation
+    template_name = 'generic_form.html'
+    form_class = ItemItemTypeRelationModelForm
+    success_url = reverse_lazy('itemitemtyperelations')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("update")
+        context['object_name'] = "itemitemtyperelation"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class ItemItemTypeRelationDeleteView(DeleteView):
+    model = ItemItemTypeRelation
+    success_url = reverse_lazy('itemitemtyperelations')
+
+
+# ItemLanguageRelation views
+class ItemLanguageRelationTableView(ListView):
+    model = ItemLanguageRelation
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return ItemLanguageRelation.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(ItemLanguageRelationTableView, self).get_context_data(**kwargs)
+        filter = ItemLanguageRelationFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = ItemLanguageRelationTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name'] = "itemlanguagerelation"
+        context['add_url'] = reverse_lazy('add_itemlanguagerelation')
+
+        return context
+
+
+class ItemLanguageRelationDetailView(DetailView):
+    model = ItemLanguageRelation
+
+
+class ItemLanguageRelationCreateView(CreateView):
+    model = ItemLanguageRelation
+    template_name = 'generic_form.html'
+    form_class = ItemLanguageRelationModelForm
+    success_url = reverse_lazy('itemlanguagerelations')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = "itemlanguagerelation"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class ItemLanguageRelationUpdateView(UpdateView):
+    model = ItemLanguageRelation
+    template_name = 'generic_form.html'
+    form_class = ItemLanguageRelationModelForm
+    success_url = reverse_lazy('itemlanguagerelations')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("update")
+        context['object_name'] = "itemlanguagerelation"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class ItemLanguageRelationDeleteView(DeleteView):
+    model = ItemLanguageRelation
+    success_url = reverse_lazy('itemlanguagerelations')
+
+
+# ItemMaterialDetailsRelation views
+class ItemMaterialDetailsRelationTableView(ListView):
+    model = ItemMaterialDetailsRelation
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return ItemMaterialDetailsRelation.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(ItemMaterialDetailsRelationTableView, self).get_context_data(**kwargs)
+        filter = ItemMaterialDetailsRelationFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = ItemMaterialDetailsRelationTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name'] = "itemmaterialdetailsrelation"
+        context['add_url'] = reverse_lazy('add_itemmaterialdetailsrelation')
+
+        return context
+
+
+class ItemMaterialDetailsRelationDetailView(DetailView):
+    model = ItemMaterialDetailsRelation
+
+
+class ItemMaterialDetailsRelationCreateView(CreateView):
+    model = ItemMaterialDetailsRelation
+    template_name = 'generic_form.html'
+    form_class = ItemMaterialDetailsRelationModelForm
+    success_url = reverse_lazy('itemmaterialdetailsrelations')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = "itemmaterialdetailsrelation"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class ItemMaterialDetailsRelationUpdateView(UpdateView):
+    model = ItemMaterialDetailsRelation
+    template_name = 'generic_form.html'
+    form_class = ItemMaterialDetailsRelationModelForm
+    success_url = reverse_lazy('itemmaterialdetailsrelations')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("update")
+        context['object_name'] = "itemmaterialdetailsrelation"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class ItemMaterialDetailsRelationDeleteView(DeleteView):
+    model = ItemMaterialDetailsRelation
+    success_url = reverse_lazy('itemmaterialdetailsrelations')
+
+
+# ItemType views
+class ItemTypeTableView(ListView):
+    model = ItemType
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return ItemType.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(ItemTypeTableView, self).get_context_data(**kwargs)
+        filter = ItemTypeFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = ItemTypeTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name'] = "itemtype"
+        context['add_url'] = reverse_lazy('add_itemtype')
+
+        return context
+
+
+class ItemTypeDetailView(DetailView):
+    model = ItemType
+
+
+class ItemTypeCreateView(CreateView):
+    model = ItemType
+    template_name = 'generic_form.html'
+    form_class = ItemTypeModelForm
+    success_url = reverse_lazy('itemtypes')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = "itemtype"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class ItemTypeUpdateView(UpdateView):
+    model = ItemType
+    template_name = 'generic_form.html'
+    form_class = ItemTypeModelForm
+    success_url = reverse_lazy('itemtypes')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("update")
+        context['object_name'] = "itemtype"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class ItemTypeDeleteView(DeleteView):
+    model = ItemType
+    success_url = reverse_lazy('itemtypes')
+
+
+# ItemWorkRelation views
+class ItemWorkRelationTableView(ListView):
+    model = ItemWorkRelation
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return ItemWorkRelation.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(ItemWorkRelationTableView, self).get_context_data(**kwargs)
+        filter = ItemWorkRelationFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = ItemWorkRelationTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name'] = "itemworkrelation"
+        context['add_url'] = reverse_lazy('add_itemworkrelation')
+
+        return context
+
+
+class ItemWorkRelationDetailView(DetailView):
+    model = ItemWorkRelation
+
+
+class ItemWorkRelationCreateView(CreateView):
+    model = ItemWorkRelation
+    template_name = 'generic_form.html'
+    form_class = ItemWorkRelationModelForm
+    success_url = reverse_lazy('itemworkrelations')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = "itemworkrelation"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class ItemWorkRelationUpdateView(UpdateView):
+    model = ItemWorkRelation
+    template_name = 'generic_form.html'
+    form_class = ItemWorkRelationModelForm
+    success_url = reverse_lazy('itemworkrelations')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("update")
+        context['object_name'] = "itemworkrelation"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class ItemWorkRelationDeleteView(DeleteView):
+    model = ItemWorkRelation
+    success_url = reverse_lazy('itemworkrelations')
+
+
+# Language views
 class LanguageTableView(ListView):
     model = Language
+    template_name = 'generic_list.html'
 
     def get_queryset(self):
         return Language.objects.all()
@@ -89,6 +677,10 @@ class LanguageTableView(ListView):
 
         context['filter'] = filter
         context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name'] = "language"
+        context['add_url'] = reverse_lazy('add_language')
 
         return context
 
@@ -119,12 +711,12 @@ class LanguageCreateView(CreateView):
 class LanguageUpdateView(UpdateView):
     model = Language
     template_name = 'generic_form.html'
-    fields = LanguageModelForm
+    form_class = LanguageModelForm
     success_url = reverse_lazy('languages')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['action'] = _("add")
+        context['action'] = _("update")
         context['object_name'] = "language"
         return context
 
@@ -134,6 +726,655 @@ class LanguageUpdateView(UpdateView):
                                  _("Your changes will be sent to a moderator for reviewing."))
         return super().form_valid(form)
 
+
 class LanguageDeleteView(DeleteView):
     model = Language
     success_url = reverse_lazy('languages')
+
+
+# MaterialDetails views
+class MaterialDetailsTableView(ListView):
+    model = MaterialDetails
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return MaterialDetails.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(MaterialDetailsTableView, self).get_context_data(**kwargs)
+        filter = MaterialDetailsFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = MaterialDetailsTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name'] = "materialdetails"
+        context['add_url'] = reverse_lazy('add_materialdetails')
+
+        return context
+
+
+class MaterialDetailsDetailView(DetailView):
+    model = MaterialDetails
+
+
+class MaterialDetailsCreateView(CreateView):
+    model = MaterialDetails
+    template_name = 'generic_form.html'
+    form_class = MaterialDetailsModelForm
+    success_url = reverse_lazy('materialdetailss')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = "materialdetails"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class MaterialDetailsUpdateView(UpdateView):
+    model = MaterialDetails
+    template_name = 'generic_form.html'
+    form_class = MaterialDetailsModelForm
+    success_url = reverse_lazy('materialdetailss')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("update")
+        context['object_name'] = "materialdetails"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class MaterialDetailsDeleteView(DeleteView):
+    model = MaterialDetails
+    success_url = reverse_lazy('materialdetailss')
+
+
+# PersonItemRelation views
+class PersonItemRelationTableView(ListView):
+    model = PersonItemRelation
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return PersonItemRelation.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(PersonItemRelationTableView, self).get_context_data(**kwargs)
+        filter = PersonItemRelationFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = PersonItemRelationTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name'] = "personitemrelation"
+        context['add_url'] = reverse_lazy('add_personitemrelation')
+
+        return context
+
+
+class PersonItemRelationDetailView(DetailView):
+    model = PersonItemRelation
+
+
+class PersonItemRelationCreateView(CreateView):
+    model = PersonItemRelation
+    template_name = 'generic_form.html'
+    form_class = PersonItemRelationModelForm
+    success_url = reverse_lazy('personitemrelations')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = "personitemrelation"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class PersonItemRelationUpdateView(UpdateView):
+    model = PersonItemRelation
+    template_name = 'generic_form.html'
+    form_class = PersonItemRelationModelForm
+    success_url = reverse_lazy('personitemrelations')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("update")
+        context['object_name'] = "personitemrelation"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class PersonItemRelationDeleteView(DeleteView):
+    model = PersonItemRelation
+    success_url = reverse_lazy('personitemrelations')
+
+
+# PersonItemRelationRole views
+class PersonItemRelationRoleTableView(ListView):
+    model = PersonItemRelationRole
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return PersonItemRelationRole.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(PersonItemRelationRoleTableView, self).get_context_data(**kwargs)
+        filter = PersonItemRelationRoleFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = PersonItemRelationRoleTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name'] = "personitemrelationrole"
+        context['add_url'] = reverse_lazy('add_personitemrelationrole')
+
+        return context
+
+
+class PersonItemRelationRoleDetailView(DetailView):
+    model = PersonItemRelationRole
+
+
+class PersonItemRelationRoleCreateView(CreateView):
+    model = PersonItemRelationRole
+    template_name = 'generic_form.html'
+    form_class = PersonItemRelationRoleModelForm
+    success_url = reverse_lazy('personitemrelationroles')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = "personitemrelationrole"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class PersonItemRelationRoleUpdateView(UpdateView):
+    model = PersonItemRelationRole
+    template_name = 'generic_form.html'
+    form_class = PersonItemRelationRoleModelForm
+    success_url = reverse_lazy('personitemrelationroles')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("update")
+        context['object_name'] = "personitemrelationrole"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class PersonItemRelationRoleDeleteView(DeleteView):
+    model = PersonItemRelationRole
+    success_url = reverse_lazy('personitemrelationroles')
+
+
+# Publication views
+class PublicationTableView(ListView):
+    model = Publication
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return Publication.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(PublicationTableView, self).get_context_data(**kwargs)
+        filter = PublicationFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = PublicationTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name'] = "publication"
+        context['add_url'] = reverse_lazy('add_publication')
+
+        return context
+
+
+class PublicationDetailView(DetailView):
+    model = Publication
+
+
+class PublicationCreateView(CreateView):
+    model = Publication
+    template_name = 'generic_form.html'
+    form_class = PublicationModelForm
+    success_url = reverse_lazy('publications')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = "publication"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class PublicationUpdateView(UpdateView):
+    model = Publication
+    template_name = 'generic_form.html'
+    form_class = PublicationModelForm
+    success_url = reverse_lazy('publications')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("update")
+        context['object_name'] = "publication"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class PublicationDeleteView(DeleteView):
+    model = Publication
+    success_url = reverse_lazy('publications')
+
+
+# Publisher views
+class PublisherTableView(ListView):
+    model = Publisher
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return Publisher.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(PublisherTableView, self).get_context_data(**kwargs)
+        filter = PublisherFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = PublisherTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name'] = "publisher"
+        context['add_url'] = reverse_lazy('add_publisher')
+
+        return context
+
+
+class PublisherDetailView(DetailView):
+    model = Publisher
+
+
+class PublisherCreateView(CreateView):
+    model = Publisher
+    template_name = 'generic_form.html'
+    form_class = PublisherModelForm
+    success_url = reverse_lazy('publishers')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = "publisher"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class PublisherUpdateView(UpdateView):
+    model = Publisher
+    template_name = 'generic_form.html'
+    form_class = PublisherModelForm
+    success_url = reverse_lazy('publishers')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("update")
+        context['object_name'] = "publisher"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class PublisherDeleteView(DeleteView):
+    model = Publisher
+    success_url = reverse_lazy('publishers')
+
+
+# Subject views
+class SubjectTableView(ListView):
+    model = Subject
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return Subject.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(SubjectTableView, self).get_context_data(**kwargs)
+        filter = SubjectFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = SubjectTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name'] = "subject"
+        context['add_url'] = reverse_lazy('add_subject')
+
+        return context
+
+
+class SubjectDetailView(DetailView):
+    model = Subject
+
+
+class SubjectCreateView(CreateView):
+    model = Subject
+    template_name = 'generic_form.html'
+    form_class = SubjectModelForm
+    success_url = reverse_lazy('subjects')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = "subject"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class SubjectUpdateView(UpdateView):
+    model = Subject
+    template_name = 'generic_form.html'
+    form_class = SubjectModelForm
+    success_url = reverse_lazy('subjects')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("update")
+        context['object_name'] = "subject"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class SubjectDeleteView(DeleteView):
+    model = Subject
+    success_url = reverse_lazy('subjects')
+
+
+# Work views
+class WorkTableView(ListView):
+    model = Work
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return Work.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(WorkTableView, self).get_context_data(**kwargs)
+        filter = WorkFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = WorkTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name'] = "work"
+        context['add_url'] = reverse_lazy('add_work')
+
+        return context
+
+
+class WorkDetailView(DetailView):
+    model = Work
+
+
+class WorkCreateView(CreateView):
+    model = Work
+    template_name = 'generic_form.html'
+    form_class = WorkModelForm
+    success_url = reverse_lazy('works')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = "work"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class WorkUpdateView(UpdateView):
+    model = Work
+    template_name = 'generic_form.html'
+    form_class = WorkModelForm
+    success_url = reverse_lazy('works')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("update")
+        context['object_name'] = "work"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class WorkDeleteView(DeleteView):
+    model = Work
+    success_url = reverse_lazy('works')
+
+
+# WorkAuthor views
+class WorkAuthorTableView(ListView):
+    model = WorkAuthor
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return WorkAuthor.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(WorkAuthorTableView, self).get_context_data(**kwargs)
+        filter = WorkAuthorFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = WorkAuthorTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name'] = "workauthor"
+        context['add_url'] = reverse_lazy('add_workauthor')
+
+        return context
+
+
+class WorkAuthorDetailView(DetailView):
+    model = WorkAuthor
+
+
+class WorkAuthorCreateView(CreateView):
+    model = WorkAuthor
+    template_name = 'generic_form.html'
+    form_class = WorkAuthorModelForm
+    success_url = reverse_lazy('workauthors')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = "workauthor"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class WorkAuthorUpdateView(UpdateView):
+    model = WorkAuthor
+    template_name = 'generic_form.html'
+    form_class = WorkAuthorModelForm
+    success_url = reverse_lazy('workauthors')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("update")
+        context['object_name'] = "workauthor"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class WorkAuthorDeleteView(DeleteView):
+    model = WorkAuthor
+    success_url = reverse_lazy('workauthors')
+
+
+# WorkSubject views
+class WorkSubjectTableView(ListView):
+    model = WorkSubject
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return WorkSubject.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(WorkSubjectTableView, self).get_context_data(**kwargs)
+        filter = WorkSubjectFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = WorkSubjectTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name'] = "worksubject"
+        context['add_url'] = reverse_lazy('add_worksubject')
+
+        return context
+
+
+class WorkSubjectDetailView(DetailView):
+    model = WorkSubject
+
+
+class WorkSubjectCreateView(CreateView):
+    model = WorkSubject
+    template_name = 'generic_form.html'
+    form_class = WorkSubjectModelForm
+    success_url = reverse_lazy('worksubjects')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = "worksubject"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class WorkSubjectUpdateView(UpdateView):
+    model = WorkSubject
+    template_name = 'generic_form.html'
+    form_class = WorkSubjectModelForm
+    success_url = reverse_lazy('worksubjects')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("update")
+        context['object_name'] = "worksubject"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class WorkSubjectDeleteView(DeleteView):
+    model = WorkSubject
+    success_url = reverse_lazy('worksubjects')

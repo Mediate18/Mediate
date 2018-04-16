@@ -9,6 +9,8 @@ urlpatterns = [
     path(r'', RedirectView.as_view(url='catalogues/')),
     path(r'catalogues/', login_required(CatalogueTableView.as_view()), name="catalogues"),
     path(r'catalogues/<int:pk>', login_required(CatalogueDetailView.as_view()), name="catalogue_detail"),
+    # path(r'lots/', login_required(LotListView.as_view()), name="lots"),
+    # path(r'lots/<int:pk>', RedirectView.as_view(url=reverse_lazy('lots')), name="lot_detail"),  # TODO
 
     # Edit forms
     path(r'catalogues/edit/<int:pk>', permission_required('catalogues.change_catalogue')(change_catalogue),
