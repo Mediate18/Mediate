@@ -6,7 +6,7 @@
         {{ user.first_name }} {{ user.last_name }} </a>
     <div id="popover_content_wrapper" class="hide">
       <div><a href="{% url 'logout' %}"><span class="glyphicon glyphicon-log-out"> </span> Log out</a></div>
-      <div><a href="#"><span class="glyphicon glyphicon-dashboard"> </span> {% trans "Dashboard" %}</a></div>
+      <div><a href="{% url 'dashboard' %}"><span class="glyphicon glyphicon-dashboard"> </span> {% trans "Dashboard" %}</a></div>
     </div>
 </li>
 {% else %}

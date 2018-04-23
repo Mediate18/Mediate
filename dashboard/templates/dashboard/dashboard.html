@@ -5,6 +5,179 @@
 
 <h1>{% trans "Dashboard" %}</h1>
 
-<a href="{% url 'languages' %}">Languages</a>
+<table class="table">
+    <tbody>
+
+        <tr>
+            <td>
+                {% if perms.items.change_bookformat %}
+                <a href="{% url 'bookformats' %}">BookFormats</a>
+                {% endif %}
+            </td>
+        </tr>
+
+
+        <tr>
+            <td>
+                {% if perms.items.change_item %}
+                <a href="{% url 'items' %}">Items</a>
+                {% endif %}
+            </td>
+        </tr>
+
+
+        <tr>
+            <td>
+                {% if perms.items.change_itemauthor %}
+                <a href="{% url 'itemauthors' %}">ItemAuthors</a>
+                {% endif %}
+            </td>
+        </tr>
+
+
+        <tr>
+            <td>
+                {% if perms.items.change_itembookformatrelation %}
+                <a href="{% url 'itembookformatrelations' %}">ItemBookFormatRelations</a>
+                {% endif %}
+            </td>
+        </tr>
+
+
+        <tr>
+            <td>
+                {% if perms.items.change_itemitemtyperelation %}
+                <a href="{% url 'itemitemtyperelations' %}">ItemItemTypeRelations</a>
+                {% endif %}
+            </td>
+        </tr>
+
+
+        <tr>
+            <td>
+                {% if perms.items.change_itemlanguagerelation %}
+                <a href="{% url 'itemlanguagerelations' %}">ItemLanguageRelations</a>
+                {% endif %}
+            </td>
+        </tr>
+
+
+        <tr>
+            <td>
+                {% if perms.items.change_itemmaterialdetailsrelation %}
+                <a href="{% url 'itemmaterialdetailsrelations' %}">ItemMaterialDetailsRelations</a>
+                {% endif %}
+            </td>
+        </tr>
+
+
+        <tr>
+            <td>
+                {% if perms.items.change_itemtype %}
+                <a href="{% url 'itemtypes' %}">ItemTypes</a>
+                {% endif %}
+            </td>
+        </tr>
+
+
+        <tr>
+            <td>
+                {% if perms.items.change_itemworkrelation %}
+                <a href="{% url 'itemworkrelations' %}">ItemWorkRelations</a>
+                {% endif %}
+            </td>
+        </tr>
+
+
+        <tr>
+            <td>
+                {% if perms.items.change_language %}
+                <a href="{% url 'languages' %}">Languages</a>
+                {% endif %}
+            </td>
+        </tr>
+
+
+        <tr>
+            <td>
+                {% if perms.items.change_materialdetails %}
+                <a href="{% url 'materialdetailss' %}">MaterialDetailss</a>
+                {% endif %}
+            </td>
+        </tr>
+
+
+        <tr>
+            <td>
+                {% if perms.items.change_personitemrelation %}
+                <a href="{% url 'personitemrelations' %}">PersonItemRelations</a>
+                {% endif %}
+            </td>
+        </tr>
+
+
+        <tr>
+            <td>
+                {% if perms.items.change_personitemrelationrole %}
+                <a href="{% url 'personitemrelationroles' %}">PersonItemRelationRoles</a>
+                {% endif %}
+            </td>
+        </tr>
+
+
+        <tr>
+            <td>
+                {% if perms.items.change_publication %}
+                <a href="{% url 'publications' %}">Publications</a>
+                {% endif %}
+            </td>
+        </tr>
+
+
+        <tr>
+            <td>
+                {% if perms.items.change_publisher %}
+                <a href="{% url 'publishers' %}">Publishers</a>
+                {% endif %}
+            </td>
+        </tr>
+
+
+        <tr>
+            <td>
+                {% if perms.items.change_subject %}
+                <a href="{% url 'subjects' %}">Subjects</a>
+                {% endif %}
+            </td>
+        </tr>
+
+
+        <tr>
+            <td>
+                {% if perms.items.change_work %}
+                <a href="{% url 'works' %}">Works</a>
+                {% endif %}
+            </td>
+        </tr>
+
+
+        <tr>
+            <td>
+                {% if perms.items.change_workauthor %}
+                <a href="{% url 'workauthors' %}">WorkAuthors</a>
+                {% endif %}
+            </td>
+        </tr>
+
+
+        <tr>
+            <td>
+                {% if perms.items.change_worksubject %}
+                <a href="{% url 'worksubjects' %}">WorkSubjects</a>
+                {% endif %}
+            </td>
+        </tr>
+    </tbody>
+</table>
 
 {% endblock %}
