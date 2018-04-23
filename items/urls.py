@@ -7,27 +7,7 @@ from .views.views import *
 
 urlpatterns = [
     path(r'', RedirectView.as_view(url='items/')),
-    # path(r'items/', login_required(ItemTableView.as_view()), name="items"),
-    # path(r'items/<int:pk>', RedirectView.as_view(url=reverse_lazy('items')), name="item_detail"),  # TODO
-    #
-    # # Edit forms
-    # path(r'items/add', permission_required('items.add_item')(ItemCreateView.as_view()),
-    #      name="add_item"),
-    # path(r'items/edit/<int:pk>', permission_required('items.change_item')(ItemUpdateView.as_view()),
-    #      name="change_item"),
-    #
-    #
-    # # Language urls
-    # path('languages/', login_required(LanguageTableView.as_view()), name='languages'),
-    # path(r'languages/<uuid:pk>', login_required(LanguageDetailView.as_view()), name="language_detail"),
-    # path(r'languages/add', permission_required('items.add_language')(LanguageCreateView.as_view()),
-    #      name="add_language"),
-    # path(r'languages/edit/<uuid:pk>', permission_required('items.change_language')(LanguageUpdateView.as_view()),
-    #      name="change_language"),
-    # path(r'languages/delete/<uuid:pk>', permission_required('items.delete_language')(LanguageDeleteView.as_view()),
-    #      name="delete_language"),
 
-###
     # BookFormat urls
     path('bookformats/', login_required(BookFormatTableView.as_view()), name='bookformats'),
     path(r'bookformats/<uuid:pk>', login_required(BookFormatDetailView.as_view()),

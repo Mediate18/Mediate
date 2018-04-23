@@ -49,6 +49,9 @@ class Library(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("The name of the library/institute"), max_length=128)
 
+    class Meta:
+        verbose_name_plural = "libraries"
+
     def __str__(self):
         return self.name
 

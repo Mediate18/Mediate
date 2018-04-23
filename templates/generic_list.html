@@ -32,7 +32,11 @@
 
 <div class="row">
     <div class="col-xs-10">
-        <h1>{{ object_name|title }}s</h1>
+        {% if object_name_plural %}
+            <h1>{{ object_name_plural|title }} </h1>
+        {% else %}
+            <h1>{{ object_name|title }}s</h1>
+        {% endif %}
         <div class="small">Displaying {{ filter.qs.count }} of {{ filter.queryset.count }} {{ object_name }}s.</div>
         {% if table %}
             {% render_table table %}
