@@ -11,7 +11,7 @@ class PersonModelForm(forms.ModelForm):
         fields = "__all__"
         widgets = {
             'viaf_id': ViafWidget(
-                url=reverse_lazy()
+                url=reverse_lazy('viapy:person-suggest')
             ),
             'sex': Select2Widget,
             'city_of_birth': Select2Widget,
