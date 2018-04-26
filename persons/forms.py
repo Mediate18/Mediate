@@ -1,4 +1,7 @@
 from django import forms
+from django.urls import reverse_lazy
+from django_select2.forms import Select2Widget
+from viapy.widgets import ViafWidget
 from .models import *
 
 
@@ -6,6 +9,14 @@ class PersonModelForm(forms.ModelForm):
     class Meta:
         model = Person
         fields = "__all__"
+        widgets = {
+            'viaf_id': ViafWidget(
+                url=reverse_lazy()
+            ),
+            'sex': Select2Widget,
+            'city_of_birth': Select2Widget,
+            'city_of_death': Select2Widget,
+        }
 
 
 class PersonPersonRelationModelForm(forms.ModelForm):

@@ -53,7 +53,7 @@ router.register(r'works', items.views.WorkViewSet)
 
 
 urlpatterns = [
-    path(r'', RedirectView.as_view(url='catalogues/')),
+    path(r'', RedirectView.as_view(url='dashboard/')),
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path(r'items/', include(items.urls)),
@@ -64,4 +64,5 @@ urlpatterns = [
     url(r'^api/', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^select2/', include('django_select2.urls')),
+    url(r'^viaf/', include(('viapy.urls', 'viapy'), namespace='viaf'), name='viaf'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
