@@ -5,7 +5,7 @@ from .models import *
 
 # Person table
 class PersonTable(tables.Table):
-    edit = tables.LinkColumn('person_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_person', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -15,7 +15,7 @@ class PersonTable(tables.Table):
 
 # PersonPersonRelation table
 class PersonPersonRelationTable(tables.Table):
-    edit = tables.LinkColumn('personpersonrelation_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_personpersonrelation', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -25,7 +25,7 @@ class PersonPersonRelationTable(tables.Table):
 
 # PersonPersonRelationType table
 class PersonPersonRelationTypeTable(tables.Table):
-    edit = tables.LinkColumn('personpersonrelationtype_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_personpersonrelationtype', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -35,7 +35,7 @@ class PersonPersonRelationTypeTable(tables.Table):
 
 # PersonProfession table
 class PersonProfessionTable(tables.Table):
-    edit = tables.LinkColumn('personprofession_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_personprofession', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -45,7 +45,7 @@ class PersonProfessionTable(tables.Table):
 
 # Place table
 class PlaceTable(tables.Table):
-    edit = tables.LinkColumn('place_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_place', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -55,7 +55,7 @@ class PlaceTable(tables.Table):
 
 # Profession table
 class ProfessionTable(tables.Table):
-    edit = tables.LinkColumn('profession_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_profession', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -65,7 +65,7 @@ class ProfessionTable(tables.Table):
 
 # Religion table
 class ReligionTable(tables.Table):
-    edit = tables.LinkColumn('religion_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_religion', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -75,7 +75,7 @@ class ReligionTable(tables.Table):
 
 # ReligiousAffiliation table
 class ReligiousAffiliationTable(tables.Table):
-    edit = tables.LinkColumn('religiousaffiliation_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_religiousaffiliation', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -85,7 +85,7 @@ class ReligiousAffiliationTable(tables.Table):
 
 # Residence table
 class ResidenceTable(tables.Table):
-    edit = tables.LinkColumn('residence_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_residence', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:

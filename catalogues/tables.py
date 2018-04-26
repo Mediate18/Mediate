@@ -5,7 +5,7 @@ from .models import *
 
 # Catalogue table
 class CatalogueTable(tables.Table):
-    edit = tables.LinkColumn('catalogue_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_catalogue', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -15,7 +15,7 @@ class CatalogueTable(tables.Table):
 
 # CatalogueHeldBy table
 class CatalogueHeldByTable(tables.Table):
-    edit = tables.LinkColumn('catalogueheldby_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_catalogueheldby', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -25,7 +25,7 @@ class CatalogueHeldByTable(tables.Table):
 
 # CatalogueType table
 class CatalogueTypeTable(tables.Table):
-    edit = tables.LinkColumn('cataloguetype_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_cataloguetype', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -35,7 +35,7 @@ class CatalogueTypeTable(tables.Table):
 
 # Collection table
 class CollectionTable(tables.Table):
-    edit = tables.LinkColumn('collection_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_collection', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -45,7 +45,7 @@ class CollectionTable(tables.Table):
 
 # CollectionYear table
 class CollectionYearTable(tables.Table):
-    edit = tables.LinkColumn('collectionyear_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_collectionyear', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -55,7 +55,7 @@ class CollectionYearTable(tables.Table):
 
 # Library table
 class LibraryTable(tables.Table):
-    edit = tables.LinkColumn('library_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_library', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -65,7 +65,7 @@ class LibraryTable(tables.Table):
 
 # Lot table
 class LotTable(tables.Table):
-    edit = tables.LinkColumn('lot_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_lot', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -75,7 +75,7 @@ class LotTable(tables.Table):
 
 # PersonCatalogueRelation table
 class PersonCatalogueRelationTable(tables.Table):
-    edit = tables.LinkColumn('personcataloguerelation_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_personcataloguerelation', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -85,7 +85,7 @@ class PersonCatalogueRelationTable(tables.Table):
 
 # PersonCatalogueRelationRole table
 class PersonCatalogueRelationRoleTable(tables.Table):
-    edit = tables.LinkColumn('personcataloguerelationrole_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_personcataloguerelationrole', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -95,7 +95,7 @@ class PersonCatalogueRelationRoleTable(tables.Table):
 
 # PersonCollectionRelation table
 class PersonCollectionRelationTable(tables.Table):
-    edit = tables.LinkColumn('personcollectionrelation_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_personcollectionrelation', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:

@@ -7,7 +7,7 @@ from .models import *
 
 # BookFormat table
 class BookFormatTable(tables.Table):
-    edit = tables.LinkColumn('bookformat_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_bookformat', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -17,7 +17,7 @@ class BookFormatTable(tables.Table):
 
 # Item table
 class ItemTable(tables.Table):
-    edit = tables.LinkColumn('item_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_item', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -27,7 +27,7 @@ class ItemTable(tables.Table):
 
 # ItemAuthor table
 class ItemAuthorTable(tables.Table):
-    edit = tables.LinkColumn('itemauthor_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_itemauthor', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -37,7 +37,7 @@ class ItemAuthorTable(tables.Table):
 
 # ItemBookFormatRelation table
 class ItemBookFormatRelationTable(tables.Table):
-    edit = tables.LinkColumn('itembookformatrelation_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_itembookformatrelation', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -47,7 +47,7 @@ class ItemBookFormatRelationTable(tables.Table):
 
 # ItemItemTypeRelation table
 class ItemItemTypeRelationTable(tables.Table):
-    edit = tables.LinkColumn('itemitemtyperelation_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_itemitemtyperelation', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -57,7 +57,7 @@ class ItemItemTypeRelationTable(tables.Table):
 
 # ItemLanguageRelation table
 class ItemLanguageRelationTable(tables.Table):
-    edit = tables.LinkColumn('itemlanguagerelation_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_itemlanguagerelation', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -67,7 +67,7 @@ class ItemLanguageRelationTable(tables.Table):
 
 # ItemMaterialDetailsRelation table
 class ItemMaterialDetailsRelationTable(tables.Table):
-    edit = tables.LinkColumn('itemmaterialdetailsrelation_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_itemmaterialdetailsrelation', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -77,7 +77,7 @@ class ItemMaterialDetailsRelationTable(tables.Table):
 
 # ItemType table
 class ItemTypeTable(tables.Table):
-    edit = tables.LinkColumn('itemtype_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_itemtype', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -87,7 +87,7 @@ class ItemTypeTable(tables.Table):
 
 # ItemWorkRelation table
 class ItemWorkRelationTable(tables.Table):
-    edit = tables.LinkColumn('itemworkrelation_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_itemworkrelation', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -107,7 +107,7 @@ class LanguageTable(tables.Table):
 
 # MaterialDetails table
 class MaterialDetailsTable(tables.Table):
-    edit = tables.LinkColumn('materialdetails_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_materialdetails', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -117,7 +117,7 @@ class MaterialDetailsTable(tables.Table):
 
 # PersonItemRelation table
 class PersonItemRelationTable(tables.Table):
-    edit = tables.LinkColumn('personitemrelation_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_personitemrelation', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -127,7 +127,7 @@ class PersonItemRelationTable(tables.Table):
 
 # PersonItemRelationRole table
 class PersonItemRelationRoleTable(tables.Table):
-    edit = tables.LinkColumn('personitemrelationrole_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_personitemrelationrole', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -137,7 +137,7 @@ class PersonItemRelationRoleTable(tables.Table):
 
 # Publication table
 class PublicationTable(tables.Table):
-    edit = tables.LinkColumn('publication_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_publication', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -147,7 +147,7 @@ class PublicationTable(tables.Table):
 
 # Publisher table
 class PublisherTable(tables.Table):
-    edit = tables.LinkColumn('publisher_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_publisher', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -157,7 +157,7 @@ class PublisherTable(tables.Table):
 
 # Subject table
 class SubjectTable(tables.Table):
-    edit = tables.LinkColumn('subject_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_subject', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -167,7 +167,7 @@ class SubjectTable(tables.Table):
 
 # Work table
 class WorkTable(tables.Table):
-    edit = tables.LinkColumn('work_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_work', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -177,7 +177,7 @@ class WorkTable(tables.Table):
 
 # WorkAuthor table
 class WorkAuthorTable(tables.Table):
-    edit = tables.LinkColumn('workauthor_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_workauthor', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
@@ -187,7 +187,7 @@ class WorkAuthorTable(tables.Table):
 
 # WorkSubject table
 class WorkSubjectTable(tables.Table):
-    edit = tables.LinkColumn('worksubject_edit', text='Edit', args=[A('pk')],
+    edit = tables.LinkColumn('change_worksubject', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:
