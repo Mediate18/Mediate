@@ -369,12 +369,41 @@
         </table>
     </div>
     <div class="col-xs-3">
-        <!--<h3>{% trans "Catalogues" %}</h3>-->
-        <!--<table class="table">-->
-            <!--<tbody>-->
+        <h3>{% trans "Transcriptions" %}</h3>
+        <table class="table">
+            <tbody>
 
-            <!--</tbody>-->
-        <!--</table>-->
+
+                <tr>
+                    <td>
+                        {% if perms.transcriptions.change_documentscan %}
+                        <a href="{% url 'documentscans' %}">DocumentScans</a>
+                        {% endif %}
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>
+                        {% if perms.transcriptions.change_sourcematerial %}
+                        <a href="{% url 'sourcematerials' %}">SourceMaterials</a>
+                        {% endif %}
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>
+                        {% if perms.transcriptions.change_transcription %}
+                        <a href="{% url 'transcriptions' %}">Transcriptions</a>
+                        {% endif %}
+                    </td>
+                </tr>
+
+
+
+            </tbody>
+        </table>
 
     </div>
 </div>
