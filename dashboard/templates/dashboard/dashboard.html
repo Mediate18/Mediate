@@ -7,6 +7,95 @@
 
 <div class="row">
     <div class="col-xs-3">
+        <h3>{% trans "Persons" %}</h3>
+        <table class="table">
+            <tbody>
+
+                <tr>
+                    <td>
+                        {% if perms.persons.change_person %}
+                        <a href="{% url 'persons' %}">Persons</a>
+                        {% endif %}
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>
+                        {% if perms.persons.change_personpersonrelation %}
+                        <a href="{% url 'personpersonrelations' %}">PersonPersonRelations</a>
+                        {% endif %}
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>
+                        {% if perms.persons.change_personpersonrelationtype %}
+                        <a href="{% url 'personpersonrelationtypes' %}">PersonPersonRelationTypes</a>
+                        {% endif %}
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>
+                        {% if perms.persons.change_personprofession %}
+                        <a href="{% url 'personprofessions' %}">PersonProfessions</a>
+                        {% endif %}
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>
+                        {% if perms.persons.change_place %}
+                        <a href="{% url 'places' %}">Places</a>
+                        {% endif %}
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>
+                        {% if perms.persons.change_profession %}
+                        <a href="{% url 'professions' %}">Professions</a>
+                        {% endif %}
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>
+                        {% if perms.persons.change_religion %}
+                        <a href="{% url 'religions' %}">Religions</a>
+                        {% endif %}
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>
+                        {% if perms.persons.change_religiousaffiliation %}
+                        <a href="{% url 'religiousaffiliations' %}">ReligiousAffiliations</a>
+                        {% endif %}
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>
+                        {% if perms.persons.change_residence %}
+                        <a href="{% url 'residences' %}">Residences</a>
+                        {% endif %}
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+    <div class="col-xs-3">
         <h3>{% trans "Catalogues" %}</h3>
         <table class="table">
             <tbody>
@@ -278,15 +367,6 @@
                 </tr>
             </tbody>
         </table>
-    </div>
-    <div class="col-xs-3">
-        <!--<h3>{% trans "Catalogues" %}</h3>-->
-        <!--<table class="table">-->
-            <!--<tbody>-->
-
-            <!--</tbody>-->
-        <!--</table>-->
-
     </div>
     <div class="col-xs-3">
         <!--<h3>{% trans "Catalogues" %}</h3>-->

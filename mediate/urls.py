@@ -58,7 +58,7 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path(r'items/', include(items.urls)),
     path(r'catalogues/', include(catalogues.urls)),
-    # path(r'persons/', include(persons.urls)),
+    path(r'persons/', include(persons.urls)),
     # path(r'transcriptions/', include(transcriptions.urls)),
     path(r'dashboard/', view_dashboard, name='dashboard'),
     url(r'^api/', include(router.urls)),
