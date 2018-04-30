@@ -22,7 +22,7 @@ class Transcription(models.Model):
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    date = models.DateField(_("Creation date"))
+    date = models.DateField(_("Creation date"), auto_now_add=True)
     source_material = models.ForeignKey(SourceMaterial, on_delete=models.PROTECT)
     curator = models.CharField(_("Curator"), max_length=128)
 

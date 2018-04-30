@@ -18,6 +18,8 @@ class SourceMaterialModelForm(forms.ModelForm):
 class TranscriptionModelForm(forms.ModelForm):
     class Meta:
         model = Transcription
-        fields = "__all__"
-
+        fields = ['source_material', 'curator']
+        widgets = {
+            'source_material': Select2Widget,
+        }
 

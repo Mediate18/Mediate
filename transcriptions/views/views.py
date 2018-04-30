@@ -206,6 +206,16 @@ class TranscriptionCreateView(CreateView):
                                  _("Your changes will be sent to a moderator for reviewing."))
         return super().form_valid(form)
 
+    def post(self, request, *args, **kwargs):
+        form = TranscriptionModelForm(request.POST)
+        if form.is_valid():
+            transcription = form.save(commit=False)
+            transcription.author = request.user
+            transcription.save()
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
 
 class TranscriptionUpdateView(UpdateView):
     model = Transcription
