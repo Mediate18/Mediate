@@ -48,7 +48,7 @@ class ItemWorkRelationViewSet(viewsets.ModelViewSet):
 
 
 class LanguageViewSet(viewsets.ModelViewSet):
-    queryset = Language.unmoderated_objects.all()
+    queryset = Language.objects.all()
     serializer_class = LanguageSerializer
 
 
