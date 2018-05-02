@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'bootstrap3',
     'rest_framework',
     'django_filters',
-    'moderation',
     'django_tables2',
     'django_select2',
     'dal',
@@ -166,5 +165,3 @@ DJANGO_TABLES2_TEMPLATE = 'django_tables2/bootstrap-responsive.html'
 BOOTSTRAP3 = {
     'jquery_url': '//code.jquery.com/jquery-2.x-git.min.js'
 }
-
-MODERATED_OBJECT_PK = "use_uuid"

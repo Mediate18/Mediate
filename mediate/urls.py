@@ -29,9 +29,7 @@ import transcriptions.urls
 from dashboard.views import view_dashboard
 
 from django.contrib import admin
-from moderation.helpers import auto_discover
 admin.autodiscover()
-auto_discover()
 
 router = routers.DefaultRouter()
 # router.register(r'users', views.UserViewSet)
