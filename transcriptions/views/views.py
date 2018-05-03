@@ -211,8 +211,24 @@ class TranscriptionCreateView(CreateView):
         if form.is_valid():
             transcription = form.save(commit=False)
             transcription.author = request.user
-            transcription.save()
-            return self.form_valid(form)
+
+            if not self.request.user.is_superuser:
+                messages.add_message(self.request, messages.SUCCESS,
+                                     _("Your changes will be sent to a moderator for reviewing."))
+
+                from simplemoderation.models import Moderation
+                from django.forms.models import model_to_dict
+                moderation = Moderation(
+                    editor=request.user,
+                    action='C',  # Create
+                    data=model_to_dict(transcription, fields=[field.name for field in transcription._meta.fields]),
+                )
+                moderation.save()
+            else:
+                transcription.save()
+
+            from django.shortcuts import redirect
+            return redirect(self.success_url)
         else:
             return self.form_invalid(form)
 
