@@ -1,0 +1,50 @@
+{% extends "baselayout.html" %}
+{% load i18n %}
+{% load render_table from django_tables2 %}
+
+
+{% block content %}
+
+<div class="row">
+    <div class="col-xs-10">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+              <h4 class="panel-title">
+                <a data-toggle="collapse" href="#collapse1">Filter <span class="glyphicon glyphicon-chevron-down"></span></a>
+              </h4>
+            </div>
+            <div id="collapse1" class="panel-collapse collapse">
+              <div class="panel-body">
+                <form action="" method="get">
+                    <table class="table">
+                    {{ filter.form.as_table }}
+                    </table>
+                    <div class="pull-right">
+                        <input type="submit" class="btn"/>
+                        <a href='{{ request.path }}' class="btn">Clear</a>
+                    </div>
+                </form>
+              </div>
+            </div>
+          </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-10">
+        {% if object_name_plural %}
+            <h1>{{ object_name_plural|title }} </h1>
+        {% else %}
+            <h1>{{ object_name|title }}s</h1>
+        {% endif %}
+        <div class="small">Displaying {{ filter.qs.count }} of {{ filter.queryset.count }} {{ object_name }}s.</div>
+        {% if table %}
+            {% render_table table %}
+        {% else %}
+            <div>No {{ object_name}}s.</div>
+        {% endif %}
+    </div>
+    <div class="col-xs-2">
+    </div>
+</div>
+{% endblock %}

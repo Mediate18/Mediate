@@ -1,16 +1,20 @@
 from django.contrib import messages
+from django.shortcuts import redirect
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.detail import DetailView
+
+from django.contrib.contenttypes.models import ContentType
 
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse_lazy
 import django_tables2
 
+from simplemoderation.models import Moderation
+
 from ..forms import *
 from ..filters import *
 from ..tables import *
-
 
 
 # DocumentScan views
@@ -85,7 +89,6 @@ class DocumentScanDeleteView(DeleteView):
     success_url = reverse_lazy('documentscans')
 
 
-
 # SourceMaterial views
 class SourceMaterialTableView(ListView):
     model = SourceMaterial
@@ -158,7 +161,6 @@ class SourceMaterialDeleteView(DeleteView):
     success_url = reverse_lazy('sourcematerials')
 
 
-
 # Transcription views
 class TranscriptionTableView(ListView):
     model = Transcription
@@ -201,36 +203,18 @@ class TranscriptionCreateView(CreateView):
         return context
 
     def form_valid(self, form):
+        transcription = form.save(commit=False)
+        transcription.author = self.request.user
+
         if not self.request.user.is_superuser:
             messages.add_message(self.request, messages.SUCCESS,
                                  _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
-
-    def post(self, request, *args, **kwargs):
-        form = TranscriptionModelForm(request.POST)
-        if form.is_valid():
-            transcription = form.save(commit=False)
-            transcription.author = request.user
-
-            if not self.request.user.is_superuser:
-                messages.add_message(self.request, messages.SUCCESS,
-                                     _("Your changes will be sent to a moderator for reviewing."))
-
-                from simplemoderation.models import Moderation
-                from django.forms.models import model_to_dict
-                moderation = Moderation(
-                    editor=request.user,
-                    action='C',  # Create
-                    data=model_to_dict(transcription, fields=[field.name for field in transcription._meta.fields]),
-                )
-                moderation.save()
-            else:
-                transcription.save()
-
-            from django.shortcuts import redirect
-            return redirect(self.success_url)
+            moderation = Moderation.create(editor=self.request.user, obj=transcription)
+            moderation.save()
         else:
-            return self.form_invalid(form)
+            transcription.save()
+
+        return redirect(self.success_url)
 
 
 class TranscriptionUpdateView(UpdateView):
@@ -246,10 +230,18 @@ class TranscriptionUpdateView(UpdateView):
         return context
 
     def form_valid(self, form):
+        transcription = form.save(commit=False)
+        transcription.author = self.request.user
+
         if not self.request.user.is_superuser:
             messages.add_message(self.request, messages.SUCCESS,
                                  _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
+            moderation = Moderation.update(editor=self.request.user, obj=transcription)
+            moderation.save()
+        else:
+            transcription.save()
+
+        return redirect(self.success_url)
 
 
 class TranscriptionDeleteView(DeleteView):

@@ -35,6 +35,23 @@ class SerializedObjectField(models.TextField):
         self.serialize_format = serialize_format
         super(SerializedObjectField, self).__init__(*args, **kwargs)
 
+    def db_type(self, connection=None):
+        return 'text'
+
+    def from_db_value(self, value, expression, connection):
+        if value is None:
+            return value
+        return self._deserialize(value)
+
+    def to_python(self, value):
+        print("to_python")
+        if isinstance(value, models.Model):
+            print("models.Model")
+            return value
+        if value is None:
+            return value
+        return self._deserialize(value)
+
     def _serialize(self, value):
         if not value:
             return ''
@@ -67,28 +84,17 @@ class SerializedObjectField(models.TextField):
                         return None
         return obj
 
-    def db_type(self, connection=None):
-        return 'text'
+    def _serialize_if_object(self, value):
+        if isinstance(value, str):
+            # Check whether value can be deserialized
+            self._deserialize(value)
+            return value
+        else:
+            return self._serialize(value)
 
     def pre_save(self, model_instance, add):
         value = getattr(model_instance, self.attname, None)
-        return self._serialize(value)
+        return self._serialize_if_object(value)
 
-    def contribute_to_class(self, cls, name):
-        self.class_name = cls
-        super(SerializedObjectField, self).contribute_to_class(cls, name)
-        models.signals.post_init.connect(self.post_init)
-
-    def post_init(self, **kwargs):
-        if 'sender' in kwargs and 'instance' in kwargs:
-            sender = kwargs['sender']
-            if (sender == self.class_name or sender._meta.proxy and
-                issubclass(sender, self.class_name)) and\
-               hasattr(kwargs['instance'], self.attname):
-                value = self.value_from_object(kwargs['instance'])
-
-                if value:
-                    setattr(kwargs['instance'], self.attname,
-                            self._deserialize(value))
-                else:
-                    setattr(kwargs['instance'], self.attname, None)
+    def get_prep_value(self, value):
+        return self._serialize_if_object(value)

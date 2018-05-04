@@ -59,6 +59,7 @@ urlpatterns = [
     path(r'persons/', include(persons.urls)),
     path(r'transcriptions/', include(transcriptions.urls)),
     path(r'dashboard/', view_dashboard, name='dashboard'),
+    path(r'moderation/', include('simplemoderation.urls')),
     url(r'^api/', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^select2/', include('django_select2.urls')),
