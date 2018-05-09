@@ -27,7 +27,7 @@ class CatalogueTableView(ListView):
         filter = CatalogueFilter(self.request.GET, queryset=self.get_queryset())
 
         table = CatalogueTable(filter.qs)
-        django_tables2.RequestConfig(self.request, ).configure(table)
+        django_tables2.RequestConfig(self.request, paginate={'per_page': 10}).configure(table)
 
         context['filter'] = filter
         context['table'] = table
@@ -460,7 +460,7 @@ class LotTableView(ListView):
         filter = LotFilter(self.request.GET, queryset=self.get_queryset())
 
         table = LotTable(filter.qs)
-        django_tables2.RequestConfig(self.request, ).configure(table)
+        django_tables2.RequestConfig(self.request, paginate={'per_page': 10}).configure(table)
 
         context['filter'] = filter
         context['table'] = table

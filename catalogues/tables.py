@@ -12,6 +12,12 @@ class CatalogueTable(tables.Table):
         model = Catalogue
         attrs = {'class': 'table table-sortable'}
 
+    def render_full_title(self, value):
+        return (value[:50] + "...") if len(value) > 50 else value
+
+    def render_preface_and_paratexts(self, value):
+        return (value[:50] + "...") if len(value) > 50 else value
+
 
 # CatalogueHeldBy table
 class CatalogueHeldByTable(tables.Table):
@@ -71,6 +77,8 @@ class LotTable(tables.Table):
     class Meta:
         model = Lot
         attrs = {'class': 'table table-sortable'}
+
+
 
 
 # PersonCatalogueRelation table
