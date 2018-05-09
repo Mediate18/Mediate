@@ -2,12 +2,15 @@ import django_filters
 from .models import *
 
 
-
 # Catalogue filter
 class CatalogueFilter(django_filters.FilterSet):
+    collection = django_filters.Filter(name='collection__name', lookup_expr='icontains')
+
     class Meta:
         model = Catalogue
         fields = "__all__"
+        exclude = ['transcription', 'uuid']
+
 
 
 # CatalogueHeldBy filter
@@ -47,6 +50,8 @@ class LibraryFilter(django_filters.FilterSet):
 
 # Lot filter
 class LotFilter(django_filters.FilterSet):
+    catalogue = django_filters.Filter(name='catalogue__short_title', lookup_expr='icontains')
+
     class Meta:
         model = Lot
         fields = "__all__"

@@ -17,7 +17,10 @@ class ItemModelForm(forms.ModelForm):
         fields = "__all__"
         widgets = {
             'collection': Select2Widget,
-            'lot': Select2Widget,
+            'lot': ModelSelect2Widget(
+                model=Lot,
+                search_fields=['name__icontains']
+            ),
             'book_format': Select2Widget,
             'binding_material_details': Select2Widget,
             'language': Select2Widget,

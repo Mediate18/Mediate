@@ -1,5 +1,5 @@
 from django import forms
-from django_select2.forms import Select2Widget
+from django_select2.forms import Select2Widget, ModelSelect2Widget
 from .models import *
 
 
@@ -48,6 +48,12 @@ class LotModelForm(forms.ModelForm):
     class Meta:
         model = Lot
         fields = "__all__"
+        widgets = {
+            'catalogue': ModelSelect2Widget(
+                model=Catalogue,
+                search_fields=['name__icontains']
+            ),
+        }
 
 
 class PersonCatalogueRelationModelForm(forms.ModelForm):
