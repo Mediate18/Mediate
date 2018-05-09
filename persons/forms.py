@@ -41,6 +41,11 @@ class PlaceModelForm(forms.ModelForm):
     class Meta:
         model = Place
         fields = "__all__"
+        widgets = {
+            'cerl_id': ViafWidget(
+                url=reverse_lazy('cerl_suggest')
+            ),
+        }
 
 
 class ProfessionModelForm(forms.ModelForm):

@@ -18,6 +18,7 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block bootstrap3_title %}Mediate - Catalogues{% endblock %}</title>
+    {% block extracss %}{% endblock %}
     <link rel="stylesheet" href="{% static 'css/mediate.css' %}">
     <script src="{% static 'django_select2/django_select2.js' %}"></script>
     <style>
@@ -25,7 +26,6 @@
             padding: 70px 0px 15px;
         }
     </style>
-    {% block extracss %}{% endblock %}
 </head>
 <body>
 

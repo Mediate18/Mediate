@@ -133,4 +133,6 @@ urlpatterns = [
          permission_required('catalogue.delete_residence')(ResidenceDeleteView.as_view()),
          name="delete_residence"),
 
+    # Cerl API
+    path(r'cerl_suggest', CerlSuggest.as_view(), name='cerl_suggest'),
 ]

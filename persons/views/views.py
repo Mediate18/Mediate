@@ -7,6 +7,10 @@ from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse_lazy
 import django_tables2
 
+from dal import autocomplete
+from django.http import JsonResponse
+import requests
+
 from ..forms import *
 from ..filters import *
 from ..tables import *
@@ -658,3 +662,28 @@ class ResidenceUpdateView(UpdateView):
 class ResidenceDeleteView(DeleteView):
     model = Residence
     success_url = reverse_lazy('residences')
+
+
+def cerl_suggest(query):
+    base_url = 'http://data.cerl.org/thesaurus/_search?query=placeName:'
+    response = requests.get(base_url,
+                            params={'query': 'placeName:'+query+'*'},
+                            headers={'accept': 'application/json'})
+    if response.status_code == requests.codes.ok:
+        return response.json().get('rows', None) or []
+    else:
+        return []
+
+
+class CerlSuggest(autocomplete.Select2ListView):
+    def get(self, request, *args, **kwargs):
+        result = cerl_suggest(self.q)
+
+        return JsonResponse({
+            'results': [dict(
+                id=item['id'],
+                id_number=item['id'],
+                text=item['name_display_line'] + " - " + ", ".join(item['placeName']),
+                nametype=''
+            ) for item in result]
+        })
