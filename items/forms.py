@@ -1,5 +1,7 @@
 from django import forms
-from django_select2.forms import Select2Widget
+from django.urls import reverse_lazy
+from django_select2.forms import Select2Widget, ModelSelect2Widget
+from viapy.widgets import ViafWidget
 from .models import *
 
 
@@ -45,6 +47,16 @@ class ItemLanguageRelationModelForm(forms.ModelForm):
     class Meta:
         model = ItemLanguageRelation
         fields = "__all__"
+        widgets = {
+            'item': ModelSelect2Widget(
+                model=Item,
+                search_fields=['short_title__icontains']
+            ),
+            'language': ModelSelect2Widget(
+                model=Language,
+                search_fields=['name__icontains']
+            )
+        }
 
 
 class ItemMaterialDetailsRelationModelForm(forms.ModelForm):
@@ -63,6 +75,16 @@ class ItemWorkRelationModelForm(forms.ModelForm):
     class Meta:
         model = ItemWorkRelation
         fields = "__all__"
+        widgets = {
+            'item': ModelSelect2Widget(
+                model=Item,
+                search_fields=['short_title__icontains']
+            ),
+            'work': ModelSelect2Widget(
+                model=Work,
+                search_fields=['title__icontains']
+            )
+        }
 
 
 class LanguageModelForm(forms.ModelForm):
@@ -81,6 +103,20 @@ class PersonItemRelationModelForm(forms.ModelForm):
     class Meta:
         model = PersonItemRelation
         fields = "__all__"
+        widgets = {
+            'person': ModelSelect2Widget(
+                model=Person,
+                search_fields=['short_name__icontains']
+            ),
+            'item': ModelSelect2Widget(
+                model=Item,
+                search_fields=['short_title__icontains']
+            ),
+            'role': ModelSelect2Widget(
+                model=PersonItemRelationRole,
+                search_fields=['name__icontains']
+            )
+        }
 
 
 class PersonItemRelationRoleModelForm(forms.ModelForm):
@@ -110,13 +146,28 @@ class SubjectModelForm(forms.ModelForm):
 class WorkModelForm(forms.ModelForm):
     class Meta:
         model = Work
-        fields = "__all__"
+        fields = ['viaf_id', 'title']
+        widgets = {
+            'viaf_id': ViafWidget(
+                url=reverse_lazy('viapy:suggest')
+            ),
+        }
 
 
 class WorkAuthorModelForm(forms.ModelForm):
     class Meta:
         model = WorkAuthor
         fields = "__all__"
+        widgets = {
+            'author': ModelSelect2Widget(
+                model=Person,
+                search_fields=['short_name__icontains']
+            ),
+            'work': ModelSelect2Widget(
+                model=Work,
+                search_fields=['title__icontains']
+            ),
+        }
 
 
 class WorkSubjectModelForm(forms.ModelForm):

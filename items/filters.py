@@ -11,6 +11,9 @@ class BookFormatFilter(django_filters.FilterSet):
 
 # Item filter
 class ItemFilter(django_filters.FilterSet):
+    lot = django_filters.Filter(name='lot__item_as_listed_in_catalogue', lookup_expr='icontains')
+    collection = django_filters.Filter(name='collection__name', lookup_expr='icontains')
+
     class Meta:
         model = Item
         fields = "__all__"

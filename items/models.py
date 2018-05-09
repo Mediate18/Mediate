@@ -111,7 +111,7 @@ class Item(models.Model):
     number_of_volumes = models.CharField(_("Number of volumes, as listed in the catalogue"), max_length=128)
 
     def __str__(self):
-        return self.work.title
+        return self.short_title
 
     def clean(self):
         if self.collection != self.lot.catalogue.collection:
