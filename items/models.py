@@ -67,7 +67,7 @@ class Work(models.Model):
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.TextField(_("Title of a work"))
-    viaf_id = models.CharField(_("VIAF ID of a work"), max_length=32)
+    viaf_id = models.CharField(_("VIAF ID of a work"), max_length=32, blank=True)
 
     def __str__(self):
         return self.title
