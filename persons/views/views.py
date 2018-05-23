@@ -665,7 +665,7 @@ class ResidenceDeleteView(DeleteView):
 
 
 def cerl_suggest(query):
-    base_url = 'http://data.cerl.org/thesaurus/_search?query=placeName:'
+    base_url = 'https://data.cerl.org/thesaurus/_search'
     response = requests.get(base_url,
                             params={'query': 'placeName:'+query+'*'},
                             headers={'accept': 'application/json'})
