@@ -32,18 +32,36 @@ class ItemAuthorModelForm(forms.ModelForm):
     class Meta:
         model = ItemAuthor
         fields = "__all__"
+        widgets = {
+            'item': ModelSelect2Widget(
+                model=Item,
+                search_fields=['short_title__icontains']
+            ),
+        }
 
 
 class ItemBookFormatRelationModelForm(forms.ModelForm):
     class Meta:
         model = ItemBookFormatRelation
         fields = "__all__"
+        widgets = {
+            'item': ModelSelect2Widget(
+                model=Item,
+                search_fields=['short_title__icontains']
+            ),
+        }
 
 
 class ItemItemTypeRelationModelForm(forms.ModelForm):
     class Meta:
         model = ItemItemTypeRelation
         fields = "__all__"
+        widgets = {
+            'item': ModelSelect2Widget(
+                model=Item,
+                search_fields=['short_title__icontains']
+            ),
+        }
 
 
 class ItemLanguageRelationModelForm(forms.ModelForm):
@@ -66,6 +84,12 @@ class ItemMaterialDetailsRelationModelForm(forms.ModelForm):
     class Meta:
         model = ItemMaterialDetailsRelation
         fields = "__all__"
+        widgets = {
+            'item': ModelSelect2Widget(
+                model=Item,
+                search_fields=['short_title__icontains']
+            ),
+        }
 
 
 class ItemTypeModelForm(forms.ModelForm):
@@ -132,6 +156,12 @@ class PublicationModelForm(forms.ModelForm):
     class Meta:
         model = Publication
         fields = "__all__"
+        widgets = {
+            'item': ModelSelect2Widget(
+                model=Item,
+                search_fields=['short_title__icontains']
+            ),
+        }
 
 
 class PublisherModelForm(forms.ModelForm):

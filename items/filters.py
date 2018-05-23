@@ -21,6 +21,8 @@ class ItemFilter(django_filters.FilterSet):
 
 # ItemAuthor filter
 class ItemAuthorFilter(django_filters.FilterSet):
+    item = django_filters.Filter(name='item__short_title', lookup_expr='icontains')
+
     class Meta:
         model = ItemAuthor
         fields = "__all__"
@@ -28,6 +30,8 @@ class ItemAuthorFilter(django_filters.FilterSet):
 
 # ItemBookFormatRelation filter
 class ItemBookFormatRelationFilter(django_filters.FilterSet):
+    item = django_filters.Filter(name='item__short_title', lookup_expr='icontains')
+
     class Meta:
         model = ItemBookFormatRelation
         fields = "__all__"
@@ -35,6 +39,8 @@ class ItemBookFormatRelationFilter(django_filters.FilterSet):
 
 # ItemItemTypeRelation filter
 class ItemItemTypeRelationFilter(django_filters.FilterSet):
+    item = django_filters.Filter(name='item__short_title', lookup_expr='icontains')
+
     class Meta:
         model = ItemItemTypeRelation
         fields = "__all__"
@@ -42,6 +48,8 @@ class ItemItemTypeRelationFilter(django_filters.FilterSet):
 
 # ItemLanguageRelation filter
 class ItemLanguageRelationFilter(django_filters.FilterSet):
+    item = django_filters.Filter(name='item__short_title', lookup_expr='icontains')
+
     class Meta:
         model = ItemLanguageRelation
         fields = "__all__"
@@ -49,6 +57,8 @@ class ItemLanguageRelationFilter(django_filters.FilterSet):
 
 # ItemMaterialDetailsRelation filter
 class ItemMaterialDetailsRelationFilter(django_filters.FilterSet):
+    item = django_filters.Filter(name='item__short_title', lookup_expr='icontains')
+
     class Meta:
         model = ItemMaterialDetailsRelation
         fields = "__all__"
@@ -63,6 +73,8 @@ class ItemTypeFilter(django_filters.FilterSet):
 
 # ItemWorkRelation filter
 class ItemWorkRelationFilter(django_filters.FilterSet):
+    item = django_filters.Filter(name='item__short_title', lookup_expr='icontains')
+
     class Meta:
         model = ItemWorkRelation
         fields = "__all__"
@@ -84,6 +96,8 @@ class MaterialDetailsFilter(django_filters.FilterSet):
 
 # PersonItemRelation filter
 class PersonItemRelationFilter(django_filters.FilterSet):
+    item = django_filters.Filter(name='item__short_title', lookup_expr='icontains')
+
     class Meta:
         model = PersonItemRelation
         fields = "__all__"
@@ -98,6 +112,8 @@ class PersonItemRelationRoleFilter(django_filters.FilterSet):
 
 # Publication filter
 class PublicationFilter(django_filters.FilterSet):
+    item = django_filters.Filter(name='item__short_title', lookup_expr='icontains')
+
     class Meta:
         model = Publication
         fields = "__all__"
