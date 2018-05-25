@@ -186,6 +186,9 @@ class WorkModelForm(forms.ModelForm):
             ),
         }
 
+    class Media:
+        js = ('js/viaf_select.js',)
+
 
 class WorkAuthorModelForm(forms.ModelForm):
     class Meta:
