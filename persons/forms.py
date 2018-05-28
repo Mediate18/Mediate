@@ -18,6 +18,8 @@ class PersonModelForm(forms.ModelForm):
             'city_of_death': Select2Widget,
         }
 
+    class Media:
+        js = ('js/viaf_select.js',)
 
 class PersonPersonRelationModelForm(forms.ModelForm):
     class Meta:
