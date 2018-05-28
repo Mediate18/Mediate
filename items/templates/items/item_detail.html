@@ -1,0 +1,53 @@
+{% extends "baselayout.html" %}
+{% load i18n %}
+
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-10">
+        <h2>Item</h2>
+        <div class="row">
+            <div class="col-sm-6">
+                <dl class="row">
+                    <dt class="col-sm-3">{% trans "Short title" %}:</dt>
+                    <dd class="col-sm-9">{{ object.short_title }}</dd>
+                    <dt class="col-sm-3">{% trans "Lot" %}:</dt>
+                    <dd class="col-sm-9">{{ object.lot }}</dd>
+                    <dt class="col-sm-3">{% trans "Collection" %}:</dt>
+                    <dd class="col-sm-9">{{ object.collection }}</dd>
+                    <dt class="col-sm-3">{% trans "Number of volumes, as listed in the catalogue" %}:</dt>
+                    <dd class="col-sm-9">
+                        {% if object.number_of_volumes %}
+                            {{ object.number_of_volumes }}
+                        {% else %}
+                            <i style="color:grey">{% trans "No value" %}</i>
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
+            <div class="col-sm-6">
+                <h3>{% trans "Works" %}</h3>
+                <ul>
+                    {% for related_work in object.works.all %}
+                    <li>{{ related_work.work }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <h3>Actions</h3>
+        <ul>
+            <li>
+                <a href="{% url 'change_item' object.pk %}">{% trans "Edit" %}</a>
+            </li>
+
+            <li>
+                <a href="{% url 'add_workstoitem' object.pk %}">{% trans "Manage works" %}</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+{% endblock %}

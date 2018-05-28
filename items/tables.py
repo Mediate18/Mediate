@@ -19,6 +19,8 @@ class BookFormatTable(tables.Table):
 class ItemTable(tables.Table):
     edit = tables.LinkColumn('change_item', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
+    short_title = tables.LinkColumn('item_detail', args=[A('pk')],
+                         orderable=False, empty_values=())
 
     class Meta:
         model = Item

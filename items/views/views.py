@@ -1,11 +1,16 @@
 from django.contrib import messages
+from django.http import HttpResponseRedirect
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.detail import DetailView
+from django.forms.models import inlineformset_factory
 
 from django.utils.translation import ugettext_lazy as _
-from django.urls import reverse_lazy
 import django_tables2
+
+from dal import autocomplete
+from django.http import JsonResponse
+import requests
 
 from ..forms import *
 from ..filters import *
@@ -111,6 +116,7 @@ class ItemTableView(ListView):
 
 class ItemDetailView(DetailView):
     model = Item
+    template_name = 'items/item_detail.html'
 
 
 class ItemCreateView(CreateView):
@@ -658,6 +664,40 @@ class ItemWorkRelationUpdateView(UpdateView):
 class ItemWorkRelationDeleteView(DeleteView):
     model = ItemWorkRelation
     success_url = reverse_lazy('itemworkrelations')
+
+
+ItemWorkRelationFormSet = inlineformset_factory(Item, ItemWorkRelation, fields=('work',), widgets={
+    'work': ModelSelect2Widget(
+                model=Work,
+                search_fields=['title__icontains']
+            ),
+})
+
+class ItemWorkRelationAddView(UpdateView):
+    """
+    A view to add works to an item through ItemWorkRelations
+    """
+    model = Item
+    template_name = 'generic_form.html'
+    succes_url = reverse_lazy('items')
+    form_class = ItemWorkRelationFormSet
+
+    def get_context_data(self, **kwargs):
+        context = super(ItemWorkRelationAddView, self).get_context_data(**kwargs)
+        print(self.object)
+        context['form'] = ItemWorkRelationFormSet(instance=self.object)
+        context['form_as'] = 'p'  # Type of form
+        return context
+
+    def form_valid(self, form):
+        print(self.object)
+        form_set = ItemWorkRelationFormSet(self.request.POST, instance=self.object)
+        if form_set.is_valid():
+            form_set.save()
+            return HttpResponseRedirect(reverse_lazy('item_detail', kwargs={'pk':self.object.uuid}))
+        else:
+            return self.form_invalid(form_set)
+
 
 
 # Language views

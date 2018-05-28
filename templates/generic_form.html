@@ -14,7 +14,11 @@
         <form action="" method="post">
             <table class="table">
                 {% csrf_token %}
-                {{ form.as_table }}
+                    {% if form_as == 'p' %}
+                        {{ form.as_p }}
+                    {% else %}
+                        {{ form.as_table }}
+                    {% endif %}
             </table>
         <input type="submit" class="btn pull-right" value="{% trans 'Save' %}"/>
         </form>

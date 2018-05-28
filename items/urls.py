@@ -141,6 +141,10 @@ urlpatterns = [
        permission_required('items.delete_itemworkrelation')(ItemWorkRelationDeleteView.as_view()),
        name="delete_itemworkrelation"),
 
+    path(r'itemworkrelations/addworkstoitem/<uuid:pk>',
+         permission_required('items.add_itemworkrelation')(ItemWorkRelationAddView.as_view()),
+         name="add_workstoitem"),
+
     # Language urls
     path('languages/', login_required(LanguageTableView.as_view()), name='languages'),
     path(r'languages/<uuid:pk>', login_required(LanguageDetailView.as_view()), name="language_detail"),
