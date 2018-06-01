@@ -145,6 +145,12 @@ urlpatterns = [
          permission_required('items.add_itemworkrelation')(ItemWorkRelationAddView.as_view()),
          name="add_workstoitem"),
 
+    path(r'itemworkrelations/addworkstoitem2/<uuid:pk>',
+         permission_required('items.add_itemworkrelation')(ItemWorkRelationAddView2.as_view()),
+         name="add_workstoitem2"),
+    # WorkAndVIAF API
+    path(r'workandviaf_suggest', WorkAndVIAFSuggest.as_view(), name='workandviaf_suggest'),
+
     # Language urls
     path('languages/', login_required(LanguageTableView.as_view()), name='languages'),
     path(r'languages/<uuid:pk>', login_required(LanguageDetailView.as_view()), name="language_detail"),

@@ -4,6 +4,7 @@ from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.detail import DetailView
 from django.forms.models import inlineformset_factory
+from django.core.exceptions import ObjectDoesNotExist
 
 from django.utils.translation import ugettext_lazy as _
 import django_tables2
@@ -667,11 +668,66 @@ class ItemWorkRelationDeleteView(DeleteView):
 
 
 ItemWorkRelationFormSet = inlineformset_factory(Item, ItemWorkRelation, fields=('work',), widgets={
-    'work': ModelSelect2Widget(
-                model=Work,
-                search_fields=['title__icontains']
+    'work': ViafWidget(
+                url=reverse_lazy('workandviaf_suggest'),
+                attrs={'data-html': True},
             ),
 })
+
+class Media:
+    js = ('js/viaf_select.js',)
+ItemWorkRelationFormSet.Media = Media
+
+def work_and_viaf_suggest(query):
+    base_url = 'https://www.viaf.org/viaf/AutoSuggest'
+    response = requests.get(base_url,
+                            params={'query': query},
+                            headers={'accept': 'application/json'})
+    # print(response.content)
+    if response.status_code == requests.codes.ok:
+        return response.json().get('result', None) or []
+    else:
+        return []
+
+
+from viapy.api import ViafAPI
+import re
+from django.utils.html import escape
+
+class WorkAndVIAFSuggest(autocomplete.Select2ListView):
+    def get(self, request, *args, **kwargs):
+        viaf = ViafAPI()
+
+        work_result_raw = Work.objects.filter(title__icontains=self.q)
+        work_viaf_ids = set()
+        work_result = []
+        for obj in work_result_raw:
+            id_number = re.match(r'.*?(\d+)$', obj.viaf_id).group(1)
+            obj_dict = dict(
+                id=obj.viaf_id,
+                id_number=id_number,
+                text='<i>'+escape(obj.title)+'</i>',
+                nametype='',
+                class_name="local_work"
+            )
+            work_result.append(obj_dict)
+            work_viaf_ids.add(id_number)
+            print(str(work_result))
+
+        viaf_result_raw = work_and_viaf_suggest(self.q)
+        # print(viaf_result_raw)
+        viaf_result = [dict(
+                id=viaf.uri_from_id(item['viafid']),
+                id_number=item['viafid'],
+                text=escape(item['displayForm']),
+                nametype=item['nametype'],
+                class_name="viaf_api"
+            ) for item in viaf_result_raw if item['viafid'] not in work_viaf_ids]
+
+        return JsonResponse({
+            'results': work_result + viaf_result
+        })
+
 
 class ItemWorkRelationAddView(UpdateView):
     """
@@ -686,6 +742,7 @@ class ItemWorkRelationAddView(UpdateView):
         context = super(ItemWorkRelationAddView, self).get_context_data(**kwargs)
         print(self.object)
         context['form'] = ItemWorkRelationFormSet(instance=self.object)
+        print(str(context['form'].Media.js))
         context['form_as'] = 'p'  # Type of form
         return context
 
@@ -698,6 +755,53 @@ class ItemWorkRelationAddView(UpdateView):
         else:
             return self.form_invalid(form_set)
 
+
+class ItemWorkRelationAddView2(UpdateView):
+    """
+    A view to add works to an item through ItemWorkRelations
+    """
+    model = Item
+    template_name = 'generic_form.html'
+    succes_url = reverse_lazy('items')
+    form_class = ItemWorkRelationAddForm
+
+    def get_context_data(self, **kwargs):
+        context = super(ItemWorkRelationAddView2, self).get_context_data(**kwargs)
+        # print(self.object)
+        context['form'] = ItemWorkRelationAddForm()
+        print(str(context['form'].Media.js))
+        context['form_as'] = 'table'  # Type of form
+        import json
+        context['js_variables'] = json.dumps({'viaf_select_id': ItemWorkRelationAddForm.viaf_select_id})
+        return context
+
+    def post(self, request, *args, **kwargs):
+        try:
+            item = Item.objects.get(uuid=kwargs['pk'])
+
+        except:
+            import traceback
+            traceback.print_exc()
+            return HttpResponseRedirect(reverse_lazy('items'))
+
+        viaf_id = request.POST[ItemWorkRelationAddForm.viaf_select_id]
+        title = request.POST['title']
+
+        try:
+            work = Work.objects.get(viaf_id=viaf_id)
+        except:
+            work = Work(viaf_id=viaf_id, title=title)
+            work.save()
+
+        try:
+            itemworkrelation = ItemWorkRelation.objects.get(item=item, work=work)
+            messages.add_message(self.request, messages.SUCCESS,
+                                _("The work was already linked to this item."))
+        except ObjectDoesNotExist as e:
+            itemworkrelation = ItemWorkRelation(item=item, work=work)
+            itemworkrelation.save()
+
+        return HttpResponseRedirect(reverse_lazy('item_detail', kwargs={'pk': kwargs['pk']}))
 
 
 # Language views

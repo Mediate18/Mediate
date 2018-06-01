@@ -28,6 +28,9 @@
 {% endblock %}
 
 {% block extrajs %}
+<script>
+    js_variables = {{ js_variables|safe }}
+</script>
 {{ form.media.js }}
 <script>
 $(document).ready(function(){

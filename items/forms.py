@@ -114,6 +114,24 @@ class ItemWorkRelationModelForm(forms.ModelForm):
         }
 
 
+class ItemWorkRelationAddForm(forms.ModelForm):
+    viaf_select_id = 'viaf_id'  # ID of the VIAF suggest widget
+
+    class Meta:
+        model = Work
+        fields = ['viaf_id', 'title']
+        widgets = {
+            'viaf_id': ViafWidget(
+                url='workandviaf_suggest',
+                attrs={'data-html': True, 'data-placeholder': "Search for a work (italic: works in the local database)"},
+            ),
+        }
+
+    class Media:
+        js = ('js/viaf_select.js',)
+
+
+
 class LanguageModelForm(forms.ModelForm):
     class Meta:
         model = Language
@@ -177,6 +195,8 @@ class SubjectModelForm(forms.ModelForm):
 
 
 class WorkModelForm(forms.ModelForm):
+    viaf_select_id = 'viaf_id'
+
     class Meta:
         model = Work
         fields = ['viaf_id', 'title']
