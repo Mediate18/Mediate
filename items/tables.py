@@ -1,8 +1,42 @@
 import django_tables2 as tables
 from django_tables2.utils import A  # alias for Accessor
+from django.utils.html import format_html
+from django.urls import reverse_lazy
+from django.utils.translation import ugettext_lazy as _
 from .models import *
 
 
+class ActionColumn(tables.Column):
+    def __init__(self, url_name_view, url_name_change, url_name_delete, **kwargs):
+        super().__init__(ActionColumn, **kwargs)
+        self.url_name_view = url_name_view
+        self.url_name_change = url_name_change
+        self.url_name_delete = url_name_delete
+
+    def render(self, value):
+        html = format_html(
+            """
+            <div class="text-nowrap">
+                <a href="{}">
+                    <span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-original-title="{}"></span>
+                </a>
+                <a href="{}">
+                    <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-original-title="{}"></span>
+                    </a>
+                <a class="delete-entry" href="" data-toggle="modal" data-target="#deleteModal" modal_url="{}">
+                    <span class="glyphicon glyphicon-remove" data-toggle="tooltip" data-original-title="{}"></span>
+                </a>
+            </div>
+            """.format(
+                reverse_lazy(self.url_name_view, kwargs={'pk': value}),
+                _('View'),
+                reverse_lazy(self.url_name_change, kwargs={'pk': value}),
+                _('Change'),
+                reverse_lazy(self.url_name_delete, kwargs={'pk': value}),
+                _('Delete'),
+            )
+        )
+        return html
 
 
 # BookFormat table
@@ -17,14 +51,20 @@ class BookFormatTable(tables.Table):
 
 # Item table
 class ItemTable(tables.Table):
-    edit = tables.LinkColumn('change_item', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
-    short_title = tables.LinkColumn('item_detail', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('item_detail', 'change_item', 'delete_item', orderable=False)
+    lot = tables.Column(order_by='lot__item_as_listed_in_catalogue')
+    number_of_volumes = tables.Column(verbose_name=_('Number of volumes'))
 
     class Meta:
         model = Item
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'short_title',
+            'lot',
+            'collection',
+            'number_of_volumes',
+            'uuid'
+        ]
 
 
 # ItemAuthor table
