@@ -162,17 +162,17 @@ urlpatterns = [
        name="delete_language"),
 
     # MaterialDetails urls
-    path('materialdetailss/', login_required(MaterialDetailsTableView.as_view()),
-       name='materialdetailss'),
-    path(r'materialdetailss/<uuid:pk>', login_required(MaterialDetailsDetailView.as_view()),
+    path('materialdetails/', login_required(MaterialDetailsTableView.as_view()),
+       name='materialdetails'),
+    path(r'materialdetails/<uuid:pk>', login_required(MaterialDetailsDetailView.as_view()),
        name="materialdetails_detail"),
-    path(r'materialdetailss/add',
+    path(r'materialdetails/add',
        permission_required('items.add_materialdetails')(MaterialDetailsCreateView.as_view()),
        name="add_materialdetails"),
-    path(r'materialdetailss/edit/<uuid:pk>',
+    path(r'materialdetails/edit/<uuid:pk>',
        permission_required('items.change_materialdetails')(MaterialDetailsUpdateView.as_view()),
        name="change_materialdetails"),
-    path(r'materialdetailss/delete/<uuid:pk>',
+    path(r'materialdetails/delete/<uuid:pk>',
        permission_required('items.delete_materialdetails')(MaterialDetailsDeleteView.as_view()),
        name="delete_materialdetails"),
 

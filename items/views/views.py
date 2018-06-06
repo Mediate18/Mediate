@@ -868,7 +868,7 @@ class MaterialDetailsTableView(ListView):
         context['table'] = table
 
         context['action'] = _("add")
-        context['object_name'] = "materialdetails"
+        context['object_name'] = "materialdetail"
         context['add_url'] = reverse_lazy('add_materialdetails')
 
         return context
@@ -882,7 +882,7 @@ class MaterialDetailsCreateView(CreateView):
     model = MaterialDetails
     template_name = 'generic_form.html'
     form_class = MaterialDetailsModelForm
-    success_url = reverse_lazy('materialdetailss')
+    success_url = reverse_lazy('materialdetails')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -901,7 +901,7 @@ class MaterialDetailsUpdateView(UpdateView):
     model = MaterialDetails
     template_name = 'generic_form.html'
     form_class = MaterialDetailsModelForm
-    success_url = reverse_lazy('materialdetailss')
+    success_url = reverse_lazy('materialdetails')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -918,7 +918,7 @@ class MaterialDetailsUpdateView(UpdateView):
 
 class MaterialDetailsDeleteView(DeleteView):
     model = MaterialDetails
-    success_url = reverse_lazy('materialdetailss')
+    success_url = reverse_lazy('materialdetails')
 
 
 # PersonItemRelation views
