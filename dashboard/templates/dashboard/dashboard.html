@@ -11,85 +11,85 @@
         <table class="table">
             <tbody>
 
+                {% if perms.persons.change_person %}
                 <tr>
                     <td>
-                        {% if perms.persons.change_person %}
                         <a href="{% url 'persons' %}">Persons</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.persons.change_personpersonrelation %}
                 <tr>
                     <td>
-                        {% if perms.persons.change_personpersonrelation %}
                         <a href="{% url 'personpersonrelations' %}">PersonPersonRelations</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.persons.change_personpersonrelationtype %}
                 <tr>
                     <td>
-                        {% if perms.persons.change_personpersonrelationtype %}
                         <a href="{% url 'personpersonrelationtypes' %}">PersonPersonRelationTypes</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.persons.change_personprofession %}
                 <tr>
                     <td>
-                        {% if perms.persons.change_personprofession %}
                         <a href="{% url 'personprofessions' %}">PersonProfessions</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.persons.change_place %}
                 <tr>
                     <td>
-                        {% if perms.persons.change_place %}
                         <a href="{% url 'places' %}">Places</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.persons.change_profession %}
                 <tr>
                     <td>
-                        {% if perms.persons.change_profession %}
                         <a href="{% url 'professions' %}">Professions</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.persons.change_religion %}
                 <tr>
                     <td>
-                        {% if perms.persons.change_religion %}
                         <a href="{% url 'religions' %}">Religions</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.persons.change_religiousaffiliation %}
                 <tr>
                     <td>
-                        {% if perms.persons.change_religiousaffiliation %}
                         <a href="{% url 'religiousaffiliations' %}">ReligiousAffiliations</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.persons.change_residence %}
                 <tr>
                     <td>
-                        {% if perms.persons.change_residence %}
                         <a href="{% url 'residences' %}">Residences</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
             </tbody>
         </table>
@@ -99,94 +99,94 @@
         <h3>{% trans "Catalogues" %}</h3>
         <table class="table">
             <tbody>
+                {% if perms.catalogues.change_catalogue %}
                 <tr>
                     <td>
-                        {% if perms.catalogues.change_catalogue %}
                         <a href="{% url 'catalogues' %}">Catalogues</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.catalogues.change_catalogueheldby %}
                 <tr>
                     <td>
-                        {% if perms.catalogues.change_catalogueheldby %}
                         <a href="{% url 'catalogueheldbys' %}">CatalogueHeldBys</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.catalogues.change_cataloguetype %}
                 <tr>
                     <td>
-                        {% if perms.catalogues.change_cataloguetype %}
                         <a href="{% url 'cataloguetypes' %}">CatalogueTypes</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.catalogues.change_collection %}
                 <tr>
                     <td>
-                        {% if perms.catalogues.change_collection %}
                         <a href="{% url 'collections' %}">Collections</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.catalogues.change_collectionyear %}
                 <tr>
                     <td>
-                        {% if perms.catalogues.change_collectionyear %}
                         <a href="{% url 'collectionyears' %}">CollectionYears</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.catalogues.change_library %}
                 <tr>
                     <td>
-                        {% if perms.catalogues.change_library %}
                         <a href="{% url 'libraries' %}">Libraries</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.catalogues.change_lot %}
                 <tr>
                     <td>
-                        {% if perms.catalogues.change_lot %}
                         <a href="{% url 'lots' %}">Lots</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.catalogues.change_personcataloguerelation %}
                 <tr>
                     <td>
-                        {% if perms.catalogues.change_personcataloguerelation %}
                         <a href="{% url 'personcataloguerelations' %}">PersonCatalogueRelations</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.catalogues.change_personcataloguerelationrole %}
                 <tr>
                     <td>
-                        {% if perms.catalogues.change_personcataloguerelationrole %}
                         <a href="{% url 'personcataloguerelationroles' %}">PersonCatalogueRelationRoles</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.catalogues.change_personcollectionrelation %}
                 <tr>
                     <td>
-                        {% if perms.catalogues.change_personcollectionrelation %}
                         <a href="{% url 'personcollectionrelations' %}">PersonCollectionRelations</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
             </tbody>
         </table>
@@ -196,175 +196,175 @@
         <table class="table">
             <tbody>
 
+                {% if perms.items.change_bookformat %}
                 <tr>
                     <td>
-                        {% if perms.items.change_bookformat %}
                         <a href="{% url 'bookformats' %}">BookFormats</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.items.change_item %}
                 <tr>
                     <td>
-                        {% if perms.items.change_item %}
                         <a href="{% url 'items' %}">Items</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.items.change_itemauthor %}
                 <tr>
                     <td>
-                        {% if perms.items.change_itemauthor %}
                         <a href="{% url 'itemauthors' %}">ItemAuthors</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.items.change_itembookformatrelation %}
                 <tr>
                     <td>
-                        {% if perms.items.change_itembookformatrelation %}
                         <a href="{% url 'itembookformatrelations' %}">ItemBookFormatRelations</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.items.change_itemitemtyperelation %}
                 <tr>
                     <td>
-                        {% if perms.items.change_itemitemtyperelation %}
                         <a href="{% url 'itemitemtyperelations' %}">ItemItemTypeRelations</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.items.change_itemlanguagerelation %}
                 <tr>
                     <td>
-                        {% if perms.items.change_itemlanguagerelation %}
                         <a href="{% url 'itemlanguagerelations' %}">ItemLanguageRelations</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.items.change_itemmaterialdetailsrelation %}
                 <tr>
                     <td>
-                        {% if perms.items.change_itemmaterialdetailsrelation %}
                         <a href="{% url 'itemmaterialdetailsrelations' %}">ItemMaterialDetailsRelations</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.items.change_itemtype %}
                 <tr>
                     <td>
-                        {% if perms.items.change_itemtype %}
                         <a href="{% url 'itemtypes' %}">ItemTypes</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.items.change_itemworkrelation %}
                 <tr>
                     <td>
-                        {% if perms.items.change_itemworkrelation %}
                         <a href="{% url 'itemworkrelations' %}">ItemWorkRelations</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.items.change_language %}
                 <tr>
                     <td>
-                        {% if perms.items.change_language %}
                         <a href="{% url 'languages' %}">Languages</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.items.change_materialdetails %}
                 <tr>
                     <td>
-                        {% if perms.items.change_materialdetails %}
                         <a href="{% url 'materialdetails' %}">MaterialDetails</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.items.change_personitemrelation %}
                 <tr>
                     <td>
-                        {% if perms.items.change_personitemrelation %}
                         <a href="{% url 'personitemrelations' %}">PersonItemRelations</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.items.change_personitemrelationrole %}
                 <tr>
                     <td>
-                        {% if perms.items.change_personitemrelationrole %}
                         <a href="{% url 'personitemrelationroles' %}">PersonItemRelationRoles</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.items.change_publication %}
                 <tr>
                     <td>
-                        {% if perms.items.change_publication %}
                         <a href="{% url 'publications' %}">Publications</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.items.change_publisher %}
                 <tr>
                     <td>
-                        {% if perms.items.change_publisher %}
                         <a href="{% url 'publishers' %}">Publishers</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.items.change_subject %}
                 <tr>
                     <td>
-                        {% if perms.items.change_subject %}
                         <a href="{% url 'subjects' %}">Subjects</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.items.change_work %}
                 <tr>
                     <td>
-                        {% if perms.items.change_work %}
                         <a href="{% url 'works' %}">Works</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.items.change_workauthor %}
                 <tr>
                     <td>
-                        {% if perms.items.change_workauthor %}
                         <a href="{% url 'workauthors' %}">WorkAuthors</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.items.change_worksubject %}
                 <tr>
                     <td>
-                        {% if perms.items.change_worksubject %}
                         <a href="{% url 'worksubjects' %}">WorkSubjects</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
             </tbody>
         </table>
     </div>
@@ -374,31 +374,31 @@
             <tbody>
 
 
+                {% if perms.transcriptions.change_documentscan %}
                 <tr>
                     <td>
-                        {% if perms.transcriptions.change_documentscan %}
                         <a href="{% url 'documentscans' %}">DocumentScans</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.transcriptions.change_sourcematerial %}
                 <tr>
                     <td>
-                        {% if perms.transcriptions.change_sourcematerial %}
                         <a href="{% url 'sourcematerials' %}">SourceMaterials</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
+                {% if perms.transcriptions.change_transcription %}
                 <tr>
                     <td>
-                        {% if perms.transcriptions.change_transcription %}
                         <a href="{% url 'transcriptions' %}">Transcriptions</a>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
 
 
 
