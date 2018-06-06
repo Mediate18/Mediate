@@ -17,7 +17,7 @@
             <p>{{ relation.title }}
                 <a class="delete-itemworkrelation" href="" data-toggle="modal" data-target="#deleteModal"
                    modal_url="{% url 'delete_itemworkrelation' relation.uuid %}">
-                    <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-original-title="{% trans 'Delete' %}"></span>
+                    <span class="glyphicon glyphicon-remove" data-toggle="tooltip" data-original-title="{% trans 'Delete' %}"></span>
                 </a>
             </p>
         {% endfor %}

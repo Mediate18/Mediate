@@ -7,11 +7,15 @@ from django.forms.models import inlineformset_factory
 from django.core.exceptions import ObjectDoesNotExist
 
 from django.utils.translation import ugettext_lazy as _
+from django.utils.html import escape
 import django_tables2
 
 from dal import autocomplete
 from django.http import JsonResponse
 import requests
+import re
+
+from viapy.api import ViafAPI
 
 from ..forms import *
 from ..filters import *
@@ -669,17 +673,6 @@ class ItemWorkRelationDeleteView(DeleteView):
         return self.request.META['HTTP_REFERER']
 
 
-ItemWorkRelationFormSet = inlineformset_factory(Item, ItemWorkRelation, fields=('work',), widgets={
-    'work': ViafWidget(
-                url=reverse_lazy('workandviaf_suggest'),
-                attrs={'data-html': True},
-            ),
-})
-
-class Media:
-    js = ('js/viaf_select.js',)
-ItemWorkRelationFormSet.Media = Media
-
 def work_and_viaf_suggest(query):
     base_url = 'https://www.viaf.org/viaf/AutoSuggest'
     response = requests.get(base_url,
@@ -691,10 +684,6 @@ def work_and_viaf_suggest(query):
     else:
         return []
 
-
-from viapy.api import ViafAPI
-import re
-from django.utils.html import escape
 
 class WorkAndVIAFSuggest(autocomplete.Select2ListView):
     def get(self, request, *args, **kwargs):
@@ -736,33 +725,6 @@ class ItemWorkRelationAddView(UpdateView):
     A view to add works to an item through ItemWorkRelations
     """
     model = Item
-    template_name = 'generic_form.html'
-    succes_url = reverse_lazy('items')
-    form_class = ItemWorkRelationFormSet
-
-    def get_context_data(self, **kwargs):
-        context = super(ItemWorkRelationAddView, self).get_context_data(**kwargs)
-        print(self.object)
-        context['form'] = ItemWorkRelationFormSet(instance=self.object)
-        print(str(context['form'].Media.js))
-        context['form_as'] = 'p'  # Type of form
-        return context
-
-    def form_valid(self, form):
-        print(self.object)
-        form_set = ItemWorkRelationFormSet(self.request.POST, instance=self.object)
-        if form_set.is_valid():
-            form_set.save()
-            return HttpResponseRedirect(reverse_lazy('item_detail', kwargs={'pk':self.object.uuid}))
-        else:
-            return self.form_invalid(form_set)
-
-
-class ItemWorkRelationAddView2(UpdateView):
-    """
-    A view to add works to an item through ItemWorkRelations
-    """
-    model = Item
     template_name = 'items/manage_itemworkrelations_form.html'
     form_class = ItemWorkRelationAddForm
 
@@ -770,7 +732,7 @@ class ItemWorkRelationAddView2(UpdateView):
         return self.request.META['HTTP_REFERER']
 
     def get_context_data(self, **kwargs):
-        context = super(ItemWorkRelationAddView2, self).get_context_data(**kwargs)
+        context = super(ItemWorkRelationAddView, self).get_context_data(**kwargs)
         # print(self.object)
 
         context['existing_relations'] = [{'uuid': work.uuid, 'title': work.work.title} for work in self.object.works.all()]

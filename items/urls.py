@@ -141,13 +141,11 @@ urlpatterns = [
        permission_required('items.delete_itemworkrelation')(ItemWorkRelationDeleteView.as_view()),
        name="delete_itemworkrelation"),
 
+    # Add works to item
     path(r'itemworkrelations/addworkstoitem/<uuid:pk>',
          permission_required('items.add_itemworkrelation')(ItemWorkRelationAddView.as_view()),
          name="add_workstoitem"),
 
-    path(r'itemworkrelations/addworkstoitem2/<uuid:pk>',
-         permission_required('items.add_itemworkrelation')(ItemWorkRelationAddView2.as_view()),
-         name="add_workstoitem2"),
     # WorkAndVIAF API
     path(r'workandviaf_suggest', WorkAndVIAFSuggest.as_view(), name='workandviaf_suggest'),
 
