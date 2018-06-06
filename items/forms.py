@@ -123,7 +123,7 @@ class ItemWorkRelationAddForm(forms.ModelForm):
         widgets = {
             'viaf_id': ViafWidget(
                 url='workandviaf_suggest',
-                attrs={'data-html': True, 'data-placeholder': "Search for a work (italic: works in the local database)"},
+                attrs={'data-html': True, 'data-placeholder': "Search for a work - <i>italic: works in the local database</i>"},
             ),
         }
 

@@ -664,7 +664,9 @@ class ItemWorkRelationUpdateView(UpdateView):
 
 class ItemWorkRelationDeleteView(DeleteView):
     model = ItemWorkRelation
-    success_url = reverse_lazy('itemworkrelations')
+
+    def get_success_url(self):
+        return self.request.META['HTTP_REFERER']
 
 
 ItemWorkRelationFormSet = inlineformset_factory(Item, ItemWorkRelation, fields=('work',), widgets={
@@ -761,18 +763,27 @@ class ItemWorkRelationAddView2(UpdateView):
     A view to add works to an item through ItemWorkRelations
     """
     model = Item
-    template_name = 'generic_form.html'
-    succes_url = reverse_lazy('items')
+    template_name = 'items/manage_itemworkrelations_form.html'
     form_class = ItemWorkRelationAddForm
+
+    def get_success_url(self):
+        return self.request.META['HTTP_REFERER']
 
     def get_context_data(self, **kwargs):
         context = super(ItemWorkRelationAddView2, self).get_context_data(**kwargs)
         # print(self.object)
+
+        context['existing_relations'] = [{'uuid': work.uuid, 'title': work.work.title} for work in self.object.works.all()]
+        print(context['existing_relations'])
+
         context['form'] = ItemWorkRelationAddForm()
         print(str(context['form'].Media.js))
         context['form_as'] = 'table'  # Type of form
         import json
         context['js_variables'] = json.dumps({'viaf_select_id': ItemWorkRelationAddForm.viaf_select_id})
+
+        context['action'] = _('Manage works for item')
+        context['object_name'] = str(self.object)
         return context
 
     def post(self, request, *args, **kwargs):
@@ -801,7 +812,7 @@ class ItemWorkRelationAddView2(UpdateView):
             itemworkrelation = ItemWorkRelation(item=item, work=work)
             itemworkrelation.save()
 
-        return HttpResponseRedirect(reverse_lazy('item_detail', kwargs={'pk': kwargs['pk']}))
+        return HttpResponseRedirect(self.get_success_url())
 
 
 # Language views

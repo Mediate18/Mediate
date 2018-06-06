@@ -1,0 +1,93 @@
+{% extends "baselayout.html" %}
+{% load i18n %}
+
+
+{% block extracss %}
+{{ form.media.css }}
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-xs-10">
+        <h1>{% trans action %} <i>{% trans object_name %}</i></h1>
+
+        <h3>{% trans "Works" %}</h3>
+        {% for relation in existing_relations %}
+            <p>{{ relation.title }}
+                <a class="delete-itemworkrelation" href="" data-toggle="modal" data-target="#deleteModal"
+                   modal_url="{% url 'delete_itemworkrelation' relation.uuid %}">
+                    <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-original-title="{% trans 'Delete' %}"></span>
+                </a>
+            </p>
+        {% endfor %}
+
+        <br />
+
+        <h3>{% trans "Add work" %}</h3>
+
+        <form action="" method="post">
+            <table class="table">
+                {% csrf_token %}
+                    {% if form_as == 'p' %}
+                        {{ form.as_p }}
+                    {% else %}
+                        {{ form.as_table }}
+                    {% endif %}
+            </table>
+        <input type="submit" class="btn pull-right" value="{% trans 'Add' %}"/>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div id="deleteModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-warning-sign"></span> {% trans "Warning" %}</h4>
+      </div>
+      <div class="modal-body">
+        <p>{% trans "Are you sure you want to delete the relation to this work?" %}</p>
+      </div>
+      <div class="modal-footer">
+        <!-- Since the confirmation is done in this modal, the deletion is done using a POST.
+        A GET would trigger a confirm page. -->
+        <form id="delete-form" method="POST" action="">
+           {% csrf_token %}
+        </form>
+        <a class="btn btn-danger" href="" id="delete-link"
+               onclick="document.getElementById('delete-form').submit(); return false;">{% trans "Yes" %}</a>
+        <button type="button" class="btn btn-success" data-dismiss="modal">{% trans "No" %}</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    js_variables = {{ js_variables|safe }}
+</script>
+{{ form.media.js }}
+<script>
+$(document).ready(function(){
+        $('.django-select2').djangoSelect2({placeholder: 'Select an option'});
+
+        $('.delete-itemworkrelation').on('click', function() {
+            var url = $(this).attr('modal_url');
+            $('#delete-form').attr('action', url);
+            $('#delete-link').attr('href', url);
+        });
+
+        $('[data-toggle="tooltip"]').tooltip({
+            placement : 'right'
+        });
+});
+</script>
+{% endblock %}
