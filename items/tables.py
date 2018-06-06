@@ -54,6 +54,9 @@ class ItemTable(tables.Table):
     uuid = ActionColumn('item_detail', 'change_item', 'delete_item', orderable=False)
     lot = tables.Column(order_by='lot__item_as_listed_in_catalogue')
     number_of_volumes = tables.Column(verbose_name=_('Number of volumes'))
+    manage_works = tables.LinkColumn('add_workstoitem',
+        text=format_html('<span class="glyphicon glyphicon-list" data-toggle="tooltip" data-original-title="Manage works"></span>'),
+        args=[A('pk')], orderable=False, empty_values=())
 
     class Meta:
         model = Item
@@ -63,7 +66,8 @@ class ItemTable(tables.Table):
             'lot',
             'collection',
             'number_of_volumes',
-            'uuid'
+            'uuid',
+            'manage_works'
         ]
 
 

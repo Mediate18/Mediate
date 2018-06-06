@@ -11,12 +11,14 @@ class BookFormatFilter(django_filters.FilterSet):
 
 # Item filter
 class ItemFilter(django_filters.FilterSet):
+    short_title = django_filters.Filter(lookup_expr='icontains')
     lot = django_filters.Filter(name='lot__item_as_listed_in_catalogue', lookup_expr='icontains')
     collection = django_filters.Filter(name='collection__name', lookup_expr='icontains')
+    number_of_volumes = django_filters.Filter(lookup_expr='icontains')
 
     class Meta:
         model = Item
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # ItemAuthor filter

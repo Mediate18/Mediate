@@ -37,7 +37,7 @@
         {% else %}
             <h1>{{ object_name|title }}s</h1>
         {% endif %}
-        <div class="small">Displaying {{ filter.qs.count }} of {{ filter.queryset.count }} {{ object_name }}s.</div>
+        <div class="small">Displaying {{ filter.qs.count }} of {{ filter.queryset.count }}</div>
         {% if table %}
             {% render_table table %}
         {% else %}
@@ -48,7 +48,7 @@
         <h3>Actions</h3>
         <ul>
             <li>
-                <a href="{{ add_url }}">Create new {{ object_name }}</a>
+                <a href="{{ add_url }}">Create new</a>
             </li>
         </ul>
     </div>
