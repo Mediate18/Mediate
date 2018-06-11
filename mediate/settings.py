@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
-from decouple import config
+from mediate.decouple import config
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -93,8 +93,9 @@ WSGI_APPLICATION = 'mediate.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'USER': 'mediate_admin',
-        'NAME': 'mediate',
+        'HOST': config('DB_HOST'),
+        'USER': config('DB_USERNAME'),
+        'NAME': config('DB_NAME'),
         'PASSWORD': config('DB_PASSWORD'),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
