@@ -6,8 +6,11 @@ $(document).ready(function(){
         }
         $('#id_'+viaf_select_id).change(function() {
             // ... show a link when a selection is made;
-            $('#viaf_uri').attr('href', $(this).val());
-            $('#viaf_uri').html($(this).val());
+            var link = $('#id_viaf_id').select2('data')[0].external_url;
+            if(link != "") {
+                $('#viaf_uri').attr('href', link);
+                $('#viaf_uri').html(link);
+            }
 
             // ... copy the title to the Title field;
             var result_class_name = $('#id_viaf_id').select2('data')[0].class_name;
@@ -17,7 +20,7 @@ $(document).ready(function(){
             } else {
                 $('#id_title').removeAttr("readonly");
             }
-            var title = $('#select2-id_'+viaf_select_id+'-container span').last().text();
+            var title = $('#id_viaf_id').select2('data')[0].clean_text;
             $('#id_title').val(title);
         });
 

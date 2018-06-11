@@ -693,26 +693,31 @@ class WorkAndVIAFSuggest(autocomplete.Select2ListView):
         work_viaf_ids = set()
         work_result = []
         for obj in work_result_raw:
-            id_number = re.match(r'.*?(\d+)$', obj.viaf_id).group(1)
+
             obj_dict = dict(
-                id=obj.viaf_id,
-                id_number=id_number,
+                id=obj.pk,
+                id_number=obj.pk,
                 text='<i>'+escape(obj.title)+'</i>',
                 nametype='',
-                class_name="local_work"
+                class_name="local_work",
+                external_url=obj.viaf_id,
+                clean_text=escape(obj.title)
             )
             work_result.append(obj_dict)
-            work_viaf_ids.add(id_number)
-            print(str(work_result))
+
+            if obj.viaf_id:
+                id_number = re.match(r'.*?(\d+)$', obj.viaf_id).group(1)
+                work_viaf_ids.add(id_number)
 
         viaf_result_raw = work_and_viaf_suggest(self.q)
-        # print(viaf_result_raw)
         viaf_result = [dict(
                 id=viaf.uri_from_id(item['viafid']),
                 id_number=item['viafid'],
                 text=escape(item['displayForm']),
                 nametype=item['nametype'],
-                class_name="viaf_api"
+                class_name="viaf_api",
+                external_url=viaf.uri_from_id(item['viafid']),
+                clean_text=escape(item['displayForm'])
             ) for item in viaf_result_raw if item['viafid'] not in work_viaf_ids]
 
         return JsonResponse({
@@ -757,13 +762,17 @@ class ItemWorkRelationAddView(UpdateView):
             traceback.print_exc()
             return HttpResponseRedirect(reverse_lazy('items'))
 
-        viaf_id = request.POST[ItemWorkRelationAddForm.viaf_select_id]
+        work_id = request.POST[ItemWorkRelationAddForm.viaf_select_id]
+        if work_id.startswith(ViafAPI.uri_base):
+            get_work_args = {'viaf_id': work_id}
+        else:
+            get_work_args = {'pk': work_id}
         title = request.POST['title']
 
         try:
-            work = Work.objects.get(viaf_id=viaf_id)
+            work = Work.objects.get(**get_work_args)
         except:
-            work = Work(viaf_id=viaf_id, title=title)
+            work = Work(viaf_id=work_id, title=title)
             work.save()
 
         try:
