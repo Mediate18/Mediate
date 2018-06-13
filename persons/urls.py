@@ -135,4 +135,5 @@ urlpatterns = [
 
     # Cerl API
     path(r'cerl_suggest', CerlSuggest.as_view(), name='cerl_suggest'),
+    path(r'placeandcerl_suggest', PlaceAndCerlSuggest.as_view(), name='placeandcerl_suggest'),
 ]

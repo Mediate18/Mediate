@@ -1,11 +1,14 @@
 from django import forms
 from django.urls import reverse_lazy
 from django_select2.forms import Select2Widget
+from apiconnectors.widgets import ApiSelectWidget
 from viapy.widgets import ViafWidget
 from .models import *
 
 
 class PersonModelForm(forms.ModelForm):
+    cerl_select_id = ['city_of_birth', 'city_of_death']  # ID of the VIAF suggest widget
+
     class Meta:
         model = Person
         fields = "__all__"
@@ -14,8 +17,16 @@ class PersonModelForm(forms.ModelForm):
                 url=reverse_lazy('viapy:person-suggest')
             ),
             'sex': Select2Widget,
-            'city_of_birth': Select2Widget,
-            'city_of_death': Select2Widget,
+            'city_of_birth': ApiSelectWidget(
+                url='placeandcerl_suggest',
+                attrs={'data-html': True,
+                       'data-placeholder': "Search for a place - <i>italic: places in the local database</i>"},
+            ),
+            'city_of_death': ApiSelectWidget(
+                url='placeandcerl_suggest',
+                attrs={'data-html': True,
+                       'data-placeholder': "Search for a place - <i>italic: places in the local database</i>"},
+            ),
         }
 
     class Media:
