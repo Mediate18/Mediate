@@ -7,11 +7,11 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.html import escape
 import django_tables2
 
-from dal import autocomplete
 from django.http import JsonResponse
-import requests
 import re
 import json
+
+from apiconnectors.cerlapi import CerlSuggest, cerl_record_url
 
 from ..forms import *
 from ..filters import *
@@ -667,35 +667,10 @@ class ResidenceDeleteView(DeleteView):
     success_url = reverse_lazy('residences')
 
 
-def cerl_suggest(query):
-    base_url = 'https://data.cerl.org/thesaurus/_search'
-    response = requests.get(base_url,
-                            params={'query': 'placeName:'+query+'*'},
-                            headers={'accept': 'application/json'})
-    if response.status_code == requests.codes.ok:
-        return response.json().get('rows', None) or []
-    else:
-        return []
-
-
-class CerlSuggest(autocomplete.Select2ListView):
+class PlaceAndCerlSuggest(CerlSuggest):
     def get(self, request, *args, **kwargs):
-        result = cerl_suggest(self.q)
+        cerl_result = super().get_api_list()
 
-        return JsonResponse({
-            'results': [dict(
-                id=item['id'],
-                id_number=item['id'],
-                text=item['name_display_line'] + " - " + ", ".join(item['placeName']),
-                nametype='',
-                external_url='http://thesaurus.cerl.org/record/'+item['id'],
-                clean_text=item['name_display_line']
-            ) for item in result]
-        })
-
-
-class PlaceAndCerlSuggest(autocomplete.Select2ListView):
-    def get(self, request, *args, **kwargs):
         place_result_raw = Place.objects.filter(name__icontains=self.q)
         place_cerl_ids = set()
         place_result = []
@@ -704,26 +679,14 @@ class PlaceAndCerlSuggest(autocomplete.Select2ListView):
             obj_dict = dict(
                 id=obj.cerl_id if obj.cerl_id else obj.uuid,
                 id_number=id_number,
-                text='<i>'+escape(obj.name)+'</i>',
+                text='<i>' + escape(obj.name) + '</i>',
                 nametype='',
                 class_name="local_place",
-                external_url='http://thesaurus.cerl.org/record/'+obj.cerl_id if obj.cerl_id else obj.uuid,
+                external_url=cerl_record_url + obj.cerl_id if obj.cerl_id else obj.uuid,
                 clean_text=escape(obj.name)
             )
             place_result.append(obj_dict)
             place_cerl_ids.add(id_number)
-
-        cerl_result_raw = cerl_suggest(self.q)
-        # print(cerl_result_raw)
-        cerl_result = [dict(
-                id=item['id'],
-                id_number=item['id'],
-                text=item['name_display_line'] + " - " + ", ".join(item['placeName']),
-                nametype='',
-                class_name="cerl_api",
-                external_url='http://thesaurus.cerl.org/record/'+item['id'],
-                clean_text=item['name_display_line']
-            ) for item in cerl_result_raw if item['id'] not in place_cerl_ids]
 
         return JsonResponse({
             'results': place_result + cerl_result

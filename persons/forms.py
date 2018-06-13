@@ -55,8 +55,10 @@ class PlaceModelForm(forms.ModelForm):
         model = Place
         fields = "__all__"
         widgets = {
-            'cerl_id': ViafWidget(
-                url=reverse_lazy('cerl_suggest')
+            'cerl_id': ApiSelectWidget(
+                url='cerl_suggest',
+                attrs={'data-html': True,
+                       'data-placeholder': "Search for a place"},
             ),
         }
 
