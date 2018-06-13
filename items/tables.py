@@ -52,7 +52,9 @@ class BookFormatTable(tables.Table):
 # Item table
 class ItemTable(tables.Table):
     uuid = ActionColumn('item_detail', 'change_item', 'delete_item', orderable=False)
-    lot = tables.Column(order_by='lot__item_as_listed_in_catalogue')
+    lot = tables.RelatedLinkColumn(order_by='lot__item_as_listed_in_catalogue')
+    catalogue = tables.Column(empty_values=())
+    collection = tables.RelatedLinkColumn()
     number_of_volumes = tables.Column(verbose_name=_('Number of volumes'))
     manage_works = tables.LinkColumn('add_workstoitem',
         text=format_html('<span class="glyphicon glyphicon-list" data-toggle="tooltip" data-original-title="Manage works"></span>'),
@@ -64,11 +66,18 @@ class ItemTable(tables.Table):
         sequence = [
             'short_title',
             'lot',
+            'catalogue',
             'collection',
             'number_of_volumes',
             'uuid',
             'manage_works'
         ]
+
+    def render_catalogue(self, record):
+        return format_html('<a href="{}">{}</a>'.format(
+            reverse_lazy('catalogue_detail', args=[str(record.lot.catalogue.uuid)]),
+            str(record.lot.catalogue))
+        )
 
 
 # ItemAuthor table

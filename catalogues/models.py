@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models.deletion import CASCADE, SET_NULL
 from django.utils.translation import ugettext_lazy as _
+from django.urls import reverse_lazy
 
 import uuid
 
@@ -17,6 +18,9 @@ class Collection(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse_lazy('change_collection', args=[str(self.uuid)])
 
 
 class CollectionYear(models.Model):
@@ -73,7 +77,7 @@ class Catalogue(models.Model):
     collection = models.ForeignKey(Collection, on_delete=SET_NULL, null=True)
 
     def __str__(self):
-        return "{0} ({1})".format(self.short_title, self.uuid)
+        return "{0}".format(self.short_title)
 
 
 class CatalogueHeldBy(models.Model):
@@ -101,6 +105,9 @@ class Lot(models.Model):
 
     def __str__(self):
         return self.item_as_listed_in_catalogue
+
+    def get_absolute_url(self):
+        return reverse_lazy('change_lot', args=[str(self.uuid)])
 
 
 class PersonCollectionRelation(models.Model):
