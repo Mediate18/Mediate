@@ -188,6 +188,24 @@
                 </tr>
                 {% endif %}
 
+
+                {% if perms.transcriptions.change_sourcematerial %}
+                <tr>
+                    <td>
+                        <a href="{% url 'sourcematerials' %}">SourceMaterials</a>
+                    </td>
+                </tr>
+                {% endif %}
+
+
+                {% if perms.transcriptions.change_transcription %}
+                <tr>
+                    <td>
+                        <a href="{% url 'transcriptions' %}">Transcriptions</a>
+                    </td>
+                </tr>
+                {% endif %}
+
             </tbody>
         </table>
     </div>
@@ -329,6 +347,13 @@
                     </td>
                 </tr>
                 {% endif %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-xs-3">
+        <h3>{% trans "Works" %}</h3>
+        <table class="table">
+            <tbody>
 
 
                 {% if perms.items.change_subject %}
@@ -365,13 +390,6 @@
                     </td>
                 </tr>
                 {% endif %}
-            </tbody>
-        </table>
-    </div>
-    <div class="col-xs-3">
-        <h3>{% trans "Transcriptions" %}</h3>
-        <table class="table">
-            <tbody>
 
 
                 {% if perms.transcriptions.change_documentscan %}
@@ -381,25 +399,6 @@
                     </td>
                 </tr>
                 {% endif %}
-
-
-                {% if perms.transcriptions.change_sourcematerial %}
-                <tr>
-                    <td>
-                        <a href="{% url 'sourcematerials' %}">SourceMaterials</a>
-                    </td>
-                </tr>
-                {% endif %}
-
-
-                {% if perms.transcriptions.change_transcription %}
-                <tr>
-                    <td>
-                        <a href="{% url 'transcriptions' %}">Transcriptions</a>
-                    </td>
-                </tr>
-                {% endif %}
-
 
 
             </tbody>

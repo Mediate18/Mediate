@@ -288,6 +288,10 @@ h1 {
     background-color: #d93d34;
 }
 
+.navbar-nav {
+    padding-left: 20px;
+}
+
 /* TABLE SORTING */
 .table-sortable > thead > tr > th {
   cursor: pointer;
