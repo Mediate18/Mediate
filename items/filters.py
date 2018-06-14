@@ -1,4 +1,6 @@
 import django_filters
+from django_select2.forms import ModelSelect2MultipleWidget
+from tagging.models import Tag, TaggedItem
 from .models import *
 
 
@@ -15,10 +17,24 @@ class ItemFilter(django_filters.FilterSet):
     lot = django_filters.Filter(name='lot__item_as_listed_in_catalogue', lookup_expr='icontains')
     collection = django_filters.Filter(name='collection__name', lookup_expr='icontains')
     number_of_volumes = django_filters.Filter(lookup_expr='icontains')
+    tag = django_filters.ModelMultipleChoiceFilter(
+        label='Tag',
+        queryset=Tag.objects.all(),
+        method='tag_filter',
+        widget=ModelSelect2MultipleWidget(
+            model=Tag,
+            search_fields=['name__icontains'],
+        ),
+    )
 
     class Meta:
         model = Item
         exclude = ['uuid']
+
+    def tag_filter(self, queryset, name, value):
+        if value:
+            return TaggedItem.objects.get_by_model(queryset, value)
+        return queryset
 
 
 # ItemAuthor filter
