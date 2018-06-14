@@ -1,8 +1,10 @@
 from django import forms
 from django.urls import reverse_lazy
-from django_select2.forms import Select2Widget, ModelSelect2Widget
+from django_select2.forms import Select2Widget, ModelSelect2Widget, ModelSelect2MultipleWidget
 from viapy.widgets import ViafWidget
 from .models import *
+
+from tagging.models import Tag
 
 
 class BookFormatModelForm(forms.ModelForm):
@@ -12,6 +14,23 @@ class BookFormatModelForm(forms.ModelForm):
 
 
 class ItemModelForm(forms.ModelForm):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.add_tag_field()
+
+    def add_tag_field(self):
+        tag = forms.ModelMultipleChoiceField(
+            widget=ModelSelect2MultipleWidget(
+                    model=Tag,
+                    search_fields=['name__icontains'],
+                    # queryset=Tag.objects.filter(namespace='item')
+                ),
+            queryset=Tag.objects.all(),  # ... filter(namespace='item'),
+            required=False,
+            initial=self.instance.tags
+        )
+        self.fields['tag'] = tag
+
     class Meta:
         model = Item
         fields = "__all__"
@@ -26,6 +45,10 @@ class ItemModelForm(forms.ModelForm):
             'language': Select2Widget,
             'work': Select2Widget,
         }
+
+    def save(self, commit=True):
+        self.instance.tags = self.cleaned_data['tag']
+        return super(ItemModelForm, self).save(commit=commit)
 
 
 class ItemAuthorModelForm(forms.ModelForm):

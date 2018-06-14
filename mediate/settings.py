@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'dal',
     'dal_select2',
     'viapy',
+    'tagging',
     'simplemoderation',
     'items',
     'transcriptions',
@@ -169,3 +170,4 @@ BOOTSTRAP3 = {
 }
 
 MODERATED_OBJECT_PK = "use_uuid"
+TAGGING_OBJECT_ID_TYPE = "uuid"

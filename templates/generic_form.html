@@ -29,7 +29,9 @@
 
 {% block extrajs %}
 <script>
-    js_variables = {{ js_variables|safe }}
+    {% if js_variables %}
+        js_variables = {{ js_variables|safe }}
+    {% endif %}
 </script>
 {{ form.media.js }}
 <script>

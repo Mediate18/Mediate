@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 
 import uuid
+import tagging
 
 from persons.models import Place, Person
 from catalogues.models import Collection, Lot
@@ -118,6 +119,8 @@ class Item(models.Model):
             raise ValidationError({'collection':
                 _("The collection of this item and the collection of the catalogue of this item, are not the same.")
                                    })
+
+tagging.register(Item)
 
 
 class ItemType(models.Model):
