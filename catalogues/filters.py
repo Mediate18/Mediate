@@ -1,10 +1,21 @@
 import django_filters
+from django_select2.forms import Select2MultipleWidget
 from .models import *
 
 
 # Catalogue filter
 class CatalogueFilter(django_filters.FilterSet):
+    short_title = django_filters.Filter(lookup_expr='icontains')
+    full_title = django_filters.Filter(lookup_expr='icontains')
+    preface_and_paratexts = django_filters.Filter(lookup_expr='icontains')
+    type = django_filters.ModelMultipleChoiceFilter(
+        queryset=CatalogueType.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
+    )
+    terminus_post_quem = django_filters.BooleanFilter(widget=django_filters.widgets.BooleanWidget())
     collection = django_filters.Filter(name='collection__name', lookup_expr='icontains')
+    notes = django_filters.Filter(lookup_expr='icontains')
+    bibliography = django_filters.Filter(lookup_expr='icontains')
 
     class Meta:
         model = Catalogue
