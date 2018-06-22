@@ -2,6 +2,7 @@ import django_filters
 from django_select2.forms import ModelSelect2MultipleWidget
 from tagging.models import Tag, TaggedItem
 from .models import *
+from apiconnectors.viafapi import viaf_record_url
 
 
 # BookFormat filter
@@ -153,9 +154,17 @@ class SubjectFilter(django_filters.FilterSet):
 
 # Work filter
 class WorkFilter(django_filters.FilterSet):
+    title = django_filters.Filter(lookup_expr='icontains')
+    viaf_id = django_filters.Filter(method='viaf_id_filter')
+
     class Meta:
         model = Work
-        fields = "__all__"
+        exclude = ['uuid']
+
+    def viaf_id_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(viaf_id=viaf_record_url+value)
+        return queryset
 
 
 # WorkAuthor filter
