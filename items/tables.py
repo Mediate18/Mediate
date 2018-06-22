@@ -222,12 +222,25 @@ class SubjectTable(tables.Table):
 
 # Work table
 class WorkTable(tables.Table):
-    edit = tables.LinkColumn('change_work', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('work_detail', 'change_work', 'delete_work', orderable=False)
+    viaf_id = tables.Column(empty_values=())
 
     class Meta:
         model = Work
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'title',
+            'viaf_id',
+            'uuid'
+        ]
+
+    def render_viaf_id(self, value):
+        if value:
+            return format_html('<a target="blank" href="{}">{}</a>'.format(
+                value, value
+            ))
+        else:
+            return format_html('-')
 
 
 # WorkAuthor table
