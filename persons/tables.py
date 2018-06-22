@@ -1,16 +1,38 @@
 import django_tables2 as tables
 from django_tables2.utils import A  # alias for Accessor
+from django.utils.html import format_html
 from .models import *
+from mediate.columns import ActionColumn
 
 
 # Person table
 class PersonTable(tables.Table):
-    edit = tables.LinkColumn('change_person', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('person_detail', 'change_person', 'delete_person', orderable=False)
+    viaf_id = tables.Column(empty_values=())
 
     class Meta:
         model = Person
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'short_name',
+            'first_names',
+            'surname',
+            'sex',
+            'city_of_birth',
+            'date_of_birth',
+            'city_of_death',
+            'date_of_death',
+            'viaf_id',
+            'uuid'
+        ]
+
+    def render_viaf_id(self, value):
+        if value:
+            return format_html('<a target="blank" href="{}">{}</a>'.format(
+                value, value
+            ))
+        else:
+            return format_html('-')
 
 
 # PersonPersonRelation table
