@@ -1,1 +1,0 @@
-viaf_record_url = "http://viaf.org/viaf/"

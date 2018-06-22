@@ -2,7 +2,7 @@ import django_filters
 from django_select2.forms import ModelSelect2MultipleWidget
 from tagging.models import Tag, TaggedItem
 from .models import *
-from apiconnectors.viafapi import viaf_record_url
+from viapy.api import ViafAPI
 
 
 # BookFormat filter
@@ -163,7 +163,7 @@ class WorkFilter(django_filters.FilterSet):
 
     def viaf_id_filter(self, queryset, name, value):
         if value:
-            return queryset.filter(viaf_id=viaf_record_url+value)
+            return queryset.filter(viaf_id=ViafAPI.uri_base+"/"+value)
         return queryset
 
 
