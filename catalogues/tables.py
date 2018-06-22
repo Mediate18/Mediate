@@ -2,15 +2,29 @@ import django_tables2 as tables
 from django_tables2.utils import A  # alias for Accessor
 from .models import *
 
+from mediate.columns import ActionColumn
 
 # Catalogue table
 class CatalogueTable(tables.Table):
-    edit = tables.LinkColumn('change_catalogue', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('catalogue_detail', 'change_catalogue', 'delete_catalogue', orderable=False)
+    transcription = tables.RelatedLinkColumn()
+    collection = tables.RelatedLinkColumn()
 
     class Meta:
         model = Catalogue
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'transcription',
+            'short_title',
+            'full_title',
+            'preface_and_paratexts',
+            'type',
+            'year_of_publication',
+            'terminus_post_quem',
+            'notes',
+            'bibliography',
+            'collection'
+        ]
 
     def render_full_title(self, value):
         return (value[:50] + "...") if len(value) > 50 else value

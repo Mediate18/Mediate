@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
+from django.urls import reverse_lazy
 
 import uuid
 
@@ -29,6 +30,8 @@ class Transcription(models.Model):
     def __str__(self):
         return _("{} as transcribed by {}").format(self.source_material, self.author)
 
+    def get_absolute_url(self):
+        return reverse_lazy('change_transcription', args=[str(self.uuid)])
 
 class DocumentScan(models.Model):
     """
