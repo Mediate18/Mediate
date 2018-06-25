@@ -30,6 +30,9 @@ class ItemTable(tables.Table):
     manage_works = tables.LinkColumn('add_workstoitem',
         text=format_html('<span class="glyphicon glyphicon-list" data-toggle="tooltip" data-original-title="Manage works"></span>'),
         args=[A('pk')], orderable=False, empty_values=())
+    manage_persons = tables.LinkColumn('add_personstoitem',
+         text=format_html('<span class="glyphicon glyphicon-list" data-toggle="tooltip" data-original-title="Manage people"></span>'),
+         args=[A('pk')], orderable=False, empty_values=())
 
     class Meta:
         model = Item
@@ -43,7 +46,8 @@ class ItemTable(tables.Table):
             'collection',
             'number_of_volumes',
             'uuid',
-            'manage_works'
+            'manage_works',
+            'manage_persons'
         ]
 
     def render_people(self, record):

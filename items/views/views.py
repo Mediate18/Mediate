@@ -1001,6 +1001,64 @@ class PersonItemRelationDeleteView(DeleteView):
     model = PersonItemRelation
     success_url = reverse_lazy('personitemrelations')
 
+    def get_success_url(self):
+        return self.request.META['HTTP_REFERER']
+
+
+class PersonItemRelationAddView(UpdateView):
+    """
+    A view to add persons to an item through PersonItemRelations
+    """
+    model = Item
+    template_name = 'items/manage_personitemrelations_form.html'
+    form_class = PersonItemRelationAddForm
+
+    def get_success_url(self):
+        return self.request.META['HTTP_REFERER']
+
+    def get_context_data(self, **kwargs):
+        context = super(PersonItemRelationAddView, self).get_context_data(**kwargs)
+        # print(self.object)
+
+        context['existing_relations'] = [{'uuid': relation.uuid, 'person': relation.person, 'role': relation.role}
+                                         for relation in self.object.personitemrelation_set.all()]
+        print(context['existing_relations'])
+
+        context['form'] = PersonItemRelationAddForm()
+        print(str(context['form'].Media.js))
+        context['form_as'] = 'table'  # Type of form
+        import json
+        context['js_variables'] = json.dumps({})
+
+        context['action'] = _('Manage people for item')
+
+        context['object_name'] = str(self.object)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        try:
+            item = Item.objects.get(uuid=kwargs['pk'])
+
+        except:
+            import traceback
+            traceback.print_exc()
+            return HttpResponseRedirect(reverse_lazy('items'))
+
+        person_id = request.POST['person']
+        person = Person.objects.get(pk=person_id)
+        role_id = request.POST['role']
+        role = PersonItemRelationRole.objects.get(pk=role_id)
+
+        try:
+            person_item_relation = PersonItemRelation.objects.get(item=item, person=person, role=role)
+            messages.add_message(self.request, messages.WARNING,
+                                 _("This person was already linked to this item as %s." % role))
+        except ObjectDoesNotExist as e:
+            person_item_relation = PersonItemRelation(item=item, person=person, role=role)
+            person_item_relation.save()
+
+        return HttpResponseRedirect(self.get_success_url())
+
 
 # PersonItemRelationRole views
 class PersonItemRelationRoleTableView(ListView):

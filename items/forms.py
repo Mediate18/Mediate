@@ -187,6 +187,27 @@ class PersonItemRelationModelForm(forms.ModelForm):
         }
 
 
+class PersonItemRelationAddForm(forms.ModelForm):
+    viaf_select_id = 'viaf_id'  # ID of the VIAF suggest widget
+
+    class Meta:
+        model = PersonItemRelation
+        fields = ['person', 'role']
+        widgets = {
+            'person': ModelSelect2Widget(
+                model=Person,
+                search_fields=['short_name__icontains']
+            ),
+            'role': ModelSelect2Widget(
+                model=PersonItemRelationRole,
+                search_fields=['name__icontains']
+            )
+        }
+
+    class Media:
+        js = ('js/viaf_select.js',)
+
+
 class PersonItemRelationRoleModelForm(forms.ModelForm):
     class Meta:
         model = PersonItemRelationRole
