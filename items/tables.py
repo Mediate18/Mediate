@@ -45,14 +45,24 @@ class ItemTable(tables.Table):
         ]
 
     def render_people(self, record):
-        relation_roles = PersonItemRelationRole.objects.filter(personitemrelation__item=record).distinct()
+        person_item_relations = PersonItemRelation.objects.filter(item=record)
         relation_groups = []
-        for role in relation_roles:
-            person_item_relations = Person.objects.filter(personitemrelation__item=record, personitemrelation__role=role)
+        for role in set([relation.role for relation in person_item_relations]):
+            role_relations = person_item_relations.filter(role=role)
+            persons = []
+            for relation in role_relations:
+                person = relation.person
+                name = person.short_name
+                viaf = person.viaf_id
+                person_entry = "<a href='{}'>{}</a>".format(reverse_lazy('change_person', args=[person.pk]), name)
+                if viaf:
+                    person_entry += " (<a target='blank' href='{}'>VIAF</a>)".format(viaf)
+                persons.append(person_entry)
+
             relation_groups.append(
-                role.name + ": " + ", ".join([person.short_name for person in person_item_relations])
+                role.name.capitalize() + ": " + ", ".join(persons)
             )
-        return format_html("; ".join(relation_groups))
+        return format_html("<br/> ".join(relation_groups))
 
     def render_catalogue(self, record):
         return format_html('<a href="{}">{}</a>'.format(
