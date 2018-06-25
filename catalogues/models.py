@@ -76,8 +76,14 @@ class Catalogue(models.Model):
     bibliography = models.TextField(_("Bibliography"), null=True)
     collection = models.ForeignKey(Collection, on_delete=SET_NULL, null=True)
 
+    class Meta:
+        ordering = ['year_of_publication', 'short_title']
+
     def __str__(self):
         return "{0}".format(self.short_title)
+
+    def get_absolute_url(self):
+        return reverse_lazy('change_catalogue', args=[str(self.uuid)])
 
 
 class CatalogueHeldBy(models.Model):
@@ -102,6 +108,9 @@ class Lot(models.Model):
     bookseller_category_non_books = models.TextField(_("Heading / category for other, non-book items"))
     number_in_catalogue = models.CharField(_("Number of items as listed in catalogue"), max_length=128)
     item_as_listed_in_catalogue = models.TextField(_("Full item description, exactly as in the catalogue"))
+
+    class Meta:
+        ordering = ['catalogue__year_of_publication', 'catalogue__short_title', 'item_as_listed_in_catalogue']
 
     def __str__(self):
         return self.item_as_listed_in_catalogue

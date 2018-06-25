@@ -86,6 +86,7 @@ class LibraryTable(tables.Table):
 # Lot table
 class LotTable(tables.Table):
     uuid = ActionColumn('lot_detail', 'change_lot', 'delete_lot', orderable=False)
+    catalogue = tables.RelatedLinkColumn()
 
     class Meta:
         model = Lot
@@ -98,8 +99,6 @@ class LotTable(tables.Table):
             'item_as_listed_in_catalogue',
             'uuid'
         ]
-
-
 
 
 # PersonCatalogueRelation table

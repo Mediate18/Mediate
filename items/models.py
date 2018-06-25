@@ -70,6 +70,9 @@ class Work(models.Model):
     title = models.TextField(_("Title of a work"))
     viaf_id = models.CharField(_("VIAF ID of a work"), max_length=32, null=True, blank=True, unique=True)
 
+    class Meta:
+        ordering = ['title']
+
     def __str__(self):
         return self.title
 
@@ -110,6 +113,10 @@ class Item(models.Model):
     lot = models.ForeignKey(Lot, on_delete=CASCADE, null=True)
     collection = models.ForeignKey(Collection, on_delete=CASCADE)
     number_of_volumes = models.CharField(_("Number of volumes, as listed in the catalogue"), max_length=128)
+
+    class Meta:
+        ordering = ['lot__catalogue__year_of_publication', 'lot__catalogue__short_title',
+                    'lot__item_as_listed_in_catalogue']
 
     def __str__(self):
         return self.short_title

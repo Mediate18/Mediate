@@ -56,6 +56,9 @@ class Person(models.Model):
     city_of_birth = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True, related_name='persons_born')
     city_of_death = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True, related_name='persons_died')
 
+    class Meta:
+        ordering = ['short_name']
+
     def __str__(self):
         return self.short_name
 
