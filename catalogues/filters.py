@@ -62,10 +62,14 @@ class LibraryFilter(django_filters.FilterSet):
 # Lot filter
 class LotFilter(django_filters.FilterSet):
     catalogue = django_filters.Filter(name='catalogue__short_title', lookup_expr='icontains')
+    bookseller_category_books = django_filters.Filter(lookup_expr='icontains')
+    bookseller_category_non_books = django_filters.Filter(lookup_expr='icontains')
+    number_in_catalogue = django_filters.RangeFilter(widget=django_filters.widgets.RangeWidget())
+    item_as_listed_in_catalogue = django_filters.Filter(lookup_expr='icontains')
 
     class Meta:
         model = Lot
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # PersonCatalogueRelation filter

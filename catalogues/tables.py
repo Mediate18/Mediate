@@ -85,12 +85,19 @@ class LibraryTable(tables.Table):
 
 # Lot table
 class LotTable(tables.Table):
-    edit = tables.LinkColumn('change_lot', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('lot_detail', 'change_lot', 'delete_lot', orderable=False)
 
     class Meta:
         model = Lot
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'catalogue',
+            'bookseller_category_books',
+            'bookseller_category_non_books',
+            'number_in_catalogue',
+            'item_as_listed_in_catalogue',
+            'uuid'
+        ]
 
 
 
