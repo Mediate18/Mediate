@@ -21,6 +21,7 @@ class BookFormatTable(tables.Table):
 # Item table
 class ItemTable(tables.Table):
     uuid = ActionColumn('item_detail', 'change_item', 'delete_item', orderable=False)
+    people = tables.Column(empty_values=())
     lot = tables.RelatedLinkColumn(order_by='lot__item_as_listed_in_catalogue')
     catalogue = tables.Column(empty_values=())
     collection = tables.RelatedLinkColumn()
@@ -34,6 +35,7 @@ class ItemTable(tables.Table):
         attrs = {'class': 'table table-sortable'}
         sequence = [
             'short_title',
+            'people',
             'lot',
             'catalogue',
             'collection',
@@ -41,6 +43,16 @@ class ItemTable(tables.Table):
             'uuid',
             'manage_works'
         ]
+
+    def render_people(self, record):
+        relation_roles = PersonItemRelationRole.objects.filter(personitemrelation__item=record).distinct()
+        relation_groups = []
+        for role in relation_roles:
+            person_item_relations = Person.objects.filter(personitemrelation__item=record, personitemrelation__role=role)
+            relation_groups.append(
+                role.name + ": " + ", ".join([person.short_name for person in person_item_relations])
+            )
+        return format_html("; ".join(relation_groups))
 
     def render_catalogue(self, record):
         return format_html('<a href="{}">{}</a>'.format(
