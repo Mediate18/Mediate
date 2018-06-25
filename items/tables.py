@@ -22,6 +22,7 @@ class BookFormatTable(tables.Table):
 class ItemTable(tables.Table):
     uuid = ActionColumn('item_detail', 'change_item', 'delete_item', orderable=False)
     people = tables.Column(empty_values=())
+    works = tables.Column(empty_values=(), verbose_name=_("Works"))
     lot = tables.RelatedLinkColumn(order_by='lot__item_as_listed_in_catalogue')
     catalogue = tables.Column(empty_values=())
     collection = tables.RelatedLinkColumn()
@@ -36,6 +37,7 @@ class ItemTable(tables.Table):
         sequence = [
             'short_title',
             'people',
+            'works',
             'lot',
             'catalogue',
             'collection',
@@ -63,6 +65,19 @@ class ItemTable(tables.Table):
                 role.name.capitalize() + ": " + ", ".join(persons)
             )
         return format_html("<br/> ".join(relation_groups))
+
+    def render_works(self, record):
+        item_work_relations = ItemWorkRelation.objects.filter(item=record)
+        work_entries = []
+        for relation in item_work_relations:
+            work = relation.work
+            viaf = work.viaf_id
+            work_entry = "<a href='{}'>{}</a>".format(reverse_lazy('change_work', args=[work.pk]), work.title)
+            if viaf:
+                work_entry += " (<a target='blank' href='{}'>VIAF</a>)".format(viaf)
+            work_entries.append(work_entry)
+        return format_html(" | ".join(work_entries))
+
 
     def render_catalogue(self, record):
         return format_html('<a href="{}">{}</a>'.format(
