@@ -8,7 +8,7 @@
     <div class="col-md-10">
         <h2>Item</h2>
         <div class="row">
-            <div class="col-sm-6">
+            <div class="col-sm-4">
                 <dl class="row">
                     <dt class="col-sm-3">{% trans "Short title" %}:</dt>
                     <dd class="col-sm-9">{{ object.short_title }}</dd>
@@ -26,11 +26,19 @@
                     </dd>
                 </dl>
             </div>
-            <div class="col-sm-6">
+            <div class="col-sm-4">
                 <h3>{% trans "Works" %}</h3>
                 <ul>
                     {% for related_work in object.works.all %}
                     <li>{{ related_work.work }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-sm-4">
+                <h3>{% trans "People" %}</h3>
+                <ul>
+                    {% for personitemrelation in object.personitemrelation_set.all %}
+                    <li>{{ personitemrelation.person }} ({{ personitemrelation.role }})</li>
                     {% endfor %}
                 </ul>
             </div>
@@ -42,9 +50,11 @@
             <li>
                 <a href="{% url 'change_item' object.pk %}">{% trans "Edit" %}</a>
             </li>
-
             <li>
                 <a href="{% url 'add_workstoitem' object.pk %}">{% trans "Manage works" %}</a>
+            </li>
+            <li>
+                <a href="{% url 'add_personstoitem' object.pk %}">{% trans "Manage people" %}</a>
             </li>
         </ul>
     </div>
