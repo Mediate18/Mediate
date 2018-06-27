@@ -1,12 +1,13 @@
 import django_filters
 from django_select2.forms import Select2MultipleWidget
 from .models import *
+from mediate.tools import filter_multiple_words
 
 
 # Catalogue filter
 class CatalogueFilter(django_filters.FilterSet):
-    short_title = django_filters.Filter(lookup_expr='icontains')
-    full_title = django_filters.Filter(lookup_expr='icontains')
+    short_title = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
+    full_title = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
     preface_and_paratexts = django_filters.Filter(lookup_expr='icontains')
     type = django_filters.ModelMultipleChoiceFilter(
         queryset=CatalogueType.objects.all(),
@@ -21,6 +22,9 @@ class CatalogueFilter(django_filters.FilterSet):
         model = Catalogue
         fields = "__all__"
         exclude = ['transcription', 'uuid']
+
+    def multiple_words_filter(self, queryset, name, value):
+        return filter_multiple_words(self.filters[name].lookup_expr, queryset, name, value)
 
 
 
