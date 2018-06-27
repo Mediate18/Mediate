@@ -106,7 +106,7 @@ class Lot(models.Model):
     catalogue = models.ForeignKey(Catalogue, on_delete=CASCADE, null=True)
     bookseller_category_books = models.TextField(_("Heading / category used to describe books"))
     bookseller_category_non_books = models.TextField(_("Heading / category for other, non-book items"))
-    number_in_catalogue = models.CharField(_("Number of items as listed in catalogue"), max_length=128)
+    number_in_catalogue = models.CharField(_("Number in catalogue"), max_length=128)
     item_as_listed_in_catalogue = models.TextField(_("Full item description, exactly as in the catalogue"))
 
     class Meta:
