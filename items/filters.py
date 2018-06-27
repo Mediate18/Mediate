@@ -2,6 +2,7 @@ import django_filters
 from django_select2.forms import ModelSelect2MultipleWidget
 from tagging.models import Tag, TaggedItem
 from .models import *
+from mediate.tools import filter_multiple_words
 from viapy.api import ViafAPI
 
 
@@ -14,7 +15,7 @@ class BookFormatFilter(django_filters.FilterSet):
 
 # Item filter
 class ItemFilter(django_filters.FilterSet):
-    short_title = django_filters.Filter(lookup_expr='icontains')
+    short_title = django_filters.Filter(lookup_expr='icontains', method='short_title_filter')
     lot = django_filters.Filter(name='lot__item_as_listed_in_catalogue', lookup_expr='icontains')
     collection = django_filters.Filter(name='collection__name', lookup_expr='icontains')
     number_of_volumes = django_filters.Filter(lookup_expr='icontains')
@@ -36,6 +37,9 @@ class ItemFilter(django_filters.FilterSet):
         if value:
             return TaggedItem.objects.get_by_model(queryset, value)
         return queryset
+
+    def short_title_filter(self, queryset, name, value):
+        return filter_multiple_words(self.filters[name].lookup_expr, queryset, name, value)
 
 
 # ItemAuthor filter
