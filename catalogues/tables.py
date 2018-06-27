@@ -9,6 +9,8 @@ class CatalogueTable(tables.Table):
     uuid = ActionColumn('catalogue_detail', 'change_catalogue', 'delete_catalogue', orderable=False)
     transcription = tables.RelatedLinkColumn()
     collection = tables.RelatedLinkColumn()
+    number_of_lots = tables.Column(empty_values=(), orderable=False)
+    number_of_items = tables.Column(empty_values=(), orderable=False)
 
     class Meta:
         model = Catalogue
@@ -23,7 +25,9 @@ class CatalogueTable(tables.Table):
             'terminus_post_quem',
             'notes',
             'bibliography',
-            'collection'
+            'collection',
+            'number_of_lots',
+            'number_of_items'
         ]
 
     def render_full_title(self, value):
@@ -31,6 +35,12 @@ class CatalogueTable(tables.Table):
 
     def render_preface_and_paratexts(self, value):
         return (value[:50] + "...") if len(value) > 50 else value
+
+    def render_number_of_lots(self, record):
+        return record.num_lots
+
+    def render_number_of_items(self, record):
+        return record.num_items
 
 
 # CatalogueHeldBy table

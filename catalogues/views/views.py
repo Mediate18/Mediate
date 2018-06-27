@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
+from django.db.models import Count
 
 from ..forms import *
 from ..tables import *
@@ -20,7 +21,8 @@ class CatalogueTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return Catalogue.objects.all()
+        return Catalogue.objects.annotate(num_lots=Count('lot', distinct=True),
+                                          num_items=Count('lot__item', distinct=True))
 
     def get_context_data(self, **kwargs):
         context = super(CatalogueTableView, self).get_context_data(**kwargs)
