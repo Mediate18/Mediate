@@ -47,14 +47,14 @@ class Person(models.Model):
 
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     short_name = models.CharField(_("Short name"), max_length=128, null=True)
-    viaf_id = models.CharField(_("VIAF ID (https://viaf.org)"), max_length=128, null=True)
+    viaf_id = models.CharField(_("VIAF ID (https://viaf.org)"), max_length=128, null=True, blank=True)
     surname = models.CharField(_("Surname"), max_length=128)
     first_names = models.CharField(_("First names"), max_length=512)
     date_of_birth = models.DateField(_("Date of birth"))
     date_of_death = models.DateField(_("Date of death"))
     sex = models.CharField(_("Sex"), choices=SEX_CHOICES, max_length=7)
-    city_of_birth = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True, related_name='persons_born')
-    city_of_death = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True, related_name='persons_died')
+    city_of_birth = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True, blank=True, related_name='persons_born')
+    city_of_death = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True, blank=True, related_name='persons_died')
 
     class Meta:
         ordering = ['short_name']

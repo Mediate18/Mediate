@@ -21,6 +21,8 @@ from ..forms import *
 from ..filters import *
 from ..tables import *
 
+from persons.forms import PersonModelForm
+
 
 # BookFormat views
 class BookFormatTableView(ListView):
@@ -1025,7 +1027,12 @@ class PersonItemRelationAddView(UpdateView):
         print(context['existing_relations'])
 
         context['form'] = PersonItemRelationAddForm()
-        print(str(context['form'].Media.js))
+
+        # Add another Person
+        import json
+        context['addanother_person_form'] = PersonModelForm()
+        context['js_variables'] = json.dumps({'viaf_select_id': PersonModelForm.cerl_select_id})
+
         context['form_as'] = 'table'  # Type of form
         import json
         context['js_variables'] = json.dumps({})

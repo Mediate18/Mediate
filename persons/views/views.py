@@ -60,11 +60,26 @@ class PersonCreateView(CreateView):
         context['js_variables'] = json.dumps({'viaf_select_id': PersonModelForm.cerl_select_id})
         return context
 
+    def form_invalid(self, form):
+        response = super().form_invalid(form)
+        if self.request.is_ajax():
+            return JsonResponse(form.errors, status=400)
+        else:
+            return response
+
     def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        if self.request.is_ajax():
+            data = {
+                'pk': self.object.pk,
+                'short_name': self.object.short_name,
+            }
+            return JsonResponse(data)
+        else:
+            if not self.request.user.is_superuser:
+                messages.add_message(self.request, messages.SUCCESS,
+                                     _("Your changes will be sent to a moderator for reviewing."))
+            return response
 
 
 class PersonUpdateView(UpdateView):

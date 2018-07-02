@@ -25,7 +25,7 @@
         <br />
 
         <h3>{% trans "Add person" %}</h3>
-
+        <a href="#" data-toggle="modal" data-target="#addanotherModal">{% trans "Add another person" %}</a>
         <form action="" method="post">
             <table class="table">
                 {% csrf_token %}
@@ -68,6 +68,40 @@
   </div>
 </div>
 
+<!-- Add another Modal -->
+<div id="addanotherModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-plus"></span> {% trans "Add another person" %}</h4>
+      </div>
+        <form id="addanother-person-form" action="{% url 'add_person' %}" method="post">
+          <div class="modal-body">
+                <table class="table">
+                    {% csrf_token %}
+                        {% if form_as == 'p' %}
+                            {{ addanother_person_form.as_p }}
+                        {% else %}
+                            {{ addanother_person_form.as_table }}
+                        {% endif %}
+                </table>
+              <div id="addanother-person-message">
+
+              </div>
+          </div>
+          <div class="modal-footer">
+            <input type="submit" class="btn btn-success" value="{% trans 'Add' %}"/>
+            <input type="reset" class="btn btn-default" data-dismiss="modal" value="{% trans 'Cancel' %}"/>
+          </div>
+        </form>
+    </div>
+
+  </div>
+</div>
+
 {% endblock %}
 
 {% block extrajs %}
@@ -75,7 +109,20 @@
     js_variables = {{ js_variables|safe }}
 </script>
 {{ form.media.js }}
+{{ addanother_person_form.media.js }}
 <script>
+function handleAddanotherPersonResponse(response) {
+    console.log(response);
+    if(response.pk) { // Success!
+        $('#id_person').append(
+            '<option value="'+response.pk+'">'+response.short_name+'</option>'
+        );
+        $('#addanotherModal').modal('toggle');
+    } else {
+        $('#addanother-person-message').append('{% trans "Something went wrong. Please review the form." %}');
+    }
+}
+
 $(document).ready(function(){
         $('.django-select2').djangoSelect2({placeholder: 'Select an option'});
 
@@ -87,6 +134,22 @@ $(document).ready(function(){
 
         $('[data-toggle="tooltip"]').tooltip({
             placement : 'right'
+        });
+
+        $('#addanother-person-form').submit(function(event) {
+            event.preventDefault();
+            $.ajax({
+                 type:"POST",
+                 url: $('#addanother-person-form').attr('action'),
+                 data: $('#addanother-person-form').serialize(),
+                 success: function(response){
+                     handleAddanotherPersonResponse(response);
+                 },
+                 error: function(response){
+                    console.log(response);
+                    $('#addanother-person-message').append('{% trans "Something went wrong. Please review the form." %}');
+                 }
+            });
         });
 });
 </script>
