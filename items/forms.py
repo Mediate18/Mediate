@@ -187,6 +187,17 @@ class PersonItemRelationModelForm(forms.ModelForm):
         }
 
 
+class AddAnotherWidget(ModelSelect2Widget):
+    def render(self, *args, **kwargs):
+        output = super(AddAnotherWidget, self).render(*args, **kwargs)
+        output += '&nbsp;&nbsp;' \
+                  '<a href="#" data-toggle="modal" data-target="#addanotherModal">' \
+                  '<span class="glyphicon glyphicon-plus" data-toggle="tooltip" data-original-title="Add another">' \
+                  '</span>' \
+                  '</a>'
+        return output
+
+
 class PersonItemRelationAddForm(forms.ModelForm):
     viaf_select_id = 'viaf_id'  # ID of the VIAF suggest widget
 
@@ -194,7 +205,7 @@ class PersonItemRelationAddForm(forms.ModelForm):
         model = PersonItemRelation
         fields = ['person', 'role']
         widgets = {
-            'person': ModelSelect2Widget(
+            'person': AddAnotherWidget(
                 model=Person,
                 search_fields=['short_name__icontains']
             ),
