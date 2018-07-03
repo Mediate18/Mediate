@@ -57,7 +57,7 @@ class PersonCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         context['action'] = _("add")
         context['object_name'] = "person"
-        context['js_variables'] = json.dumps({'viaf_select_id': PersonModelForm.cerl_select_id})
+        context['js_variables'] = json.dumps({'viaf_select_id': PersonModelForm.suggest_select_ids})
         return context
 
     def form_invalid(self, form):

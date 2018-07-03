@@ -1046,7 +1046,7 @@ class PersonItemRelationAddView(UpdateView):
 
         # Add another Person
         context['addanother_person_form'] = PersonModelForm()
-        context['js_variables'] = json.dumps({'viaf_select_id': PersonModelForm.cerl_select_id})
+        context['js_variables'] = json.dumps({'viaf_select_id': PersonModelForm.suggest_select_ids})
 
         context['form_as'] = 'table'  # Type of form
         context['js_variables'] = json.dumps({})
