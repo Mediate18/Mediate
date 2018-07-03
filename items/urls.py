@@ -148,6 +148,7 @@ urlpatterns = [
 
     # WorkAndVIAF API
     path(r'workandviaf_suggest', WorkAndVIAFSuggest.as_view(), name='workandviaf_suggest'),
+    path(r'viaf_suggest', VIAFSuggest.as_view(), name='viaf_suggest'),
 
     # Language urls
     path('languages/', login_required(LanguageTableView.as_view()), name='languages'),

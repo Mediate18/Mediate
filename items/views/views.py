@@ -14,6 +14,7 @@ from dal import autocomplete
 from django.http import JsonResponse
 import requests
 import re
+import json
 
 from viapy.api import ViafAPI
 
@@ -687,6 +688,32 @@ def work_and_viaf_suggest(query):
         return []
 
 
+class VIAFSuggest(autocomplete.Select2ListView):
+    def get(self, request, *args, **kwargs):
+        return self.find_viaf(self.q)
+
+    @staticmethod
+    def find_viaf(q, work_viaf_ids=set(), json=True):
+        viaf = ViafAPI()
+        viaf_result_raw = work_and_viaf_suggest(q)
+        viaf_result = [dict(
+            id=viaf.uri_from_id(item['viafid']),
+            id_number=item['viafid'],
+            text=escape(item['displayForm']),
+            nametype=item['nametype'],
+            class_name="viaf_api",
+            external_url=viaf.uri_from_id(item['viafid']),
+            clean_text=escape(item['displayForm'])
+        ) for item in viaf_result_raw if item['viafid'] not in work_viaf_ids]
+
+        if json:
+            return JsonResponse({
+                'results': viaf_result
+            })
+        else:
+            return viaf_result
+
+
 class WorkAndVIAFSuggest(autocomplete.Select2ListView):
     def get(self, request, *args, **kwargs):
         viaf = ViafAPI()
@@ -711,16 +738,7 @@ class WorkAndVIAFSuggest(autocomplete.Select2ListView):
                 id_number = re.match(r'.*?(\d+)$', obj.viaf_id).group(1)
                 work_viaf_ids.add(id_number)
 
-        viaf_result_raw = work_and_viaf_suggest(self.q)
-        viaf_result = [dict(
-                id=viaf.uri_from_id(item['viafid']),
-                id_number=item['viafid'],
-                text=escape(item['displayForm']),
-                nametype=item['nametype'],
-                class_name="viaf_api",
-                external_url=viaf.uri_from_id(item['viafid']),
-                clean_text=escape(item['displayForm'])
-            ) for item in viaf_result_raw if item['viafid'] not in work_viaf_ids]
+        viaf_result = VIAFSuggest.find_viaf(self.q, work_viaf_ids=work_viaf_ids, json=False)
 
         return JsonResponse({
             'results': work_result + viaf_result
@@ -748,7 +766,6 @@ class ItemWorkRelationAddView(UpdateView):
         context['form'] = ItemWorkRelationAddForm()
         print(str(context['form'].Media.js))
         context['form_as'] = 'table'  # Type of form
-        import json
         context['js_variables'] = json.dumps({'viaf_select_id': ItemWorkRelationAddForm.viaf_select_id})
 
         context['action'] = _('Manage works for item')
@@ -1029,12 +1046,10 @@ class PersonItemRelationAddView(UpdateView):
         context['form'] = PersonItemRelationAddForm()
 
         # Add another Person
-        import json
         context['addanother_person_form'] = PersonModelForm()
         context['js_variables'] = json.dumps({'viaf_select_id': PersonModelForm.cerl_select_id})
 
         context['form_as'] = 'table'  # Type of form
-        import json
         context['js_variables'] = json.dumps({})
 
         context['action'] = _('Manage people for item')
@@ -1394,6 +1409,7 @@ class WorkCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         context['action'] = _("add")
         context['object_name'] = "work"
+        context['js_variables'] = json.dumps({'viaf_selec_id': 'viaf_id'})
         return context
 
     def form_valid(self, form):

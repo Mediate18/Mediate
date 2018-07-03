@@ -1,7 +1,7 @@
 from django import forms
 from django.urls import reverse_lazy
 from django_select2.forms import Select2Widget, ModelSelect2Widget, ModelSelect2MultipleWidget
-from viapy.widgets import ViafWidget
+from apiconnectors.widgets import ApiSelectWidget
 from .models import *
 
 from tagging.models import Tag
@@ -144,7 +144,7 @@ class ItemWorkRelationAddForm(forms.ModelForm):
         model = Work
         fields = ['viaf_id', 'title']
         widgets = {
-            'viaf_id': ViafWidget(
+            'viaf_id': ApiSelectWidget(
                 url='workandviaf_suggest',
                 attrs={'data-html': True, 'data-placeholder': "Search for a work - <i>italic: works in the local database</i>"},
             ),
@@ -256,8 +256,10 @@ class WorkModelForm(forms.ModelForm):
         model = Work
         fields = ['viaf_id', 'title']
         widgets = {
-            'viaf_id': ViafWidget(
-                url=reverse_lazy('viapy:suggest')
+            'viaf_id': ApiSelectWidget(
+                url=reverse_lazy('viaf_suggest'),
+                attrs={'data-html': True,
+                       'data-placeholder': "Search for a work"},
             ),
         }
 
