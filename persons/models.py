@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django_date_extensions.fields import ApproximateDateField
 
 import uuid
 
@@ -50,8 +51,8 @@ class Person(models.Model):
     viaf_id = models.CharField(_("VIAF ID (https://viaf.org)"), max_length=128, null=True, blank=True)
     surname = models.CharField(_("Surname"), max_length=128)
     first_names = models.CharField(_("First names"), max_length=512)
-    date_of_birth = models.DateField(_("Date of birth"))
-    date_of_death = models.DateField(_("Date of death"))
+    date_of_birth = ApproximateDateField(_("Date of birth"))
+    date_of_death = ApproximateDateField(_("Date of death"))
     sex = models.CharField(_("Sex"), choices=SEX_CHOICES, max_length=7)
     city_of_birth = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True, blank=True, related_name='persons_born')
     city_of_death = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True, blank=True, related_name='persons_died')

@@ -1,6 +1,7 @@
 from django import forms
 from django.urls import reverse_lazy
 from django_select2.forms import Select2Widget
+from django_date_extensions.fields import ApproximateDateFormField
 from apiconnectors.widgets import ApiSelectWidget
 from viapy.widgets import ViafWidget
 from .models import *
@@ -8,6 +9,8 @@ from .models import *
 
 class PersonModelForm(forms.ModelForm):
     cerl_select_id = ['city_of_birth', 'city_of_death']  # ID of the VIAF suggest widget
+    date_of_birth = ApproximateDateFormField()
+    date_of_death = ApproximateDateFormField()
 
     class Meta:
         model = Person
