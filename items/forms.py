@@ -257,7 +257,7 @@ class WorkModelForm(forms.ModelForm):
         fields = ['viaf_id', 'title']
         widgets = {
             'viaf_id': ApiSelectWidget(
-                url=reverse_lazy('viaf_suggest'),
+                url=reverse_lazy('work_viaf_suggest'),
                 attrs={'data-html': True,
                        'data-placeholder': "Search for a work"},
             ),

@@ -676,37 +676,25 @@ class ItemWorkRelationDeleteView(DeleteView):
         return self.request.META['HTTP_REFERER']
 
 
-def work_and_viaf_suggest(query):
-    base_url = 'https://www.viaf.org/viaf/AutoSuggest'
-    response = requests.get(base_url,
-                            params={'query': query},
-                            headers={'accept': 'application/json'})
-    # print(response.content)
-    if response.status_code == requests.codes.ok:
-        return response.json().get('result', None) or []
-    else:
-        return []
-
-
 class VIAFSuggest(autocomplete.Select2ListView):
     def get(self, request, *args, **kwargs):
         return self.find_viaf(self.q)
 
     @staticmethod
-    def find_viaf(q, work_viaf_ids=set(), json=True):
+    def find_viaf(q, discard_viaf_ids=set(), json_output=True, cql_relation='cql.any'):
         viaf = ViafAPI()
-        viaf_result_raw = work_and_viaf_suggest(q)
+        viaf_result_raw = viaf.search('%s = "%s"' % (cql_relation, q)) or []
         viaf_result = [dict(
-            id=viaf.uri_from_id(item['viafid']),
-            id_number=item['viafid'],
-            text=escape(item['displayForm']),
-            nametype=item['nametype'],
+            id=item.uri,
+            id_number=item.viaf_id,
+            text=escape(item.label),
+            nametype=item.nametype,
             class_name="viaf_api",
-            external_url=viaf.uri_from_id(item['viafid']),
-            clean_text=escape(item['displayForm'])
-        ) for item in viaf_result_raw if item['viafid'] not in work_viaf_ids]
+            external_url=item.uri,
+            clean_text=escape(item.label)
+        ) for item in viaf_result_raw if item.viaf_id not in discard_viaf_ids]
 
-        if json:
+        if json_output:
             return JsonResponse({
                 'results': viaf_result
             })
@@ -716,8 +704,6 @@ class VIAFSuggest(autocomplete.Select2ListView):
 
 class WorkAndVIAFSuggest(autocomplete.Select2ListView):
     def get(self, request, *args, **kwargs):
-        viaf = ViafAPI()
-
         work_result_raw = Work.objects.filter(title__icontains=self.q)
         work_viaf_ids = set()
         work_result = []
@@ -738,11 +724,24 @@ class WorkAndVIAFSuggest(autocomplete.Select2ListView):
                 id_number = re.match(r'.*?(\d+)$', obj.viaf_id).group(1)
                 work_viaf_ids.add(id_number)
 
-        viaf_result = VIAFSuggest.find_viaf(self.q, work_viaf_ids=work_viaf_ids, json=False)
+        viaf_result = VIAFSuggest.find_viaf(self.q, discard_viaf_ids=work_viaf_ids, json_output=False,
+                                            cql_relation='local.uniformTitleWorks')
 
-        return JsonResponse({
-            'results': work_result + viaf_result
-        })
+        return JsonResponse({'results': work_result + viaf_result})
+
+
+class PersonVIAFSuggest(autocomplete.Select2ListView):
+    def get(self, request, *args, **kwargs):
+        viaf_result = VIAFSuggest.find_viaf(self.q, json_output=False, cql_relation='local.personalNames')
+
+        return JsonResponse({'results': viaf_result})
+
+
+class WorkVIAFSuggest(autocomplete.Select2ListView):
+    def get(self, request, *args, **kwargs):
+        viaf_result = VIAFSuggest.find_viaf(self.q, json_output=False, cql_relation='local.uniformTitleWorks')
+
+        return JsonResponse({'results': viaf_result})
 
 
 class ItemWorkRelationAddView(UpdateView):

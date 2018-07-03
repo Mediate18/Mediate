@@ -16,8 +16,10 @@ class PersonModelForm(forms.ModelForm):
         model = Person
         fields = "__all__"
         widgets = {
-            'viaf_id': ViafWidget(
-                url=reverse_lazy('viapy:person-suggest')
+            'viaf_id': ApiSelectWidget(
+                url=reverse_lazy('person_viaf_suggest'),
+                attrs={'data-html': True,
+                       'data-placeholder': "Search for a person"},
             ),
             'sex': Select2Widget,
             'city_of_birth': ApiSelectWidget(
