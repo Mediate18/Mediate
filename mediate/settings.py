@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'dal_select2',
     'viapy',
     'tagging',
+    'dbbackup',
     'simplemoderation',
     'items',
     'transcriptions',
@@ -174,3 +175,6 @@ MODERATED_OBJECT_PK = "use_uuid"
 TAGGING_OBJECT_ID_TYPE = "uuid"
 
 APPLICATION_INSTANCE_TYPE = config('APPLICATION_INSTANCE_TYPE', default="")
+
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {'location': '/var/backups'}
