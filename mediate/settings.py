@@ -80,6 +80,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'mediate.context_processors.application_instance_type',
             ],
         },
     },
@@ -171,3 +172,5 @@ BOOTSTRAP3 = {
 
 MODERATED_OBJECT_PK = "use_uuid"
 TAGGING_OBJECT_ID_TYPE = "uuid"
+
+APPLICATION_INSTANCE_TYPE = config('APPLICATION_INSTANCE_TYPE', default="")

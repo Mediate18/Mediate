@@ -32,6 +32,13 @@
     <!-- top bar -->
     <nav class="navbar navbar-default navbar-fixed-top">
       <div class="container-fluid">
+        {% if APPLICATION_INSTANCE_TYPE %}
+        <div class="navbar-header">
+            <div class="navbar-brand">
+            <span class="label label-warning">{{ APPLICATION_INSTANCE_TYPE }}</span>
+            </div>
+		</div>
+        {% endif %}
         <div class="navbar-header">
 			<a class="navbar-brand navbar-img" href="http://www.ru.nl/" target="_blank"><img src="{% static 'img/ru.png' %}" alt="Radboud University" class="mini-logo"></a>
 		</div>
