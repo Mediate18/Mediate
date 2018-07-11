@@ -1,0 +1,20 @@
+{% extends "baselayout.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-xs-6 col-xs-offset-3">
+        <div class="alert alert-warning">
+            <h3>{% trans "Oops!" %}</h3>
+            <p>
+            {% trans "Something went wrong. Sorry." %}
+            </p>
+            <p>
+                {% trans "Perhaps you could start again from" %} <a href="{% url 'home' %}">Home</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
