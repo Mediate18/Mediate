@@ -68,7 +68,7 @@ class Work(models.Model):
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.TextField(_("Title of a work"))
-    viaf_id = models.CharField(_("VIAF ID of a work"), max_length=32, null=True, blank=True, unique=True)
+    viaf_id = models.CharField(_("VIAF ID of a work"), max_length=128, null=True, blank=True, unique=True)
 
     class Meta:
         ordering = ['title']
