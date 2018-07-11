@@ -17,6 +17,7 @@ function prepare_select_widget(viaf_select_id) {
                 $('#id_title').removeAttr("readonly");
             }
             var title = $(this).select2('data')[0].clean_text;
+            title = $('<div/>').html(title).text();  // html decode
             $('#id_title').val(title);
         });
 
