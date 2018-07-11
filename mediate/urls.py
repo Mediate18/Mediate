@@ -51,7 +51,7 @@ router.register(r'works', items.views.WorkViewSet)
 
 
 urlpatterns = [
-    path(r'', RedirectView.as_view(url='dashboard/')),
+    path(r'', RedirectView.as_view(url='dashboard/'), name='home'),
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path(r'items/', include(items.urls)),
