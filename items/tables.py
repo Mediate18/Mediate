@@ -202,12 +202,18 @@ class PersonItemRelationRoleTable(tables.Table):
 
 # Manifestation table
 class ManifestationTable(tables.Table):
-    edit = tables.LinkColumn('change_manifestation', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('manifestation_detail', 'change_manifestation', 'delete_manifestation', orderable=False)
 
     class Meta:
         model = Manifestation
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'item',
+            'year',
+            'year_tag',
+            'terminus_post_quem',
+            'place'
+        ]
 
 
 # Publisher table
