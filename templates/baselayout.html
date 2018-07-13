@@ -55,6 +55,7 @@
             <li class="{% if url_name == 'catalogues' %}active{% endif %}"><a href="{% url 'catalogues' %}">{% trans "Catalogues" %}</a></li>
             <li class="{% if url_name == 'lots' %}active{% endif %}"><a href="{% url 'lots' %}">{% trans "Lots" %}</a></li>
             <li class="{% if url_name == 'items' %}active{% endif %}"><a href="{% url 'items' %}">{% trans "Items" %}</a></li>
+            <li class="{% if url_name == 'manifestations' %}active{% endif %}"><a href="{% url 'manifestations' %}">{% trans "Manifestations" %}</a></li>
             <li class="{% if url_name == 'works' %}active{% endif %}"><a href="{% url 'works' %}">{% trans "Works" %}</a></li>
             {% endwith %}
           </ul>
