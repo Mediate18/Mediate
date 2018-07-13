@@ -1,5 +1,6 @@
 import django_filters
-from django_select2.forms import ModelSelect2MultipleWidget
+from django_filters.widgets import RangeWidget, BooleanWidget
+from django_select2.forms import ModelSelect2MultipleWidget, Select2MultipleWidget
 from tagging.models import Tag, TaggedItem
 from .models import *
 from mediate.tools import filter_multiple_words
@@ -136,10 +137,16 @@ class PersonItemRelationRoleFilter(django_filters.FilterSet):
 # Manifestation filter
 class ManifestationFilter(django_filters.FilterSet):
     item = django_filters.Filter(name='item__short_title', lookup_expr='icontains')
+    year = django_filters.RangeFilter(widget=RangeWidget())
+    year_tag = django_filters.Filter(lookup_expr='icontains')
+    place = django_filters.ModelMultipleChoiceFilter(
+        queryset=Place.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
+    )
 
     class Meta:
         model = Manifestation
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # Publisher filter

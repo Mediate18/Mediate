@@ -1205,7 +1205,7 @@ class ManifestationUpdateView(UpdateView):
     model = Manifestation
     template_name = 'generic_form.html'
     form_class = ManifestationModelForm
-    success_url = reverse_lazy('manifestationa')
+    success_url = reverse_lazy('manifestations')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
