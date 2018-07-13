@@ -68,7 +68,7 @@ class PersonItemRelationRoleViewSet(viewsets.ModelViewSet):
 
 
 class PublicationViewSet(viewsets.ModelViewSet):
-    queryset = Publication.objects.all()
+    queryset = Manifestation.objects.all()
     serializer_class = PublicationSerializer
 
 

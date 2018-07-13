@@ -71,7 +71,7 @@ class PersonItemRelationRoleAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(Publication)
+@admin.register(Manifestation)
 class PublicationAdmin(admin.ModelAdmin):
     pass
 

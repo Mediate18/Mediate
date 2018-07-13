@@ -228,7 +228,7 @@ class ItemMaterialDetailsRelation(models.Model):
         return _("{} contains {}").format(self.item, self.material_details)
 
 
-class Publication(models.Model):
+class Manifestation(models.Model):
     """
     The publication information for an item
     """
@@ -249,7 +249,7 @@ class Publisher(models.Model):
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     publisher = models.ForeignKey(Person, on_delete=CASCADE)
-    publication = models.ForeignKey(Publication, on_delete=CASCADE)
+    publication = models.ForeignKey(Manifestation, on_delete=CASCADE)
 
     class Meta:
         unique_together = (("publisher", "publication"),)

@@ -227,7 +227,7 @@ class PersonItemRelationRoleModelForm(forms.ModelForm):
 
 class PublicationModelForm(forms.ModelForm):
     class Meta:
-        model = Publication
+        model = Manifestation
         fields = "__all__"
         widgets = {
             'item': ModelSelect2Widget(

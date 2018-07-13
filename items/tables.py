@@ -206,7 +206,7 @@ class PublicationTable(tables.Table):
                          orderable=False, empty_values=())
 
     class Meta:
-        model = Publication
+        model = Manifestation
         attrs = {'class': 'table table-sortable'}
 
 

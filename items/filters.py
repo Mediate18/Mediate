@@ -138,7 +138,7 @@ class PublicationFilter(django_filters.FilterSet):
     item = django_filters.Filter(name='item__short_title', lookup_expr='icontains')
 
     class Meta:
-        model = Publication
+        model = Manifestation
         fields = "__all__"
 
 

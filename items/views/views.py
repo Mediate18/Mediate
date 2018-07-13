@@ -1155,11 +1155,11 @@ class PersonItemRelationRoleDeleteView(DeleteView):
 
 # Publication views
 class PublicationTableView(ListView):
-    model = Publication
+    model = Manifestation
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return Publication.objects.all()
+        return Manifestation.objects.all()
 
     def get_context_data(self, **kwargs):
         context = super(PublicationTableView, self).get_context_data(**kwargs)
@@ -1179,11 +1179,11 @@ class PublicationTableView(ListView):
 
 
 class PublicationDetailView(DetailView):
-    model = Publication
+    model = Manifestation
 
 
 class PublicationCreateView(CreateView):
-    model = Publication
+    model = Manifestation
     template_name = 'generic_form.html'
     form_class = PublicationModelForm
     success_url = reverse_lazy('publications')
@@ -1202,7 +1202,7 @@ class PublicationCreateView(CreateView):
 
 
 class PublicationUpdateView(UpdateView):
-    model = Publication
+    model = Manifestation
     template_name = 'generic_form.html'
     form_class = PublicationModelForm
     success_url = reverse_lazy('publications')
@@ -1221,7 +1221,7 @@ class PublicationUpdateView(UpdateView):
 
 
 class PublicationDeleteView(DeleteView):
-    model = Publication
+    model = Manifestation
     success_url = reverse_lazy('publications')
 
 
