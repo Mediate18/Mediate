@@ -216,19 +216,19 @@ urlpatterns = [
            PersonItemRelationRoleDeleteView.as_view()),
        name="delete_personitemrelationrole"),
 
-    # Publication urls
-    path('publications/', login_required(PublicationTableView.as_view()), name='publications'),
-    path(r'publications/<uuid:pk>', login_required(PublicationDetailView.as_view()),
-       name="publication_detail"),
-    path(r'publications/add',
-       permission_required('items.add_publication')(PublicationCreateView.as_view()),
-       name="add_publication"),
-    path(r'publications/edit/<uuid:pk>',
-       permission_required('items.change_publication')(PublicationUpdateView.as_view()),
-       name="change_publication"),
-    path(r'publications/delete/<uuid:pk>',
-       permission_required('items.delete_publication')(PublicationDeleteView.as_view()),
-       name="delete_publication"),
+    # Manifestation urls
+    path('manifestations/', login_required(ManifestationTableView.as_view()), name='manifestations'),
+    path(r'manifestations/<uuid:pk>', login_required(ManifestationDetailView.as_view()),
+         name="manifestation_detail"),
+    path(r'manifestations/add',
+         permission_required('items.add_manifestation')(ManifestationCreateView.as_view()),
+         name="add_manifestation"),
+    path(r'manifestations/edit/<uuid:pk>',
+         permission_required('items.change_manifestation')(ManifestationUpdateView.as_view()),
+         name="change_manifestation"),
+    path(r'manifestations/delete/<uuid:pk>',
+         permission_required('items.delete_manifestation')(ManifestationDeleteView.as_view()),
+         name="delete_manifestation"),
 
     # Publisher urls
     path('publishers/', login_required(PublisherTableView.as_view()), name='publishers'),

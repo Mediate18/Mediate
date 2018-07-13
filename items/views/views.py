@@ -1153,8 +1153,8 @@ class PersonItemRelationRoleDeleteView(DeleteView):
     success_url = reverse_lazy('personitemrelationroles')
 
 
-# Publication views
-class PublicationTableView(ListView):
+# Manifestation views
+class ManifestationTableView(ListView):
     model = Manifestation
     template_name = 'generic_list.html'
 
@@ -1162,36 +1162,36 @@ class PublicationTableView(ListView):
         return Manifestation.objects.all()
 
     def get_context_data(self, **kwargs):
-        context = super(PublicationTableView, self).get_context_data(**kwargs)
-        filter = PublicationFilter(self.request.GET, queryset=self.get_queryset())
+        context = super(ManifestationTableView, self).get_context_data(**kwargs)
+        filter = ManifestationFilter(self.request.GET, queryset=self.get_queryset())
 
-        table = PublicationTable(filter.qs)
+        table = ManifestationTable(filter.qs)
         django_tables2.RequestConfig(self.request, ).configure(table)
 
         context['filter'] = filter
         context['table'] = table
 
         context['action'] = _("add")
-        context['object_name'] = "publication"
-        context['add_url'] = reverse_lazy('add_publication')
+        context['object_name'] = "manifestation"
+        context['add_url'] = reverse_lazy('add_manifestation')
 
         return context
 
 
-class PublicationDetailView(DetailView):
+class ManifestationDetailView(DetailView):
     model = Manifestation
 
 
-class PublicationCreateView(CreateView):
+class ManifestationCreateView(CreateView):
     model = Manifestation
     template_name = 'generic_form.html'
-    form_class = PublicationModelForm
-    success_url = reverse_lazy('publications')
+    form_class = ManifestationModelForm
+    success_url = reverse_lazy('manifestations')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("add")
-        context['object_name'] = "publication"
+        context['object_name'] = "manifestation"
         return context
 
     def form_valid(self, form):
@@ -1201,16 +1201,16 @@ class PublicationCreateView(CreateView):
         return super().form_valid(form)
 
 
-class PublicationUpdateView(UpdateView):
+class ManifestationUpdateView(UpdateView):
     model = Manifestation
     template_name = 'generic_form.html'
-    form_class = PublicationModelForm
-    success_url = reverse_lazy('publications')
+    form_class = ManifestationModelForm
+    success_url = reverse_lazy('manifestationa')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("update")
-        context['object_name'] = "publication"
+        context['object_name'] = "manifestation"
         return context
 
     def form_valid(self, form):
@@ -1220,9 +1220,9 @@ class PublicationUpdateView(UpdateView):
         return super().form_valid(form)
 
 
-class PublicationDeleteView(DeleteView):
+class ManifestationDeleteView(DeleteView):
     model = Manifestation
-    success_url = reverse_lazy('publications')
+    success_url = reverse_lazy('manifestations')
 
 
 # Publisher views

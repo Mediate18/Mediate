@@ -230,10 +230,10 @@ class ItemMaterialDetailsRelation(models.Model):
 
 class Manifestation(models.Model):
     """
-    The publication information for an item
+    The manifestation information for an item
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    item = models.ForeignKey(Item, on_delete=models.PROTECT, related_name="publications")
+    item = models.ForeignKey(Item, on_delete=models.PROTECT, related_name="manifestations")
     year = models.IntegerField(_("Year of publication"))
     year_tag = models.CharField(_("Year of publication tag"), max_length=128)
     terminus_post_quem = models.BooleanField(_("Terminus post quem"), default=False)
@@ -249,13 +249,13 @@ class Publisher(models.Model):
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     publisher = models.ForeignKey(Person, on_delete=CASCADE)
-    publication = models.ForeignKey(Manifestation, on_delete=CASCADE)
+    manifestation = models.ForeignKey(Manifestation, on_delete=CASCADE)
 
     class Meta:
-        unique_together = (("publisher", "publication"),)
+        unique_together = (("publisher", "manifestation"),)
 
     def __str__(self):
-        return _("{} published {}").format(self.publisher, self.publication)
+        return _("{} published {}").format(self.publisher, self.manifestation)
 
 
 class PersonItemRelationRole(models.Model):
@@ -272,7 +272,7 @@ class PersonItemRelationRole(models.Model):
 class PersonItemRelation(models.Model):
     """
     A person-item relation (e.g. author, translator, illustrator, owner)
-    Note that the publisher relation is handled by the Publication/Publisher models.
+    Note that the publisher relation is handled by the Manifestation/Publisher models.
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     person = models.ForeignKey(Person, on_delete=CASCADE)

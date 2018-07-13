@@ -225,7 +225,7 @@ class PersonItemRelationRoleModelForm(forms.ModelForm):
         fields = "__all__"
 
 
-class PublicationModelForm(forms.ModelForm):
+class ManifestationModelForm(forms.ModelForm):
     class Meta:
         model = Manifestation
         fields = "__all__"

@@ -72,7 +72,7 @@ class PersonItemRelationRoleAdmin(admin.ModelAdmin):
 
 
 @admin.register(Manifestation)
-class PublicationAdmin(admin.ModelAdmin):
+class ManifestationAdmin(admin.ModelAdmin):
     pass
 
 

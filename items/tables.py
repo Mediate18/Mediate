@@ -200,9 +200,9 @@ class PersonItemRelationRoleTable(tables.Table):
         attrs = {'class': 'table table-sortable'}
 
 
-# Publication table
-class PublicationTable(tables.Table):
-    edit = tables.LinkColumn('change_publication', text='Edit', args=[A('pk')],
+# Manifestation table
+class ManifestationTable(tables.Table):
+    edit = tables.LinkColumn('change_manifestation', text='Edit', args=[A('pk')],
                          orderable=False, empty_values=())
 
     class Meta:

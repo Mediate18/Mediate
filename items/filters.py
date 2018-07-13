@@ -133,8 +133,8 @@ class PersonItemRelationRoleFilter(django_filters.FilterSet):
         fields = "__all__"
 
 
-# Publication filter
-class PublicationFilter(django_filters.FilterSet):
+# Manifestation filter
+class ManifestationFilter(django_filters.FilterSet):
     item = django_filters.Filter(name='item__short_title', lookup_expr='icontains')
 
     class Meta:
