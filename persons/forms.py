@@ -9,8 +9,8 @@ from .models import *
 
 class PersonModelForm(forms.ModelForm):
     suggest_select_ids = ['viaf_id', 'city_of_birth', 'city_of_death']  # IDs of the suggest widgets
-    date_of_birth = ApproximateDateFormField()
-    date_of_death = ApproximateDateFormField()
+    date_of_birth = ApproximateDateFormField(required=False)
+    date_of_death = ApproximateDateFormField(required=False)
 
     class Meta:
         model = Person
