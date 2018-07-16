@@ -23,7 +23,8 @@ class ItemTable(tables.Table):
     uuid = ActionColumn('item_detail', 'change_item', 'delete_item', orderable=False)
     people = tables.Column(empty_values=())
     works = tables.Column(empty_values=(), verbose_name=_("Works"))
-    lot = tables.RelatedLinkColumn(order_by='lot__item_as_listed_in_catalogue')
+    lot = tables.RelatedLinkColumn(order_by='lot__lot_as_listed_in_catalogue')
+    sales_price = tables.Column(empty_values=())
     catalogue = tables.Column(empty_values=())
     collection = tables.RelatedLinkColumn()
     number_of_volumes = tables.Column(verbose_name=_('Number of volumes'))
@@ -42,6 +43,7 @@ class ItemTable(tables.Table):
             'people',
             'works',
             'lot',
+            'sales_price',
             'catalogue',
             'collection',
             'number_of_volumes',
@@ -88,6 +90,9 @@ class ItemTable(tables.Table):
             reverse_lazy('catalogue_detail', args=[str(record.lot.catalogue.uuid)]),
             str(record.lot.catalogue))
         )
+
+    def render_sales_price(self, record):
+        return record.lot.sales_price
 
 
 # ItemAuthor table

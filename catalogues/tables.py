@@ -106,7 +106,8 @@ class LotTable(tables.Table):
             'bookseller_category_books',
             'bookseller_category_non_books',
             'number_in_catalogue',
-            'item_as_listed_in_catalogue',
+            'lot_as_listed_in_catalogue',
+            'sales_price',
             'uuid'
         ]
 

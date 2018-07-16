@@ -107,13 +107,14 @@ class Lot(models.Model):
     bookseller_category_books = models.TextField(_("Heading / category used to describe books"))
     bookseller_category_non_books = models.TextField(_("Heading / category for other, non-book items"))
     number_in_catalogue = models.CharField(_("Number in catalogue"), max_length=128)
-    item_as_listed_in_catalogue = models.TextField(_("Full lot description, exactly as in the catalogue"))
+    sales_price = models.CharField(_("Sales price"), max_length=128, blank=True)
+    lot_as_listed_in_catalogue = models.TextField(_("Full lot description, exactly as in the catalogue"))
 
     class Meta:
-        ordering = ['catalogue__year_of_publication', 'catalogue__short_title', 'item_as_listed_in_catalogue']
+        ordering = ['catalogue__year_of_publication', 'catalogue__short_title', 'lot_as_listed_in_catalogue']
 
     def __str__(self):
-        return self.item_as_listed_in_catalogue
+        return self.lot_as_listed_in_catalogue
 
     def get_absolute_url(self):
         return reverse_lazy('change_lot', args=[str(self.uuid)])

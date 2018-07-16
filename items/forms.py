@@ -38,7 +38,7 @@ class ItemModelForm(forms.ModelForm):
             'collection': Select2Widget,
             'lot': ModelSelect2Widget(
                 model=Lot,
-                search_fields=['item_as_listed_in_catalogue__icontains']
+                search_fields=['lot_as_listed_in_catalogue__icontains']
             ),
             'book_format': Select2Widget,
             'binding_material_details': Select2Widget,

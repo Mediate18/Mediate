@@ -116,7 +116,7 @@ class Item(models.Model):
 
     class Meta:
         ordering = ['lot__catalogue__year_of_publication', 'lot__catalogue__short_title',
-                    'lot__item_as_listed_in_catalogue']
+                    'lot__lot_as_listed_in_catalogue']
 
     def __str__(self):
         return self.short_title
