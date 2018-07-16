@@ -240,7 +240,7 @@ class Manifestation(models.Model):
     place = models.ForeignKey(Place, on_delete=models.PROTECT)
 
     def __str__(self):
-        return _("{}, published in {} in {}").format(self.item.work.title, self.year, self.place.name)
+        return _("{}, published in {} in {}").format(self.item, self.year, self.place.name)
 
 
 class Publisher(models.Model):
