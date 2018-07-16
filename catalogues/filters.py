@@ -69,6 +69,7 @@ class LotFilter(django_filters.FilterSet):
     bookseller_category_books = django_filters.Filter(lookup_expr='icontains')
     bookseller_category_non_books = django_filters.Filter(lookup_expr='icontains')
     number_in_catalogue = django_filters.RangeFilter(widget=django_filters.widgets.RangeWidget())
+    page_in_catalogue = django_filters.RangeFilter(widget=django_filters.widgets.RangeWidget())
     sales_price = django_filters.Filter(lookup_expr='icontains')
     lot_as_listed_in_catalogue = django_filters.Filter(lookup_expr='icontains')
 
