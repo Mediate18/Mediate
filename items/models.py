@@ -128,6 +128,9 @@ class Item(models.Model):
                 _("The collection of this item and the collection of the catalogue of this item, are not the same.")
                                    })
 
+    def get_absolute_url(self):
+        return reverse_lazy('change_item', args=[str(self.uuid)])
+
 tagging.register(Item)
 
 

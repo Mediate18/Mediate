@@ -208,6 +208,8 @@ class PersonItemRelationRoleTable(tables.Table):
 # Manifestation table
 class ManifestationTable(tables.Table):
     uuid = ActionColumn('manifestation_detail', 'change_manifestation', 'delete_manifestation', orderable=False)
+    item = tables.RelatedLinkColumn()
+    place = tables.RelatedLinkColumn()
 
     class Meta:
         model = Manifestation
