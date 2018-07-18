@@ -234,13 +234,13 @@ class Manifestation(models.Model):
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     item = models.ForeignKey(Item, on_delete=models.PROTECT, related_name="manifestations")
-    year = models.IntegerField(_("Year of publication"))
+    year = models.IntegerField(_("Year of publication"), null=True)
     year_tag = models.CharField(_("Year of publication tag"), max_length=128)
     terminus_post_quem = models.BooleanField(_("Terminus post quem"), default=False)
-    place = models.ForeignKey(Place, on_delete=models.PROTECT)
+    place = models.ForeignKey(Place, on_delete=models.PROTECT, null=True)
 
     def __str__(self):
-        return _("{}, published in {} in {}").format(self.item, self.year, self.place.name)
+        return _("{}, published in {} in {}").format(self.item, self.year, self.place.name if self.place else '-')
 
 
 class Publisher(models.Model):
