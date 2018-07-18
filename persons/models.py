@@ -14,6 +14,9 @@ class Place(models.Model):
     name = models.CharField(_("Name of the place"), max_length=128, null=True)
     cerl_id = models.CharField(_("CERL ID of a place"), max_length=32, null=True)
 
+    class Meta:
+        ordering = ['name']
+
     def __str__(self):
         return self.name
 

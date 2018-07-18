@@ -154,7 +154,10 @@ class ManifestationFilter(django_filters.FilterSet):
 class PublisherFilter(django_filters.FilterSet):
     publisher = django_filters.Filter(name='publisher__short_name', lookup_expr='icontains')
     manifestation = django_filters.Filter(name='manifestation__item__short_title', lookup_expr='icontains')
-    publication_place = django_filters.Filter(name='manifestation__place__name', lookup_expr='icontains')
+    manifestation__place = django_filters.ModelMultipleChoiceFilter(
+        queryset=Place.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
+    )
 
     class Meta:
         model = Publisher
