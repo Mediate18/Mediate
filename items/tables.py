@@ -223,12 +223,17 @@ class ManifestationTable(tables.Table):
 
 # Publisher table
 class PublisherTable(tables.Table):
-    edit = tables.LinkColumn('change_publisher', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('publisher_detail', 'change_publisher', 'delete_publisher', orderable=False)
+    publisher = tables.RelatedLinkColumn()
+    manifestation = tables.RelatedLinkColumn()
 
     class Meta:
         model = Publisher
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'publisher',
+            'manifestation',
+        ]
 
 
 # Subject table

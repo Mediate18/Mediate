@@ -152,9 +152,13 @@ class ManifestationFilter(django_filters.FilterSet):
 
 # Publisher filter
 class PublisherFilter(django_filters.FilterSet):
+    publisher = django_filters.Filter(name='publisher__short_name', lookup_expr='icontains')
+    manifestation = django_filters.Filter(name='manifestation__item__short_title', lookup_expr='icontains')
+    publication_place = django_filters.Filter(name='manifestation__place__name', lookup_expr='icontains')
+
     class Meta:
         model = Publisher
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # Subject filter

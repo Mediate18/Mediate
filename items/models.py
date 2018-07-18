@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models.deletion import CASCADE
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
+from django.urls import reverse_lazy
 
 import uuid
 import tagging
@@ -240,7 +241,13 @@ class Manifestation(models.Model):
     place = models.ForeignKey(Place, on_delete=models.PROTECT, null=True)
 
     def __str__(self):
-        return _("{}, published in {} in {}").format(self.item, self.year, self.place.name if self.place else '-')
+        year_str = _(" in {}").format(self.year) if self.year else ''
+        place_str = _(" in {}").format(self.place.name) if self.place else ''
+        published_str = _(" [published{}{}]").format(year_str, place_str) if year_str or place_str else ''
+        return _("{}{}").format(self.item, published_str)
+
+    def get_absolute_url(self):
+        return reverse_lazy('change_manifestation', args=[str(self.uuid)])
 
 
 class Publisher(models.Model):

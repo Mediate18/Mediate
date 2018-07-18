@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django_date_extensions.fields import ApproximateDateField
+from django.urls import reverse_lazy
 
 import uuid
 
@@ -62,6 +63,9 @@ class Person(models.Model):
 
     def __str__(self):
         return self.short_name
+
+    def get_absolute_url(self):
+        return reverse_lazy('change_person', args=[str(self.uuid)])
 
 
 class ReligiousAffiliation(models.Model):
