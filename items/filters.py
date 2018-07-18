@@ -18,6 +18,7 @@ class BookFormatFilter(django_filters.FilterSet):
 class ItemFilter(django_filters.FilterSet):
     short_title = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
     lot = django_filters.Filter(name='lot__lot_as_listed_in_catalogue', lookup_expr='icontains')
+    sales_price = django_filters.Filter(name='lot__sales_price', lookup_expr='icontains')
     collection = django_filters.Filter(name='collection__name', lookup_expr='icontains')
     number_of_volumes = django_filters.Filter(lookup_expr='icontains')
     tag = django_filters.ModelMultipleChoiceFilter(
