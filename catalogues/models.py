@@ -110,9 +110,11 @@ class Lot(models.Model):
     page_in_catalogue = models.IntegerField(_("Page in catalogue"), null=True)
     sales_price = models.CharField(_("Sales price"), max_length=128, blank=True)
     lot_as_listed_in_catalogue = models.TextField(_("Full lot description, exactly as in the catalogue"))
+    index_in_catalogue = models.IntegerField(_("Index in catalogue"), null=True)
 
     class Meta:
-        ordering = ['catalogue__year_of_publication', 'catalogue__short_title', 'lot_as_listed_in_catalogue']
+        ordering = ['catalogue__year_of_publication', 'catalogue__short_title', 'index_in_catalogue',
+                    'lot_as_listed_in_catalogue']
 
     def __str__(self):
         return self.lot_as_listed_in_catalogue
