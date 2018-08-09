@@ -44,6 +44,16 @@ class CatalogueTableView(ListView):
 class CatalogueDetailView(DetailView):
     model = Catalogue
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from django.db.models import Min
+        first_lot_on_page_dict = dict([(page['first_lot_on_page'], page['page_in_catalogue']) for page in
+                                       self.object.lot_set.filter(page_in_catalogue__isnull=False)
+                                      .values('page_in_catalogue')
+                                      .annotate(first_lot_on_page=Min('index_in_catalogue')).order_by()])
+        context['first_lot_on_page_dict'] = first_lot_on_page_dict
+        return context
+
 
 class CatalogueCreateView(CreateView):
     model = Catalogue

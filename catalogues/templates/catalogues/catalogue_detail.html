@@ -1,5 +1,6 @@
 {% extends "baselayout.html" %}
 {% load i18n %}
+{% load dictionary_lookup %}
 
 {% block content %}
 
@@ -18,7 +19,25 @@
 
             <dt>{% trans "Notes" %}</dt>
             <dd>{{ object.notes }}</dd>
+
+            <dt>{% trans "Scans" %}</dt>
+            <dd>
+                {% for scan in object.transcription.scans.all %}
+                    <a href="{{ scan.scan.url }}">{{ scan.scan.name }}</a>
+                {% endfor %}
+            </dd>
         </dl>
+        {% for lot in object.lot_set.all %}
+            {% if lot.index_in_catalogue in first_lot_on_page_dict %}
+                <hr/>
+                <b>Page {{ first_lot_on_page_dict|lookup:lot.index_in_catalogue }}</b>
+            {% endif %}
+            {% if lot.number_in_catalogue == "1" %}
+                <br/>
+                <h4><i>{{ lot.bookseller_category_books }}</i></h4>
+            {% endif %}
+            <p><b>{{ lot.number_in_catalogue }}</b> {{ lot }} <i>{{ lot.sales_price }}</i></p>
+        {% endfor %}
     </div>
     <div class="col-xs-2">
         <h3>Actions</h3>

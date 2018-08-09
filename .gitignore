@@ -4,3 +4,4 @@
 /venv/
 /static_root/
 .env
+/writable/

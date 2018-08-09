@@ -64,4 +64,5 @@ urlpatterns = [
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^select2/', include('django_select2.urls')),
     url(r'^viaf/', include(('viapy.urls', 'viapy'), namespace='viaf'), name='viaf'),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) \
+              + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
