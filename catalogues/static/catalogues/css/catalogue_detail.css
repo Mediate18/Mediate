@@ -1,0 +1,66 @@
+/*
+    The purpose of this css is the Catalogue detail view which contains
+    split panes with the catalogue contents including lots
+    and the PDF of the scan of the catalogue.
+*/
+
+html, body {
+    height: 100%;
+}
+
+.container-fluid, .row {
+    height: 100%;
+}
+
+.flex-row, .flex-row > div[class*='col-'] {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    flex:0 auto;
+}
+
+.flex-col {
+    display: flex;
+    display: -webkit-flex;
+    flex: 1;
+    flex-flow: column nowrap;
+}
+
+.flex-grow {
+    display: flex;
+    -webkit-flex: 2;
+    flex: 2;
+    min-height: 0;
+}
+
+/* horizontal panel*/
+.panel-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    border: 1px solid #DDDDDD;
+    overflow: hidden;
+}
+.panel-left {
+    overflow: auto;
+    flex: 0 0 auto;  /* only manually resize */
+    padding: 10px;
+    width: 49%;
+}
+.splitter {
+    flex: 0 0 auto;
+    width: 12px;
+    background: url(https://raw.githubusercontent.com/RickStrahl/jquery-resizable/master/assets/vsizegrip.png) center center no-repeat #DDDDDD;
+    min-height: 200px;
+    cursor: col-resize;
+}
+.panel-right {
+    flex: 1 1 auto; /* resizable */
+    padding: 10px;
+    width: 100%;
+    min-height: 200px;
+    min-width: 200px !important;   /* NOTE: This won't be respected! Explicit size of left forces the size to be fixed */
+    background: #eee;
+}

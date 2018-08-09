@@ -1,53 +1,117 @@
 {% extends "baselayout.html" %}
 {% load i18n %}
+{% load static %}
 {% load dictionary_lookup %}
+
+{% block extracss %}
+    <link rel="stylesheet" href="{% static 'catalogues/css/catalogue_detail.css' %}">
+{% endblock %}
 
 {% block content %}
 
-<div class="row">
-    <div class="col-xs-10">
-        <h1>Catalogue detail</h1>
-        <dl class="dl-horizontal">
-            <dt>{% trans "Short title" %}</dt>
-            <dd>{{ object.short_title }}</dd>
+<div class="row flex-row">
+    <div class="col-xs-12">
+        <div class="flex-col">
+            <!-- Put content header here -->
+            <h2>
+                Catalogue <i>{{ object }}</i>
+            </h2>
+            <div class="flex-grow">
+                <!-- Begin split panels -->
+                <div class="panel-container">
+                    <div class="panel-left">
+                        <a class="pull-right" href="{% url 'change_catalogue' object.pk %}" target="_blank">
+                            <span class="glyphicon glyphicon-pencil" title="{% trans 'Change catalogue' %}"></span>
+                        </a>
+                        <dl class="dl-horizontal" style="padding-bottom: 15px;">
+                            <dt>{% trans "Short title" %}</dt>
+                            <dd>{{ object.short_title }}</dd>
 
-            <dt>{% trans "Year of publication" %}</dt>
-            <dd>{{ object.year_of_publication }}</dd>
+                            <dt>{% trans "Year of publication" %}</dt>
+                            <dd>{{ object.year_of_publication }}</dd>
 
-            <dt>{% trans "Full title" %}</dt>
-            <dd>{{ object.full_title }}</dd>
+                            <dt>{% trans "Full title" %}</dt>
+                            <dd>{{ object.full_title }}</dd>
 
-            <dt>{% trans "Preface and paratexts" %}</dt>
-            <dd>{{ object.preface_and_paratexts }}</dd>
+                            <dt>{% trans "Preface and paratexts" %}</dt>
+                            <dd>{{ object.preface_and_paratexts }}</dd>
 
-            <dt>{% trans "Notes" %}</dt>
-            <dd>{{ object.notes }}</dd>
+                            <dt>{% trans "Notes" %}</dt>
+                            <dd>{{ object.notes }}</dd>
 
-            <dt>{% trans "Scans" %}</dt>
-            <dd>
-                {% for scan in object.transcription.scans.all %}
-                    <a href="{{ scan.scan.url }}">{{ scan.scan.name }}</a>
-                {% endfor %}
-            </dd>
-        </dl>
-        {% for lot in object.lot_set.all %}
-            {% if lot.index_in_catalogue in first_lot_on_page_dict %}
-                <hr/>
-                <b>Page {{ first_lot_on_page_dict|lookup:lot.index_in_catalogue }}</b>
-            {% endif %}
-            {% if lot.number_in_catalogue == "1" %}
-                <br/>
-                <h4><i>{{ lot.bookseller_category_books }}</i></h4>
-            {% endif %}
-            <p><b>{{ lot.number_in_catalogue }}</b> {{ lot }} <i>{{ lot.sales_price }}</i></p>
-        {% endfor %}
-    </div>
-    <div class="col-xs-2">
-        <h3>Actions</h3>
-        <div class="list-group">
-            <a class="list-group-item" href="{% url 'change_catalogue' object.pk %}">Edit this catalogue</a>
-            <a class="list-group-item" href="" data-toggle="modal" data-target="#deleteModal">Delete this catalogue</a>
-            <a class="list-group-item" href="{% url 'add_catalogue' %}">Create new catalogue</a>
+                            <dt>{% trans "Scans" %}</dt>
+                            <dd>
+                                {% for scan in object.transcription.scans.all %}
+                                    <a href="{{ scan.scan.url }}">{{ scan.scan.name }}</a>
+                                {% endfor %}
+                            </dd>
+                        </dl>
+                        <h2 class="text-center">{% trans "Lots" %}</h2>
+                        <table class="table table-hover">
+                        {% for lot in object.lot_set.all %}
+                                    {% if lot.index_in_catalogue in first_lot_on_page_dict %}
+                            <tr>
+                                <td class="text-center" colspan="4">
+                                        <b>{% trans "Page" %} {{ first_lot_on_page_dict|lookup:lot.index_in_catalogue }}</b>
+                                </td>
+                            </tr>
+                                    {% endif %}
+                                    {% if lot.number_in_catalogue == "1" %}
+                            <tr>
+                                <td class="text-center" colspan="4">
+                                        <br/>
+                                        <h4><i>{{ lot.bookseller_category_books }}</i></h4>
+                                </td>
+                            </tr>
+                                    {% endif %}
+                            <tr>
+                                <td>
+                                    <b>{{ lot.number_in_catalogue }}</b>
+                                </td>
+                                <td>
+                                    {{ lot }}
+                                </td>
+                                <td>
+                                    <i>{{ lot.sales_price }}</i>
+                                </td>
+                                <td>
+                                    {% if lot.under_moderation %}
+                                        <span class="glyphicon glyphicon-ban-circle" title="{% trans 'Lot is being moderated' %}"></span>
+                                    {% else %}
+                                        <a href="{% url 'change_lot' lot.pk %}" target="_blank">
+                                            <span class="glyphicon glyphicon-pencil" title="{% trans 'Change lot' %}"></span>
+                                        </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </table>
+                    </div>
+
+
+                    <div class="splitter">
+                    </div>
+
+                    <div class="panel-right">
+                        {% if object.transcription.scans.count > 0 %}
+                        {% with object.transcription.scans.first as first_scan %}
+                            <object data="{{ first_scan.scan.url }}" type="application/pdf" width="100%" height="100%">
+                                <iframe src="{{ first_scan.scan.url }}" width="100%" height="100%" style="border: none;">
+                                    This browser does not support PDFs. Please download the PDF to view it:
+                                    <a href="{{ first_scan.scan.url }}">Download PDF</a>
+                                </iframe>
+                            </object>
+                        {% endwith %}
+                        {% else %}
+                            <div class="alert alert-warning">
+                                {% trans "No scan found." %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <!-- End split panels -->
+            </div>
+            <!-- Put content footer here -->
         </div>
     </div>
 </div>
@@ -74,4 +138,14 @@
   </div>
 </div>
 
+{% endblock %}
+
+{% block extrajs %}
+<script src="https://cdn.rawgit.com/RickStrahl/jquery-resizable/7fe305c4/src/jquery-resizable.js"></script>
+<script>
+    $(".panel-left").resizable({
+        handleSelector: ".splitter",
+        resizeHeight: false
+    });
+</script>
 {% endblock %}
