@@ -1,0 +1,47 @@
+{% extends "baselayout.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-10">
+        <h2>Transcription <i>{{ object }}</i></h2>
+        <dl class="row">
+            <dt class="col-sm-3">{% trans "Source material" %}:</dt>
+            <dd class="col-sm-9">{{ object.source_material }}</dd>
+            <dt class="col-sm-3">{% trans "Curator" %}:</dt>
+            <dd class="col-sm-9">{{ object.curator }}</dd>
+            <dt class="col-sm-3">{% trans "Author" %}:</dt>
+            <dd class="col-sm-9">{{ object.author }}</dd>
+            <dt class="col-sm-3">{% trans "Creation date" %}:</dt>
+            <dd class="col-sm-9">{{ object.date }}</dd>
+            <dt class="col-sm-3">{% trans "Scans" %}:</dt>
+            <dd class="col-sm-9">
+                {% if object.scans.count == 0 %}
+                    <i>{% trans "No scans" %}</i>
+                {% else %}
+                    <ul style="padding: 0px; list-style-type: none">
+                        {% for scan in object.scans.all %}
+                            <li>
+                                <a href="{{ scan.scan.url }}">
+                                    <i class="glyphicon glyphicon-file"></i>
+                                    {{ scan.scan.name }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </dd>
+        </dl>
+    </div>
+    <div class="col-md-2">
+        <h3>Actions</h3>
+        <ul>
+            <li>
+                <a href="{% url 'change_transcription' object.pk %}">{% trans "Edit" %}</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+{% endblock %}

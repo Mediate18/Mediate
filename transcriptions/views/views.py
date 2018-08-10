@@ -3,6 +3,7 @@ from django.shortcuts import redirect
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.detail import DetailView
+from django.forms import inlineformset_factory
 
 from django.contrib.contenttypes.models import ContentType
 
@@ -188,11 +189,15 @@ class TranscriptionTableView(ListView):
 
 class TranscriptionDetailView(DetailView):
     model = Transcription
+    template_name = 'transcription_detail.html'
+
+
+DocumentScanFormset = inlineformset_factory(Transcription, DocumentScan, fields=('scan',))
 
 
 class TranscriptionCreateView(CreateView):
     model = Transcription
-    template_name = 'generic_form.html'
+    template_name = 'transcription_form.html'
     form_class = TranscriptionModelForm
     success_url = reverse_lazy('transcriptions')
 
@@ -200,26 +205,37 @@ class TranscriptionCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         context['action'] = _("add")
         context['object_name'] = "transcription"
+        if self.request.POST:
+            context['documentscans'] = DocumentScanFormset(self.request.POST, self.request.FILES)
+        else:
+            context['documentscans'] = DocumentScanFormset()
         return context
 
     def form_valid(self, form):
-        transcription = form.save(commit=False)
-        transcription.author = self.request.user
+        context = self.get_context_data()
+        formset = context['documentscans']
+        if formset.is_valid():
+            transcription = form.save(commit=False)
+            transcription.author = self.request.user
 
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-            moderation = Moderation.create(editor=self.request.user, obj=transcription)
-            moderation.save()
+            if not self.request.user.is_superuser:
+                messages.add_message(self.request, messages.SUCCESS,
+                                     _("Your changes will be sent to a moderator for reviewing."))
+                moderation = Moderation.create(editor=self.request.user, obj=transcription)
+                moderation.save()
+            else:
+                transcription.save()
+                formset.instance = transcription
+                formset.save()
         else:
-            transcription.save()
+            return self.render_to_response(self.get_context_data(form=form))
 
         return redirect(self.success_url)
 
 
 class TranscriptionUpdateView(UpdateView):
     model = Transcription
-    template_name = 'generic_form.html'
+    template_name = 'transcription_form.html'
     form_class = TranscriptionModelForm
     success_url = reverse_lazy('transcriptions')
 
@@ -227,19 +243,30 @@ class TranscriptionUpdateView(UpdateView):
         context = super().get_context_data(**kwargs)
         context['action'] = _("update")
         context['object_name'] = "transcription"
+        if self.request.POST:
+            context['documentscans'] = DocumentScanFormset(self.request.POST, self.request.FILES, instance=self.object)
+        else:
+            context['documentscans'] = DocumentScanFormset(instance=self.object)
+        print(str(context['documentscans'][0].__dict__))
         return context
 
     def form_valid(self, form):
-        transcription = form.save(commit=False)
-        transcription.author = self.request.user
+        context = self.get_context_data()
+        formset = context['documentscans']
+        if formset.is_valid():
+            transcription = form.save(commit=False)
+            transcription.author = self.request.user
 
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-            moderation = Moderation.update(editor=self.request.user, obj=transcription)
-            moderation.save()
-        else:
-            transcription.save()
+            if not self.request.user.is_superuser:
+                messages.add_message(self.request, messages.SUCCESS,
+                                     _("Your changes will be sent to a moderator for reviewing."))
+                moderation = Moderation.update(editor=self.request.user, obj=transcription)
+                moderation.save()
+            else:
+                print("SAVE")
+                transcription.save()
+                formset.instance = transcription
+                formset.save()
 
         return redirect(self.success_url)
 

@@ -1,6 +1,7 @@
 import django_tables2 as tables
 from django_tables2.utils import A  # alias for Accessor
 from .models import *
+from mediate.columns import ActionColumn
 
 
 # DocumentScan table
@@ -25,11 +26,17 @@ class SourceMaterialTable(tables.Table):
 
 # Transcription table
 class TranscriptionTable(tables.Table):
-    edit = tables.LinkColumn('change_transcription', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('transcription_detail', 'change_transcription', 'delete_transcription', orderable=False)
 
     class Meta:
         model = Transcription
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'source_material',
+            'curator',
+            'author',
+            'date',
+            'uuid'
+        ]
 
 
