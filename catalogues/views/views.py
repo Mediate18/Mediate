@@ -55,6 +55,10 @@ class CatalogueDetailView(DetailView):
         return context
 
 
+class CatalogueDetailBareView(CatalogueDetailView):
+    template_name = 'catalogues/catalogue_detail_bare.html'
+
+
 class CatalogueCreateView(CreateView):
     model = Catalogue
     template_name = 'generic_form.html'

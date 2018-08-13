@@ -12,6 +12,8 @@ urlpatterns = [
     path('catalogues/', login_required(CatalogueTableView.as_view()), name='catalogues'),
     path(r'catalogues/<uuid:pk>', login_required(CatalogueDetailView.as_view()),
        name="catalogue_detail"),
+    path(r'catalogues/bare/<uuid:pk>', login_required(CatalogueDetailBareView.as_view()),
+       name="catalogue_detail_bare"),
     path(r'catalogues/add', permission_required('catalogues.add_catalogue')(CatalogueCreateView.as_view()),
        name="add_catalogue"),
     path(r'catalogues/edit/<uuid:pk>',

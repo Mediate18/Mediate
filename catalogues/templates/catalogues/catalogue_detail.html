@@ -20,74 +20,9 @@
                 <!-- Begin split panels -->
                 <div class="panel-container">
                     <div class="panel-left">
-                        <a class="pull-right" href="{% url 'change_catalogue' object.pk %}" target="_blank">
-                            <span class="glyphicon glyphicon-pencil" title="{% trans 'Change catalogue' %}"></span>
-                        </a>
-                        <dl class="dl-horizontal" style="padding-bottom: 15px;">
-                            <dt>{% trans "Short title" %}</dt>
-                            <dd>{{ object.short_title }}</dd>
-
-                            <dt>{% trans "Year of publication" %}</dt>
-                            <dd>{{ object.year_of_publication }}</dd>
-
-                            <dt>{% trans "Full title" %}</dt>
-                            <dd>{{ object.full_title }}</dd>
-
-                            <dt>{% trans "Preface and paratexts" %}</dt>
-                            <dd>{{ object.preface_and_paratexts }}</dd>
-
-                            <dt>{% trans "Notes" %}</dt>
-                            <dd>{{ object.notes }}</dd>
-
-                            <dt>{% trans "Scans" %}</dt>
-                            <dd>
-                                {% for scan in object.transcription.scans.all %}
-                                    <a href="{{ scan.scan.url }}">{{ scan.scan.name }}</a>
-                                {% endfor %}
-                            </dd>
-                        </dl>
-                        <h2 class="text-center">{% trans "Lots" %}</h2>
-                        <table class="table table-hover">
-                        {% for lot in object.lot_set.all %}
-                                    {% if lot.index_in_catalogue in first_lot_on_page_dict %}
-                            <tr>
-                                <td class="text-center" colspan="4">
-                                        <b>{% trans "Page" %} {{ first_lot_on_page_dict|lookup:lot.index_in_catalogue }}</b>
-                                </td>
-                            </tr>
-                                    {% endif %}
-                                    {% if lot.number_in_catalogue == "1" %}
-                            <tr>
-                                <td class="text-center" colspan="4">
-                                        <br/>
-                                        <h4><i>{{ lot.bookseller_category_books }}</i></h4>
-                                </td>
-                            </tr>
-                                    {% endif %}
-                            <tr>
-                                <td>
-                                    <b>{{ lot.number_in_catalogue }}</b>
-                                </td>
-                                <td>
-                                    {{ lot }}
-                                </td>
-                                <td>
-                                    <i>{{ lot.sales_price }}</i>
-                                </td>
-                                <td>
-                                    {% if lot.under_moderation %}
-                                        <span class="glyphicon glyphicon-ban-circle" title="{% trans 'Lot is being moderated' %}"></span>
-                                    {% else %}
-                                        <a href="{% url 'change_lot' lot.pk %}" target="_blank">
-                                            <span class="glyphicon glyphicon-pencil" title="{% trans 'Change lot' %}"></span>
-                                        </a>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </table>
+                        <iframe style="width:100%; height:100%; border: 0;"
+                                src="{% url 'catalogue_detail_bare' object.pk %}"></iframe>
                     </div>
-
 
                     <div class="splitter">
                     </div>

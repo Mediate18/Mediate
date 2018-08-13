@@ -44,9 +44,7 @@ html, body {
     overflow: hidden;
 }
 .panel-left {
-    overflow: auto;
     flex: 0 0 auto;  /* only manually resize */
-    padding: 10px;
     width: 49%;
 }
 .splitter {
@@ -58,7 +56,6 @@ html, body {
 }
 .panel-right {
     flex: 1 1 auto; /* resizable */
-    padding: 10px;
     width: 100%;
     min-height: 200px;
     min-width: 200px !important;   /* NOTE: This won't be respected! Explicit size of left forces the size to be fixed */

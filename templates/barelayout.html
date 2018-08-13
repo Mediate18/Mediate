@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+
+{# Load the tag library #}
+{% load bootstrap3 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery=True %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+
+{% load i18n %}
+{% load static %}
+{% load staticfiles %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block bootstrap3_title %}Mediate - Catalogues{% endblock %}</title>
+    {% block extracss %}{% endblock %}
+    <link rel="stylesheet" href="{% static 'css/mediate.css' %}">
+    <style>
+        body {
+            padding: 10px 0px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        {% block content %}(no content){% endblock %}
+    </div>
+
+    {% block extrajs %}{% endblock %}
+</body>
+</html>
