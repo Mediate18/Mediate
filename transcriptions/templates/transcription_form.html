@@ -25,7 +25,12 @@
 
             <h3>{% trans "Document scans" %}</h3>
             <table class="table">
+                {{ documentscans.management_form }}
+
                 {% for form in documentscans %}
+                    {% for hidden in form.hidden_fields %}
+                        {{ hidden }}
+                    {% endfor %}
                     {% if form.initial %}
                         <tr>
                             <th>
