@@ -224,15 +224,15 @@ class TranscriptionCreateView(CreateView):
             transcription = form.save(commit=False)
             transcription.author = self.request.user
 
-            if not self.request.user.is_superuser:
-                messages.add_message(self.request, messages.SUCCESS,
-                                     _("Your changes will be sent to a moderator for reviewing."))
-                moderation = Moderation.create(editor=self.request.user, obj=transcription)
-                moderation.save()
-            else:
-                transcription.save()
-                formset.instance = transcription
-                formset.save()
+            # if not self.request.user.is_superuser:
+            #     messages.add_message(self.request, messages.SUCCESS,
+            #                          _("Your changes will be sent to a moderator for reviewing."))
+            #     moderation = Moderation.create(editor=self.request.user, obj=transcription)
+            #     moderation.save()
+            # else:
+            transcription.save()
+            formset.instance = transcription
+            formset.save()
         else:
             return self.render_to_response(self.get_context_data(form=form))
 
@@ -268,16 +268,15 @@ class TranscriptionUpdateView(UpdateView):
             transcription = form.save(commit=False)
             transcription.author = self.request.user
 
-            if not self.request.user.is_superuser:
-                messages.add_message(self.request, messages.SUCCESS,
-                                     _("Your changes will be sent to a moderator for reviewing."))
-                moderation = Moderation.update(editor=self.request.user, obj=transcription)
-                moderation.save()
-            else:
-                print("SAVE")
-                transcription.save()
-                formset.instance = transcription
-                formset.save()
+            # if not self.request.user.is_superuser:
+            #     messages.add_message(self.request, messages.SUCCESS,
+            #                          _("Your changes will be sent to a moderator for reviewing."))
+            #     moderation = Moderation.update(editor=self.request.user, obj=transcription)
+            #     moderation.save()
+            # else:
+            transcription.save()
+            formset.instance = transcription
+            formset.save()
 
         return redirect(self.success_url)
 
