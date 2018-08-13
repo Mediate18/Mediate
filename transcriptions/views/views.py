@@ -192,7 +192,7 @@ class TranscriptionDetailView(DetailView):
     template_name = 'transcription_detail.html'
 
 
-DocumentScanFormset = inlineformset_factory(Transcription, DocumentScan, fields=('scan',))
+DocumentScanFormset = inlineformset_factory(Transcription, DocumentScan, fields=('scan',), extra=2)
 
 
 class TranscriptionCreateView(CreateView):
@@ -209,6 +209,12 @@ class TranscriptionCreateView(CreateView):
             context['documentscans'] = DocumentScanFormset(self.request.POST, self.request.FILES)
         else:
             context['documentscans'] = DocumentScanFormset()
+
+        # Remove the option to delete for new objects
+        for form in context['documentscans']:
+            if not form.initial:
+                del form.fields['DELETE']
+                
         return context
 
     def form_valid(self, form):
@@ -247,7 +253,12 @@ class TranscriptionUpdateView(UpdateView):
             context['documentscans'] = DocumentScanFormset(self.request.POST, self.request.FILES, instance=self.object)
         else:
             context['documentscans'] = DocumentScanFormset(instance=self.object)
-        print(str(context['documentscans'][0].__dict__))
+
+        # Remove the option to delete for new objects
+        for form in context['documentscans']:
+            if not form.initial:
+                del form.fields['DELETE']
+
         return context
 
     def form_valid(self, form):
