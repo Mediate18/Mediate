@@ -71,6 +71,9 @@
                     <span class="glyphicon glyphicon-pencil" title="{% trans 'Change lot' %}"></span>
                 </a>
             {% endif %}
+            <a href="{% url 'items' %}?lot__uuid={{ lot.pk }}" target="_blank">
+                <span class="glyphicon glyphicon-list" title="{% trans 'Items of this lot' %}"></span>
+            </a>
         </td>
     </tr>
 {% endfor %}

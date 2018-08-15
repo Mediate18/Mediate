@@ -103,7 +103,11 @@ class ItemTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return Item.objects.all()
+        items = Item.objects.all()
+        lot_uuid = self.request.GET.get('lot__uuid')
+        if lot_uuid:
+            items = items.filter(lot__uuid=uuid.UUID(lot_uuid))
+        return items
 
     def get_context_data(self, **kwargs):
         context = super(ItemTableView, self).get_context_data(**kwargs)
