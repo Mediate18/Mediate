@@ -9,7 +9,7 @@
 
 {% block content %}
 
-<a class="pull-right" href="{% url 'change_catalogue' object.pk %}" target="_blank">
+<a class="pull-right" href="{% url 'change_catalogue' object.pk %}?layout=bare&next={{ request.path }}">
     <span class="glyphicon glyphicon-pencil" title="{% trans 'Change catalogue' %}"></span>
 </a>
 <dl class="dl-horizontal" style="padding-bottom: 15px;">
@@ -67,7 +67,7 @@
             {% if lot.under_moderation %}
                 <span class="glyphicon glyphicon-ban-circle" title="{% trans 'Lot is being moderated' %}"></span>
             {% else %}
-                <a href="{% url 'change_lot' lot.pk %}" target="_blank">
+                <a href="{% url 'change_lot' lot.pk %}?layout=bare&next={{ request.path }}">
                     <span class="glyphicon glyphicon-pencil" title="{% trans 'Change lot' %}"></span>
                 </a>
             {% endif %}

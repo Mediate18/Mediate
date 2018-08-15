@@ -1,4 +1,4 @@
-{% extends "baselayout.html" %}
+{% extends extended_layout|default:"baselayout.html" %}
 {% load i18n %}
 
 
@@ -9,9 +9,9 @@
 {% block content %}
 
 <div class="row">
-    <div class="col-xs-10">
+    <div class="col-xs-12">
         <h1>{% trans action|title %} {% trans object_name %}</h1>
-        <form action="" method="post" enctype="multipart/form-data">
+        <form action="{{ request.path }}?next={{ next_url }}" method="post" enctype="multipart/form-data">
             <table class="table">
                 {% csrf_token %}
                     {% if form_as == 'p' %}
@@ -20,7 +20,12 @@
                         {{ form.as_table }}
                     {% endif %}
             </table>
-        <input type="submit" class="btn pull-right" value="{% trans 'Save' %}"/>
+            <div class="pull-right">
+                <input type="submit" class="btn" value="{% trans 'Save' %}"/>
+                {% if next_url %}
+                    <a href="{{ next_url }}">{% trans 'Cancel' %}</a>
+                {% endif %}
+            </div>
         </form>
     </div>
 </div>

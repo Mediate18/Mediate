@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db.models import Q
 import re
 
@@ -36,3 +37,45 @@ def filter_multiple_words(lookup_expr, queryset, name, value):
         query_keywords = {name + '__' + lookup_expr: word}
         q = q | Q(**query_keywords)
     return queryset.filter(q)
+
+
+def put_layout_in_context(original_get_context_data_function):
+    """
+    A decorator function to add the GET request variable 'layout' to the context.
+    Works on get_context_data methods of class based views.
+    :param original_get_context_data_function: the original get_context_data function
+    :return: get_context_data_with_layout: the wrapper function
+    """
+
+    def get_context_data_with_layout(self, *args, **kwargs):
+        context = original_get_context_data_function(self, *args, **kwargs)
+        # if 'layout' in self.request.GET and self.request.GET['layout'] == 'bare':
+        #     context['extended_layout'] = 'barelayout.html'
+        layout = self.request.GET.get('layout')
+        if layout and layout in settings.AVAILABLE_LAYOUTS:
+            context['extended_layout'] = "{}{}".format(layout, settings.LAYOUT_SUFFIX)
+        return context
+    return get_context_data_with_layout
+
+
+def put_get_variable_in_context(mapping):
+    """
+    A decorator function to add a GET request variable to the context.
+    Works on get_context_data methods of class based views.
+    :param mapping: a tuple/list of 2-tuple with the get request variable and the context key
+    :return: the wrapping function
+    """
+    def wrapper(original_get_context_data_function):
+        """
+        The actual function wrapper
+        :param original_get_context_data_function: the original get_context_data function 
+        :return: 
+        """
+        def get_context_data_with_get_variable(self, *args, **kwargs):
+            context = original_get_context_data_function(self, *args, **kwargs)
+            for pair in mapping:
+                if pair[1] not in context:
+                    context[pair[1]] = self.request.GET.get(pair[0])
+            return context
+        return get_context_data_with_get_variable
+    return wrapper

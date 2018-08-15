@@ -182,3 +182,12 @@ DBBACKUP_STORAGE_OPTIONS = {'location': '/var/backups'}
 WRITABLE_FOLDER = os.path.join(BASE_DIR, config('WRITABLE_FOLDER'))
 MEDIA_ROOT = os.path.join(WRITABLE_FOLDER, 'media')
 MEDIA_URL = '/media/'
+
+# The next bit find all '.*layout.html' files in the main template directory
+# and extracts the first parts
+LAYOUT_SUFFIX = 'layout.html'
+AVAILABLE_LAYOUTS = [
+    template[:-len(LAYOUT_SUFFIX)]
+    for template in os.listdir(TEMPLATES[0]['DIRS'][0])
+    if template.endswith(LAYOUT_SUFFIX) and os.path.isfile(os.path.join(TEMPLATES[0]['DIRS'][0], template))
+]

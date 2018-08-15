@@ -1,10 +1,11 @@
 from django.contrib import messages
-from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 from django.db.models import Count
+
+from mediate.tools import put_layout_in_context, put_get_variable_in_context
 
 from ..forms import *
 from ..tables import *
@@ -82,8 +83,12 @@ class CatalogueUpdateView(UpdateView):
     model = Catalogue
     template_name = 'generic_form.html'
     form_class = CatalogueModelForm
-    success_url = reverse_lazy('catalogues')
 
+    def get_success_url(self):
+        return self.request.GET.get('next') or reverse_lazy('catalogues')
+
+    @put_get_variable_in_context([('next', 'next_url'),])
+    @put_layout_in_context
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("update")
@@ -515,8 +520,12 @@ class LotUpdateView(UpdateView):
     model = Lot
     template_name = 'generic_form.html'
     form_class = LotModelForm
-    success_url = reverse_lazy('lots')
 
+    def get_success_url(self):
+        return self.request.GET.get('next') or reverse_lazy('lots')
+
+    @put_get_variable_in_context([('next', 'next_url'),])
+    @put_layout_in_context
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("update")
