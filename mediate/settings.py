@@ -70,10 +70,13 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'mediate.urls'
 
+MAIN_TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
+TEMPLATE_DIRS = [MAIN_TEMPLATE_DIR]
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': TEMPLATE_DIRS,
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -188,6 +191,6 @@ MEDIA_URL = '/media/'
 LAYOUT_SUFFIX = 'layout.html'
 AVAILABLE_LAYOUTS = [
     template[:-len(LAYOUT_SUFFIX)]
-    for template in os.listdir(TEMPLATES[0]['DIRS'][0])
+    for template in os.listdir(MAIN_TEMPLATE_DIR)
     if template.endswith(LAYOUT_SUFFIX) and os.path.isfile(os.path.join(TEMPLATES[0]['DIRS'][0], template))
 ]
