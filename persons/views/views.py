@@ -5,6 +5,7 @@ from django.views.generic.detail import DetailView
 
 from django.utils.translation import ugettext_lazy as _
 from django.utils.html import escape
+from django.urls import reverse
 import django_tables2
 
 from django.http import JsonResponse
@@ -92,6 +93,7 @@ class PersonUpdateView(UpdateView):
         context = super().get_context_data(**kwargs)
         context['action'] = _("update")
         context['object_name'] = "person"
+        context['js_variables'] = json.dumps({'viaf_select_id': PersonModelForm.suggest_select_ids})
         return context
 
     def form_valid(self, form):
@@ -697,9 +699,14 @@ class PlaceAndCerlSuggest(CerlSuggest):
                 text='<i>' + escape(obj.name) + '</i>',
                 nametype='',
                 class_name="local_place",
-                external_url=cerl_record_url + obj.cerl_id if obj.cerl_id else obj.uuid,
                 clean_text=escape(obj.name)
             )
+            if obj.cerl_id:
+                obj_dict['external_url'] = cerl_record_url + obj.cerl_id
+                obj_dict['url_type'] = 'Cerl'
+            else:
+                obj_dict['external_url'] = request.build_absolute_uri(reverse('change_place', args=[obj.uuid]))
+                obj_dict['url_type'] = 'internal'
             place_result.append(obj_dict)
             place_cerl_ids.add(id_number)
 

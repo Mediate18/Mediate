@@ -32,5 +32,6 @@ class CerlSuggest(autocomplete.Select2ListView):
                 text=item['name_display_line'] + " - <small>" + ", ".join(item['placeName']) + "</small>",
                 nametype='',
                 external_url=cerl_record_url+item['id'],
+                url_type='Cerl',
                 clean_text=item['name_display_line']
             ) for item in result]

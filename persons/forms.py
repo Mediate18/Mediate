@@ -26,11 +26,13 @@ class PersonModelForm(forms.ModelForm):
                 url='placeandcerl_suggest',
                 attrs={'data-html': True,
                        'data-placeholder': "Search for a place - <i>italic: places in the local database</i>"},
+                model=Place,
             ),
             'city_of_death': ApiSelectWidget(
                 url='placeandcerl_suggest',
                 attrs={'data-html': True,
                        'data-placeholder': "Search for a place - <i>italic: places in the local database</i>"},
+                model=Place,
             ),
         }
 
