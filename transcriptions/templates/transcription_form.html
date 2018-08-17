@@ -8,8 +8,6 @@
 
 {% block content %}
 
-{% get_media_prefix as MEDIA_PREFIX %}
-
 <div class="row">
     <div class="col-xs-10">
         <h1>{% trans action|title %} {% trans object_name %}</h1>
@@ -37,7 +35,7 @@
                                 {% trans "Scan:" %}
                             </th>
                             <td>
-                                <a href="{{ MEDIA_PREFIX }}{{ form.scan.value }}">
+                                <a href="{% url 'protected_media' form.scan.value %}">
                                     <i class="glyphicon glyphicon-file"></i>
                                     {{ form.scan.value }}
                                 </a>

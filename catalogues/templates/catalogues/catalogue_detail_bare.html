@@ -31,7 +31,7 @@
     <dt>{% trans "Scans" %}</dt>
     <dd>
         {% for scan in object.transcription.scans.all %}
-            <a href="{{ scan.scan.url }}">{{ scan.scan.name }}</a>
+            <a href="{% url 'protected_media' scan.scan.name %}" target="_blank">{{ scan.scan.name }}</a>
         {% endfor %}
     </dd>
 </dl>

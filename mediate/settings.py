@@ -182,9 +182,10 @@ APPLICATION_INSTANCE_TYPE = config('APPLICATION_INSTANCE_TYPE', default="")
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
 DBBACKUP_STORAGE_OPTIONS = {'location': '/var/backups'}
 
-WRITABLE_FOLDER = os.path.join(BASE_DIR, config('WRITABLE_FOLDER'))
+WRITABLE_FOLDER = os.path.normpath(os.path.join(BASE_DIR, config('WRITABLE_FOLDER')))
 MEDIA_ROOT = os.path.join(WRITABLE_FOLDER, 'media')
 MEDIA_URL = '/media/'
+XSENDFILE = config('XSENDFILE', True, cast=bool)
 
 # The next bit find all '.*layout.html' files in the main template directory
 # and extracts the first parts

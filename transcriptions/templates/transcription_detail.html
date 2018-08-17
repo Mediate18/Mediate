@@ -23,7 +23,7 @@
                     <ul style="padding: 0px; list-style-type: none">
                         {% for scan in object.scans.all %}
                             <li>
-                                <a href="{{ scan.scan.url }}">
+                                <a href="{% url 'protected_media' scan.scan.name %}">
                                     <i class="glyphicon glyphicon-file"></i>
                                     {{ scan.scan.name }}
                                 </a>
