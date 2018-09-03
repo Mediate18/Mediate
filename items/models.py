@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models.deletion import CASCADE
+from django.db.models.deletion import CASCADE, SET_NULL
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
@@ -114,6 +114,7 @@ class Item(models.Model):
     lot = models.ForeignKey(Lot, on_delete=CASCADE, null=True)
     collection = models.ForeignKey(Collection, on_delete=CASCADE)
     number_of_volumes = models.CharField(_("Number of volumes, as listed in the catalogue"), max_length=128)
+    book_format = models.ForeignKey(BookFormat, on_delete=SET_NULL, null=True, related_name='items')
 
     class Meta:
         ordering = ['lot__catalogue__year_of_publication', 'lot__catalogue__short_title',
@@ -123,7 +124,9 @@ class Item(models.Model):
         return self.short_title
 
     def clean(self):
-        if self.collection != self.lot.catalogue.collection:
+        print("{} =? {}".format(self.collection, self.lot.catalogue.collection))
+        if self.lot and self.lot.catalogue and self.lot.catalogue.collection and \
+                        self.collection != self.lot.catalogue.collection:
             raise ValidationError({'collection':
                 _("The collection of this item and the collection of the catalogue of this item, are not the same.")
                                    })
@@ -185,21 +188,6 @@ class ItemLanguageRelation(models.Model):
 
     def __str__(self):
         return _("{} is written in {}").format(self.item, self.language)
-
-
-class ItemBookFormatRelation(models.Model):
-    """
-    The book format of an item
-    """
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    item = models.ForeignKey(Item, on_delete=CASCADE, related_name='book_formats')
-    book_format = models.ForeignKey(BookFormat, on_delete=CASCADE, related_name='items')
-
-    class Meta:
-        unique_together = (('item', 'book_format'),)
-
-    def __str__(self):
-        return _("Format of {}: {}").format(self.item, self.book_format)
 
 
 class ItemWorkRelation(models.Model):

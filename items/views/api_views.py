@@ -17,11 +17,6 @@ class ItemAuthorViewSet(viewsets.ModelViewSet):
     serializer_class = ItemAuthorSerializer
 
 
-class ItemBookFormatRelationViewSet(viewsets.ModelViewSet):
-    queryset = ItemBookFormatRelation.objects.all()
-    serializer_class = ItemBookFormatRelationSerializer
-
-
 class ItemItemTypeRelationViewSet(viewsets.ModelViewSet):
     queryset = ItemItemTypeRelation.objects.all()
     serializer_class = ItemItemTypeRelationSerializer

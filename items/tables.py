@@ -47,6 +47,7 @@ class ItemTable(tables.Table):
             'catalogue',
             'collection',
             'number_of_volumes',
+            'book_format',
             'uuid',
             'manage_works',
             'manage_persons'
@@ -102,16 +103,6 @@ class ItemAuthorTable(tables.Table):
 
     class Meta:
         model = ItemAuthor
-        attrs = {'class': 'table table-sortable'}
-
-
-# ItemBookFormatRelation table
-class ItemBookFormatRelationTable(tables.Table):
-    edit = tables.LinkColumn('change_itembookformatrelation', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
-
-    class Meta:
-        model = ItemBookFormatRelation
         attrs = {'class': 'table table-sortable'}
 
 

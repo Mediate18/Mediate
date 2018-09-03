@@ -44,23 +44,6 @@ urlpatterns = [
        permission_required('items.delete_itemauthor')(ItemAuthorDeleteView.as_view()),
        name="delete_itemauthor"),
 
-    # ItemBookFormatRelation urls
-    path('itembookformatrelations/', login_required(ItemBookFormatRelationTableView.as_view()),
-       name='itembookformatrelations'),
-    path(r'itembookformatrelations/<uuid:pk>', login_required(ItemBookFormatRelationDetailView.as_view()),
-       name="itembookformatrelation_detail"),
-    path(r'itembookformatrelations/add', permission_required('items.add_itembookformatrelation')(
-      ItemBookFormatRelationCreateView.as_view()),
-       name="add_itembookformatrelation"),
-    path(r'itembookformatrelations/edit/<uuid:pk>',
-       permission_required('items.change_itembookformatrelation')(
-           ItemBookFormatRelationUpdateView.as_view()),
-       name="change_itembookformatrelation"),
-    path(r'itembookformatrelations/delete/<uuid:pk>',
-       permission_required('items.delete_itembookformatrelation')(
-           ItemBookFormatRelationDeleteView.as_view()),
-       name="delete_itembookformatrelation"),
-
     # ItemItemTypeRelation urls
     path('itemitemtyperelations/', login_required(ItemItemTypeRelationTableView.as_view()),
        name='itemitemtyperelations'),

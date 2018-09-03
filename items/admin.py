@@ -21,11 +21,6 @@ class ItemAuthorAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(ItemBookFormatRelation)
-class ItemBookFormatRelationAdmin(admin.ModelAdmin):
-    pass
-
-
 @admin.register(ItemItemTypeRelation)
 class ItemItemTypeRelationAdmin(admin.ModelAdmin):
     pass

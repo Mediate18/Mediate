@@ -20,12 +20,6 @@ class ItemAuthorSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
-class ItemBookFormatRelationSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = ItemBookFormatRelation
-        fields = "__all__"
-
-
 class ItemItemTypeRelationSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ItemItemTypeRelation

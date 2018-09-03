@@ -63,18 +63,6 @@ class ItemAuthorModelForm(forms.ModelForm):
         }
 
 
-class ItemBookFormatRelationModelForm(forms.ModelForm):
-    class Meta:
-        model = ItemBookFormatRelation
-        fields = "__all__"
-        widgets = {
-            'item': ModelSelect2Widget(
-                model=Item,
-                search_fields=['short_title__icontains']
-            ),
-        }
-
-
 class ItemItemTypeRelationModelForm(forms.ModelForm):
     class Meta:
         model = ItemItemTypeRelation
