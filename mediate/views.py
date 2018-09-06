@@ -28,7 +28,7 @@ def protected_media(request, filename):
         return serve(request, full_path, document_root='/')
 
     # Determine the mime type
-    mime_type = mimetypes.guess_type(full_path)
+    (mime_type, encoding) = mimetypes.guess_type(full_path)
 
     # Construct the response
     response = HttpResponse(content_type=mime_type)
