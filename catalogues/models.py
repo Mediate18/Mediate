@@ -69,7 +69,6 @@ class Catalogue(models.Model):
     short_title = models.CharField(_("Short title"), max_length=128, null=True)
     full_title = models.TextField(_("Full title"), null=True)
     preface_and_paratexts = models.TextField(_("Preface or prefatory / concluding text"), null=True)
-    type = models.ForeignKey(CatalogueType, on_delete=CASCADE, null=True)
     year_of_publication = models.IntegerField(_("Year of publication"), null=True)
     terminus_post_quem = models.BooleanField(_("Terminus post quem"), default=False)
     notes = models.TextField(_("Notes for the Mediate project"), null=True)
@@ -84,6 +83,18 @@ class Catalogue(models.Model):
 
     def get_absolute_url(self):
         return reverse_lazy('change_catalogue', args=[str(self.uuid)])
+
+
+class CatalogueCatalogueTypeRelation(models.Model):
+    """
+    A catalogue-catalogue type relation
+    """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    catalogue = models.ForeignKey(Catalogue, on_delete=models.CASCADE)
+    type = models.ForeignKey(CatalogueType, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = (("catalogue", "type"),)  # Multiple identical relations would be redundant
 
 
 class CatalogueHeldBy(models.Model):

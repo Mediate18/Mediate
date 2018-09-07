@@ -74,7 +74,7 @@ def put_get_variable_in_context(mapping):
         def get_context_data_with_get_variable(self, *args, **kwargs):
             context = original_get_context_data_function(self, *args, **kwargs)
             for pair in mapping:
-                if pair[1] not in context:
+                if pair[1] not in context and pair[0] in self.request.GET:
                     context[pair[1]] = self.request.GET.get(pair[0])
             return context
         return get_context_data_with_get_variable
