@@ -186,6 +186,7 @@ WRITABLE_FOLDER = os.path.normpath(os.path.join(BASE_DIR, config('WRITABLE_FOLDE
 MEDIA_ROOT = os.path.join(WRITABLE_FOLDER, 'media')
 MEDIA_URL = '/media/'
 XSENDFILE = config('XSENDFILE', True, cast=bool)
+FILE_UPLOAD_PERMISSIONS = 0o640
 
 # The next bit find all '.*layout.html' files in the main template directory
 # and extracts the first parts
