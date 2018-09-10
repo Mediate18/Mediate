@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'viapy',
     'tagging',
     'dbbackup',
+    'maintenance_mode',
     'simplemoderation',
     'items',
     'transcriptions',
@@ -66,6 +67,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'maintenance_mode.middleware.MaintenanceModeMiddleware',
 ]
 
 ROOT_URLCONF = 'mediate.urls'
@@ -196,3 +198,5 @@ AVAILABLE_LAYOUTS = [
     for template in os.listdir(MAIN_TEMPLATE_DIR)
     if template.endswith(LAYOUT_SUFFIX) and os.path.isfile(os.path.join(TEMPLATES[0]['DIRS'][0], template))
 ]
+
+MAINTENANCE_MODE = config('MAINTENANCE_MODE', False, cast=bool)

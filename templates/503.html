@@ -1,0 +1,20 @@
+{% extends "baselayout.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-xs-6 col-xs-offset-3">
+        <div class="alert alert-warning">
+            <h3><span class="glyphicon glyphicon-wrench"> {% trans "Work in progress" %}</span></h3>
+            <p>
+            {% trans "The web application is temporarily unavailable due to maintenance work." %}
+            </p>
+            <p>
+                {% trans "Perhaps you could take a look at" %} <a href="http://www.mediate18.nl/">www.mediate18.nl</a>.
+            </p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
