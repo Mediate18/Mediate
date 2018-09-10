@@ -34,6 +34,13 @@
             <a href="{% url 'protected_media' scan.scan.name %}" target="_blank">{{ scan.scan.name }}</a>
         {% endfor %}
     </dd>
+
+    <dt>{% trans "Types" %}</dt>
+    <dd>
+        {% for cataloguecataloguetyperelation in object.cataloguecataloguetyperelation_set.all %}
+            {{ cataloguecataloguetyperelation.type }}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </dd>
 </dl>
 <h2 class="text-center">{% trans "Lots" %}</h2>
 <table class="table table-hover">

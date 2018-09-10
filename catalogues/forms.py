@@ -1,5 +1,5 @@
 from django import forms
-from django_select2.forms import Select2Widget, ModelSelect2Widget
+from django_select2.forms import Select2Widget, ModelSelect2Widget, ModelSelect2MultipleWidget
 from .models import *
 
 
@@ -9,9 +9,45 @@ class CatalogueModelForm(forms.ModelForm):
         fields = "__all__"
         widgets = {
             'collection': Select2Widget,
-            'type': Select2Widget,
             'transcription': Select2Widget,
         }
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.add_types_field()
+
+    def add_types_field(self):
+        types = forms.ModelMultipleChoiceField(
+            widget=ModelSelect2MultipleWidget(
+                    model=CatalogueType,
+                    search_fields=['name__icontains'],
+                ),
+            queryset=CatalogueType.objects.all(),
+            required=False,
+            initial=CatalogueType.objects.filter(cataloguecataloguetyperelation__catalogue=self.instance)
+        )
+        self.fields['types'] = types
+
+    def save(self, commit=True):
+        if commit:
+            self.save_types()
+        return super(CatalogueModelForm, self).save(commit=commit)
+
+    def save_types(self):
+        submitted_types = self.cleaned_data['types']
+
+        # Delete relations for types that are not in the submitted types
+        relations_to_delete = CatalogueCatalogueTypeRelation.objects \
+            .filter(catalogue=self.instance).exclude(type__in=submitted_types)
+        for relation in relations_to_delete:
+            relation.delete()
+
+        # Add relations for submitted types that are not in the existing types
+        new_types = set(submitted_types) - set(CatalogueType.objects.filter(
+            cataloguecataloguetyperelation__catalogue=self.instance))
+        for new_type in new_types:
+            catalogue_cataloguetype_relation = CatalogueCatalogueTypeRelation(catalogue=self.instance, type=new_type)
+            catalogue_cataloguetype_relation.save()
 
 
 class CatalogueHeldByModelForm(forms.ModelForm):
