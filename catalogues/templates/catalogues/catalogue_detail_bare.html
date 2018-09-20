@@ -20,13 +20,13 @@
     <dd>{{ object.year_of_publication }}</dd>
 
     <dt>{% trans "Full title" %}</dt>
-    <dd>{{ object.full_title }}</dd>
+    <dd>{{ object.full_title|linebreaks }}</dd>
 
     <dt>{% trans "Preface and paratexts" %}</dt>
-    <dd>{{ object.preface_and_paratexts }}</dd>
+    <dd>{{ object.preface_and_paratexts|linebreaks }}</dd>
 
     <dt>{% trans "Notes" %}</dt>
-    <dd>{{ object.notes }}</dd>
+    <dd>{{ object.notes|linebreaks }}</dd>
 
     <dt>{% trans "Scans" %}</dt>
     <dd>
