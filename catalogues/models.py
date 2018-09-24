@@ -171,3 +171,36 @@ class PersonCatalogueRelation(models.Model):
 
     def __str__(self):
         return _("{} is {} of {}").format(self.person, self.role, self.catalogue)
+
+
+class ParisianCategory(models.Model):
+    """
+    A category from Parisian system of 17th century booksellers.
+    """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(_("Name"), max_length=128)
+    description = models.TextField(_("Description"), blank=True)
+
+    def __str__(self):
+        return "{} ({})".format(self.name, self.description)
+
+
+class Category(models.Model):
+    """
+    A category as found in a catalogue.
+    """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    catalogue = models.ForeignKey(Catalogue, on_delete=SET_NULL, null=True)
+    parent = models.ForeignKey('self', on_delete=SET_NULL, null=True)
+    bookseller_category = models.TextField(_("Heading / category used to describe books"))
+    parisian_category = models.ForeignKey(ParisianCategory, on_delete=SET_NULL, null=True)
+
+    def __str__(self):
+        return "{} ({})".format(self.bookseller_category, self.parisian_category.name)
+
+    def save(self, *args, **kwargs):
+        # Check whether the catalogue of the parent is the same catalogue
+        if not self.parent or self.catalogue == self.parent.catalogue:
+            super(Category, self).save(*args, **kwargs)
+        else:
+            raise Exception(_("Category {}: the catalogue is not the as the parent's catalogue").format(self))
