@@ -48,15 +48,15 @@
             {% if lot.index_in_catalogue in first_lot_on_page_dict %}
     <tr>
         <td class="text-center" colspan="4">
-                <b>{% trans "Page" %} {{ first_lot_on_page_dict|lookup:lot.index_in_catalogue }}</b>
+                <b>{% trans "Page" %} {{ lot.page_in_catalogue }}</b>
         </td>
     </tr>
             {% endif %}
-            {% if lot.number_in_catalogue == "1" %}
+            {% if lot.index_in_catalogue in first_lot_in_category_dict %}
     <tr>
         <td class="text-center" colspan="4">
                 <br/>
-                <h4><i>{{ lot.bookseller_category_books }}</i></h4>
+                <h4><i>{{ lot.category.bookseller_category }}</i></h4>
         </td>
     </tr>
             {% endif %}

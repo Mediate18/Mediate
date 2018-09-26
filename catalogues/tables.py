@@ -96,14 +96,14 @@ class LibraryTable(tables.Table):
 class LotTable(tables.Table):
     uuid = ActionColumn('lot_detail', 'change_lot', 'delete_lot', orderable=False)
     catalogue = tables.RelatedLinkColumn()
+    category = tables.RelatedLinkColumn()
 
     class Meta:
         model = Lot
         attrs = {'class': 'table table-sortable'}
         sequence = [
             'catalogue',
-            'bookseller_category_books',
-            'bookseller_category_non_books',
+            'category',
             'number_in_catalogue',
             'page_in_catalogue',
             'lot_as_listed_in_catalogue',

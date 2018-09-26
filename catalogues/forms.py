@@ -91,6 +91,19 @@ class LotModelForm(forms.ModelForm):
             ),
         }
 
+    def __init__(self, *args, **kwargs):
+        super(LotModelForm, self).__init__(*args, **kwargs)
+        self.add_category_field()
+
+    def add_category_field(self):
+        self.fields['category'] = forms.ModelChoiceField(
+            widget=ModelSelect2Widget(
+                model=Category,
+                search_fields=['bookseller_category__icontains'],
+                queryset=Category.objects.filter(catalogue=self.instance.catalogue)),
+            queryset=Category.objects.filter(catalogue=self.instance.catalogue),
+        )
+
 
 class PersonCatalogueRelationModelForm(forms.ModelForm):
     class Meta:

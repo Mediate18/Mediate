@@ -115,13 +115,12 @@ class Lot(models.Model):
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     catalogue = models.ForeignKey(Catalogue, on_delete=CASCADE, null=True)
-    bookseller_category_books = models.TextField(_("Heading / category used to describe books"))
-    bookseller_category_non_books = models.TextField(_("Heading / category for other, non-book items"), blank=True)
     number_in_catalogue = models.CharField(_("Number in catalogue"), max_length=128)
     page_in_catalogue = models.IntegerField(_("Page in catalogue"), null=True, blank=True)
     sales_price = models.CharField(_("Sales price"), max_length=128, blank=True)
     lot_as_listed_in_catalogue = models.TextField(_("Full lot description, exactly as in the catalogue"))
     index_in_catalogue = models.IntegerField(_("Index in catalogue"), null=True)
+    category = models.ForeignKey('Category', on_delete=SET_NULL, null=True)
 
     class Meta:
         ordering = ['catalogue__year_of_publication', 'catalogue__short_title', 'index_in_catalogue',
@@ -129,6 +128,13 @@ class Lot(models.Model):
 
     def __str__(self):
         return self.lot_as_listed_in_catalogue
+
+    def save(self, *args, **kwargs):
+        # Check whether the catalogue of the category is the same catalogue
+        if not self.category or self.catalogue == self.category.catalogue:
+            super(Lot, self).save(*args, **kwargs)
+        else:
+            raise Exception(_("Lot {}: the catalogue is not the as the category's catalogue").format(self))
 
     def get_absolute_url(self):
         return reverse_lazy('change_lot', args=[str(self.uuid)])
@@ -195,8 +201,11 @@ class Category(models.Model):
     bookseller_category = models.TextField(_("Heading / category used to describe books"))
     parisian_category = models.ForeignKey(ParisianCategory, on_delete=SET_NULL, null=True)
 
+    class Meta:
+        ordering = ['bookseller_category']
+
     def __str__(self):
-        return "{} ({})".format(self.bookseller_category, self.parisian_category.name)
+        return self.bookseller_category
 
     def save(self, *args, **kwargs):
         # Check whether the catalogue of the parent is the same catalogue

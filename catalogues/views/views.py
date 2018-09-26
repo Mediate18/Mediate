@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
-from django.db.models import Count
+from django.db.models import Count, Min
 
 from mediate.tools import put_layout_in_context, put_get_variable_in_context
 
@@ -47,12 +47,21 @@ class CatalogueDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        from django.db.models import Min
-        first_lot_on_page_dict = dict([(page['first_lot_on_page'], page['page_in_catalogue']) for page in
-                                       self.object.lot_set.filter(page_in_catalogue__isnull=False)
-                                      .values('page_in_catalogue')
-                                      .annotate(first_lot_on_page=Min('index_in_catalogue')).order_by()])
-        context['first_lot_on_page_dict'] = first_lot_on_page_dict
+
+        # Find the first lot for each page
+        context['first_lot_on_page_dict'] = dict([
+            (lot['first_lot_on_page'], lot['page_in_catalogue']) for lot in
+            self.object.lot_set.filter(page_in_catalogue__isnull=False).values('page_in_catalogue')
+                .annotate(first_lot_on_page=Min('index_in_catalogue')).order_by()
+        ])
+
+        # Find the first lot for each category
+        context['first_lot_in_category_dict'] = dict([
+            (lot['first_lot_in_category'], lot['category__bookseller_category']) for lot in
+            self.object.lot_set.filter(category__isnull=False).values('category__bookseller_category')
+                .annotate(first_lot_in_category=Min('index_in_catalogue')).order_by()
+        ])
+
         return context
 
 
