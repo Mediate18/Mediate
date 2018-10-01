@@ -115,6 +115,7 @@ class Item(models.Model):
     collection = models.ForeignKey(Collection, on_delete=CASCADE)
     number_of_volumes = models.CharField(_("Number of volumes, as listed in the catalogue"), max_length=128)
     book_format = models.ForeignKey(BookFormat, on_delete=SET_NULL, null=True, related_name='items')
+    index_in_lot = models.IntegerField(_("Index in the lot"))
 
     class Meta:
         ordering = ['lot__catalogue__year_of_publication', 'lot__catalogue__short_title',
