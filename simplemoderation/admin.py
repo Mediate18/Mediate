@@ -1,3 +1,7 @@
 from django.contrib import admin
+from .models import *
 
-# Register your models here.
+
+@admin.register(Moderation)
+class ModerationAdmin(admin.ModelAdmin):
+    readonly_fields = ('editor', 'created_datetime', 'action', 'content_type', 'data',)

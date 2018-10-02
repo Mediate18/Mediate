@@ -20,7 +20,7 @@ urlpatterns = [
        permission_required('catalogues.change_catalogue')(CatalogueUpdateView.as_view()),
        name="change_catalogue"),
     path(r'catalogues/delete/<uuid:pk>',
-       permission_required('catalogue.delete_catalogue')(CatalogueDeleteView.as_view()),
+       permission_required('catalogues.delete_catalogue')(CatalogueDeleteView.as_view()),
        name="delete_catalogue"),
 
 

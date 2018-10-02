@@ -6,6 +6,7 @@ from django.views.generic.list import ListView
 from django.db.models import Count, Min
 
 from mediate.tools import put_layout_in_context, put_get_variable_in_context
+from simplemoderation.tools import moderate
 
 from ..forms import *
 from ..tables import *
@@ -69,6 +70,7 @@ class CatalogueDetailBareView(CatalogueDetailView):
     template_name = 'catalogues/catalogue_detail_bare.html'
 
 
+@moderate
 class CatalogueCreateView(CreateView):
     model = Catalogue
     template_name = 'generic_form.html'
@@ -81,13 +83,8 @@ class CatalogueCreateView(CreateView):
         context['object_name'] = "catalogue"
         return context
 
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
-
+@moderate
 class CatalogueUpdateView(UpdateView):
     model = Catalogue
     template_name = 'generic_form.html'
@@ -104,13 +101,8 @@ class CatalogueUpdateView(UpdateView):
         context['object_name'] = "catalogue"
         return context
 
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
-
+@moderate
 class CatalogueDeleteView(DeleteView):
     model = Catalogue
     success_url = reverse_lazy('catalogues')
@@ -506,6 +498,7 @@ class LotDetailView(DetailView):
     model = Lot
 
 
+@moderate
 class LotCreateView(CreateView):
     model = Lot
     template_name = 'generic_form.html'
@@ -518,13 +511,8 @@ class LotCreateView(CreateView):
         context['object_name'] = "lot"
         return context
 
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
-
+@moderate
 class LotUpdateView(UpdateView):
     model = Lot
     template_name = 'generic_form.html'
@@ -541,13 +529,8 @@ class LotUpdateView(UpdateView):
         context['object_name'] = "lot"
         return context
 
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
-
+@moderate
 class LotDeleteView(DeleteView):
     model = Lot
     success_url = reverse_lazy('lots')

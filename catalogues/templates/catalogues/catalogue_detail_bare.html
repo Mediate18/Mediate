@@ -9,9 +9,14 @@
 
 {% block content %}
 
-<a class="pull-right" href="{% url 'change_catalogue' object.pk %}?layout=bare&next={{ request.path }}">
-    <span class="glyphicon glyphicon-pencil" title="{% trans 'Change catalogue' %}"></span>
-</a>
+{% if catalogue.under_moderation %}
+    <span class="glyphicon glyphicon-ban-circle pull-right" title="{% trans 'Catalogue is being moderated' %}"></span>
+{% else %}
+    <a class="pull-right" href="{% url 'change_catalogue' object.pk %}?layout=bare&next={{ request.path }}">
+        <span class="glyphicon glyphicon-pencil" title="{% trans 'Change catalogue' %}"></span>
+    </a>
+{% endif %}
+
 <dl class="dl-horizontal" style="padding-bottom: 15px;">
     <dt>{% trans "Short title" %}</dt>
     <dd>{{ object.short_title }}</dd>

@@ -7,6 +7,7 @@ import uuid
 
 from persons.models import Person
 from transcriptions.models import Transcription
+from simplemoderation.tools import under_moderation
 
 
 class Collection(models.Model):
@@ -60,6 +61,7 @@ class Library(models.Model):
         return self.name
 
 
+@under_moderation
 class Catalogue(models.Model):
     """
     The catalogue an item occurs in
@@ -109,6 +111,7 @@ class CatalogueHeldBy(models.Model):
         return _("{} held by {}").format(self.catalogue, self.library)
 
 
+@under_moderation
 class Lot(models.Model):
     """
     Catalogue lot

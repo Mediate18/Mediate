@@ -28,7 +28,8 @@ class Moderation(models.Model):
     editor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="moderated_objects",
                                editable=False)
     created_datetime = models.DateTimeField(auto_now_add=True, editable=False)
-    action = models.CharField(max_length=1, choices=[(tag.value, tag) for tag in ModerationAction], default='C', editable=False)
+    action = models.CharField(max_length=1, choices=[(tag.value, tag) for tag in ModerationAction], default='C',
+                              editable=False)
 
     # The created/updated/deleted object
     data = SerializedObjectField(serialize_format='json', editable=False)
@@ -39,27 +40,19 @@ class Moderation(models.Model):
         object_pk = models.PositiveIntegerField(null=True, blank=True, editable=False)
 
     # The moderation
+    # The moderation that this moderation is dependent on:
+    master = models.ForeignKey('Moderation', null=True, blank=True, on_delete=models.SET_NULL)
     state = models.CharField(max_length=1, choices=[(tag.value, tag) for tag in ModerationState], default='P')
     moderated_datetime = models.DateTimeField(null=True)
     moderator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="handled_moderations")
     reason = models.TextField(blank=True)
 
     @staticmethod
-    def create(editor, obj):
+    def create(editor, obj, action):
         return Moderation(
                     editor=editor,
-                    action=ModerationAction.CREATE.value,
-                    object_pk=None,
+                    action=action.value,
+                    object_pk=obj.pk,
                     data=obj,
                     content_type=ContentType.objects.get_for_model(obj)
                 )
-
-    @staticmethod
-    def update(editor, obj):
-        return Moderation(
-            editor=editor,
-            action=ModerationAction.UPDATE.value,
-            object_pk=obj.pk,
-            data=obj,
-            content_type=ContentType.objects.get_for_model(obj)
-        )
