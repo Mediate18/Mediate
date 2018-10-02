@@ -5,8 +5,10 @@ from .models import *
 
 # Moderation table
 class ModerationTable(tables.Table):
-    edit = tables.LinkColumn('change_moderation', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    id = tables.LinkColumn('change_moderation', text='Moderate', args=[A('pk')], orderable=False, verbose_name="Moderate",
+                           empty_values=[moderation.id for moderation in
+                                         Moderation.objects.filter(state__in=[ModerationState.APPROVED.value,
+                                                                              ModerationState.REJECTED.value])])
 
     class Meta:
         model = Moderation

@@ -6,6 +6,7 @@ from django.views.generic.edit import UpdateView
 
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse_lazy
+from django.shortcuts import redirect
 import django_tables2
 
 from datetime import datetime
@@ -49,6 +50,22 @@ class ModerationUpdateView(UpdateView):
         context['action'] = _("update")
         context['object_name'] = "moderation"
         return context
+
+    def get(self, request, *args, **kwargs):
+        """
+        Check whether the moderation to be edited is pending. Otherwise fail with a messages.
+        :param request: 
+        :param args: 
+        :param kwargs: 
+        :return: 
+        """
+        obj = self.get_object()
+        if obj.state != ModerationState.PENDING.value:
+            messages.add_message(self.request, messages.WARNING,
+                                 _("This moderation is not pending."))
+            return redirect(self.success_url)
+        else:
+            return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
         moderation = form.save(commit=False)
