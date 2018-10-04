@@ -10,6 +10,7 @@ from django.shortcuts import redirect
 import django_tables2
 
 from datetime import datetime
+from collections import OrderedDict
 
 from .forms import *
 from .filters import *
@@ -99,18 +100,23 @@ class ModerationUpdateView(UpdateView):
         return redirect(self.success_url)
 
     def get_changes(self):
+        """
+        Puts the changes between the original and new object in an ordered dict
+        :return: OrderedDict: ordered dict containing the changes
+        """
         moderation = self.get_object()
         original = moderation.content_object
         new = moderation.data
 
-        from collections import OrderedDict
         changes = OrderedDict()
 
-        for field in original.relevant_fields:
+        fields = [f for f in original._meta.fields if not f.primary_key]  # All model fields except for the primary key
+        for field in fields:
             changes[field] = {}
-            original_field = getattr(original, field)
+            original_field = getattr(original, field.name)
+            print(type(original_field))
             changes[field]['original'] = original_field
-            new_field = getattr(new, field)
+            new_field = getattr(new, field.name)
             changes[field]['new'] = new_field
             if original_field == new_field:
                 changes[field]['changed'] = False

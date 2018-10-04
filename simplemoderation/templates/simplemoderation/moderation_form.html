@@ -1,6 +1,6 @@
 {% extends extended_layout|default:"baselayout.html" %}
 {% load i18n %}
-
+{% load underscore_to_space %}
 
 {% block extracss %}
 {{ form.media.css }}
@@ -10,28 +10,39 @@
 
 <div class="row">
     <div class="col-xs-12">
-        <h1>{% trans action|title %} {% trans object_name %}</h1>
+        <h1>{% trans "Moderate" %} {{ object.content_type|title }} <i>{{ object.content_object }}</i></h1>
 
         <h3>{% trans "Original and new data" %}</h3>
         <table class="table">
             <thead>
                 <tr>
-                    <td>{% trans "Field" %}</td>
-                    <td>{% trans "Original" %}</td>
-                    <td>{% trans "New" %}</td>
+                    <th>{% trans "Field" %}</th>
+                    <th>{% trans "Original" %}</th>
+                    <th>{% trans "New" %}</th>
                 </tr>
             </thead>
             <tbody>
                 {% for field, change in changes.items %}
                     <tr>
-                        <td>{{ field }}</td>
-                        {% if change.changed %}
-                            <td>{{ change.original|default_if_none:"-empty-" }}</td>
-                            <td style="background-color: red">{{ change.new|default_if_none:"-empty-" }}</td>
-                        {% else %}
-                            <td>{{ change.original|default_if_none:"-empty-" }}</td>
-                            <td>{{ change.new|default_if_none:"-empty-" }}</td>
-                        {% endif %}
+                        <td>{{ field.name|underscore_to_space|capfirst }}:</td>
+                        <td class="{% if change.changed %}bg-warning{% endif %}">
+                            {% if change.original.get_absolute_url %}
+                                <a href="{{ change.original.get_absolute_url }}">
+                                    {{ change.original }}
+                                </a>
+                            {% else %}
+                                {{ change.original|default_if_none:"-empty-" }}
+                            {% endif %}
+                        </td>
+                        <td class="{% if change.changed %}bg-warning{% endif %}">
+                            {% if change.new.get_absolute_url %}
+                                <a href="{{ change.new.get_absolute_url }}">
+                                    {{ change.new }}
+                                </a>
+                            {% else %}
+                                {{ change.new|default_if_none:"-empty-" }}
+                            {% endif %}
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
