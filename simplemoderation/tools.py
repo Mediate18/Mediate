@@ -6,25 +6,31 @@ from django.utils.translation import ugettext_lazy as _
 from .models import Moderation, ModerationAction
 
 
-def under_moderation(cls):
-    """
-    Model class decorator to add an under_moderation method
-    :param cls: the Model class
-    :return: the extended Model class 
-    """
-    def under_moderation(self):
+def moderated(relevant_fields_list=[]):
+    def decorator(cls):
         """
-        Method to check whether the object of this class in under moderation
-        :return: boolean: whether the object of this class in under moderation
+        Model class decorator to add an under_moderation method
+        :param cls: the Model class
+        :return: the extended Model class 
         """
-        moderation = Moderation.objects.filter(object_pk=self.pk, state='P')
-        if moderation:
-            return True
-        else:
-            return False
-    cls.under_moderation = under_moderation
+        def under_moderation(self):
+            """
+            Method to check whether the object of this class in under moderation
+            :return: boolean: whether the object of this class in under moderation
+            """
+            moderation = Moderation.objects.filter(object_pk=self.pk, state='P')
+            if moderation:
+                return True
+            else:
+                return False
+        cls.under_moderation = under_moderation
 
-    return cls
+        # Filter relevant fields with existing class fields
+        existing_class_fields = [f.name for f in cls._meta.fields]
+        cls.relevant_fields = [f for f in relevant_fields_list if f in existing_class_fields]
+
+        return cls
+    return decorator
 
 
 def moderate(cls):
@@ -70,7 +76,7 @@ def moderate(cls):
                                          _("This object ({}) is already under moderation.").format(obj))
                     return redirect(self.get_success_url())
                 else:
-                    return super().get(request, *args, **kwargs)
+                    return super(cls, self).get(request, *args, **kwargs)
 
             cls.get = get
 

@@ -41,7 +41,7 @@ class ModerationTableView(ListView):
 
 class ModerationUpdateView(UpdateView):
     model = Moderation
-    template_name = 'generic_form.html'
+    template_name = 'simplemoderation/moderation_form.html'
     form_class = ModerationModelForm
     success_url = reverse_lazy('moderations')
 
@@ -49,6 +49,9 @@ class ModerationUpdateView(UpdateView):
         context = super().get_context_data(**kwargs)
         context['action'] = _("update")
         context['object_name'] = "moderation"
+
+        context['changes'] = self.get_changes()
+
         return context
 
     def get(self, request, *args, **kwargs):
@@ -94,3 +97,23 @@ class ModerationUpdateView(UpdateView):
 
         from django.shortcuts import redirect
         return redirect(self.success_url)
+
+    def get_changes(self):
+        moderation = self.get_object()
+        original = moderation.content_object
+        new = moderation.data
+
+        from collections import OrderedDict
+        changes = OrderedDict()
+
+        for field in original.relevant_fields:
+            changes[field] = {}
+            original_field = getattr(original, field)
+            changes[field]['original'] = original_field
+            new_field = getattr(new, field)
+            changes[field]['new'] = new_field
+            if original_field == new_field:
+                changes[field]['changed'] = False
+            else:
+                changes[field]['changed'] = True
+        return changes

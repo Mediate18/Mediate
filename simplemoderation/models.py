@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.conf import settings
 import uuid
 from enum import Enum
@@ -38,6 +39,7 @@ class Moderation(models.Model):
         object_pk = models.UUIDField(default=uuid.uuid4, null=True, editable=False)
     else:
         object_pk = models.PositiveIntegerField(null=True, blank=True, editable=False)
+    content_object = GenericForeignKey('content_type', 'object_pk')
 
     # The moderation
     # The moderation that this moderation is dependent on:

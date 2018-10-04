@@ -1,0 +1,76 @@
+{% extends extended_layout|default:"baselayout.html" %}
+{% load i18n %}
+
+
+{% block extracss %}
+{{ form.media.css }}
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-xs-12">
+        <h1>{% trans action|title %} {% trans object_name %}</h1>
+
+        <h3>{% trans "Original and new data" %}</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>{% trans "Field" %}</td>
+                    <td>{% trans "Original" %}</td>
+                    <td>{% trans "New" %}</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for field, change in changes.items %}
+                    <tr>
+                        <td>{{ field }}</td>
+                        {% if change.changed %}
+                            <td>{{ change.original|default_if_none:"-empty-" }}</td>
+                            <td style="background-color: red">{{ change.new|default_if_none:"-empty-" }}</td>
+                        {% else %}
+                            <td>{{ change.original|default_if_none:"-empty-" }}</td>
+                            <td>{{ change.new|default_if_none:"-empty-" }}</td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h3>{% trans "Moderation" %}</h3>
+
+        <form action="{{ request.path }}?next={{ next_url }}" method="post" enctype="multipart/form-data">
+            <table class="table">
+                {% csrf_token %}
+                    {% if form_as == 'p' %}
+                        {{ form.as_p }}
+                    {% else %}
+                        {{ form.as_table }}
+                    {% endif %}
+            </table>
+
+            <div class="pull-right">
+                <input type="submit" class="btn" value="{% trans 'Save' %}"/>
+                {% if next_url %}
+                    <a href="{{ next_url }}">{% trans 'Cancel' %}</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    {% if js_variables %}
+        js_variables = {{ js_variables|safe }}
+    {% endif %}
+</script>
+{{ form.media.js }}
+<script>
+$(document).ready(function(){
+        $('.django-select2').djangoSelect2({placeholder: 'Select an option'});
+});
+</script>
+{% endblock %}
