@@ -114,7 +114,6 @@ class ModerationUpdateView(UpdateView):
         for field in fields:
             changes[field] = {}
             original_field = getattr(original, field.name)
-            print(type(original_field))
             changes[field]['original'] = original_field
             new_field = getattr(new, field.name)
             changes[field]['new'] = new_field

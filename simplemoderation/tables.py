@@ -13,3 +13,14 @@ class ModerationTable(tables.Table):
     class Meta:
         model = Moderation
         attrs = {'class': 'table table-sortable'}
+        fields = ('editor', 'created_datetime', 'action', 'content_type', 'data', 'state', 'id',)
+
+    def render_action(self, record):
+        return ModerationAction(record.action).name.capitalize()
+
+    def render_content_type(self, value):
+        return value.name.capitalize()
+
+    def render_state(self, record):
+        return ModerationState(record.state).name.capitalize()
+
