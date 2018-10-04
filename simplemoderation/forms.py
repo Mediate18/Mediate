@@ -12,3 +12,6 @@ class ModerationModelForm(forms.ModelForm):
     class Meta:
         model = Moderation
         fields = ['state', 'reason']
+
+    class Media:
+        js = ('js/diff.js',)
