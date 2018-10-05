@@ -10,9 +10,15 @@
 
 <div class="row">
     <div class="col-xs-12">
-        <h1>{% trans "Moderate" %} {{ object.content_type|title }} <i>{{ object.content_object }}</i></h1>
+        <h1>{% trans "Moderate" %} {{ object.content_type|title }} <i>{{ object.content_object|default:"" }}</i></h1>
 
-        <h3>{% trans "Original and new data" %}</h3>
+        {% if original_exists and new_exists %}
+            <h3>{% trans "Update: original and new data" %}</h3>
+        {% elif original_exists %}
+            <h3>{% trans "Deletion: original data" %}</h3>
+        {% elif new_exists %}
+            <h3>{% trans "Creation: new data" %}</h3>
+        {% endif %}
 
         <!-- Expand and collapse all panels -->
         <div class="btn-toolbar" role="toolbar" id="panel-expand-collapse-btn-toolbar">
@@ -32,38 +38,46 @@
             <thead>
                 <tr>
                     <th></th>
-                    <th>{% trans "Original" %}</th>
-                    <th>{% trans "New" %}</th>
+                    {% if original_exists %}
+                        <th>{% trans "Original" %}</th>
+                    {% endif %}
+                    {% if new_exists %}
+                        <th>{% trans "New" %}</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
                 {% for field, change in changes.items %}
                     <tr class="{% if change.changed %}bg-warning{% else %}field-collapse{% endif %}">
                         <th>{{ field.name|underscore_to_space|capfirst }}:</th>
-                        <td id="original_{{ field.name }}">
-                            {% if change.original.get_absolute_url %}
-                                <a href="{{ change.original.get_absolute_url }}" target="_blank">
-                                    {{ change.original }}
-                                </a>
-                            {% else %}
-                                {{ change.original|default_if_none:"" }}
-                            {% endif %}
-                        </td>
-                        <td id="new_{{ field.name }}">
-                            {% if change.new.get_absolute_url %}
-                                <a href="{{ change.new.get_absolute_url }}" target="_blank">
-                                    {{ change.new }}
-                                </a>
-                            {% else %}
-                                {% if field.get_internal_type == 'TextField' %}
-                                    <span id="diff_{{ field.name }}" class="field_diff"
-                                        data-original="{{ change.original|default_if_none:'' }}"
-                                        data-new="{{ change.new|default_if_none:'' }}"/>
+                        {% if original_exists %}
+                            <td id="original_{{ field.name }}">
+                                {% if change.original.get_absolute_url %}
+                                    <a href="{{ change.original.get_absolute_url }}" target="_blank">
+                                        {{ change.original }}
+                                    </a>
                                 {% else %}
-                                    {{ change.new|default_if_none:"" }}
+                                    {{ change.original|default_if_none:"" }}
                                 {% endif %}
-                            {% endif %}
-                        </td>
+                            </td>
+                        {% endif %}
+                        {% if new_exists %}
+                            <td id="new_{{ field.name }}">
+                                {% if change.new.get_absolute_url %}
+                                    <a href="{{ change.new.get_absolute_url }}" target="_blank">
+                                        {{ change.new }}
+                                    </a>
+                                {% else %}
+                                    {% if field.get_internal_type == 'TextField' or field.get_internal_type == 'CharField' %}
+                                        <span id="diff_{{ field.name }}" class="field_diff"
+                                            data-original="{{ change.original|default_if_none:'' }}"
+                                            data-new="{{ change.new|default_if_none:'' }}"/>
+                                    {% else %}
+                                        {{ change.new|default_if_none:"" }}
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                        {% endif %}
                     </tr>
                 {% endfor %}
             </tbody>

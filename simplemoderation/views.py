@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.views.generic.list import ListView
 from django.views.generic.edit import UpdateView
+from django.db import transaction
 
 # from django.contrib.contenttypes.models import ContentType
 
@@ -51,7 +52,7 @@ class ModerationUpdateView(UpdateView):
         context['action'] = _("update")
         context['object_name'] = "moderation"
 
-        context['changes'] = self.get_changes()
+        context['original_exists'], context['new_exists'], context['changes'] = self.get_changes()
 
         return context
 
@@ -75,28 +76,30 @@ class ModerationUpdateView(UpdateView):
         moderation = form.save(commit=False)
 
         # If approved, save or delete the object
-        if moderation.state is ModerationState.APPROVED.value:
-            if moderation.object_pk and moderation.action == ModerationAction.UPDATE.value:
-                obj = moderation.data
-                obj.pk = moderation.object_pk
-                obj.save()
-            elif not moderation.object_pk and moderation.action == ModerationAction.CREATE.value:
-                obj = moderation.data
-                obj.save()
-            elif moderation.object_pk and moderation.action == ModerationAction.DELETE.value:
-                obj = moderation.data
-                obj.delete()
-            else:
-                # TODO
-                message = "ERROR: Something went wrong when handling moderation %s" % str(moderation.pk)
-                print(message)
-                messages.add_message(self.request, messages.ERROR, _(message))
+        try:
+            with transaction.atomic():
+                if moderation.state is ModerationState.APPROVED.value:
+                    if moderation.object_pk and moderation.action == ModerationAction.UPDATE.value:
+                        obj = moderation.data
+                        obj.pk = moderation.object_pk
+                        obj.save()
+                    elif not moderation.object_pk and moderation.action == ModerationAction.CREATE.value:
+                        obj = moderation.data
+                        obj.save()
+                    elif moderation.object_pk and moderation.action == ModerationAction.DELETE.value:
+                        obj = moderation.data
+                        obj.delete()
+                    else:
+                        message = _("ERROR: Something went wrong when handling moderation {}")\
+                            .format(str(moderation.pk))
+                        raise Exception(message)
 
-        moderation.moderator = self.request.user
-        moderation.moderated_datetime = datetime.now()
-        moderation.save()
+                moderation.moderator = self.request.user
+                moderation.moderated_datetime = datetime.now()
+                moderation.save()
+        except Exception as e:
+            messages.add_message(self.request, messages.ERROR, str(e))
 
-        from django.shortcuts import redirect
         return redirect(self.success_url)
 
     def get_changes(self):
@@ -105,20 +108,34 @@ class ModerationUpdateView(UpdateView):
         :return: OrderedDict: ordered dict containing the changes
         """
         moderation = self.get_object()
-        original = moderation.content_object
-        new = moderation.data
 
+        # Determine whether there is an original and new object
+        original_exists = True if moderation.action in (ModerationAction.UPDATE.value, ModerationAction.DELETE.value) \
+            else False
+        new_exists = True if moderation.action in (ModerationAction.UPDATE.value, ModerationAction.CREATE.value) \
+            else False
+        original = moderation.content_object if original_exists else None
+        new = moderation.data if new_exists else None
+
+        # Get all model fields except for the primary key
+        if original_exists:
+            fields = [f for f in original._meta.fields if not f.primary_key]
+        else:
+            fields = [f for f in new._meta.fields if
+                      not f.primary_key]  # All model fields except for the primary key
+
+        # Determine whether a field has changed (always true for creation and deletion)
         changes = OrderedDict()
-
-        fields = [f for f in original._meta.fields if not f.primary_key]  # All model fields except for the primary key
         for field in fields:
             changes[field] = {}
-            original_field = getattr(original, field.name)
-            changes[field]['original'] = original_field
-            new_field = getattr(new, field.name)
-            changes[field]['new'] = new_field
-            if original_field == new_field:
+            if original_exists:
+                original_field = getattr(original, field.name)
+                changes[field]['original'] = original_field
+            if new_exists:
+                new_field = getattr(new, field.name)
+                changes[field]['new'] = new_field
+            if original_exists and new_exists and original_field == new_field:
                 changes[field]['changed'] = False
             else:
                 changes[field]['changed'] = True
-        return changes
+        return (original_exists, new_exists, changes)
