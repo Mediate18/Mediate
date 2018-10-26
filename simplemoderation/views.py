@@ -6,6 +6,7 @@ from django.db import transaction
 # from django.contrib.contenttypes.models import ContentType
 
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 import django_tables2
@@ -95,7 +96,7 @@ class ModerationUpdateView(UpdateView):
                         raise Exception(message)
 
                 moderation.moderator = self.request.user
-                moderation.moderated_datetime = datetime.now()
+                moderation.moderated_datetime = timezone.now()
                 moderation.save()
         except Exception as e:
             messages.add_message(self.request, messages.ERROR, str(e))
