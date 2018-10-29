@@ -2,6 +2,9 @@
 {% load i18n %}
 {% load render_table from django_tables2 %}
 
+{% block extracss %}
+<link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" type="text/css" media="screen" rel="stylesheet">
+{% endblock %}
 
 {% block content %}
 
@@ -47,4 +50,10 @@
     <div class="col-xs-2">
     </div>
 </div>
+{% endblock %}
+
+{% block extrajs %}
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+
 {% endblock %}

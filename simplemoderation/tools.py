@@ -3,7 +3,7 @@ from django.shortcuts import redirect
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.utils.translation import ugettext_lazy as _
 
-from .models import Moderation, ModerationAction
+from .models import Moderation, ModerationAction, register_model
 
 
 def moderated(relevant_fields_list=[]):
@@ -13,6 +13,10 @@ def moderated(relevant_fields_list=[]):
         :param cls: the Model class
         :return: the extended Model class 
         """
+
+        # First register this model
+        register_model(cls)
+
         def under_moderation(self):
             """
             Method to check whether the object of this class in under moderation

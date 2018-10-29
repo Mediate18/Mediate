@@ -5,6 +5,8 @@ from django.urls import reverse_lazy
 
 import uuid
 
+from simplemoderation.tools import moderated
+
 
 class SourceMaterial(models.Model):
     """
@@ -17,6 +19,7 @@ class SourceMaterial(models.Model):
         return self.name
 
 
+@moderated()
 class Transcription(models.Model):
     """
     Transcription

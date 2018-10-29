@@ -58,3 +58,11 @@ class Moderation(models.Model):
                     data=obj,
                     content_type=ContentType.objects.get_for_model(obj)
                 )
+
+
+# The model registration
+registered_content_types = set()
+
+
+def register_model(model):
+    registered_content_types.add(ContentType.objects.get_for_model(model))
