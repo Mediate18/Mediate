@@ -9,6 +9,10 @@ from enum import Enum
 from .fields import SerializedObjectField
 
 
+class ModelNotRegisteredException(Exception):
+    pass
+
+
 class ModerationAction(Enum):
     CREATE = "C"
     UPDATE = "U"
@@ -51,13 +55,17 @@ class Moderation(models.Model):
 
     @staticmethod
     def create(editor, obj, action):
-        return Moderation(
-                    editor=editor,
-                    action=action.value,
-                    object_pk=obj.pk,
-                    data=obj,
-                    content_type=ContentType.objects.get_for_model(obj)
-                )
+        content_type = ContentType.objects.get_for_model(obj)
+        if content_type in registered_content_types:
+            return Moderation(
+                        editor=editor,
+                        action=action.value,
+                        object_pk=obj.pk,
+                        data=obj,
+                        content_type=content_type
+                    )
+        else:
+            raise ModelNotRegisteredException("Model {} is not registered for moderation.".format(type(obj)))
 
 
 # The model registration

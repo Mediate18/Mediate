@@ -14,6 +14,8 @@ import json
 
 from apiconnectors.cerlapi import CerlSuggest, cerl_record_url
 
+from simplemoderation.tools import moderate
+
 from ..forms import *
 from ..filters import *
 from ..tables import *
@@ -83,6 +85,7 @@ class PersonCreateView(CreateView):
             return response
 
 
+@moderate
 class PersonUpdateView(UpdateView):
     model = Person
     template_name = 'generic_form.html'
@@ -95,12 +98,6 @@ class PersonUpdateView(UpdateView):
         context['object_name'] = "person"
         context['js_variables'] = json.dumps({'viaf_select_id': PersonModelForm.suggest_select_ids})
         return context
-
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
 
 class PersonDeleteView(DeleteView):

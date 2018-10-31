@@ -5,6 +5,8 @@ from django.urls import reverse_lazy
 
 import uuid
 
+from simplemoderation.tools import moderated
+
 
 class Place(models.Model):
     """
@@ -36,6 +38,7 @@ class Religion(models.Model):
         return self.name
 
 
+@moderated()
 class Person(models.Model):
     """
     A person

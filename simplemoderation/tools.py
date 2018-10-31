@@ -65,14 +65,13 @@ def moderate(cls):
 
         cls.delete = delete
 
-        return cls
-
     else:
         if CreateView in cls.__bases__:
             action = ModerationAction.CREATE
         elif UpdateView in cls.__bases__:
             action = ModerationAction.UPDATE
 
+            # Check whether the object is under moderation when the update form is requested
             def get(self, request, *args, **kwargs):
                 obj = self.get_object()
                 if obj.under_moderation():
@@ -102,4 +101,4 @@ def moderate(cls):
 
         cls.form_valid = form_valid
 
-        return cls
+    return cls
