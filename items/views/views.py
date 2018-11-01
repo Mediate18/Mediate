@@ -3,7 +3,6 @@ from django.http import HttpResponseRedirect
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.detail import DetailView
-from django.forms.models import inlineformset_factory
 from django.core.exceptions import ObjectDoesNotExist
 
 from django.utils.translation import ugettext_lazy as _
@@ -12,17 +11,18 @@ import django_tables2
 
 from dal import autocomplete
 from django.http import JsonResponse
-import requests
 import re
 import json
 
-from viapy.api import ViafAPI
 
 from ..forms import *
 from ..filters import *
 from ..tables import *
 
 from persons.forms import PersonModelForm
+from simplemoderation.models import Moderation, ModerationAction
+
+from simplemoderation.tools import moderate
 
 
 # BookFormat views
@@ -150,6 +150,7 @@ class ItemCreateView(CreateView):
         return super().form_valid(form)
 
 
+@moderate()
 class ItemUpdateView(UpdateView):
     model = Item
     template_name = 'generic_form.html'
@@ -161,12 +162,6 @@ class ItemUpdateView(UpdateView):
         context['action'] = _("update")
         context['object_name'] = "item"
         return context
-
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
 
 class ItemDeleteView(DeleteView):
@@ -955,6 +950,7 @@ class PersonItemRelationDeleteView(DeleteView):
         return self.request.META['HTTP_REFERER']
 
 
+@moderate(action=ModerationAction.CREATE, check_under_moderation=False)
 class PersonItemRelationAddView(UpdateView):
     """
     A view to add persons to an item through PersonItemRelations
@@ -968,13 +964,12 @@ class PersonItemRelationAddView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(PersonItemRelationAddView, self).get_context_data(**kwargs)
-        # print(self.object)
 
         context['existing_relations'] = [{'uuid': relation.uuid, 'person': relation.person, 'role': relation.role}
                                          for relation in self.object.personitemrelation_set.all()]
-        print(context['existing_relations'])
 
-        context['form'] = PersonItemRelationAddForm()
+        personitemrelation = PersonItemRelation(item=self.object)
+        context['form'] = PersonItemRelationAddForm(instance=personitemrelation)
 
         # Add another Person
         context['addanother_person_form'] = PersonModelForm()
@@ -989,28 +984,13 @@ class PersonItemRelationAddView(UpdateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        try:
-            item = Item.objects.get(uuid=kwargs['pk'])
-
-        except:
-            import traceback
-            traceback.print_exc()
-            return HttpResponseRedirect(reverse_lazy('items'))
-
-        person_id = request.POST['person']
-        person = Person.objects.get(pk=person_id)
-        role_id = request.POST['role']
-        role = PersonItemRelationRole.objects.get(pk=role_id)
-
-        try:
-            person_item_relation = PersonItemRelation.objects.get(item=item, person=person, role=role)
-            messages.add_message(self.request, messages.WARNING,
-                                 _("This person was already linked to this item as %s." % role))
-        except ObjectDoesNotExist as e:
-            person_item_relation = PersonItemRelation(item=item, person=person, role=role)
-            person_item_relation.save()
-
-        return HttpResponseRedirect(self.get_success_url())
+        item = Item.objects.get(uuid=kwargs['pk'])
+        personitemrelation = PersonItemRelation(item=item)
+        form = PersonItemRelationAddForm(instance=personitemrelation, data=request.POST)
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
 
 
 # PersonItemRelationRole views

@@ -10,6 +10,8 @@ import tagging
 from persons.models import Place, Person
 from catalogues.models import Collection, Lot
 
+from simplemoderation.tools import moderated
+
 
 class Language(models.Model):
     """
@@ -105,6 +107,7 @@ class WorkAuthor(models.Model):
         return _("{} wrote {}").format(self.author, self.work)
 
 
+@moderated()
 class Item(models.Model):
     """
     Item
@@ -268,6 +271,7 @@ class PersonItemRelationRole(models.Model):
         return self.name
 
 
+@moderated()
 class PersonItemRelation(models.Model):
     """
     A person-item relation (e.g. author, translator, illustrator, owner)
@@ -277,6 +281,9 @@ class PersonItemRelation(models.Model):
     person = models.ForeignKey(Person, on_delete=CASCADE)
     item = models.ForeignKey(Item, on_delete=CASCADE)
     role = models.ForeignKey(PersonItemRelationRole, on_delete=CASCADE)
+
+    class Meta:
+        unique_together = (("person", "item", "role"),)
 
     def __str__(self):
         return _("{} is {} of {}").format(self.person, self.role, self.item)

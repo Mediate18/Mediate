@@ -70,7 +70,7 @@ class CatalogueDetailBareView(CatalogueDetailView):
     template_name = 'catalogues/catalogue_detail_bare.html'
 
 
-@moderate
+@moderate()
 class CatalogueCreateView(CreateView):
     model = Catalogue
     template_name = 'generic_form.html'
@@ -84,7 +84,7 @@ class CatalogueCreateView(CreateView):
         return context
 
 
-@moderate
+@moderate()
 class CatalogueUpdateView(UpdateView):
     model = Catalogue
     template_name = 'generic_form.html'
@@ -102,7 +102,7 @@ class CatalogueUpdateView(UpdateView):
         return context
 
 
-@moderate
+@moderate()
 class CatalogueDeleteView(DeleteView):
     model = Catalogue
     success_url = reverse_lazy('catalogues')
@@ -498,7 +498,7 @@ class LotDetailView(DetailView):
     model = Lot
 
 
-@moderate
+@moderate()
 class LotCreateView(CreateView):
     model = Lot
     template_name = 'generic_form.html'
@@ -512,7 +512,7 @@ class LotCreateView(CreateView):
         return context
 
 
-@moderate
+@moderate()
 class LotUpdateView(UpdateView):
     model = Lot
     template_name = 'generic_form.html'
@@ -530,7 +530,7 @@ class LotUpdateView(UpdateView):
         return context
 
 
-@moderate
+@moderate()
 class LotDeleteView(DeleteView):
     model = Lot
     success_url = reverse_lazy('lots')
