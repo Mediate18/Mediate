@@ -1,8 +1,8 @@
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic.detail import DetailView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
+from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.core.exceptions import ObjectDoesNotExist
 
 from django.utils.translation import ugettext_lazy as _
@@ -150,7 +150,7 @@ class ItemCreateView(CreateView):
         return super().form_valid(form)
 
 
-@moderate()
+@moderate(action=ModerationAction.UPDATE)
 class ItemUpdateView(UpdateView):
     model = Item
     template_name = 'generic_form.html'
@@ -950,8 +950,8 @@ class PersonItemRelationDeleteView(DeleteView):
         return self.request.META['HTTP_REFERER']
 
 
-@moderate(action=ModerationAction.CREATE, check_under_moderation=False)
-class PersonItemRelationAddView(UpdateView):
+@moderate(action=ModerationAction.CREATE)
+class PersonItemRelationAddView(SingleObjectMixin, FormView):
     """
     A view to add persons to an item through PersonItemRelations
     """
@@ -962,14 +962,16 @@ class PersonItemRelationAddView(UpdateView):
     def get_success_url(self):
         return self.request.META['HTTP_REFERER']
 
+    def get_form(self):
+        personitemrelation = PersonItemRelation(item=self.object)
+        return self.form_class(instance=personitemrelation)
+
     def get_context_data(self, **kwargs):
+        self.object = self.get_object()
         context = super(PersonItemRelationAddView, self).get_context_data(**kwargs)
 
         context['existing_relations'] = [{'uuid': relation.uuid, 'person': relation.person, 'role': relation.role}
                                          for relation in self.object.personitemrelation_set.all()]
-
-        personitemrelation = PersonItemRelation(item=self.object)
-        context['form'] = PersonItemRelationAddForm(instance=personitemrelation)
 
         # Add another Person
         context['addanother_person_form'] = PersonModelForm()

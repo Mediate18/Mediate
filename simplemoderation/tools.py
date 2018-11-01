@@ -67,11 +67,16 @@ def moderate(action=None, check_under_moderation=True):
             cls.delete = delete
 
         else:
-            if CreateView in cls.__bases__:
-                moderation_action = action if action else ModerationAction.CREATE
+            if action:
+                moderation_action = action
+            elif CreateView in cls.__bases__:
+                moderation_action = ModerationAction.CREATE
             elif UpdateView in cls.__bases__:
-                moderation_action = action if action else ModerationAction.UPDATE
+                moderation_action = ModerationAction.UPDATE
+            else:
+                raise Exception(_("Could not determine moderation action "))
 
+            if UpdateView in cls.__bases__:
                 # Check whether the object is under moderation when the update form is requested
                 if check_under_moderation:
                     def get(self, request, *args, **kwargs):
