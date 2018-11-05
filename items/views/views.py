@@ -986,8 +986,7 @@ class PersonItemRelationAddView(SingleObjectMixin, FormView):
         return context
 
     def post(self, request, *args, **kwargs):
-        item = Item.objects.get(uuid=kwargs['pk'])
-        personitemrelation = PersonItemRelation(item=item)
+        personitemrelation = PersonItemRelation(item=self.get_object())
         form = PersonItemRelationAddForm(instance=personitemrelation, data=request.POST)
         if form.is_valid():
             return self.form_valid(form)
