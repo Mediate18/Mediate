@@ -84,7 +84,7 @@ class Catalogue(models.Model):
         return "{0}".format(self.short_title)
 
     def get_absolute_url(self):
-        return reverse_lazy('change_catalogue', args=[str(self.uuid)])
+        return reverse_lazy('catalogue_detail', args=[str(self.uuid)])
 
 
 class CatalogueCatalogueTypeRelation(models.Model):
