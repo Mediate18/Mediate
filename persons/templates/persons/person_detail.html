@@ -60,6 +60,32 @@
                         </ul>
                     {% endif %}
                 {% endwith %}
+
+                {% with object.publisher_set.all as publisher_relations %}
+                    {% if publisher_relations %}
+                        <h3>{% trans "Manifestations" %}</h3>
+                        <ul>
+                        {% for relation in publisher_relations %}
+                            <li>
+                                <a href="{{ relation.manifestation.get_absolute_url }}">{{ relation.manifestation }}</a>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endwith %}
+
+                {% with object.works.all as workauthor_relations %}
+                    {% if workauthor_relations %}
+                        <h3>{% trans "Works" %}</h3>
+                        <ul>
+                        {% for relation in workauthor_relations %}
+                            <li>
+                                <a href="{{ relation.work.get_absolute_url }}">{{ relation.work }}</a>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endwith %}
             </div>
 
         </div>

@@ -62,6 +62,16 @@ class PersonTable(tables.Table):
         if item_roles:
             roles_dict['items'] = item_roles
 
+        # Manifestations
+        manifestations_count = record.publisher_set.count()
+        if manifestations_count:
+            roles_dict['manifestation'] = ['publisher']
+
+        # Works
+        work_count = record.works.count()
+        if work_count:
+            roles_dict['works'] = ['author']
+
         text = "<br/>".join(["{}: {}".format(k.capitalize(), ", ".join(v)) for k, v in roles_dict.items()])
         return format_html('<a href="{}">{}</a>'.format(reverse_lazy('person_detail', args=[record.pk]), text))
 
