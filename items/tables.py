@@ -201,6 +201,7 @@ class ManifestationTable(tables.Table):
     uuid = ActionColumn('manifestation_detail', 'change_manifestation', 'delete_manifestation', orderable=False)
     item = tables.RelatedLinkColumn()
     place = tables.RelatedLinkColumn()
+    url = tables.Column(linkify=lambda record: record.url)
 
     class Meta:
         model = Manifestation
@@ -210,7 +211,8 @@ class ManifestationTable(tables.Table):
             'year',
             'year_tag',
             'terminus_post_quem',
-            'place'
+            'place',
+            'url'
         ]
 
 

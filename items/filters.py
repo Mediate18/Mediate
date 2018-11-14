@@ -135,6 +135,7 @@ class ManifestationFilter(django_filters.FilterSet):
         queryset=Place.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
+    url = django_filters.Filter(lookup_expr='icontains')
 
     class Meta:
         model = Manifestation

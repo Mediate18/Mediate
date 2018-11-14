@@ -230,10 +230,11 @@ class Manifestation(models.Model):
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     item = models.ForeignKey(Item, on_delete=models.PROTECT, related_name="manifestations")
-    year = models.IntegerField(_("Year of publication"), null=True)
-    year_tag = models.CharField(_("Year of publication tag"), max_length=128)
+    year = models.IntegerField(_("Year of publication"), null=True, blank=True)
+    year_tag = models.CharField(_("Year of publication tag"), max_length=128, blank=True)
     terminus_post_quem = models.BooleanField(_("Terminus post quem"), default=False)
     place = models.ForeignKey(Place, on_delete=models.PROTECT, null=True)
+    url = models.CharField(_("URL"), max_length=1024, blank=True)
 
     def __str__(self):
         year_str = _(" in {}").format(self.year) if self.year else ''
