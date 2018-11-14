@@ -1,7 +1,9 @@
 import django_tables2 as tables
 from django_tables2.utils import A  # alias for Accessor
+from django.utils.html import format_html
 from .models import *
 
+from catalogues.models import PersonCatalogueRelation
 from mediate.columns import ActionColumn
 
 # Catalogue table
@@ -9,6 +11,7 @@ class CatalogueTable(tables.Table):
     uuid = ActionColumn('catalogue_detail', 'change_catalogue', 'delete_catalogue', orderable=False)
     transcription = tables.RelatedLinkColumn()
     collection = tables.RelatedLinkColumn()
+    people = tables.Column(empty_values=())
     number_of_lots = tables.Column(empty_values=(), orderable=False)
     number_of_items = tables.Column(empty_values=(), orderable=False)
 
@@ -25,6 +28,7 @@ class CatalogueTable(tables.Table):
             'notes',
             'bibliography',
             'collection',
+            'people',
             'number_of_lots',
             'number_of_items'
         ]
@@ -34,6 +38,26 @@ class CatalogueTable(tables.Table):
 
     def render_preface_and_paratexts(self, value):
         return (value[:50] + "...") if len(value) > 50 else value
+
+    def render_people(self, record):
+        person_catalogue_relations = PersonCatalogueRelation.objects.filter(catalogue=record)
+        relation_groups = []
+        for role in set([relation.role for relation in person_catalogue_relations]):
+            role_relations = person_catalogue_relations.filter(role=role)
+            persons = []
+            for relation in role_relations:
+                person = relation.person
+                name = person.short_name
+                viaf = person.viaf_id
+                person_entry = "<a href='{}'>{}</a>".format(reverse_lazy('change_person', args=[person.pk]), name)
+                if viaf:
+                    person_entry += " (<a target='blank' href='{}'>VIAF</a>)".format(viaf)
+                persons.append(person_entry)
+
+            relation_groups.append(
+                role.name.capitalize() + ": " + ", ".join(persons)
+            )
+        return format_html("<br/> ".join(relation_groups))
 
     def render_number_of_lots(self, record):
         return record.num_lots
