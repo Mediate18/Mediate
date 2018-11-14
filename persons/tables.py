@@ -11,8 +11,8 @@ from django.utils.translation import ugettext_lazy as _
 # Person table
 class PersonTable(tables.Table):
     uuid = ActionColumn('person_detail', 'change_person', 'delete_person', orderable=False)
-    catalogues = tables.Column(empty_values=())
-    items = tables.Column(verbose_name=_("Items"), empty_values=())
+    catalogues = tables.Column(verbose_name=_("Owned catalogues"), empty_values=())
+    roles = tables.Column(empty_values=())
     viaf_id = tables.Column(empty_values=())
 
     class Meta:
@@ -23,18 +23,18 @@ class PersonTable(tables.Table):
             'first_names',
             'surname',
             'sex',
+            'roles',
             'city_of_birth',
             'date_of_birth',
             'city_of_death',
             'date_of_death',
             'catalogues',
-            'items',
             'viaf_id',
             'uuid'
         ]
 
     def render_catalogues(self, record):
-        person_catalogue_relations = PersonCatalogueRelation.objects.filter(person=record)
+        person_catalogue_relations = PersonCatalogueRelation.objects.filter(person=record, role__name="owner")
         relation_groups = []
         for role in set([relation.role for relation in person_catalogue_relations]):
             role_relations = person_catalogue_relations.filter(role=role)
@@ -45,27 +45,25 @@ class PersonTable(tables.Table):
                 catalogue_entry = "<a href='{}'>{}</a>".format(reverse_lazy('catalogue_detail', args=[catalogue.pk]), title)
                 catalogues.append(catalogue_entry)
 
-            relation_groups.append(
-                role.name.capitalize() + ": " + ", ".join(catalogues)
-            )
+            relation_groups.append(", ".join(catalogues))
         return format_html("<br/> ".join(relation_groups))
 
-    def render_items(self, record):
-        person_item_relations = PersonItemRelation.objects.filter(person=record)
-        relation_groups = []
-        for role in set([relation.role for relation in person_item_relations]):
-            role_relations = person_item_relations.filter(role=role)
-            items = []
-            for relation in role_relations:
-                item = relation.item
-                title = item.short_title
-                item_entry = "<a href='{}'>{}</a>".format(reverse_lazy('change_item', args=[item.pk]), title)
-                items.append(item_entry)
+    def render_roles(self, record):
+        roles_dict = {}
 
-            relation_groups.append(
-                role.name.capitalize() + ": " + ", ".join(items)
-            )
-        return format_html("<br/> ".join(relation_groups))
+        # Catalogues
+        catalogue_roles = list(PersonCatalogueRelation.objects.filter(person=record).exclude(role__name="owner").
+                               values_list('role__name', flat=True))
+        if catalogue_roles:
+            roles_dict['catalogues'] = catalogue_roles
+
+        # Items
+        item_roles = list(PersonItemRelation.objects.filter(person=record).values_list('role__name', flat=True))
+        if item_roles:
+            roles_dict['items'] = item_roles
+
+        text = "<br/>".join(["{}: {}".format(k.capitalize(), ", ".join(v)) for k, v in roles_dict.items()])
+        return format_html('<a href="{}">{}</a>'.format(reverse_lazy('person_detail', args=[record.pk]), text))
 
     def render_viaf_id(self, value):
         if value:

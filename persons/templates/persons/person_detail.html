@@ -1,0 +1,72 @@
+{% extends "baselayout.html" %}
+{% load i18n %}
+{% load static %}
+{% load dictionary_lookup %}
+
+{% block extracss %}
+    <link rel="stylesheet" href="{% static 'catalogues/css/catalogue_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="row flex-row">
+    <div class="col-xs-12">
+        <div class="flex-col">
+            <!-- Put content header here -->
+            <h2>
+                Person <i>{{ object }}</i>
+            </h2>
+
+            <dl class="dl-horizontal" style="padding-bottom: 15px;">
+                <dt>{% trans "Short name" %}</dt>
+                <dd>{{ object.short_name }}</dd>
+
+                <dt>{% trans "Name" %}</dt>
+                <dd>{{ object.first_names }} {{ object.surname }}</dd>
+
+                <dt>{% trans "Birth" %}</dt>
+                <dd>{% if object.city_of_birth %}{{ object.city_of_birth }}, {% endif %}{{ object.date_of_birth }}</dd>
+
+                <dt>{% trans "Death" %}</dt>
+                <dd>{% if object.city_of_death %}{{ object.city_of_death }}, {% endif %}{{ object.date_of_death }}</dd>
+
+                <dt>{% trans "Sex" %}</dt>
+                <dd>{{ object.sex }}</dd>
+            </dl>
+
+            <div>
+                {% with object.personcataloguerelation_set.all as catalogue_relations %}
+                    {% if catalogue_relations %}
+                        <h3>{% trans "Catalogues" %}</h3>
+                        <ul>
+                        {% for relation in catalogue_relations %}
+                            <li>
+                                <a href="{{ relation.catalogue.get_absolute_url }}">{{ relation.catalogue }}</a> ({{ relation.role }})
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endwith %}
+
+                {% with object.personitemrelation_set.all as item_relations %}
+                    {% if item_relations %}
+                        <h3>{% trans "Items" %}</h3>
+                        <ul>
+                        {% for relation in item_relations %}
+                            <li>
+                                <a href="{{ relation.item.get_absolute_url }}">{{ relation.item }}</a> ({{ relation.role }})
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+{% endblock %}
