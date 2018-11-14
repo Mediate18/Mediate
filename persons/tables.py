@@ -59,8 +59,8 @@ class PersonTable(tables.Table):
             for relation in role_relations:
                 item = relation.item
                 title = item.short_title
-                catalogue_entry = "<a href='{}'>{}</a>".format(reverse_lazy('catalogue_detail', args=[item.pk]), title)
-                items.append(catalogue_entry)
+                item_entry = "<a href='{}'>{}</a>".format(reverse_lazy('change_item', args=[item.pk]), title)
+                items.append(item_entry)
 
             relation_groups.append(
                 role.name.capitalize() + ": " + ", ".join(items)
