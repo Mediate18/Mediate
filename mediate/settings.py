@@ -186,7 +186,7 @@ DBBACKUP_STORAGE_OPTIONS = {'location': '/var/backups'}
 
 WRITABLE_FOLDER = os.path.normpath(os.path.join(BASE_DIR, config('WRITABLE_FOLDER')))
 MEDIA_ROOT = os.path.join(WRITABLE_FOLDER, 'media')
-MEDIA_URL = '/media/'
+MEDIA_URL = '/protected_media/'
 XSENDFILE = config('XSENDFILE', True, cast=bool)
 FILE_UPLOAD_PERMISSIONS = 0o640
 
