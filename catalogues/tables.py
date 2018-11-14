@@ -33,8 +33,9 @@ class CatalogueTable(tables.Table):
             'number_of_items'
         ]
 
-    def render_full_title(self, value):
-        return (value[:50] + "...") if len(value) > 50 else value
+    def render_full_title(self, record, value):
+        return format_html('<a href="{}">{}</a>'.format(reverse_lazy('catalogue_detail', args=[record.pk]),
+                                                        value[:50] + "...") if len(value) > 50 else value)
 
     def render_preface_and_paratexts(self, value):
         return (value[:50] + "...") if len(value) > 50 else value
