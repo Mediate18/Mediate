@@ -3,11 +3,13 @@ from django_tables2.utils import A  # alias for Accessor
 from django.utils.html import format_html
 from .models import *
 from mediate.columns import ActionColumn
+from catalogues.models import PersonCatalogueRelation
 
 
 # Person table
 class PersonTable(tables.Table):
     uuid = ActionColumn('person_detail', 'change_person', 'delete_person', orderable=False)
+    catalogues = tables.Column(empty_values=())
     viaf_id = tables.Column(empty_values=())
 
     class Meta:
@@ -22,9 +24,27 @@ class PersonTable(tables.Table):
             'date_of_birth',
             'city_of_death',
             'date_of_death',
+            'catalogues',
             'viaf_id',
             'uuid'
         ]
+
+    def render_catalogues(self, record):
+        person_catalogue_relations = PersonCatalogueRelation.objects.filter(person=record)
+        relation_groups = []
+        for role in set([relation.role for relation in person_catalogue_relations]):
+            role_relations = person_catalogue_relations.filter(role=role)
+            persons = []
+            for relation in role_relations:
+                catalogue = relation.catalogue
+                title = catalogue.short_title
+                catalogue_entry = "<a href='{}'>{}</a>".format(reverse_lazy('catalogue_detail', args=[catalogue.pk]), title)
+                persons.append(catalogue_entry)
+
+            relation_groups.append(
+                role.name.capitalize() + ": " + ", ".join(persons)
+            )
+        return format_html("<br/> ".join(relation_groups))
 
     def render_viaf_id(self, value):
         if value:
