@@ -4,12 +4,15 @@ from django.utils.html import format_html
 from .models import *
 from mediate.columns import ActionColumn
 from catalogues.models import PersonCatalogueRelation
+from items.models import PersonItemRelation
+from django.utils.translation import ugettext_lazy as _
 
 
 # Person table
 class PersonTable(tables.Table):
     uuid = ActionColumn('person_detail', 'change_person', 'delete_person', orderable=False)
     catalogues = tables.Column(empty_values=())
+    items = tables.Column(verbose_name=_("Items"), empty_values=())
     viaf_id = tables.Column(empty_values=())
 
     class Meta:
@@ -25,6 +28,7 @@ class PersonTable(tables.Table):
             'city_of_death',
             'date_of_death',
             'catalogues',
+            'items',
             'viaf_id',
             'uuid'
         ]
@@ -34,15 +38,32 @@ class PersonTable(tables.Table):
         relation_groups = []
         for role in set([relation.role for relation in person_catalogue_relations]):
             role_relations = person_catalogue_relations.filter(role=role)
-            persons = []
+            catalogues = []
             for relation in role_relations:
                 catalogue = relation.catalogue
                 title = catalogue.short_title
                 catalogue_entry = "<a href='{}'>{}</a>".format(reverse_lazy('catalogue_detail', args=[catalogue.pk]), title)
-                persons.append(catalogue_entry)
+                catalogues.append(catalogue_entry)
 
             relation_groups.append(
-                role.name.capitalize() + ": " + ", ".join(persons)
+                role.name.capitalize() + ": " + ", ".join(catalogues)
+            )
+        return format_html("<br/> ".join(relation_groups))
+
+    def render_items(self, record):
+        person_item_relations = PersonItemRelation.objects.filter(person=record)
+        relation_groups = []
+        for role in set([relation.role for relation in person_item_relations]):
+            role_relations = person_item_relations.filter(role=role)
+            items = []
+            for relation in role_relations:
+                item = relation.item
+                title = item.short_title
+                catalogue_entry = "<a href='{}'>{}</a>".format(reverse_lazy('catalogue_detail', args=[item.pk]), title)
+                items.append(catalogue_entry)
+
+            relation_groups.append(
+                role.name.capitalize() + ": " + ", ".join(items)
             )
         return format_html("<br/> ".join(relation_groups))
 
