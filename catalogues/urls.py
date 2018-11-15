@@ -148,4 +148,18 @@ urlpatterns = [
     path(r'personcollectionrelations/delete/<uuid:pk>',
        permission_required('catalogue.delete_personcollectionrelation')(PersonCollectionRelationDeleteView.as_view()),
        name="delete_personcollectionrelation"),
+
+
+    # Category urls
+    path('categories/', login_required(CategoryTableView.as_view()), name='categories'),
+    path(r'categories/<uuid:pk>', login_required(CategoryDetailView.as_view()),
+       name="category_detail"),
+    path(r'categories/add', permission_required('catalogues.add_category')(CategoryCreateView.as_view()),
+       name="add_category"),
+    path(r'categories/edit/<uuid:pk>',
+       permission_required('catalogues.change_category')(CategoryUpdateView.as_view()),
+       name="change_category"),
+    path(r'categories/delete/<uuid:pk>',
+       permission_required('catalogue.delete_category')(CategoryDeleteView.as_view()),
+       name="delete_category"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

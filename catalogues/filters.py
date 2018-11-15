@@ -100,3 +100,8 @@ class PersonCollectionRelationFilter(django_filters.FilterSet):
         fields = "__all__"
 
 
+# Category filter
+class CategoryFilter(django_filters.FilterSet):
+    class Meta:
+        model = Category
+        exclude = ['uuid']

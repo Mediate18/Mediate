@@ -752,3 +752,73 @@ class PersonCollectionRelationDeleteView(DeleteView):
     success_url = reverse_lazy('personcollectionrelations')
 
 
+# Category views
+class CategoryTableView(ListView):
+    model = Category
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return Category.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        filter = CategoryFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = CategoryTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name'] = "category"
+        context['add_url'] = reverse_lazy('add_category')
+
+        return context
+
+
+class CategoryDetailView(DetailView):
+    model = Category
+
+
+class CategoryCreateView(CreateView):
+    model = Category
+    template_name = 'generic_form.html'
+    form_class = CategoryModelForm
+    success_url = reverse_lazy('categories')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = "category"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+    
+    
+class CategoryUpdateView(UpdateView):
+    model = Category
+    template_name = 'generic_form.html'
+    form_class = CategoryModelForm
+    success_url = reverse_lazy('categories')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("update")
+        context['object_name'] = "category"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class CategoryDeleteView(DeleteView):
+    model = Category
+    success_url = reverse_lazy('categories')

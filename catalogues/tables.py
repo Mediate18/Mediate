@@ -176,3 +176,17 @@ class PersonCollectionRelationTable(tables.Table):
         attrs = {'class': 'table table-sortable'}
 
 
+# Category table
+class CategoryTable(tables.Table):
+    uuid = ActionColumn('category_detail', 'change_category', 'delete_category', orderable=False)
+
+    class Meta:
+        model = Category
+        attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'catalogue',
+            'parent',
+            'bookseller_category',
+            'parisian_category',
+            'uuid'
+        ]
