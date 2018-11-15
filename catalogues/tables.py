@@ -89,12 +89,15 @@ class CatalogueTypeTable(tables.Table):
 
 # Collection table
 class CollectionTable(tables.Table):
-    edit = tables.LinkColumn('change_collection', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('collection_detail', 'change_collection', 'delete_collection', orderable=False)
 
     class Meta:
         model = Collection
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'name',
+            'uuid'
+        ]
 
 
 # CollectionYear table

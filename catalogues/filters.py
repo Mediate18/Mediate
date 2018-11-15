@@ -44,9 +44,11 @@ class CatalogueTypeFilter(django_filters.FilterSet):
 
 # Collection filter
 class CollectionFilter(django_filters.FilterSet):
+    name = django_filters.Filter(lookup_expr='icontains')
+
     class Meta:
         model = Collection
-        fields = "__all__"
+        fields = ['name']
 
 
 # CollectionYear filter
