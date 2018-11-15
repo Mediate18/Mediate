@@ -207,6 +207,7 @@ class ManifestationTable(tables.Table):
     item = tables.RelatedLinkColumn()
     place = tables.RelatedLinkColumn()
     url = tables.Column(linkify=lambda record: record.url)
+    publisher = tables.Column(verbose_name=_("Publisher"), empty_values=())
 
     class Meta:
         model = Manifestation
@@ -217,8 +218,18 @@ class ManifestationTable(tables.Table):
             'year_tag',
             'terminus_post_quem',
             'place',
-            'url'
+            'url',
+            'publisher',
+            'uuid'
         ]
+
+    def render_publisher(self, record):
+        publishers = Person.objects.filter(publisher__manifestation=record).distinct()
+        return format_html(
+            ", ".join(
+                ['<a href="{}">{}</a>'.format(publisher.get_absolute_url(), publisher) for publisher in publishers]
+            )
+        )
 
 
 # Publisher table

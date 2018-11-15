@@ -136,11 +136,21 @@ class ManifestationFilter(django_filters.FilterSet):
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
     url = django_filters.Filter(lookup_expr='icontains')
+    publisher = django_filters.ModelMultipleChoiceFilter(
+        label='Publisher',
+        queryset=Person.objects.all(),
+        method='publisher_filter',
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
+    )
 
     class Meta:
         model = Manifestation
         exclude = ['uuid']
 
+    def publisher_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(publisher__publisher__in=value)
+        return queryset
 
 # Publisher filter
 class PublisherFilter(django_filters.FilterSet):
