@@ -178,12 +178,17 @@ class MaterialDetailsTable(tables.Table):
 
 # PersonItemRelation table
 class PersonItemRelationTable(tables.Table):
-    edit = tables.LinkColumn('change_personitemrelation', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('personitemrelation_detail', 'change_personitemrelation',
+                        'delete_personitemrelation', orderable=False)
 
     class Meta:
         model = PersonItemRelation
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'person',
+            'item',
+            'role'
+        ]
 
 
 # PersonItemRelationRole table
