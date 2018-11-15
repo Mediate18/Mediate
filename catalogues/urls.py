@@ -118,7 +118,7 @@ urlpatterns = [
        permission_required('catalogues.change_personcataloguerelation')(PersonCatalogueRelationUpdateView.as_view()),
        name="change_personcataloguerelation"),
     path(r'personcataloguerelations/delete/<uuid:pk>',
-       permission_required('catalogue.delete_personcataloguerelation')(PersonCatalogueRelationDeleteView.as_view()),
+       permission_required('catalogues.delete_personcataloguerelation')(PersonCatalogueRelationDeleteView.as_view()),
        name="delete_personcataloguerelation"),
 
 
