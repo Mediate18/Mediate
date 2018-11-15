@@ -139,12 +139,18 @@ class LotTable(tables.Table):
 
 # PersonCatalogueRelation table
 class PersonCatalogueRelationTable(tables.Table):
-    edit = tables.LinkColumn('change_personcataloguerelation', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('personcataloguerelation_detail', 'change_personcataloguerelation',
+                        'delete_personcataloguerelation', orderable=False)
 
     class Meta:
         model = PersonCatalogueRelation
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'person',
+            'catalogue',
+            'role',
+            'uuid'
+        ]
 
 
 # PersonCatalogueRelationRole table
