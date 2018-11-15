@@ -11,7 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 # Person table
 class PersonTable(tables.Table):
     uuid = ActionColumn('person_detail', 'change_person', 'delete_person', orderable=False)
-    catalogues = tables.Column(verbose_name=_("Owned catalogues"), empty_values=())
+    catalogues = tables.Column(empty_values=())
     roles = tables.Column(empty_values=())
     viaf_id = tables.Column(empty_values=())
 
