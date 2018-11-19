@@ -27,7 +27,6 @@ class CatalogueFilter(django_filters.FilterSet):
         return filter_multiple_words(self.filters[name].lookup_expr, queryset, name, value)
 
 
-
 # CatalogueHeldBy filter
 class CatalogueHeldByFilter(django_filters.FilterSet):
     class Meta:
@@ -40,6 +39,22 @@ class CatalogueTypeFilter(django_filters.FilterSet):
     class Meta:
         model = CatalogueType
         fields = "__all__"
+
+
+# CatalogueCatalogueTypeRelation filter
+class CatalogueCatalogueTypeRelationFilter(django_filters.FilterSet):
+    catalogue = django_filters.ModelMultipleChoiceFilter(
+        queryset=Catalogue.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
+    )
+    type = django_filters.ModelMultipleChoiceFilter(
+        queryset=CatalogueType.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
+    )
+
+    class Meta:
+        model = CatalogueCatalogueTypeRelation
+        exclude = ['uuid']
 
 
 # Collection filter

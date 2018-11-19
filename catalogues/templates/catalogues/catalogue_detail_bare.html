@@ -27,6 +27,14 @@
     <dt>{% trans "Full title" %}</dt>
     <dd>{{ object.full_title|linebreaks }}</dd>
 
+    <dt>{% trans "Type(s)" %}</dt>
+    <dd>
+        {% for typerelation in object.cataloguecataloguetyperelation_set.all %}
+            typerelation.type
+            {% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </dd>
+
     <dt>{% trans "Preface and paratexts" %}</dt>
     <dd>{{ object.preface_and_paratexts|linebreaks }}</dd>
 

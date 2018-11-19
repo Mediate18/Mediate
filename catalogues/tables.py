@@ -87,6 +87,21 @@ class CatalogueTypeTable(tables.Table):
         attrs = {'class': 'table table-sortable'}
 
 
+# CatalogueCatalogueTypeRelation table
+class CatalogueCatalogueTypeRelationTable(tables.Table):
+    uuid = ActionColumn('cataloguecataloguetyperelation_detail', 'change_cataloguecataloguetyperelation',
+                        'delete_cataloguecataloguetyperelation', orderable=False)
+
+    class Meta:
+        model = CatalogueCatalogueTypeRelation
+        attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'catalogue',
+            'type',
+            'uuid'
+        ]
+
+
 # Collection table
 class CollectionTable(tables.Table):
     uuid = ActionColumn('collection_detail', 'change_collection', 'delete_collection', orderable=False)

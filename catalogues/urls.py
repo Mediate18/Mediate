@@ -34,7 +34,7 @@ urlpatterns = [
        permission_required('catalogues.change_catalogueheldby')(CatalogueHeldByUpdateView.as_view()),
        name="change_catalogueheldby"),
     path(r'catalogueheldbys/delete/<uuid:pk>',
-       permission_required('catalogue.delete_catalogueheldby')(CatalogueHeldByDeleteView.as_view()),
+       permission_required('catalogues.delete_catalogueheldby')(CatalogueHeldByDeleteView.as_view()),
        name="delete_catalogueheldby"),
 
 
@@ -48,8 +48,24 @@ urlpatterns = [
        permission_required('catalogues.change_cataloguetype')(CatalogueTypeUpdateView.as_view()),
        name="change_cataloguetype"),
     path(r'cataloguetypes/delete/<uuid:pk>',
-       permission_required('catalogue.delete_cataloguetype')(CatalogueTypeDeleteView.as_view()),
+       permission_required('catalogues.delete_cataloguetype')(CatalogueTypeDeleteView.as_view()),
        name="delete_cataloguetype"),
+
+
+    # CatalogueCatalogueTypeRelation urls
+    path('cataloguecataloguetyperelations/', login_required(CatalogueCatalogueTypeRelationTableView.as_view()),
+         name='cataloguecataloguetyperelations'),
+    path(r'cataloguecataloguetyperelations/<uuid:pk>',
+         login_required(CatalogueCatalogueTypeRelationDetailView.as_view()),
+       name="cataloguecataloguetyperelation_detail"),
+    path(r'cataloguecataloguetyperelations/add', permission_required('catalogues.add_cataloguecataloguetyperelation')(CatalogueCatalogueTypeRelationCreateView.as_view()),
+       name="add_cataloguecataloguetyperelation"),
+    path(r'cataloguecataloguetyperelations/edit/<uuid:pk>',
+       permission_required('catalogues.change_cataloguecataloguetyperelation')(CatalogueCatalogueTypeRelationUpdateView.as_view()),
+       name="change_cataloguecataloguetyperelation"),
+    path(r'cataloguecataloguetyperelations/delete/<uuid:pk>',
+       permission_required('catalogues.delete_cataloguecataloguetyperelation')(CatalogueCatalogueTypeRelationDeleteView.as_view()),
+       name="delete_cataloguecataloguetyperelation"),
 
 
     # Collection urls
@@ -62,7 +78,7 @@ urlpatterns = [
        permission_required('catalogues.change_collection')(CollectionUpdateView.as_view()),
        name="change_collection"),
     path(r'collections/delete/<uuid:pk>',
-       permission_required('catalogue.delete_collection')(CollectionDeleteView.as_view()),
+       permission_required('catalogues.delete_collection')(CollectionDeleteView.as_view()),
        name="delete_collection"),
 
 
@@ -76,7 +92,7 @@ urlpatterns = [
        permission_required('catalogues.change_collectionyear')(CollectionYearUpdateView.as_view()),
        name="change_collectionyear"),
     path(r'collectionyears/delete/<uuid:pk>',
-       permission_required('catalogue.delete_collectionyear')(CollectionYearDeleteView.as_view()),
+       permission_required('catalogues.delete_collectionyear')(CollectionYearDeleteView.as_view()),
        name="delete_collectionyear"),
 
 
@@ -90,7 +106,7 @@ urlpatterns = [
        permission_required('catalogues.change_library')(LibraryUpdateView.as_view()),
        name="change_library"),
     path(r'libraries/delete/<uuid:pk>',
-       permission_required('catalogue.delete_library')(LibraryDeleteView.as_view()),
+       permission_required('catalogues.delete_library')(LibraryDeleteView.as_view()),
        name="delete_library"),
 
 
@@ -104,7 +120,7 @@ urlpatterns = [
        permission_required('catalogues.change_lot')(LotUpdateView.as_view()),
        name="change_lot"),
     path(r'lots/delete/<uuid:pk>',
-       permission_required('catalogue.delete_lot')(LotDeleteView.as_view()),
+       permission_required('catalogues.delete_lot')(LotDeleteView.as_view()),
        name="delete_lot"),
 
 
@@ -132,7 +148,7 @@ urlpatterns = [
        permission_required('catalogues.change_personcataloguerelationrole')(PersonCatalogueRelationRoleUpdateView.as_view()),
        name="change_personcataloguerelationrole"),
     path(r'personcataloguerelationroles/delete/<uuid:pk>',
-       permission_required('catalogue.delete_personcataloguerelationrole')(PersonCatalogueRelationRoleDeleteView.as_view()),
+       permission_required('catalogues.delete_personcataloguerelationrole')(PersonCatalogueRelationRoleDeleteView.as_view()),
        name="delete_personcataloguerelationrole"),
 
 
@@ -146,7 +162,7 @@ urlpatterns = [
        permission_required('catalogues.change_personcollectionrelation')(PersonCollectionRelationUpdateView.as_view()),
        name="change_personcollectionrelation"),
     path(r'personcollectionrelations/delete/<uuid:pk>',
-       permission_required('catalogue.delete_personcollectionrelation')(PersonCollectionRelationDeleteView.as_view()),
+       permission_required('catalogues.delete_personcollectionrelation')(PersonCollectionRelationDeleteView.as_view()),
        name="delete_personcollectionrelation"),
 
 
@@ -160,6 +176,6 @@ urlpatterns = [
        permission_required('catalogues.change_category')(CategoryUpdateView.as_view()),
        name="change_category"),
     path(r'categories/delete/<uuid:pk>',
-       permission_required('catalogue.delete_category')(CategoryDeleteView.as_view()),
+       permission_required('catalogues.delete_category')(CategoryDeleteView.as_view()),
        name="delete_category"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

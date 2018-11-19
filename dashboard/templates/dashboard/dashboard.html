@@ -126,6 +126,15 @@
                 {% endif %}
 
 
+                {% if perms.catalogues.change_cataloguecataloguetyperelation %}
+                <tr>
+                    <td>
+                        <a href="{% url 'cataloguecataloguetyperelations' %}">CatalogueCatalogueTypeRelation</a>
+                    </td>
+                </tr>
+                {% endif %}
+
+
                 {% if perms.catalogues.change_collection %}
                 <tr>
                     <td>

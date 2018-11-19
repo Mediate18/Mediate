@@ -62,6 +62,12 @@ class CatalogueTypeModelForm(forms.ModelForm):
         fields = "__all__"
 
 
+class CatalogueCatalogueTypeRelationModelForm(forms.ModelForm):
+    class Meta:
+        model = CatalogueCatalogueTypeRelation
+        fields = "__all__"
+
+
 class CollectionModelForm(forms.ModelForm):
     class Meta:
         model = Collection

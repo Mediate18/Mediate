@@ -252,6 +252,78 @@ class CatalogueTypeDeleteView(DeleteView):
     success_url = reverse_lazy('cataloguetypes')
 
 
+# CatalogueCatalogueTypeRelation views
+class CatalogueCatalogueTypeRelationTableView(ListView):
+    model = CatalogueCatalogueTypeRelation
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return CatalogueCatalogueTypeRelation.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(CatalogueCatalogueTypeRelationTableView, self).get_context_data(**kwargs)
+        filter = CatalogueCatalogueTypeRelationFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = CatalogueCatalogueTypeRelationTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name'] = "cataloguecataloguetyperelation"
+        context['add_url'] = reverse_lazy('add_cataloguecataloguetyperelation')
+
+        return context
+
+
+class CatalogueCatalogueTypeRelationDetailView(DetailView):
+    model = CatalogueCatalogueTypeRelation
+
+
+class CatalogueCatalogueTypeRelationCreateView(CreateView):
+    model = CatalogueCatalogueTypeRelation
+    template_name = 'generic_form.html'
+    form_class = CatalogueCatalogueTypeRelationModelForm
+    success_url = reverse_lazy('cataloguecataloguetyperelations')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = "cataloguecataloguetyperelation"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class CatalogueCatalogueTypeRelationUpdateView(UpdateView):
+    model = CatalogueCatalogueTypeRelation
+    template_name = 'generic_form.html'
+    form_class = CatalogueCatalogueTypeRelationModelForm
+    success_url = reverse_lazy('cataloguecataloguetyperelations')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("update")
+        context['object_name'] = "cataloguecataloguetyperelation"
+        return context
+
+    def form_valid(self, form):
+        if not self.request.user.is_superuser:
+            messages.add_message(self.request, messages.SUCCESS,
+                                 _("Your changes will be sent to a moderator for reviewing."))
+        return super().form_valid(form)
+
+
+class CatalogueCatalogueTypeRelationDeleteView(DeleteView):
+    model = CatalogueCatalogueTypeRelation
+    success_url = reverse_lazy('cataloguecataloguetyperelations')
+
+
 # Collection views
 class CollectionTableView(ListView):
     model = Collection
