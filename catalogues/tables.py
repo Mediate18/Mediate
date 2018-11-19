@@ -10,6 +10,7 @@ from mediate.columns import ActionColumn
 class CatalogueTable(tables.Table):
     uuid = ActionColumn('catalogue_detail', 'change_catalogue', 'delete_catalogue', orderable=False)
     transcription = tables.RelatedLinkColumn()
+    types = tables.Column(empty_values=(), verbose_name="Type(s)")
     collection = tables.RelatedLinkColumn()
     people = tables.Column(empty_values=())
     number_of_lots = tables.Column(empty_values=(), orderable=False)
@@ -22,6 +23,7 @@ class CatalogueTable(tables.Table):
             'transcription',
             'short_title',
             'full_title',
+            'types',
             'preface_and_paratexts',
             'year_of_publication',
             'terminus_post_quem',
@@ -36,6 +38,19 @@ class CatalogueTable(tables.Table):
     def render_full_title(self, record, value):
         return format_html('<a href="{}">{}</a>'.format(reverse_lazy('catalogue_detail', args=[record.pk]),
                                                         value[:50] + "...") if len(value) > 50 else value)
+
+    def render_types(self, record):
+        return format_html(
+            ", ".join(
+                [
+                    '<a href="{}">{}</a>'.format(
+                        reverse_lazy('change_cataloguecataloguetyperelation', args=[relation.pk]),
+                        relation.type
+                    )
+                    for relation in record.cataloguecataloguetyperelation_set.all()
+                ]
+            )
+        )
 
     def render_preface_and_paratexts(self, value):
         return (value[:50] + "...") if len(value) > 50 else value
