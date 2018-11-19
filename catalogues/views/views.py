@@ -154,12 +154,6 @@ class CatalogueHeldByCreateView(CreateView):
         context['object_name'] = "catalogueheldby"
         return context
 
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
-
 
 class CatalogueHeldByUpdateView(UpdateView):
     model = CatalogueHeldBy
@@ -172,12 +166,6 @@ class CatalogueHeldByUpdateView(UpdateView):
         context['action'] = _("update")
         context['object_name'] = "catalogueheldby"
         return context
-
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
 
 class CatalogueHeldByDeleteView(DeleteView):
@@ -226,12 +214,6 @@ class CatalogueTypeCreateView(CreateView):
         context['object_name'] = "cataloguetype"
         return context
 
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
-
 
 class CatalogueTypeUpdateView(UpdateView):
     model = CatalogueType
@@ -244,12 +226,6 @@ class CatalogueTypeUpdateView(UpdateView):
         context['action'] = _("update")
         context['object_name'] = "cataloguetype"
         return context
-
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
 
 class CatalogueTypeDeleteView(DeleteView):
@@ -298,12 +274,6 @@ class CatalogueCatalogueTypeRelationCreateView(CreateView):
         context['object_name'] = "cataloguecataloguetyperelation"
         return context
 
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
-
 
 class CatalogueCatalogueTypeRelationUpdateView(UpdateView):
     model = CatalogueCatalogueTypeRelation
@@ -316,12 +286,6 @@ class CatalogueCatalogueTypeRelationUpdateView(UpdateView):
         context['action'] = _("update")
         context['object_name'] = "cataloguecataloguetyperelation"
         return context
-
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
 
 class CatalogueCatalogueTypeRelationDeleteView(DeleteView):
@@ -370,12 +334,6 @@ class CollectionCreateView(CreateView):
         context['object_name'] = "collection"
         return context
 
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
-
 
 class CollectionUpdateView(UpdateView):
     model = Collection
@@ -388,12 +346,6 @@ class CollectionUpdateView(UpdateView):
         context['action'] = _("update")
         context['object_name'] = "collection"
         return context
-
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
 
 class CollectionDeleteView(DeleteView):
@@ -442,12 +394,6 @@ class CollectionYearCreateView(CreateView):
         context['object_name'] = "collectionyear"
         return context
 
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
-
 
 class CollectionYearUpdateView(UpdateView):
     model = CollectionYear
@@ -460,12 +406,6 @@ class CollectionYearUpdateView(UpdateView):
         context['action'] = _("update")
         context['object_name'] = "collectionyear"
         return context
-
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
 
 class CollectionYearDeleteView(DeleteView):
@@ -515,12 +455,6 @@ class LibraryCreateView(CreateView):
         context['object_name'] = "library"
         return context
 
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
-
 
 class LibraryUpdateView(UpdateView):
     model = Library
@@ -533,12 +467,6 @@ class LibraryUpdateView(UpdateView):
         context['action'] = _("update")
         context['object_name'] = "library"
         return context
-
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
 
 class LibraryDeleteView(DeleteView):
@@ -654,12 +582,6 @@ class PersonCatalogueRelationCreateView(CreateView):
         context['object_name'] = "personcataloguerelation"
         return context
 
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
-
 
 class PersonCatalogueRelationUpdateView(UpdateView):
     model = PersonCatalogueRelation
@@ -672,12 +594,6 @@ class PersonCatalogueRelationUpdateView(UpdateView):
         context['action'] = _("update")
         context['object_name'] = "personcataloguerelation"
         return context
-
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
 
 class PersonCatalogueRelationDeleteView(DeleteView):
@@ -726,12 +642,6 @@ class PersonCatalogueRelationRoleCreateView(CreateView):
         context['object_name'] = "personcataloguerelationrole"
         return context
 
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
-
 
 class PersonCatalogueRelationRoleUpdateView(UpdateView):
     model = PersonCatalogueRelationRole
@@ -744,12 +654,6 @@ class PersonCatalogueRelationRoleUpdateView(UpdateView):
         context['action'] = _("update")
         context['object_name'] = "personcataloguerelationrole"
         return context
-
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
 
 class PersonCatalogueRelationRoleDeleteView(DeleteView):
@@ -798,12 +702,6 @@ class PersonCollectionRelationCreateView(CreateView):
         context['object_name'] = "personcollectionrelation"
         return context
 
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
-
 
 class PersonCollectionRelationUpdateView(UpdateView):
     model = PersonCollectionRelation
@@ -816,12 +714,6 @@ class PersonCollectionRelationUpdateView(UpdateView):
         context['action'] = _("update")
         context['object_name'] = "personcollectionrelation"
         return context
-
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
 
 class PersonCollectionRelationDeleteView(DeleteView):
@@ -869,12 +761,6 @@ class CategoryCreateView(CreateView):
         context['action'] = _("add")
         context['object_name'] = "category"
         return context
-
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
     
     
 class CategoryUpdateView(UpdateView):
@@ -888,12 +774,6 @@ class CategoryUpdateView(UpdateView):
         context['action'] = _("update")
         context['object_name'] = "category"
         return context
-
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
 
 class CategoryDeleteView(DeleteView):
