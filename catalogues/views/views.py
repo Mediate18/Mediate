@@ -57,11 +57,16 @@ class CatalogueDetailView(DetailView):
         ])
 
         # Find the first lot for each category
-        context['first_lot_in_category_dict'] = dict([
-            (lot['first_lot_in_category'], lot['category__bookseller_category']) for lot in
-            self.object.lot_set.filter(category__isnull=False).values('category__bookseller_category')
-                .annotate(first_lot_in_category=Min('index_in_catalogue')).order_by()
-        ])
+        # by looping over the ordered lots in the catalogue
+        lots = Catalogue.objects.get(short_title__icontains="boab").lot_set.filter(category__isnull=False).values(
+            'index_in_catalogue', 'category__bookseller_category', 'number_in_catalogue').order_by('index_in_catalogue')
+        first_lot_in_category_dict = {}
+        last_category = ""
+        for lot in lots:
+            if lot['category__bookseller_category'] != last_category or lot['number_in_catalogue'] == 1:
+                last_category = lot['category__bookseller_category']
+                first_lot_in_category_dict[lot['index_in_catalogue']] = lot['category__bookseller_category']
+        context['first_lot_in_category_dict'] = first_lot_in_category_dict
 
         return context
 
