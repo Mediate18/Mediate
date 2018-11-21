@@ -9,9 +9,11 @@ class CatalogueFilter(django_filters.FilterSet):
     short_title = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
     full_title = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
     preface_and_paratexts = django_filters.Filter(lookup_expr='icontains')
-    type = django_filters.ModelMultipleChoiceFilter(
+    types = django_filters.ModelMultipleChoiceFilter(
+        label='Types',
         queryset=CatalogueType.objects.all(),
-        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
+        method='catalogue_types_filter'
     )
     terminus_post_quem = django_filters.BooleanFilter(widget=django_filters.widgets.BooleanWidget())
     collection = django_filters.Filter(name='collection__name', lookup_expr='icontains')
@@ -20,25 +22,40 @@ class CatalogueFilter(django_filters.FilterSet):
 
     class Meta:
         model = Catalogue
-        fields = "__all__"
-        exclude = ['transcription', 'uuid']
+        fields = [
+            'short_title',
+            'full_title',
+            'types',
+            'preface_and_paratexts',
+            'year_of_publication',
+            'terminus_post_quem',
+            'notes',
+            'bibliography',
+            'collection'
+        ]
 
     def multiple_words_filter(self, queryset, name, value):
         return filter_multiple_words(self.filters[name].lookup_expr, queryset, name, value)
+
+    def catalogue_types_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(cataloguecataloguetyperelation__type__in=value)
+        else:
+            return queryset
 
 
 # CatalogueHeldBy filter
 class CatalogueHeldByFilter(django_filters.FilterSet):
     class Meta:
         model = CatalogueHeldBy
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # CatalogueType filter
 class CatalogueTypeFilter(django_filters.FilterSet):
     class Meta:
         model = CatalogueType
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # CatalogueCatalogueTypeRelation filter
@@ -70,14 +87,14 @@ class CollectionFilter(django_filters.FilterSet):
 class CollectionYearFilter(django_filters.FilterSet):
     class Meta:
         model = CollectionYear
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # Library filter
 class LibraryFilter(django_filters.FilterSet):
     class Meta:
         model = Library
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # Lot filter
@@ -98,21 +115,21 @@ class LotFilter(django_filters.FilterSet):
 class PersonCatalogueRelationFilter(django_filters.FilterSet):
     class Meta:
         model = PersonCatalogueRelation
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # PersonCatalogueRelationRole filter
 class PersonCatalogueRelationRoleFilter(django_filters.FilterSet):
     class Meta:
         model = PersonCatalogueRelationRole
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # PersonCollectionRelation filter
 class PersonCollectionRelationFilter(django_filters.FilterSet):
     class Meta:
         model = PersonCollectionRelation
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # Category filter
