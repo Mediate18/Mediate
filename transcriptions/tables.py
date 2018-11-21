@@ -6,22 +6,29 @@ from mediate.columns import ActionColumn
 
 # DocumentScan table
 class DocumentScanTable(tables.Table):
-    edit = tables.LinkColumn('change_documentscan', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('documentscan_detail', 'change_documentscan', 'delete_documentscan', orderable=False)
 
     class Meta:
         model = DocumentScan
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'transcription',
+            'scan',
+            'uuid'
+        ]
 
 
 # SourceMaterial table
 class SourceMaterialTable(tables.Table):
-    edit = tables.LinkColumn('change_sourcematerial', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('sourcematerial_detail', 'change_sourcematerial', 'delete_sourcematerial', orderable=False)
 
     class Meta:
         model = SourceMaterial
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'name',
+            'uuid'
+        ]
 
 
 # Transcription table
