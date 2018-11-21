@@ -59,12 +59,6 @@ class DocumentScanCreateView(CreateView):
         context['object_name'] = "documentscan"
         return context
 
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
-
 
 class DocumentScanUpdateView(UpdateView):
     model = DocumentScan
@@ -77,12 +71,6 @@ class DocumentScanUpdateView(UpdateView):
         context['action'] = _("update")
         context['object_name'] = "documentscan"
         return context
-
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
 
 class DocumentScanDeleteView(DeleteView):
@@ -131,12 +119,6 @@ class SourceMaterialCreateView(CreateView):
         context['object_name'] = "sourcematerial"
         return context
 
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
-
 
 class SourceMaterialUpdateView(UpdateView):
     model = SourceMaterial
@@ -149,12 +131,6 @@ class SourceMaterialUpdateView(UpdateView):
         context['action'] = _("update")
         context['object_name'] = "sourcematerial"
         return context
-
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
 
 class SourceMaterialDeleteView(DeleteView):
