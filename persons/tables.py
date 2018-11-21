@@ -86,81 +86,124 @@ class PersonTable(tables.Table):
 
 # PersonPersonRelation table
 class PersonPersonRelationTable(tables.Table):
-    edit = tables.LinkColumn('change_personpersonrelation', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('personpersonrelation_detail', 'change_personpersonrelation', 'delete_personpersonrelation',
+                        orderable=False)
 
     class Meta:
         model = PersonPersonRelation
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'first_person',
+            'second_person',
+            'type',
+            'start_year',
+            'end_year',
+            'uuid'
+        ]
 
 
 # PersonPersonRelationType table
 class PersonPersonRelationTypeTable(tables.Table):
-    edit = tables.LinkColumn('change_personpersonrelationtype', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('personpersonrelationtype_detail', 'change_personpersonrelationtype',
+                        'delete_personpersonrelationtype', orderable=False)
 
     class Meta:
         model = PersonPersonRelationType
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'name',
+            'directed',
+            'uuid'
+        ]
 
 
 # PersonProfession table
 class PersonProfessionTable(tables.Table):
-    edit = tables.LinkColumn('change_personprofession', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('personprofession_detail', 'change_personprofession', 'delete_personprofession',
+                        orderable=False)
 
     class Meta:
         model = PersonProfession
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'person',
+            'profession',
+            'uuid'
+        ]
 
 
 # Place table
 class PlaceTable(tables.Table):
-    edit = tables.LinkColumn('change_place', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('place_detail', 'change_place', 'delete_place',
+                        orderable=False)
 
     class Meta:
         model = Place
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'name',
+            'cerl_id',
+            'uuid'
+        ]
 
 
 # Profession table
 class ProfessionTable(tables.Table):
-    edit = tables.LinkColumn('change_profession', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('profession_detail', 'change_profession', 'delete_profession', orderable=False)
 
     class Meta:
         model = Profession
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'name',
+            'description',
+            'uuid'
+        ]
 
 
 # Religion table
 class ReligionTable(tables.Table):
-    edit = tables.LinkColumn('change_religion', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('religion_detail', 'change_religion', 'delete_religion', orderable=False)
 
     class Meta:
         model = Religion
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'name',
+            'description',
+            'uuid'
+        ]
 
 
 # ReligiousAffiliation table
 class ReligiousAffiliationTable(tables.Table):
-    edit = tables.LinkColumn('change_religiousaffiliation', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('religiousaffiliation_detail', 'change_religiousaffiliation', 'delete_religiousaffiliation',
+                        orderable=False)
 
     class Meta:
         model = ReligiousAffiliation
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'person',
+            'religion',
+            'uuid'
+        ]
 
 
 # Residence table
 class ResidenceTable(tables.Table):
-    edit = tables.LinkColumn('change_residence', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('residence_detail', 'change_residence', 'delete_residence',
+                        orderable=False)
 
     class Meta:
         model = Residence
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'person',
+            'place',
+            'start_year',
+            'end_year',
+            'uuid'
+        ]
 
 
