@@ -84,22 +84,29 @@ class CatalogueTable(tables.Table):
 
 # CatalogueHeldBy table
 class CatalogueHeldByTable(tables.Table):
-    edit = tables.LinkColumn('change_catalogueheldby', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('catalogueheldby_detail', 'change_catalogueheldby', 'delete_catalogueheldby', orderable=False)
 
     class Meta:
         model = CatalogueHeldBy
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'library',
+            'catalogue',
+            'uuid'
+        ]
 
 
 # CatalogueType table
 class CatalogueTypeTable(tables.Table):
-    edit = tables.LinkColumn('change_cataloguetype', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('cataloguetype_detail', 'change_cataloguetype', 'delete_cataloguetype', orderable=False)
 
     class Meta:
         model = CatalogueType
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'name',
+            'uuid'
+        ]
 
 
 # CatalogueCatalogueTypeRelation table
@@ -132,22 +139,29 @@ class CollectionTable(tables.Table):
 
 # CollectionYear table
 class CollectionYearTable(tables.Table):
-    edit = tables.LinkColumn('change_collectionyear', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('collectionyear_detail', 'change_collectionyear', 'delete_collectionyear', orderable=False)
 
     class Meta:
         model = CollectionYear
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'collection',
+            'year',
+            'uuid'
+        ]
 
 
 # Library table
 class LibraryTable(tables.Table):
-    edit = tables.LinkColumn('change_library', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('library_detail', 'change_library', 'delete_library', orderable=False)
 
     class Meta:
         model = Library
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'name',
+            'uuid'
+        ]
 
 
 # Lot table
@@ -188,22 +202,31 @@ class PersonCatalogueRelationTable(tables.Table):
 
 # PersonCatalogueRelationRole table
 class PersonCatalogueRelationRoleTable(tables.Table):
-    edit = tables.LinkColumn('change_personcataloguerelationrole', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('personcataloguerelationrole_detail', 'change_personcataloguerelationrole',
+                        'delete_personcataloguerelationrole', orderable=False)
 
     class Meta:
         model = PersonCatalogueRelationRole
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'name',
+            'uuid'
+        ]
 
 
 # PersonCollectionRelation table
 class PersonCollectionRelationTable(tables.Table):
-    edit = tables.LinkColumn('change_personcollectionrelation', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('personcollectionrelation_detail', 'change_personcollectionrelation',
+                        'delete_personcollectionrelation', orderable=False)
 
     class Meta:
         model = PersonCollectionRelation
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'person',
+            'collection',
+            'uuid'
+        ]
 
 
 # Category table
