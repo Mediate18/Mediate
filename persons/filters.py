@@ -26,7 +26,6 @@ class PersonFilter(django_filters.FilterSet):
 
     class Meta:
         model = Person
-        exclude = ['uuid']
         fields = [
             'short_name',
             'first_names',
@@ -49,55 +48,55 @@ class PersonFilter(django_filters.FilterSet):
 class PersonPersonRelationFilter(django_filters.FilterSet):
     class Meta:
         model = PersonPersonRelation
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # PersonPersonRelationType filter
 class PersonPersonRelationTypeFilter(django_filters.FilterSet):
     class Meta:
         model = PersonPersonRelationType
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # PersonProfession filter
 class PersonProfessionFilter(django_filters.FilterSet):
     class Meta:
         model = PersonProfession
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # Place filter
 class PlaceFilter(django_filters.FilterSet):
     class Meta:
         model = Place
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # Profession filter
 class ProfessionFilter(django_filters.FilterSet):
     class Meta:
         model = Profession
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # Religion filter
 class ReligionFilter(django_filters.FilterSet):
     class Meta:
         model = Religion
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # ReligiousAffiliation filter
 class ReligiousAffiliationFilter(django_filters.FilterSet):
     class Meta:
         model = ReligiousAffiliation
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # Residence filter
 class ResidenceFilter(django_filters.FilterSet):
     class Meta:
         model = Residence
-        fields = "__all__"
+        exclude = ['uuid']
 
 
