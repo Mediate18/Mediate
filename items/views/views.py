@@ -863,6 +863,7 @@ class PersonItemRelationAddView(SingleObjectMixin, FormView):
         personitemrelation = PersonItemRelation(item=self.get_object())
         form = PersonItemRelationAddForm(instance=personitemrelation, data=request.POST)
         if form.is_valid():
+            form.save()
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
