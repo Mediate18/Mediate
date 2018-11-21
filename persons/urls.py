@@ -33,7 +33,7 @@ urlpatterns = [
          permission_required('persons.change_personpersonrelation')(PersonPersonRelationUpdateView.as_view()),
          name="change_personpersonrelation"),
     path(r'personpersonrelations/delete/<uuid:pk>',
-         permission_required('catalogue.delete_personpersonrelation')(PersonPersonRelationDeleteView.as_view()),
+         permission_required('persons.delete_personpersonrelation')(PersonPersonRelationDeleteView.as_view()),
          name="delete_personpersonrelation"),
 
     # PersonPersonRelationType urls
@@ -49,7 +49,7 @@ urlpatterns = [
              PersonPersonRelationTypeUpdateView.as_view()),
          name="change_personpersonrelationtype"),
     path(r'personpersonrelationtypes/delete/<uuid:pk>',
-         permission_required('catalogue.delete_personpersonrelationtype')(PersonPersonRelationTypeDeleteView.as_view()),
+         permission_required('persons.delete_personpersonrelationtype')(PersonPersonRelationTypeDeleteView.as_view()),
          name="delete_personpersonrelationtype"),
 
     # PersonProfession urls
@@ -63,7 +63,7 @@ urlpatterns = [
          permission_required('persons.change_personprofession')(PersonProfessionUpdateView.as_view()),
          name="change_personprofession"),
     path(r'personprofessions/delete/<uuid:pk>',
-         permission_required('catalogue.delete_personprofession')(PersonProfessionDeleteView.as_view()),
+         permission_required('persons.delete_personprofession')(PersonProfessionDeleteView.as_view()),
          name="delete_personprofession"),
 
     # Place urls
@@ -76,7 +76,7 @@ urlpatterns = [
          permission_required('persons.change_place')(PlaceUpdateView.as_view()),
          name="change_place"),
     path(r'places/delete/<uuid:pk>',
-         permission_required('catalogue.delete_place')(PlaceDeleteView.as_view()),
+         permission_required('persons.delete_place')(PlaceDeleteView.as_view()),
          name="delete_place"),
 
     # Profession urls
@@ -89,7 +89,7 @@ urlpatterns = [
          permission_required('persons.change_profession')(ProfessionUpdateView.as_view()),
          name="change_profession"),
     path(r'professions/delete/<uuid:pk>',
-         permission_required('catalogue.delete_profession')(ProfessionDeleteView.as_view()),
+         permission_required('persons.delete_profession')(ProfessionDeleteView.as_view()),
          name="delete_profession"),
 
     # Religion urls
@@ -102,7 +102,7 @@ urlpatterns = [
          permission_required('persons.change_religion')(ReligionUpdateView.as_view()),
          name="change_religion"),
     path(r'religions/delete/<uuid:pk>',
-         permission_required('catalogue.delete_religion')(ReligionDeleteView.as_view()),
+         permission_required('persons.delete_religion')(ReligionDeleteView.as_view()),
          name="delete_religion"),
 
     # ReligiousAffiliation urls
@@ -117,7 +117,7 @@ urlpatterns = [
          permission_required('persons.change_religiousaffiliation')(ReligiousAffiliationUpdateView.as_view()),
          name="change_religiousaffiliation"),
     path(r'religiousaffiliations/delete/<uuid:pk>',
-         permission_required('catalogue.delete_religiousaffiliation')(ReligiousAffiliationDeleteView.as_view()),
+         permission_required('persons.delete_religiousaffiliation')(ReligiousAffiliationDeleteView.as_view()),
          name="delete_religiousaffiliation"),
 
     # Residence urls
@@ -130,7 +130,7 @@ urlpatterns = [
          permission_required('persons.change_residence')(ResidenceUpdateView.as_view()),
          name="change_residence"),
     path(r'residences/delete/<uuid:pk>',
-         permission_required('catalogue.delete_residence')(ResidenceDeleteView.as_view()),
+         permission_required('persons.delete_residence')(ResidenceDeleteView.as_view()),
          name="delete_residence"),
 
     # Cerl API
