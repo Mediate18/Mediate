@@ -21,6 +21,10 @@ class ItemFilter(django_filters.FilterSet):
     sales_price = django_filters.Filter(name='lot__sales_price', lookup_expr='icontains')
     collection = django_filters.Filter(name='collection__name', lookup_expr='icontains')
     number_of_volumes = django_filters.Filter(lookup_expr='icontains')
+    book_format = django_filters.ModelMultipleChoiceFilter(
+        queryset=BookFormat.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
+    )
     tag = django_filters.ModelMultipleChoiceFilter(
         label='Tag',
         queryset=Tag.objects.all(),
