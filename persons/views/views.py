@@ -11,6 +11,7 @@ import django_tables2
 from django.http import JsonResponse
 import re
 import json
+import requests
 
 from apiconnectors.cerlapi import CerlSuggest, cerl_record_url
 
@@ -50,7 +51,7 @@ class PersonDetailView(DetailView):
     model = Person
 
 
-class PersonCreateView(ModeratedCreateView):
+class PersonCreateView(CreateView):
     model = Person
     template_name = 'generic_form.html'
     form_class = PersonModelForm
@@ -62,6 +63,31 @@ class PersonCreateView(ModeratedCreateView):
         context['object_name'] = "person"
         context['js_variables'] = json.dumps({'viaf_select_id': PersonModelForm.suggest_select_ids})
         return context
+
+    def post(self, request, *args, **kwargs):
+        # Hacking the POST dict to enable users to enter a Cerl ID as Place identifier
+        # TODO Find a more elegant method
+        post_parameters = request.POST.copy()
+        for city_field in ['city_of_birth', 'city_of_death']:
+            if city_field in post_parameters:
+                city = post_parameters.pop(city_field, None)
+                if city[0].startswith('cnl'):
+                    response = requests.get(cerl_record_url + city[0], headers={'accept': 'application/json'})
+                    place_name = response.json().get('data')['heading'][0]['part'][0]['entry']
+                    (city_obj, created) = Place.objects.get_or_create(name=place_name, cerl_id=city[0])
+                    print(city_obj)
+                    post_parameters[city_field] = str(city_obj.uuid)
+                else:
+                    post_parameters[city_field] = city[0]
+
+        form = PersonModelForm(data=post_parameters)
+        self.object = form.instance
+        if form.is_valid():
+            print("Form city_of_birth", form.cleaned_data['city_of_birth'])
+            self.object = form.save()
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
 
     def form_invalid(self, form):
         response = super().form_invalid(form)
@@ -95,6 +121,31 @@ class PersonUpdateView(UpdateView):
         context['object_name'] = "person"
         context['js_variables'] = json.dumps({'viaf_select_id': PersonModelForm.suggest_select_ids})
         return context
+
+    def post(self, request, *args, **kwargs):
+        # Hacking the POST dict to enable users to enter a Cerl ID as Place identifier
+        # TODO Find a more elegant method
+        post_parameters = request.POST.copy()
+        for city_field in ['city_of_birth', 'city_of_death']:
+            if city_field in post_parameters:
+                city = post_parameters.pop(city_field, None)
+                if city[0].startswith('cnl'):
+                    response = requests.get(cerl_record_url + city[0], headers={'accept': 'application/json'})
+                    place_name = response.json().get('data')['heading'][0]['part'][0]['entry']
+                    (city_obj, created) = Place.objects.get_or_create(name=place_name, cerl_id=city[0])
+                    print(city_obj)
+                    post_parameters[city_field] = str(city_obj.uuid)
+                else:
+                    post_parameters[city_field] = city[0]
+
+        form = PersonModelForm(data=post_parameters)
+        self.object = form.instance
+        if form.is_valid():
+            print("Form city_of_birth", form.cleaned_data['city_of_birth'])
+            self.object = form.save()
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
 
 
 class PersonDeleteView(DeleteView):
