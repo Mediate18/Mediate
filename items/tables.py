@@ -10,12 +10,15 @@ from mediate.columns import ActionColumn
 
 # BookFormat table
 class BookFormatTable(tables.Table):
-    edit = tables.LinkColumn('change_bookformat', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('bookformat_detail', 'change_bookformat', 'delete_bookformat', orderable=False)
 
     class Meta:
         model = BookFormat
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'name',
+            'uuid'
+        ]
 
 
 # Item table
@@ -98,82 +101,120 @@ class ItemTable(tables.Table):
 
 # ItemAuthor table
 class ItemAuthorTable(tables.Table):
-    edit = tables.LinkColumn('change_itemauthor', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('itemauthor_detail', 'change_itemauthor', 'delete_itemauthor', orderable=False)
 
     class Meta:
         model = ItemAuthor
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'item',
+            'author',
+            'uuid'
+        ]
 
 
 # ItemItemTypeRelation table
 class ItemItemTypeRelationTable(tables.Table):
-    edit = tables.LinkColumn('change_itemitemtyperelation', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('itemitemtyperelation_detail', 'change_itemitemtyperelation', 'delete_itemitemtyperelation',
+                        orderable=False)
 
     class Meta:
         model = ItemItemTypeRelation
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'item',
+            'type',
+            'uuid'
+        ]
 
 
 # ItemLanguageRelation table
 class ItemLanguageRelationTable(tables.Table):
-    edit = tables.LinkColumn('change_itemlanguagerelation', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('itemlanguagerelation_detail', 'change_itemlanguagerelation', 'delete_itemlanguagerelation',
+                        orderable=False)
 
     class Meta:
         model = ItemLanguageRelation
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'item',
+            'language',
+            'uuid'
+        ]
 
 
 # ItemMaterialDetailsRelation table
 class ItemMaterialDetailsRelationTable(tables.Table):
-    edit = tables.LinkColumn('change_itemmaterialdetailsrelation', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('itemmaterialdetailsrelation_detail', 'change_itemmaterialdetailsrelation',
+                        'delete_itemmaterialdetailsrelation', orderable=False)
 
     class Meta:
         model = ItemMaterialDetailsRelation
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'item',
+            'material_details',
+            'uuid'
+        ]
 
 
 # ItemType table
 class ItemTypeTable(tables.Table):
-    edit = tables.LinkColumn('change_itemtype', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('itemtype_detail', 'change_itemtype', 'delete_itemtype', orderable=False)
 
     class Meta:
         model = ItemType
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'name',
+            'uuid'
+        ]
 
 
 # ItemWorkRelation table
 class ItemWorkRelationTable(tables.Table):
-    edit = tables.LinkColumn('change_itemworkrelation', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('itemworkrelation_detail', 'change_itemworkrelation', 'delete_itemworkrelation',
+                        orderable=False)
 
     class Meta:
         model = ItemWorkRelation
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'item',
+            'work',
+            'uuid'
+        ]
 
 
 # Language table
 class LanguageTable(tables.Table):
-    view = tables.LinkColumn('language_detail', text='View', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('language_detail', 'change_language', 'delete_language',
+                        orderable=False)
 
     class Meta:
         model = Language
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'name',
+            'language_code_2char',
+            'language_code_3char',
+            'description',
+            'uuid'
+        ]
 
 
 # MaterialDetails table
 class MaterialDetailsTable(tables.Table):
-    edit = tables.LinkColumn('change_materialdetails', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('materialdetails_detail', 'change_materialdetails', 'delete_materialdetails',
+                        orderable=False)
 
     class Meta:
         model = MaterialDetails
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'description',
+            'uuid'
+        ]
 
 
 # PersonItemRelation table
@@ -193,12 +234,16 @@ class PersonItemRelationTable(tables.Table):
 
 # PersonItemRelationRole table
 class PersonItemRelationRoleTable(tables.Table):
-    edit = tables.LinkColumn('change_personitemrelationrole', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('personitemrelationrole_detail', 'change_personitemrelationrole',
+                        'delete_personitemrelationrole', orderable=False)
 
     class Meta:
         model = PersonItemRelationRole
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'name',
+            'uuid'
+        ]
 
 
 # Manifestation table
@@ -249,12 +294,15 @@ class PublisherTable(tables.Table):
 
 # Subject table
 class SubjectTable(tables.Table):
-    edit = tables.LinkColumn('change_subject', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('subject_detail', 'change_subject', 'delete_subject', orderable=False)
 
     class Meta:
         model = Subject
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'name',
+            'uuid'
+        ]
 
 
 # Work table
@@ -282,21 +330,29 @@ class WorkTable(tables.Table):
 
 # WorkAuthor table
 class WorkAuthorTable(tables.Table):
-    edit = tables.LinkColumn('change_workauthor', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('workauthor_detail', 'change_workauthor', 'delete_workauthor', orderable=False)
 
     class Meta:
         model = WorkAuthor
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'work',
+            'author',
+            'uuid'
+        ]
 
 
 # WorkSubject table
 class WorkSubjectTable(tables.Table):
-    edit = tables.LinkColumn('change_worksubject', text='Edit', args=[A('pk')],
-                         orderable=False, empty_values=())
+    uuid = ActionColumn('worksubject_detail', 'change_worksubject', 'delete_worksubject', orderable=False)
 
     class Meta:
         model = WorkSubject
         attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'work',
+            'subject',
+            'uuid'
+        ]
 
 
