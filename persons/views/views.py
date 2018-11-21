@@ -143,12 +143,6 @@ class PersonPersonRelationCreateView(CreateView):
         context['object_name'] = "personpersonrelation"
         return context
 
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
-
 
 class PersonPersonRelationUpdateView(UpdateView):
     model = PersonPersonRelation
@@ -214,12 +208,6 @@ class PersonPersonRelationTypeCreateView(CreateView):
         context['action'] = _("add")
         context['object_name'] = "personpersonrelationtype"
         return context
-
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
 
 class PersonPersonRelationTypeUpdateView(UpdateView):
@@ -287,12 +275,6 @@ class PersonProfessionCreateView(CreateView):
         context['object_name'] = "personprofession"
         return context
 
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
-
 
 class PersonProfessionUpdateView(UpdateView):
     model = PersonProfession
@@ -305,12 +287,6 @@ class PersonProfessionUpdateView(UpdateView):
         context['action'] = _("update")
         context['object_name'] = "personprofession"
         return context
-
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
 
 class PersonProfessionDeleteView(DeleteView):
@@ -359,12 +335,6 @@ class PlaceCreateView(CreateView):
         context['object_name'] = "place"
         return context
 
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
-
 
 class PlaceUpdateView(UpdateView):
     model = Place
@@ -377,12 +347,6 @@ class PlaceUpdateView(UpdateView):
         context['action'] = _("update")
         context['object_name'] = "place"
         return context
-
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
 
 class PlaceDeleteView(DeleteView):
@@ -431,12 +395,6 @@ class ProfessionCreateView(CreateView):
         context['object_name'] = "profession"
         return context
 
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
-
 
 class ProfessionUpdateView(UpdateView):
     model = Profession
@@ -449,12 +407,6 @@ class ProfessionUpdateView(UpdateView):
         context['action'] = _("update")
         context['object_name'] = "profession"
         return context
-
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
 
 class ProfessionDeleteView(DeleteView):
@@ -503,12 +455,6 @@ class ReligionCreateView(CreateView):
         context['object_name'] = "religion"
         return context
 
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
-
 
 class ReligionUpdateView(UpdateView):
     model = Religion
@@ -521,12 +467,6 @@ class ReligionUpdateView(UpdateView):
         context['action'] = _("update")
         context['object_name'] = "religion"
         return context
-
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
 
 class ReligionDeleteView(DeleteView):
@@ -575,12 +515,6 @@ class ReligiousAffiliationCreateView(CreateView):
         context['object_name'] = "religiousaffiliation"
         return context
 
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
-
 
 class ReligiousAffiliationUpdateView(UpdateView):
     model = ReligiousAffiliation
@@ -593,12 +527,6 @@ class ReligiousAffiliationUpdateView(UpdateView):
         context['action'] = _("update")
         context['object_name'] = "religiousaffiliation"
         return context
-
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
 
 class ReligiousAffiliationDeleteView(DeleteView):
@@ -647,12 +575,6 @@ class ResidenceCreateView(CreateView):
         context['object_name'] = "residence"
         return context
 
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
-
 
 class ResidenceUpdateView(UpdateView):
     model = Residence
@@ -665,12 +587,6 @@ class ResidenceUpdateView(UpdateView):
         context['action'] = _("update")
         context['object_name'] = "residence"
         return context
-
-    def form_valid(self, form):
-        if not self.request.user.is_superuser:
-            messages.add_message(self.request, messages.SUCCESS,
-                                 _("Your changes will be sent to a moderator for reviewing."))
-        return super().form_valid(form)
 
 
 class ResidenceDeleteView(DeleteView):
