@@ -13,13 +13,12 @@ class DocumentScanFilter(django_filters.FilterSet):
 class SourceMaterialFilter(django_filters.FilterSet):
     class Meta:
         model = SourceMaterial
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # Transcription filter
 class TranscriptionFilter(django_filters.FilterSet):
     class Meta:
         model = Transcription
-        fields = "__all__"
-
+        exclude = ['uuid']
 
