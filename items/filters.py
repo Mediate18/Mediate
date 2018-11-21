@@ -11,7 +11,7 @@ from viapy.api import ViafAPI
 class BookFormatFilter(django_filters.FilterSet):
     class Meta:
         model = BookFormat
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # Item filter
@@ -50,7 +50,7 @@ class ItemAuthorFilter(django_filters.FilterSet):
 
     class Meta:
         model = ItemAuthor
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # ItemItemTypeRelation filter
@@ -59,7 +59,7 @@ class ItemItemTypeRelationFilter(django_filters.FilterSet):
 
     class Meta:
         model = ItemItemTypeRelation
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # ItemLanguageRelation filter
@@ -68,7 +68,7 @@ class ItemLanguageRelationFilter(django_filters.FilterSet):
 
     class Meta:
         model = ItemLanguageRelation
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # ItemMaterialDetailsRelation filter
@@ -77,14 +77,14 @@ class ItemMaterialDetailsRelationFilter(django_filters.FilterSet):
 
     class Meta:
         model = ItemMaterialDetailsRelation
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # ItemType filter
 class ItemTypeFilter(django_filters.FilterSet):
     class Meta:
         model = ItemType
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # ItemWorkRelation filter
@@ -93,21 +93,21 @@ class ItemWorkRelationFilter(django_filters.FilterSet):
 
     class Meta:
         model = ItemWorkRelation
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # Language filter
 class LanguageFilter(django_filters.FilterSet):
     class Meta:
         model = Language
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # MaterialDetails filter
 class MaterialDetailsFilter(django_filters.FilterSet):
     class Meta:
         model = MaterialDetails
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # PersonItemRelation filter
@@ -116,14 +116,14 @@ class PersonItemRelationFilter(django_filters.FilterSet):
 
     class Meta:
         model = PersonItemRelation
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # PersonItemRelationRole filter
 class PersonItemRelationRoleFilter(django_filters.FilterSet):
     class Meta:
         model = PersonItemRelationRole
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # Manifestation filter
@@ -170,7 +170,7 @@ class PublisherFilter(django_filters.FilterSet):
 class SubjectFilter(django_filters.FilterSet):
     class Meta:
         model = Subject
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # Work filter
@@ -195,13 +195,13 @@ class WorkFilter(django_filters.FilterSet):
 class WorkAuthorFilter(django_filters.FilterSet):
     class Meta:
         model = WorkAuthor
-        fields = "__all__"
+        exclude = ['uuid']
 
 
 # WorkSubject filter
 class WorkSubjectFilter(django_filters.FilterSet):
     class Meta:
         model = WorkSubject
-        fields = "__all__"
+        exclude = ['uuid']
 
 
