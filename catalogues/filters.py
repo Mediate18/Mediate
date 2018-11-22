@@ -15,6 +15,7 @@ class CatalogueFilter(django_filters.FilterSet):
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
         method='catalogue_types_filter'
     )
+    year_of_publication = django_filters.RangeFilter(widget=django_filters.widgets.RangeWidget())
     terminus_post_quem = django_filters.BooleanFilter(widget=django_filters.widgets.BooleanWidget())
     collection = django_filters.Filter(name='collection__name', lookup_expr='icontains')
     notes = django_filters.Filter(lookup_expr='icontains')
