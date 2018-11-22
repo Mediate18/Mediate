@@ -243,3 +243,17 @@ class CategoryTable(tables.Table):
             'parisian_category',
             'uuid'
         ]
+
+
+# ParisianCategory table
+class ParisianCategoryTable(tables.Table):
+    uuid = ActionColumn('parisiancategory_detail', 'change_parisiancategory', 'delete_parisiancategory', orderable=False)
+
+    class Meta:
+        model = ParisianCategory
+        attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'name',
+            'description',
+            'uuid'
+        ]

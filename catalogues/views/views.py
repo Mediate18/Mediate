@@ -779,3 +779,63 @@ class CategoryUpdateView(UpdateView):
 class CategoryDeleteView(DeleteView):
     model = Category
     success_url = reverse_lazy('categories')
+
+
+# ParisianCategory views
+class ParisianCategoryTableView(ListView):
+    model = ParisianCategory
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return ParisianCategory.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        filter = ParisianCategoryFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = ParisianCategoryTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name_plural'] = self.model._meta.verbose_name_plural
+        context['add_url'] = reverse_lazy('add_parisiancategory')
+
+        return context
+
+
+class ParisianCategoryDetailView(DetailView):
+    model = ParisianCategory
+
+
+class ParisianCategoryCreateView(CreateView):
+    model = ParisianCategory
+    template_name = 'generic_form.html'
+    form_class = ParisianCategoryModelForm
+    success_url = reverse_lazy('parisiancategories')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = "parisiancategory"
+        return context
+
+
+class ParisianCategoryUpdateView(UpdateView):
+    model = ParisianCategory
+    template_name = 'generic_form.html'
+    form_class = ParisianCategoryModelForm
+    success_url = reverse_lazy('parisiancategories')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("update")
+        context['object_name'] = "parisiancategory"
+        return context
+
+
+class ParisianCategoryDeleteView(DeleteView):
+    model = ParisianCategory
+    success_url = reverse_lazy('parisiancategories')

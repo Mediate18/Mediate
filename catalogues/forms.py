@@ -134,3 +134,9 @@ class CategoryModelForm(forms.ModelForm):
         model = Category
         fields = "__all__"
 
+
+class ParisianCategoryModelForm(forms.ModelForm):
+    class Meta:
+        model = ParisianCategory
+        fields = "__all__"
+

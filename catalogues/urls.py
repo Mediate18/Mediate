@@ -178,4 +178,18 @@ urlpatterns = [
     path(r'categories/delete/<uuid:pk>',
        permission_required('catalogues.delete_category')(CategoryDeleteView.as_view()),
        name="delete_category"),
+
+
+    # ParisianCategory urls
+    path('parisiancategories/', login_required(ParisianCategoryTableView.as_view()), name='parisiancategories'),
+    path(r'parisiancategories/<uuid:pk>', login_required(ParisianCategoryDetailView.as_view()),
+       name="parisiancategory_detail"),
+    path(r'parisiancategories/add', permission_required('catalogues.add_parisiancategory')(ParisianCategoryCreateView.as_view()),
+       name="add_parisiancategory"),
+    path(r'parisiancategories/edit/<uuid:pk>',
+       permission_required('catalogues.change_parisiancategory')(ParisianCategoryUpdateView.as_view()),
+       name="change_parisiancategory"),
+    path(r'parisiancategories/delete/<uuid:pk>',
+       permission_required('catalogues.delete_parisiancategory')(ParisianCategoryDeleteView.as_view()),
+       name="delete_parisiancategory"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

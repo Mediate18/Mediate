@@ -195,3 +195,13 @@ class CategoryFilter(django_filters.FilterSet):
     class Meta:
         model = Category
         exclude = ['uuid']
+
+
+# ParisianCategory Filter
+class ParisianCategoryFilter(django_filters.FilterSet):
+    class Meta:
+        model = ParisianCategory
+        fields = {
+            'name': ['icontains'],
+            'description': ['icontains']
+        }

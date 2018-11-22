@@ -135,6 +135,24 @@
                 {% endif %}
 
 
+                {% if perms.catalogues.change_category %}
+                <tr>
+                    <td>
+                        <a href="{% url 'categories' %}">Category</a>
+                    </td>
+                </tr>
+                {% endif %}
+
+
+                {% if perms.catalogues.change_parisiancategory %}
+                <tr>
+                    <td>
+                        <a href="{% url 'parisiancategories' %}">ParisianCategory</a>
+                    </td>
+                </tr>
+                {% endif %}
+
+
                 {% if perms.catalogues.change_collection %}
                 <tr>
                     <td>
