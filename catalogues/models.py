@@ -206,6 +206,7 @@ class Category(models.Model):
 
     class Meta:
         ordering = ['bookseller_category']
+        verbose_name_plural = "categories"
 
     def __str__(self):
         return self.bookseller_category
