@@ -52,13 +52,14 @@ class PersonTable(tables.Table):
         roles_dict = {}
 
         # Catalogues
-        catalogue_roles = list(PersonCatalogueRelation.objects.filter(person=record).exclude(role__name="owner").
-                               values_list('role__name', flat=True))
+        catalogue_roles = list(PersonCatalogueRelation.objects.filter(person=record).distinct()
+                               .values_list('role__name', flat=True))
         if catalogue_roles:
             roles_dict['catalogues'] = catalogue_roles
 
         # Items
-        item_roles = list(PersonItemRelation.objects.filter(person=record).values_list('role__name', flat=True))
+        item_roles = list(PersonItemRelation.objects.filter(person=record).distinct()
+                          .values_list('role__name', flat=True))
         if item_roles:
             roles_dict['items'] = item_roles
 
