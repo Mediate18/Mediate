@@ -138,8 +138,7 @@ class PersonUpdateView(UpdateView):
                 else:
                     post_parameters[city_field] = city[0]
 
-        form = PersonModelForm(data=post_parameters)
-        self.object = form.instance
+        form = PersonModelForm(instance=self.get_object(), data=post_parameters)
         if form.is_valid():
             print("Form city_of_birth", form.cleaned_data['city_of_birth'])
             self.object = form.save()
