@@ -54,7 +54,10 @@ class ItemFilter(django_filters.FilterSet):
         return filter_multiple_words(self.filters[name].lookup_expr, queryset, name, value)
 
     def material_details_filter(self, queryset, name, value):
-        return queryset.filter(itemmaterialdetailsrelation__material_details__in=value)
+        if value:
+            return queryset.filter(itemmaterialdetailsrelation__material_details__in=value)
+        else:
+            return queryset
 
 
 # ItemAuthor filter
