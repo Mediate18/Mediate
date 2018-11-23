@@ -25,6 +25,12 @@ class ItemFilter(django_filters.FilterSet):
         queryset=BookFormat.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
+    material_details = django_filters.ModelMultipleChoiceFilter(
+        label="Material details",
+        queryset=MaterialDetails.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
+        method='material_details_filter'
+    )
     tag = django_filters.ModelMultipleChoiceFilter(
         label='Tag',
         queryset=Tag.objects.all(),
@@ -46,6 +52,9 @@ class ItemFilter(django_filters.FilterSet):
 
     def multiple_words_filter(self, queryset, name, value):
         return filter_multiple_words(self.filters[name].lookup_expr, queryset, name, value)
+
+    def material_details_filter(self, queryset, name, value):
+        return queryset.filter(itemmaterialdetailsrelation__material_details__in=value)
 
 
 # ItemAuthor filter

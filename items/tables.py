@@ -31,6 +31,7 @@ class ItemTable(tables.Table):
     catalogue = tables.Column(empty_values=())
     collection = tables.RelatedLinkColumn()
     number_of_volumes = tables.Column(verbose_name=_('Number of volumes'))
+    material_details = tables.Column(empty_values=())
     manage_works = tables.LinkColumn('add_workstoitem',
         text=format_html('<span class="glyphicon glyphicon-list" data-toggle="tooltip" data-original-title="Manage works"></span>'),
         args=[A('pk')], orderable=False, empty_values=())
@@ -46,11 +47,13 @@ class ItemTable(tables.Table):
             'people',
             'works',
             'lot',
+            'index_in_lot',
             'sales_price',
             'catalogue',
             'collection',
             'number_of_volumes',
             'book_format',
+            'material_details',
             'uuid',
             'manage_works',
             'manage_persons'
@@ -97,6 +100,9 @@ class ItemTable(tables.Table):
 
     def render_sales_price(self, record):
         return record.lot.sales_price
+
+    def render_material_details(self, record):
+        return ", ".join(MaterialDetails.objects.filter(items__item=record).values_list('description', flat=True))
 
 
 # ItemAuthor table
