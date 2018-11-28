@@ -21,7 +21,18 @@ def normalize_query(query_string,
     return [normspace(' ', (t[0] or t[1]).strip()) for t in findterms(query_string)]
 
 
-def filter_multiple_words(lookup_expr, queryset, name, value):
+def wildcards_to_mysqlregex(wildcard_search_string):
+    """
+    Replaces each '?' to [[:alpha:]] which is the MySQL regex character class for alphabetical characters, and
+    replaces each '*' to [[:alpha:]]+. 
+    :param wildcard_search_string: 
+    :return: 
+    """
+    mysqlregex = re.escape(wildcard_search_string)
+    return mysqlregex.replace('?', '[[:alpha:]]').replace('*', '[[:alpha:]]+')
+
+
+def filter_multiple_words(lookup_expr, queryset, name, value, wildcards=False):
     """
     Filters the given queryset for each word in the given value, 
     using the name of a field and a lookup expression. 
@@ -31,9 +42,14 @@ def filter_multiple_words(lookup_expr, queryset, name, value):
     :param value: the value of that field
     :return: 
     """
+    if wildcards:
+        lookup_expr = 'iregex'
+
     q = Q()
     words = normalize_query(value)
     for word in words:
+        if wildcards:
+            word = wildcards_to_mysqlregex(word)
         query_keywords = {name + '__' + lookup_expr: word}
         q = q | Q(**query_keywords)
     return queryset.filter(q)

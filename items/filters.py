@@ -51,7 +51,7 @@ class ItemFilter(django_filters.FilterSet):
         return queryset
 
     def multiple_words_filter(self, queryset, name, value):
-        return filter_multiple_words(self.filters[name].lookup_expr, queryset, name, value)
+        return filter_multiple_words(self.filters[name].lookup_expr, queryset, name, value, wildcards=True)
 
     def material_details_filter(self, queryset, name, value):
         if value:
