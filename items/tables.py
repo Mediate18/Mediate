@@ -24,6 +24,8 @@ class BookFormatTable(tables.Table):
 # Item table
 class ItemTable(tables.Table):
     uuid = ActionColumn('item_detail', 'change_item', 'delete_item', orderable=False)
+    checkbox = tables.CheckBoxColumn(empty_values=(), orderable=False,
+                                     attrs={'th__input': {'id': 'checkbox_column', 'title': 'Select/deselect all'}})
     people = tables.Column(empty_values=())
     works = tables.Column(empty_values=(), verbose_name=_("Works"))
     lot = tables.RelatedLinkColumn(order_by='lot__lot_as_listed_in_catalogue')
@@ -56,8 +58,14 @@ class ItemTable(tables.Table):
             'material_details',
             'uuid',
             'manage_works',
-            'manage_persons'
+            'manage_persons',
+            'checkbox',
         ]
+
+    def render_checkbox(self, record):
+        return format_html(
+            '<input id="{}" class="checkbox" type="checkbox" name="checkbox"/>'.format(record.uuid)
+        )
 
     def render_people(self, record):
         person_item_relations = PersonItemRelation.objects.filter(item=record)

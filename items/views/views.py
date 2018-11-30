@@ -1,9 +1,10 @@
 from django.contrib import messages
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError
 
 from django.utils.translation import ugettext_lazy as _
 from django.utils.html import escape
@@ -110,6 +111,16 @@ class ItemTableView(ListView):
         context['action'] = _("add")
         context['object_name'] = "item"
         context['add_url'] = reverse_lazy('add_item')
+
+        context['addanother_person_form'] = PersonModelForm()
+        context['batch_edit_options'] = [
+            {
+                'id': 'add_person',
+                'label': _("Add person"),
+                'url': reverse_lazy('add_persontoitems'),
+                'form': PersonItemRelationAddForm()
+            }
+        ]
 
         return context
 
@@ -867,6 +878,38 @@ class PersonItemRelationAddView(SingleObjectMixin, FormView):
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
+
+
+def add_person_to_items(request):
+    """
+    Makes PersonItemRelations for a list of items
+    :param request: 
+    :return: 
+    """
+    if request.method == 'POST':
+        print(request.POST)
+        if 'items' in request.POST:
+            items = request.POST.getlist('items')
+            print(items)
+            for item_id in items:
+                item = Item.objects.get(uuid=item_id)
+                personitemrelation = PersonItemRelation(item=item)
+                form = PersonItemRelationAddForm(instance=personitemrelation, data=request.POST)
+                if form.is_valid():
+                    try:
+                        form.save()
+                    except IntegrityError as ie:
+                        # Probably a unique constraint error which means the relation already exists
+                        messages.add_message(request, messages.ERROR,
+                                             _("{} is already {} of {}".format(form.cleaned_data['person'],
+                                                                               form.cleaned_data['role'], item)))
+                else:
+                    messages.add_message(request, messages.ERROR,
+                                _("Item {} could not be used for adding a person.".format(item)))
+
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    else:
+        raise Http404
 
 
 # PersonItemRelationRole views

@@ -1,6 +1,7 @@
 {% extends "baselayout.html" %}
 {% load i18n %}
 {% load render_table from django_tables2 %}
+{% load static %}
 
 {% block extracss %}
 <link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" type="text/css" media="screen" rel="stylesheet">
@@ -42,12 +43,57 @@
                 {{ object_name|title }}s
             {% endif %}
             <div class="pull-right">
-                <a href="{{ add_url }}" class="btn btn-default btn-md">
+                <a href="{{ add_url }}" class="btn btn-default">
                   <span class="glyphicon glyphicon-plus"></span> New
                 </a>
+                {% if batch_edit_options %}
+                    {% if batch_edit_options|length > 1 %}
+                        <div class="btn-group" role="group" aria-label="batch edit">
+                    {% endif %}
+                    {% for option in batch_edit_options %}
+                        <button class="btn btn-default" id="open-batch-edit" batcheditoptionid="{{ option.id }}"
+                           data-toggle="modal" data-target="#batchEditModal"
+                                onclick="batch_edit_option = '{{console.log('bla')">
+                          <span class="glyphicon glyphicon-list"></span> {{ option.label }}
+                        </button>
+                        <div class="hidden">
+                            <form method="POST" action="{{ option.url }}" id="form_{{ option.id }}">
+                                {% csrf_token %}
+
+                              <div class="modal-body">
+                                <!-- batch edit form -->
+                                <table class="table">
+                                    {{ option.form.as_table }}
+                                </table>
+                              </div>
+                              <div class="modal-footer">
+                                <input type="submit" class="btn btn-success" value="{% trans 'Add' %}"/>
+                                <input type="reset" class="btn btn-default" data-dismiss="modal" value="{% trans 'Cancel' %}"/>
+                              </div>
+                            </form>
+                        </div>
+                    {% endfor %}
+                    {% if batch_edit_options|length > 1 %}
+                        </div>
+                    {% endif %}
+                {% endif %}
+                <div class="hidden" id="batch-edit-modal-content">
+                    <div id="no-selected-entries-warning">
+                      <div class="modal-body">
+                          <p>{% trans "No entries selected" %}</p>
+                      </div>
+                      <div class="modal-footer">
+                        <input type="reset" class="btn btn-default" data-dismiss="modal" value="{% trans 'Close' %}"/>
+                      </div>
+                    </div>
+                </div>
             </div>
         </h1>
         <div class="small">Displaying {{ filter.qs.count }} of {{ filter.queryset.count }}</div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
         {% if table %}
             {% render_table table %}
         {% else %}
@@ -84,13 +130,81 @@
   </div>
 </div>
 
+{% if batch_edit_options %}
+<!-- Batch Edit Modal -->
+<div id="batchEditModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-list"></span> {% trans "Add relations to" %}</h4>
+      </div>
+      <div id="batcheditformcontainer"></div>
+    </div>
+
+  </div>
+</div>
+{% endif %}
+
+{% if addanother_person_form %}
+<!-- Add another Modal -->
+<div id="addanotherModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-plus"></span> {% trans "Add another person" %}</h4>
+      </div>
+        <form id="addanother-person-form" action="{% url 'add_person' %}" method="post">
+          <div class="modal-body">
+                <table class="table">
+                    {% csrf_token %}
+                        {% if form_as == 'p' %}
+                            {{ addanother_person_form.as_p }}
+                        {% else %}
+                            {{ addanother_person_form.as_table }}
+                        {% endif %}
+                </table>
+              <div id="addanother-person-message">
+
+              </div>
+          </div>
+          <div class="modal-footer">
+            <input type="submit" class="btn btn-success" value="{% trans 'Add' %}"/>
+            <input type="reset" class="btn btn-default" data-dismiss="modal" value="{% trans 'Cancel' %}"/>
+          </div>
+        </form>
+    </div>
+
+  </div>
+</div>
+{% endif %}
+
 {% endblock %}
 
 {% block extrajs %}
 
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
-
+<script type="text/javascript" src="{% static 'js/table_select_entries.js' %}"></script>
+{{ form.media.js }}
+{{ addanother_person_form.media.js }}
 <script>
+function handleAddanotherPersonResponse(response) {
+    console.log(response);
+    if(response.pk) { // Success!
+        $('#id_person').append(
+            '<option value="'+response.pk+'">'+response.short_name+'</option>'
+        );
+        $('#addanotherModal').modal('toggle');
+    } else {
+        $('#addanother-person-message').append('{% trans "Something went wrong. Please review the form." %}');
+    }
+}
+
 $(document).ready(function(){
         $('.delete-entry').on('click', function() {
             var url = $(this).attr('modal_url');
@@ -100,6 +214,22 @@ $(document).ready(function(){
 
         $('[data-toggle="tooltip"]').tooltip({
             placement : 'bottom'
+        });
+
+        $('#addanother-person-form').submit(function(event) {
+            event.preventDefault();
+            $.ajax({
+                 type:"POST",
+                 url: $('#addanother-person-form').attr('action'),
+                 data: $('#addanother-person-form').serialize(),
+                 success: function(response){
+                     handleAddanotherPersonResponse(response);
+                 },
+                 error: function(response){
+                    console.log(response);
+                    $('#addanother-person-message').append('{% trans "Something went wrong. Please review the form." %}');
+                 }
+            });
         });
 });
 </script>

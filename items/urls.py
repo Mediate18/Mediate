@@ -177,10 +177,15 @@ urlpatterns = [
        permission_required('items.delete_personitemrelation')(PersonItemRelationDeleteView.as_view()),
        name="delete_personitemrelation"),
 
-    # Add persons to item
+    # Add persons (plural) to item (singular)
     path(r'personitemrelations/addpersonstoitem/<uuid:pk>',
          permission_required('items.add_personitemrelation')(PersonItemRelationAddView.as_view()),
          name="add_personstoitem"),
+
+    # Add person (singular) to items (plural)
+    path(r'personitemrelations/addpersontoitems/',
+         permission_required('items.add_personitemrelation')(add_person_to_items),
+         name="add_persontoitems"),
 
     # PersonItemRelationRole urls
     path('personitemrelationroles/', login_required(PersonItemRelationRoleTableView.as_view()),
