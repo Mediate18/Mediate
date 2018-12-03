@@ -887,10 +887,8 @@ def add_person_to_items(request):
     :return: 
     """
     if request.method == 'POST':
-        print(request.POST)
         if 'items' in request.POST:
             items = request.POST.getlist('items')
-            print(items)
             for item_id in items:
                 item = Item.objects.get(uuid=item_id)
                 personitemrelation = PersonItemRelation(item=item)
