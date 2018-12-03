@@ -47,6 +47,7 @@ class CatalogueDetailView(DetailView):
     model = Catalogue
 
     def get_context_data(self, **kwargs):
+        self.object = self.get_object()
         context = super().get_context_data(**kwargs)
 
         # Find the first lot for each page
@@ -58,7 +59,7 @@ class CatalogueDetailView(DetailView):
 
         # Find the first lot for each category
         # by looping over the ordered lots in the catalogue
-        lots = Catalogue.objects.get(short_title__icontains="boab").lot_set.filter(category__isnull=False).values(
+        lots = self.object.lot_set.filter(category__isnull=False).values(
             'index_in_catalogue', 'category__bookseller_category', 'number_in_catalogue').order_by('index_in_catalogue')
         first_lot_in_category_dict = {}
         last_category = ""
