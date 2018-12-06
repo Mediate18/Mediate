@@ -119,6 +119,7 @@ class Item(models.Model):
     number_of_volumes = models.CharField(_("Number of volumes, as listed in the catalogue"), max_length=128)
     book_format = models.ForeignKey(BookFormat, on_delete=SET_NULL, null=True, related_name='items')
     index_in_lot = models.IntegerField(_("Index in the lot"))
+    manifestation = models.ForeignKey('Manifestation', on_delete=models.PROTECT, related_name="items")
 
     class Meta:
         ordering = ['lot__catalogue__year_of_publication', 'lot__catalogue__short_title',
@@ -229,7 +230,6 @@ class Manifestation(models.Model):
     The manifestation information for an item
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    item = models.ForeignKey(Item, on_delete=models.PROTECT, related_name="manifestations")
     year = models.IntegerField(_("Year of publication"), null=True, blank=True)
     year_tag = models.CharField(_("Year of publication tag"), max_length=128, blank=True)
     terminus_post_quem = models.BooleanField(_("Terminus post quem"), default=False)
@@ -240,7 +240,7 @@ class Manifestation(models.Model):
         year_str = _(" in {}").format(self.year) if self.year else ''
         place_str = _(" in {}").format(self.place.name) if self.place else ''
         published_str = _(" [published{}{}]").format(year_str, place_str) if year_str or place_str else ''
-        return _("{}{}").format(self.item, published_str)
+        return _("Manifestation{}").format(published_str)
 
     def get_absolute_url(self):
         return reverse_lazy('change_manifestation', args=[str(self.uuid)])

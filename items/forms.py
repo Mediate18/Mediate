@@ -1,5 +1,4 @@
 from django import forms
-from django.urls import reverse_lazy
 from django_select2.forms import Select2Widget, ModelSelect2Widget, ModelSelect2MultipleWidget
 from apiconnectors.widgets import ApiSelectWidget
 from .models import *
@@ -39,6 +38,10 @@ class ItemModelForm(forms.ModelForm):
             'lot': ModelSelect2Widget(
                 model=Lot,
                 search_fields=['lot_as_listed_in_catalogue__icontains']
+            ),
+            'manifestation': ModelSelect2Widget(
+                model=Manifestation,
+                search_fields=['place__name__icontains', 'year__icontains']
             ),
             'book_format': Select2Widget,
             'binding_material_details': Select2Widget,

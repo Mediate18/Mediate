@@ -1,7 +1,6 @@
 import django_tables2 as tables
 from django_tables2.utils import A  # alias for Accessor
 from django.utils.html import format_html
-from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from .models import *
 
@@ -34,6 +33,7 @@ class ItemTable(tables.Table):
     collection = tables.RelatedLinkColumn()
     number_of_volumes = tables.Column(verbose_name=_('Number of volumes'))
     material_details = tables.Column(empty_values=())
+    manifestation = tables.LinkColumn()
     manage_works = tables.LinkColumn('add_workstoitem',
         text=format_html('<span class="glyphicon glyphicon-list" data-toggle="tooltip" data-original-title="Manage works"></span>'),
         args=[A('pk')], orderable=False, empty_values=())
@@ -44,7 +44,7 @@ class ItemTable(tables.Table):
     class Meta:
         model = Item
         attrs = {'class': 'table table-sortable'}
-        sequence = [
+        fields = [
             'short_title',
             'people',
             'works',
@@ -56,6 +56,7 @@ class ItemTable(tables.Table):
             'number_of_volumes',
             'book_format',
             'material_details',
+            'manifestation',
             'uuid',
             'manage_works',
             'manage_persons',
@@ -263,7 +264,7 @@ class PersonItemRelationRoleTable(tables.Table):
 # Manifestation table
 class ManifestationTable(tables.Table):
     uuid = ActionColumn('manifestation_detail', 'change_manifestation', 'delete_manifestation', orderable=False)
-    item = tables.RelatedLinkColumn()
+    items = tables.Column(empty_values=(), verbose_name=_("Items"))
     place = tables.RelatedLinkColumn()
     url = tables.Column(linkify=lambda record: record.url)
     publisher = tables.Column(verbose_name=_("Publisher"), empty_values=())
@@ -272,7 +273,7 @@ class ManifestationTable(tables.Table):
         model = Manifestation
         attrs = {'class': 'table table-sortable'}
         sequence = [
-            'item',
+            'items',
             'year',
             'year_tag',
             'terminus_post_quem',
@@ -281,6 +282,14 @@ class ManifestationTable(tables.Table):
             'publisher',
             'uuid'
         ]
+
+    def render_items(self, record):
+        items = Item.objects.filter(manifestation=record).distinct()
+        return format_html(
+            ", ".join(
+                ['<a href="{}">{}</a>'.format(item.get_absolute_url(), item) for item in items]
+            )
+        )
 
     def render_publisher(self, record):
         publishers = Person.objects.filter(publisher__manifestation=record).distinct()

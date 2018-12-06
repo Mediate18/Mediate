@@ -1,5 +1,5 @@
 import django_filters
-from django_filters.widgets import RangeWidget, BooleanWidget
+from django_filters.widgets import RangeWidget
 from django_select2.forms import ModelSelect2MultipleWidget, Select2MultipleWidget
 from tagging.models import Tag, TaggedItem
 from .models import *
@@ -24,6 +24,14 @@ class ItemFilter(django_filters.FilterSet):
     book_format = django_filters.ModelMultipleChoiceFilter(
         queryset=BookFormat.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
+    )
+    manifestation = django_filters.ModelMultipleChoiceFilter(
+        queryset=Manifestation.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Manifestation,
+            search_fields=['place__name__icontains', 'year__icontains', 'url__icontains']
+        )
     )
     material_details = django_filters.ModelMultipleChoiceFilter(
         label="Material details",
@@ -144,7 +152,7 @@ class PersonItemRelationRoleFilter(django_filters.FilterSet):
 
 # Manifestation filter
 class ManifestationFilter(django_filters.FilterSet):
-    item = django_filters.Filter(name='item__short_title', lookup_expr='icontains')
+    items = django_filters.Filter(name='items__short_title', lookup_expr='icontains')
     year = django_filters.RangeFilter(widget=RangeWidget())
     year_tag = django_filters.Filter(lookup_expr='icontains')
     place = django_filters.ModelMultipleChoiceFilter(
