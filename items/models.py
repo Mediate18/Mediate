@@ -116,8 +116,9 @@ class Item(models.Model):
     short_title = models.CharField(_("Short title"), max_length=128, null=True)
     lot = models.ForeignKey(Lot, on_delete=CASCADE, null=True)
     collection = models.ForeignKey(Collection, on_delete=CASCADE)
-    number_of_volumes = models.CharField(_("Number of volumes, as listed in the catalogue"), max_length=128)
-    book_format = models.ForeignKey(BookFormat, on_delete=SET_NULL, null=True, related_name='items')
+    number_of_volumes = models.CharField(_("Number of volumes, as listed in the catalogue"),
+                                         max_length=128, null=True, blank=True)
+    book_format = models.ForeignKey(BookFormat, on_delete=SET_NULL, null=True, related_name='items', blank=True)
     index_in_lot = models.IntegerField(_("Index in the lot"))
     manifestation = models.ForeignKey('Manifestation', on_delete=models.PROTECT, related_name="items")
 
