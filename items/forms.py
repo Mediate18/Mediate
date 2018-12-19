@@ -1,9 +1,11 @@
+from collections import OrderedDict
 from django import forms
 from django_select2.forms import Select2Widget, ModelSelect2Widget, ModelSelect2MultipleWidget
 from apiconnectors.widgets import ApiSelectWidget
 from .models import *
 
 from tagging.models import Tag
+from betterforms.multiform import MultiModelForm
 
 
 class BookFormatModelForm(forms.ModelForm):
@@ -221,9 +223,9 @@ class ManifestationModelForm(forms.ModelForm):
         model = Manifestation
         fields = "__all__"
         widgets = {
-            'item': ModelSelect2Widget(
-                model=Item,
-                search_fields=['short_title__icontains']
+            'place': ModelSelect2Widget(
+                model=Place,
+                search_fields=['name__icontains']
             ),
         }
 
@@ -280,4 +282,25 @@ class WorkSubjectModelForm(forms.ModelForm):
         fields = "__all__"
 
 
+class ItemModelForm2(ItemModelForm):
+    class Meta:
+        model = Item
+        exclude = ['manifestation']
+        widgets = {
+            'collection': Select2Widget,
+            'lot': ModelSelect2Widget(
+                model=Lot,
+                search_fields=['lot_as_listed_in_catalogue__icontains']
+            ),
+            'book_format': Select2Widget,
+            'binding_material_details': Select2Widget,
+            'language': Select2Widget,
+            'work': Select2Widget,
+        }
 
+
+class ItemAndManifestationForm(MultiModelForm):
+    form_classes = OrderedDict([
+        ('item', ItemModelForm2),
+        ('manifestation', ManifestationModelForm)
+    ])

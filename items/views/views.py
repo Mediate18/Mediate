@@ -1329,3 +1329,26 @@ class WorkSubjectUpdateView(UpdateView):
 class WorkSubjectDeleteView(DeleteView):
     model = WorkSubject
     success_url = reverse_lazy('worksubjects')
+
+
+class ItemAndManifestationCreateView(CreateView):
+    form_class = ItemAndManifestationForm
+    template_name = 'generic_form.html'
+    success_url = reverse_lazy('items')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = "item and manifestation"
+        return context
+
+    def form_valid(self, form):
+        # Save the manifestation first, because the item needs a manifestation before it
+        # can be saved.
+        manifestation = form['manifestation'].save()
+        item = form['item'].save(commit=False)
+        item.manifestation = manifestation
+        item.save()
+        messages.add_message(self.request, messages.SUCCESS,
+                             _("Added an item and a manifestation."))
+        return HttpResponseRedirect(self.success_url)
