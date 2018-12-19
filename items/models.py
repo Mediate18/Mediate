@@ -234,7 +234,7 @@ class Manifestation(models.Model):
     year = models.IntegerField(_("Year of publication"), null=True, blank=True)
     year_tag = models.CharField(_("Year of publication tag"), max_length=128, blank=True)
     terminus_post_quem = models.BooleanField(_("Terminus post quem"), default=False)
-    place = models.ForeignKey(Place, on_delete=models.PROTECT, null=True)
+    place = models.ForeignKey(Place, on_delete=models.PROTECT, null=True, blank=True)
     url = models.CharField(_("URL"), max_length=1024, blank=True)
 
     def __str__(self):
