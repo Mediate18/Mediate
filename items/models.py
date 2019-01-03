@@ -238,10 +238,16 @@ class Manifestation(models.Model):
     url = models.CharField(_("URL"), max_length=1024, blank=True)
 
     def __str__(self):
-        year_str = _(" in {}").format(self.year) if self.year else ''
-        place_str = _(" in {}").format(self.place.name) if self.place else ''
-        published_str = _(" [published{}{}]").format(year_str, place_str) if year_str or place_str else ''
-        return _("Manifestation{}").format(published_str)
+        str_elements = []
+        if self.place:
+            str_elements.append("{}".format(self.place.name))
+        publishers = Publisher.objects.filter(manifestation=self)
+        if publishers and publishers[0].publisher.short_name:
+            str_elements.append(publishers[0].publisher.short_name)
+        if self.year:
+            str_elements.append("{}".format(self.year))
+        published_str = ", ".join(str_elements)if str_elements else _("Emtpy manifestation").format()
+        return published_str
 
     def get_absolute_url(self):
         return reverse_lazy('change_manifestation', args=[str(self.uuid)])
