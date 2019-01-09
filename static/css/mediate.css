@@ -366,3 +366,15 @@ h1 {
 .select2-selection {
   outline: 0;
 }
+
+.expand-cell {
+    display: none;  // Don't show by default
+}
+.collapse-cell {
+    display: none;
+}
+.collapsed-cell {
+    max-height: 70px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

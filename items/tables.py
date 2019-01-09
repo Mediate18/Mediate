@@ -27,7 +27,7 @@ class ItemTable(tables.Table):
                                      attrs={'th__input': {'id': 'checkbox_column', 'title': 'Select/deselect all'}})
     people = tables.Column(empty_values=())
     works = tables.Column(empty_values=(), verbose_name=_("Works"))
-    lot = tables.RelatedLinkColumn(order_by='lot__lot_as_listed_in_catalogue')
+    lot = tables.Column(order_by='lot__lot_as_listed_in_catalogue', )
     sales_price = tables.Column(empty_values=(), order_by='lot__sales_price')
     catalogue = tables.Column(empty_values=())
     collection = tables.RelatedLinkColumn()
@@ -62,6 +62,16 @@ class ItemTable(tables.Table):
             'manage_persons',
             'checkbox',
         ]
+
+    def render_lot(self, record):
+        return format_html(
+            '<div class="col-xs-11 expandable-cell collapsed-cell"><a href="{}">{}</a></div>'
+            '<div class="col-xs-1">'
+            '<span class="expand-cell glyphicon glyphicon-chevron-down" title="Expand"></span>'
+            '<span class="collapse-cell glyphicon glyphicon-chevron-up" title="Collapse"></span>'
+            '</div>'
+                .format(reverse_lazy('change_lot', args=[record.lot.uuid]), record.lot.lot_as_listed_in_catalogue)
+        )
 
     def render_checkbox(self, record):
         return format_html(

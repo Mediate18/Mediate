@@ -231,6 +231,29 @@ $(document).ready(function(){
                  }
             });
         });
+
+        $('.expandable-cell').each(function() {
+        console.log($(this).height());
+            if($(this).height() >= 70) {
+                $(this).closest('td').find('.expand-cell').show();
+            }
+        });
+        $('.expand-cell').on('click', function(e) {
+            // Hide chevron down
+            $(this).hide();
+            // Show chevron up
+            $(this).closest('td').find('.collapse-cell').show();
+            // Make the surrounding div disable 'max-height'
+            $(this).closest('td').find('.expandable-cell').toggleClass('collapsed-cell');
+        });
+        $('.collapse-cell').on('click', function(e) {
+            // Hide chevron up
+            $(this).hide();
+            // Show chevron down
+            $(this).closest('td').find('.expand-cell').show();
+            // Make the surrounding div enable 'max-height'
+            $(this).closest('td').find('.expandable-cell').toggleClass('collapsed-cell');
+        });
 });
 </script>
 {% endblock %}
