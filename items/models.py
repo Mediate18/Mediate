@@ -246,7 +246,7 @@ class Manifestation(models.Model):
             str_elements.append(publishers[0].publisher.short_name)
         if self.year:
             str_elements.append("{}".format(self.year))
-        published_str = ", ".join(str_elements)if str_elements else _("Emtpy manifestation").format()
+        published_str = ", ".join(str_elements)if str_elements else _("Empty manifestation").format()
         return published_str
 
     def get_absolute_url(self):
