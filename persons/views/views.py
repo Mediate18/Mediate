@@ -116,6 +116,7 @@ class PersonUpdateView(UpdateView):
     success_url = reverse_lazy('persons')
 
     def get_context_data(self, **kwargs):
+        self.object = self.get_object()
         context = super().get_context_data(**kwargs)
         context['action'] = _("update")
         context['object_name'] = "person"
