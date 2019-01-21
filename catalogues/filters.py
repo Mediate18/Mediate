@@ -1,4 +1,5 @@
 import django_filters
+from django.db.models import Count
 from django_select2.forms import Select2MultipleWidget
 from .models import *
 from mediate.tools import filter_multiple_words
@@ -125,10 +126,17 @@ class LotFilter(django_filters.FilterSet):
     page_in_catalogue = django_filters.RangeFilter(widget=django_filters.widgets.RangeWidget())
     sales_price = django_filters.Filter(lookup_expr='icontains')
     lot_as_listed_in_catalogue = django_filters.Filter(lookup_expr='icontains')
+    number_of_items = django_filters.Filter(label='Number of items', method='number_of_items_filter')
 
     class Meta:
         model = Lot
         exclude = ['uuid']
+
+    def number_of_items_filter(self, queryset, name, value):
+        if value:
+            return queryset.annotate(num_items=Count('item')).filter(num_items=value)
+        else:
+            return queryset
 
 
 # PersonCatalogueRelation filter
