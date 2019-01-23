@@ -115,7 +115,7 @@ class Item(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     short_title = models.CharField(_("Short title"), max_length=128, null=True)
     lot = models.ForeignKey(Lot, on_delete=CASCADE, null=True)
-    collection = models.ForeignKey(Collection, on_delete=CASCADE)
+    collection = models.ForeignKey(Collection, on_delete=CASCADE, null=True, blank=True)
     number_of_volumes = models.CharField(_("Number of volumes, as listed in the catalogue"),
                                          max_length=128, null=True, blank=True)
     book_format = models.ForeignKey(BookFormat, on_delete=SET_NULL, null=True, related_name='items', blank=True)
@@ -131,10 +131,12 @@ class Item(models.Model):
 
     def clean(self):
         print("{} =? {}".format(self.collection, self.lot.catalogue.collection))
-        if self.lot and self.lot.catalogue and self.lot.catalogue.collection and \
-                        self.collection != self.lot.catalogue.collection:
-            raise ValidationError({'collection':
-                _("The collection of this item and the collection of the catalogue of this item, are not the same.")
+        if self.lot and self.lot.catalogue and self.lot.catalogue.collection:
+            if not self.collection:
+                self.collection = self.lot.catalogue.collection
+            elif self.collection != self.lot.catalogue.collection:
+                raise ValidationError({'collection':
+                    _("The collection of this item and the collection of the catalogue of this item, are not the same.")
                                    })
 
     def get_absolute_url(self):
