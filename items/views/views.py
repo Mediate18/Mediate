@@ -21,6 +21,7 @@ from ..filters import *
 from ..tables import *
 
 from persons.forms import PersonModelForm
+from mediate.views import GenericDetailView
 from simplemoderation.models import Moderation, ModerationAction
 
 from simplemoderation.tools import moderate
@@ -995,8 +996,9 @@ class ManifestationTableView(ListView):
         return context
 
 
-class ManifestationDetailView(DetailView):
+class ManifestationDetailView(GenericDetailView):
     model = Manifestation
+    object_fields = ['year', 'year_tag', 'terminus_post_quem', 'place', 'url']
 
 
 class ManifestationCreateView(CreateView):
@@ -1175,8 +1177,9 @@ class WorkTableView(ListView):
         return context
 
 
-class WorkDetailView(DetailView):
+class WorkDetailView(GenericDetailView):
     model = Work
+    object_fields = ['title', 'viaf_id']
 
 
 class WorkCreateView(CreateView):

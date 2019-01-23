@@ -6,6 +6,7 @@ from django.views.generic.list import ListView
 from django.db.models import Count, Min
 
 from mediate.tools import put_layout_in_context, put_get_variable_in_context
+from mediate.views import GenericDetailView
 from simplemoderation.tools import moderate
 
 from ..forms import *
@@ -319,8 +320,9 @@ class CollectionTableView(ListView):
         return context
 
 
-class CollectionDetailView(DetailView):
+class CollectionDetailView(GenericDetailView):
     model = Collection
+    object_fields = ['name']
 
 
 class CollectionCreateView(CreateView):
@@ -500,8 +502,10 @@ class LotTableView(ListView):
         return context
 
 
-class LotDetailView(DetailView):
+class LotDetailView(GenericDetailView):
     model = Lot
+    object_fields = ['catalogue', 'number_in_catalogue', 'page_in_catalogue', 'sales_price',
+                     'lot_as_listed_in_catalogue', 'index_in_catalogue', 'category']
 
 
 @moderate()
@@ -747,8 +751,9 @@ class CategoryTableView(ListView):
         return context
 
 
-class CategoryDetailView(DetailView):
+class CategoryDetailView(GenericDetailView):
     model = Category
+    object_fields = ['catalogue', 'parent', 'bookseller_category', 'parisian_category']
 
 
 class CategoryCreateView(CreateView):

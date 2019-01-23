@@ -1,0 +1,41 @@
+{% extends "baselayout.html" %}
+{% load i18n %}
+{% load static %}
+{% load dictionary_lookup %}
+
+{% block extracss %}
+    <link rel="stylesheet" href="{% static 'catalogues/css/catalogue_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="row flex-row">
+    <div class="col-xs-10">
+        <div class="flex-col">
+            <!-- Put content header here -->
+            <h2>
+                {{ object_name|title }}
+                <i>{{ object }}</i>
+            </h2>
+
+            <dl class="dl-horizontal" style="padding-bottom: 15px;">
+                {% for field, value in object_dict.items %}
+                    <dt>{{ field|capfirst }}</dt>
+                    <dd>{{ value }}</dd>
+                {% endfor %}
+            </dl>
+        </div>
+    </div>
+    <div class="col-xs-2">
+        <div>
+            <a href="{{ edit_url }}" class="btn btn-default">
+                <span class="glyphicon glyphicon-plus"></span> {% trans "Edit" %}
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+{% endblock %}

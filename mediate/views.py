@@ -4,6 +4,8 @@ import os
 import mimetypes
 from django.conf import settings
 from django.http import Http404, HttpResponse
+from django.views.generic.detail import DetailView
+from django.urls import reverse_lazy
 
 
 @login_required
@@ -37,3 +39,23 @@ def protected_media(request, filename):
 
     return response
 
+
+class GenericDetailView(DetailView):
+    """
+    A DetailView that uses a generic detail template and lists object field-value pairs
+    given by the class field 'object_fields'.
+    """
+    template_name = 'generic_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        obj = self.get_object()
+        context['object_name'] = self.model.__name__
+
+        if hasattr(self, 'object_fields'):
+            context['object_dict'] = dict([(field.replace('_', ' '), getattr(obj, field))
+                                           for field in self.object_fields])
+
+        context['edit_url'] = reverse_lazy('change_' + self.model.__name__.lower(), args=[obj.pk])
+        return context
