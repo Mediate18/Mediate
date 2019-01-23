@@ -140,7 +140,7 @@ class Item(models.Model):
                                    })
 
     def get_absolute_url(self):
-        return reverse_lazy('change_item', args=[str(self.uuid)])
+        return reverse_lazy('item_detail', args=[str(self.uuid)])
 
 tagging.register(Item)
 
@@ -252,7 +252,7 @@ class Manifestation(models.Model):
         return published_str
 
     def get_absolute_url(self):
-        return reverse_lazy('change_manifestation', args=[str(self.uuid)])
+        return reverse_lazy('manifestation_detail', args=[str(self.uuid)])
 
 
 class Publisher(models.Model):

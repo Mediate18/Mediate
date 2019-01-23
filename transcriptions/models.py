@@ -35,7 +35,7 @@ class Transcription(models.Model):
                                                       ", ".join([str(scan.scan) for scan in self.scans.all()]))
 
     def get_absolute_url(self):
-        return reverse_lazy('change_transcription', args=[str(self.uuid)])
+        return reverse_lazy('transcription_detail', args=[str(self.uuid)])
 
 class DocumentScan(models.Model):
     """

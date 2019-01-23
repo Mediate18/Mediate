@@ -16,6 +16,7 @@ import requests
 from apiconnectors.cerlapi import CerlSuggest, cerl_record_url
 
 from simplemoderation.tools import moderate, ModeratedCreateView
+from mediate.views import GenericDetailView
 
 from ..forms import *
 from ..filters import *
@@ -370,8 +371,9 @@ class PlaceTableView(ListView):
         return context
 
 
-class PlaceDetailView(DetailView):
+class PlaceDetailView(GenericDetailView):
     model = Place
+    object_fields = ['name', 'cerl_id']
 
 
 class PlaceCreateView(CreateView):

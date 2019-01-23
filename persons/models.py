@@ -23,7 +23,7 @@ class Place(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse_lazy('change_place', args=[str(self.uuid)])
+        return reverse_lazy('place_detail', args=[str(self.uuid)])
 
 
 class Religion(models.Model):
@@ -74,7 +74,7 @@ class Person(models.Model):
         return self.short_name
 
     def get_absolute_url(self):
-        return reverse_lazy('change_person', args=[str(self.uuid)])
+        return reverse_lazy('person_detail', args=[str(self.uuid)])
 
 
 class ReligiousAffiliation(models.Model):

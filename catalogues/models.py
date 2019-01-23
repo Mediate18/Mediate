@@ -21,7 +21,7 @@ class Collection(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse_lazy('change_collection', args=[str(self.uuid)])
+        return reverse_lazy('collection_detail', args=[str(self.uuid)])
 
 
 class CollectionYear(models.Model):
@@ -140,7 +140,7 @@ class Lot(models.Model):
             raise Exception(_("Lot {}: the catalogue is not the as the category's catalogue").format(self))
 
     def get_absolute_url(self):
-        return reverse_lazy('change_lot', args=[str(self.uuid)])
+        return reverse_lazy('lot_detail', args=[str(self.uuid)])
 
 
 class PersonCollectionRelation(models.Model):
