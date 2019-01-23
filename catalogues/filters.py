@@ -126,17 +126,19 @@ class LotFilter(django_filters.FilterSet):
     page_in_catalogue = django_filters.RangeFilter(widget=django_filters.widgets.RangeWidget())
     sales_price = django_filters.Filter(lookup_expr='icontains')
     lot_as_listed_in_catalogue = django_filters.Filter(lookup_expr='icontains')
-    number_of_items = django_filters.Filter(label='Number of items', method='number_of_items_filter')
+    number_of_items = django_filters.Filter(label='Number of items', method='number_of_items_filter',
+                                            widget=django_filters.widgets.RangeWidget())
 
     class Meta:
         model = Lot
         exclude = ['uuid']
 
     def number_of_items_filter(self, queryset, name, value):
-        if value:
-            return queryset.annotate(num_items=Count('item')).filter(num_items=value)
-        else:
-            return queryset
+        if value[0]:
+            queryset = queryset.annotate(num_items=Count('item')).filter(num_items__gte=value[0])
+        if value[1]:
+            queryset = queryset.annotate(num_items=Count('item')).filter(num_items__lte=value[1])
+        return queryset
 
 
 # PersonCatalogueRelation filter
