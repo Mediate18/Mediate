@@ -42,3 +42,39 @@ class PersonCollectionRelationSerializer(serializers.HyperlinkedModelSerializer)
     class Meta:
         model = PersonCollectionRelation
         fields = "__all__"
+
+
+class CollectionYearSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = CollectionYear
+        fields = "__all__"
+
+
+class LibrarySerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Library
+        fields = "__all__"
+
+
+class CatalogueCatalogueTypeRelationSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = CatalogueCatalogueTypeRelation
+        fields = "__all__"
+
+
+class CatalogueHeldBySerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = CatalogueHeldBy
+        fields = "__all__"
+
+
+class ParisianCategorySerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = ParisianCategory
+        fields = "__all__"
+
+
+class CategorySerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Category
+        fields = "__all__"
