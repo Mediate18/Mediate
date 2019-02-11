@@ -24,7 +24,7 @@ class CatalogueTests(GenericCRUDTestMixin, TestCase):
 
     def get_add_form_data(self):
         transcription = Transcription.objects.first()
-        collection = Collection.objects.first()
+        collection, created = Collection.objects.get_or_create(**CollectionTests().get_add_form_data())
         return {
             'transcription': transcription,
             'short_title': 'short_title test1',
