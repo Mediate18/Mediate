@@ -107,6 +107,9 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD'),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+        },
+        'TEST': {
+            'NAME': config('TEST_DB_NAME'),
         }
     }
 }
