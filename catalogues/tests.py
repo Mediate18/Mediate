@@ -80,7 +80,7 @@ class CatalogueTypeTests(GenericCRUDTestMixin, TestCase):
 
 class LibraryTests(GenericCRUDTestMixin, TestCase):
     model = Library
-    list_url_name = 'libraries'
+    url_names = {'list': 'libraries'}
 
     def get_add_form_data(self):
         return {
