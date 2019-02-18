@@ -104,13 +104,13 @@ class WorkSubjectTests(GenericCRUDTestMixin, TestCase):
         subject, created = Subject.objects.get_or_create(**SubjectTests().get_add_form_data())
         return {
             'work_id': work.pk,
-            'subject': subject
+            'subject_id': subject.pk
         }
 
     def get_change_form_data(self):
         work, created = Work.objects.get_or_create(**WorkTests().get_change_form_data())
         return {
-            'work': work
+            'work_id': work.pk
         }
 
     def test_Detail(self):
@@ -151,12 +151,12 @@ class ItemTests(GenericCRUDTestMixin, TestCase):
             .get_or_create(**ManifestationTests().get_add_form_data())
         return {
             'short_title': 'short_title',
-            'lot':  lot,
-            'collection': collection,
+            'lot_id':  lot.pk,
+            'collection_id': collection.pk,
             'number_of_volumes': 'number_of_volumes test',
-            'book_format': book_format,
+            'book_format_id': book_format.pk,
             'index_in_lot': 1,
-            'manifestation': manifestation
+            'manifestation_id': manifestation.pk
         }
 
     def get_change_form_data(self):
@@ -188,16 +188,16 @@ class ItemItemTypeRelationTests(GenericCRUDTestMixin, TestCase):
 
     def get_add_form_data(self):
         item, created = Item.objects.get_or_create(**ItemTests().get_add_form_data())
-        type, created = ItemType.objects.get_or_create(**ItemTypeTests().get_add_form_data())
+        item_type, created = ItemType.objects.get_or_create(**ItemTypeTests().get_add_form_data())
         return {
             'item_id': item.pk,
-            'type': type
+            'type_id': item_type.pk
         }
 
     def get_change_form_data(self):
-        type = ItemType.objects.get_or_create(**ItemTypeTests().get_change_form_data())
+        item_type, created = ItemType.objects.get_or_create(**ItemTypeTests().get_change_form_data())
         return {
-            'type': type
+            'type_id': item_type.pk
         }
 
     def test_Detail(self):
@@ -213,13 +213,13 @@ class ItemAuthorTests(GenericCRUDTestMixin, TestCase):
         person = Person.objects.first()
         return {
             'item_id': item.pk,
-            'author': person
+            'author_id': person.pk
         }
 
     def get_change_form_data(self):
         person = Person.objects.all()[1]
         return {
-            'person': person
+            'author_id': person.pk
         }
 
     def test_Detail(self):
@@ -280,14 +280,14 @@ class ItemMaterialDetailsRelationTests(GenericCRUDTestMixin, TestCase):
             .get_or_create(**MaterialDetailsTests().get_add_form_data())
         return {
             'item_id': item.pk,
-            'material_details': material_details
+            'material_details_id': material_details.pk
         }
 
     def get_change_form_data(self):
         material_details, created = MaterialDetails.objects \
             .get_or_create(**MaterialDetailsTests().get_add_form_data())
         return {
-            'material_details': material_details
+            'material_details_id': material_details.pk
         }
 
     def test_Detail(self):
