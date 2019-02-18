@@ -130,7 +130,6 @@ class Item(models.Model):
         return self.short_title
 
     def clean(self):
-        print("{} =? {}".format(self.collection, self.lot.catalogue.collection))
         if self.lot and self.lot.catalogue and self.lot.catalogue.collection:
             if not self.collection:
                 self.collection = self.lot.catalogue.collection

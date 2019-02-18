@@ -234,6 +234,16 @@ class PublisherModelForm(forms.ModelForm):
     class Meta:
         model = Publisher
         fields = "__all__"
+        widgets = {
+            'publisher': ModelSelect2Widget(
+                model=Person,
+                search_fields=['short_name__icontains']
+            ),
+            'manifestation': ModelSelect2Widget(
+                model=Manifestation,
+                search_fields=['year__icontains', 'place__name__icontains']
+            )
+        }
 
 
 class SubjectModelForm(forms.ModelForm):
