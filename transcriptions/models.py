@@ -67,3 +67,6 @@ class DocumentScan(models.Model):
         # Move the scan file
         os.rename(old_path, new_path)
 
+
+# Enable the simple-history registration:
+from .history import *

@@ -296,3 +296,7 @@ class PersonItemRelation(models.Model):
 
     def __str__(self):
         return _("{} is {} of {}").format(self.person, self.role, self.item)
+
+
+# Enable the simple-history registration:
+from .history import *

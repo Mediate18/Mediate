@@ -1,17 +1,18 @@
 from django.contrib import admin
+from simple_history.admin import SimpleHistoryAdmin
 from .models import *
 
 
 @admin.register(DocumentScan)
-class DocumentScanAdmin(admin.ModelAdmin):
+class DocumentScanAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(SourceMaterial)
-class SourceMaterialAdmin(admin.ModelAdmin):
+class SourceMaterialAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(Transcription)
-class TranscriptionAdmin(admin.ModelAdmin):
+class TranscriptionAdmin(SimpleHistoryAdmin):
     pass

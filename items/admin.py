@@ -1,4 +1,5 @@
 from django.contrib import admin
+from simple_history.admin import SimpleHistoryAdmin
 from .models import *
 
 # TODO The next bit should be in a more global place, but I could not find one (Micha, 2018-04-06)
@@ -7,92 +8,92 @@ admin.site.register(Permission)
 
 
 @admin.register(BookFormat)
-class BookFormatAdmin(admin.ModelAdmin):
+class BookFormatAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(Item)
-class ItemAdmin(admin.ModelAdmin):
+class ItemAdmin(SimpleHistoryAdmin):
     search_fields = ['work__title']
 
 
 @admin.register(ItemAuthor)
-class ItemAuthorAdmin(admin.ModelAdmin):
+class ItemAuthorAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(ItemItemTypeRelation)
-class ItemItemTypeRelationAdmin(admin.ModelAdmin):
+class ItemItemTypeRelationAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(ItemLanguageRelation)
-class ItemLanguageRelationAdmin(admin.ModelAdmin):
+class ItemLanguageRelationAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(ItemMaterialDetailsRelation)
-class ItemMaterialDetailsRelationAdmin(admin.ModelAdmin):
+class ItemMaterialDetailsRelationAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(ItemType)
-class ItemTypeAdmin(admin.ModelAdmin):
+class ItemTypeAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(ItemWorkRelation)
-class ItemWorkRelationAdmin(admin.ModelAdmin):
+class ItemWorkRelationAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(Language)
-class LanguageAdmin(admin.ModelAdmin):
+class LanguageAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(MaterialDetails)
-class MaterialDetailsAdmin(admin.ModelAdmin):
+class MaterialDetailsAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(PersonItemRelation)
-class PersonItemRelationAdmin(admin.ModelAdmin):
+class PersonItemRelationAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(PersonItemRelationRole)
-class PersonItemRelationRoleAdmin(admin.ModelAdmin):
+class PersonItemRelationRoleAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(Manifestation)
-class ManifestationAdmin(admin.ModelAdmin):
+class ManifestationAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(Publisher)
-class PublisherAdmin(admin.ModelAdmin):
+class PublisherAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(Subject)
-class SubjectAdmin(admin.ModelAdmin):
+class SubjectAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(Work)
-class WorkAdmin(admin.ModelAdmin):
+class WorkAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(WorkAuthor)
-class WorkAuthorAdmin(admin.ModelAdmin):
+class WorkAuthorAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(WorkSubject)
-class WorkSubjectAdmin(admin.ModelAdmin):
+class WorkSubjectAdmin(SimpleHistoryAdmin):
     pass
 
 

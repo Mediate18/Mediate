@@ -180,3 +180,7 @@ class PersonPersonRelation(models.Model):
         if self.end_year_year:
             object_str = object_str + _(" until {}").format(self.end_year)
         return object_str
+
+
+# Enable the simple-history registration:
+from .history import *

@@ -1,47 +1,48 @@
 from django.contrib import admin
+from simple_history.admin import SimpleHistoryAdmin
 from .models import *
 
 
 @admin.register(Person)
-class PersonAdmin(admin.ModelAdmin):
+class PersonAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(PersonPersonRelation)
-class PersonPersonRelationAdmin(admin.ModelAdmin):
+class PersonPersonRelationAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(PersonPersonRelationType)
-class PersonPersonRelationTypeAdmin(admin.ModelAdmin):
+class PersonPersonRelationTypeAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(PersonProfession)
-class PersonProfessionAdmin(admin.ModelAdmin):
+class PersonProfessionAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(Place)
-class PlaceAdmin(admin.ModelAdmin):
+class PlaceAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(Profession)
-class ProfessionAdmin(admin.ModelAdmin):
+class ProfessionAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(Religion)
-class ReligionAdmin(admin.ModelAdmin):
+class ReligionAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(ReligiousAffiliation)
-class ReligiousAffiliationAdmin(admin.ModelAdmin):
+class ReligiousAffiliationAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(Residence)
-class ResidenceAdmin(admin.ModelAdmin):
+class ResidenceAdmin(SimpleHistoryAdmin):
     pass

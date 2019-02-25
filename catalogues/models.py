@@ -220,3 +220,7 @@ class Category(models.Model):
             super(Category, self).save(*args, **kwargs)
         else:
             raise Exception(_("Category {}: the catalogue is not the as the parent's catalogue").format(self))
+
+
+# Enable the simple-history registration:
+from .history import *

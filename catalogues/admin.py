@@ -1,32 +1,33 @@
 from django.contrib import admin
+from simple_history.admin import SimpleHistoryAdmin
 from .models import *
 
 
 @admin.register(Catalogue)
-class CatalogueAdmin(admin.ModelAdmin):
+class CatalogueAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(CatalogueType)
-class CatalogueTypeAdmin(admin.ModelAdmin):
+class CatalogueTypeAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(PersonCatalogueRelation)
-class PersonCatalogueRelationAdmin(admin.ModelAdmin):
+class PersonCatalogueRelationAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(PersonCatalogueRelationRole)
-class PersonCatalogueRelationRoleAdmin(admin.ModelAdmin):
+class PersonCatalogueRelationRoleAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(PersonCollectionRelation)
-class PersonCollectionRelationAdmin(admin.ModelAdmin):
+class PersonCollectionRelationAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(Collection)
-class CollectionAdmin(admin.ModelAdmin):
+class CollectionAdmin(SimpleHistoryAdmin):
     pass
