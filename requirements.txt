@@ -9,10 +9,12 @@ django-filter==1.1.0
 django-maintenance-mode==0.10.0
 django-model-utils==3.1.1
 django-select2==6.0.2
+django-simple-history==2.7.0
 django-tables2==1.19.0
 -e git+https://github.com/Mediate18/django-tagging.git@a566fe44661d01d714846fafd4e626ad071a4bcb#egg=django_tagging
 djangorestframework==3.7.7
 mysqlclient==1.3.12
 python-decouple==3.1
+sqlparse==0.2.4
 viapy==0.2.0.dev0
 
