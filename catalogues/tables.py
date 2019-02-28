@@ -30,7 +30,7 @@ class CatalogueTable(tables.Table):
 
     def render_full_title(self, record, value):
         return format_html('<a href="{}">{}</a>'.format(reverse_lazy('catalogue_detail', args=[record.pk]),
-                                                        value[:50] + "...") if len(value) > 50 else value)
+                                                        value[:50] + "..." if len(value) > 50 else value))
 
     def render_types(self, record):
         return format_html(
