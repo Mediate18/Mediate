@@ -141,6 +141,10 @@ class Item(models.Model):
     def get_absolute_url(self):
         return reverse_lazy('item_detail', args=[str(self.uuid)])
 
+    def delete(self, using=None, keep_parents=False):
+        super().delete(using=using, keep_parents=keep_parents)
+        self.manifestation.delete()
+
 tagging.register(Item)
 
 
