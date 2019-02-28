@@ -212,6 +212,7 @@ class PersonCollectionRelationTable(tables.Table):
 # Category table
 class CategoryTable(tables.Table):
     uuid = ActionColumn('category_detail', 'change_category', 'delete_category', orderable=False)
+    parent = tables.LinkColumn(verbose_name="Parent category")
 
     class Meta:
         model = Category
