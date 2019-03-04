@@ -1,6 +1,7 @@
 import django_filters
 from django_filters.widgets import RangeWidget
 from django.db.models import Count
+from django.forms import CheckboxInput
 from django_select2.forms import ModelSelect2MultipleWidget, Select2MultipleWidget
 from tagging.models import Tag, TaggedItem
 from .models import *
@@ -34,10 +35,10 @@ class ItemFilter(django_filters.FilterSet):
             search_fields=['place__name__icontains', 'year__icontains', 'url__icontains']
         )
     )
-    manifestation_is_empty = django_filters.BooleanFilter(
-        label="Manifestation is empty",
-        widget=django_filters.widgets.BooleanWidget(),
-        method='manifestation_is_empty_filter'
+    manifestation_isnull = django_filters.BooleanFilter(
+        label="No associated manifestation",
+        widget=CheckboxInput(),
+        method='manifestation_isnull_filter'
     )
     material_details = django_filters.ModelMultipleChoiceFilter(
         label="Material details",
@@ -66,7 +67,7 @@ class ItemFilter(django_filters.FilterSet):
             'book_format',
             'index_in_lot',
             'manifestation',
-            'manifestation_is_empty',
+            'manifestation_isnull',
             'sales_price',
             'material_details',
             'tag'
@@ -86,7 +87,7 @@ class ItemFilter(django_filters.FilterSet):
         else:
             return queryset
 
-    def manifestation_is_empty_filter(self, queryset, name, value):
+    def manifestation_isnull_filter(self, queryset, name, value):
         if value:
             return queryset.filter(manifestation__isnull=True)
         return queryset

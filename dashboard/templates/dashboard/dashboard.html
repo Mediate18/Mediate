@@ -268,7 +268,7 @@
                         <span>{{ number_of_items_without_manifestations }}</span>
                         {% if number_of_items_without_manifestations > 0 %}
                             <a title="View items without manifestation"
-                               href="{% url 'items' %}?manifestation_is_empty=true">
+                               href="{% url 'items' %}?manifestation_isnull=on">
                                 <span class="glyphicon glyphicon-th-list"></span>
                             </a>
                         {% endif %}
