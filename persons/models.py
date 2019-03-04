@@ -177,7 +177,7 @@ class PersonPersonRelation(models.Model):
         object_str = _("{} is {} of {}").format(self.first_person, self.type, self.second_person)
         if self.start_year:
             object_str = object_str + _(" from {}").format(self.start_year)
-        if self.end_year_year:
+        if self.end_year:
             object_str = object_str + _(" until {}").format(self.end_year)
         return object_str
 
