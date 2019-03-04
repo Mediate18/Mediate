@@ -3,13 +3,13 @@ from django.db.models import Count
 from django_select2.forms import Select2MultipleWidget
 from .models import *
 from mediate.tools import filter_multiple_words
+from persons.models import Profession, Religion
 
 
 # Catalogue filter
 class CatalogueFilter(django_filters.FilterSet):
     short_title = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
     full_title = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
-    preface_and_paratexts = django_filters.Filter(lookup_expr='icontains')
     types = django_filters.ModelMultipleChoiceFilter(
         label='Types',
         queryset=CatalogueType.objects.all(),
@@ -18,9 +18,35 @@ class CatalogueFilter(django_filters.FilterSet):
     )
     year_of_publication = django_filters.RangeFilter(widget=django_filters.widgets.RangeWidget())
     terminus_post_quem = django_filters.BooleanFilter(widget=django_filters.widgets.BooleanWidget())
-    collection = django_filters.Filter(name='collection__name', lookup_expr='icontains')
-    notes = django_filters.Filter(lookup_expr='icontains')
-    bibliography = django_filters.Filter(lookup_expr='icontains')
+    number_of_items = django_filters.Filter(label='Number of items', method='number_of_items_filter',
+                                            widget=django_filters.widgets.RangeWidget())
+    number_of_lots = django_filters.Filter(label='Number of lots', method='number_of_lots_filter',
+                                            widget=django_filters.widgets.RangeWidget())
+    publisher = django_filters.ModelMultipleChoiceFilter(
+        label="Publisher",
+        queryset=Person.objects.filter(personcataloguerelation__role__name='publisher'),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
+        field_name='personcataloguerelation__person',
+        lookup_expr='in'
+    )
+    owner_gender = django_filters.MultipleChoiceFilter(
+        label="Owner gender",
+        choices=Person.SEX_CHOICES,
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
+        method='owner_gender_filter'
+    )
+    owner_profession = django_filters.ModelMultipleChoiceFilter(
+        label="Owner profession",
+        queryset=Profession.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
+        method='owner_profession_filter'
+    )
+    owner_profession = django_filters.ModelMultipleChoiceFilter(
+        label="Owner religion",
+        queryset=Religion.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
+        method='owner_religion_filter'
+    )
 
     class Meta:
         model = Catalogue
@@ -28,12 +54,10 @@ class CatalogueFilter(django_filters.FilterSet):
             'short_title',
             'full_title',
             'types',
-            'preface_and_paratexts',
             'year_of_publication',
             'terminus_post_quem',
-            'notes',
-            'bibliography',
-            'collection'
+            'number_of_items',
+            'number_of_lots'
         ]
 
     def multiple_words_filter(self, queryset, name, value):
@@ -44,6 +68,42 @@ class CatalogueFilter(django_filters.FilterSet):
             return queryset.filter(cataloguecataloguetyperelation__type__in=value)
         else:
             return queryset
+
+    def number_of_items_filter(self, queryset, name, value):
+        if any(value):
+            queryset = queryset.annotate(num_items=Count('lot__item'))
+            if value[0]:
+                queryset = queryset.filter(num_items__gte=value[0])
+            if value[1]:
+                queryset = queryset.filter(num_items__lte=value[1])
+        return queryset
+
+    def number_of_lots_filter(self, queryset, name, value):
+        if any(value):
+            queryset = queryset.annotate(num_items=Count('lot'))
+            if value[0]:
+                queryset = queryset.filter(num_items__gte=value[0])
+            if value[1]:
+                queryset = queryset.filter(num_items__lte=value[1])
+        return queryset
+
+    def owner_gender_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(personcataloguerelation__role__name='owner',
+                                   personcataloguerelation__person__sex__in=value)
+        return queryset
+
+    def owner_profession_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(personcataloguerelation__role__name='owner',
+                                   personcataloguerelation__person__personprofession__profession__in=value)
+        return queryset
+
+    def owner_religion_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(personcataloguerelation__role__name='owner',
+                                   personcataloguerelation__person__religiousaffiliation__religion__in=value)
+        return queryset
 
 
 # CatalogueHeldBy filter
@@ -134,10 +194,12 @@ class LotFilter(django_filters.FilterSet):
         exclude = ['uuid']
 
     def number_of_items_filter(self, queryset, name, value):
-        if value[0]:
-            queryset = queryset.annotate(num_items=Count('item')).filter(num_items__gte=value[0])
-        if value[1]:
-            queryset = queryset.annotate(num_items=Count('item')).filter(num_items__lte=value[1])
+        if any(value):
+            queryset = queryset.annotate(num_items=Count('item'))
+            if value[0]:
+                queryset = queryset.filter(num_items__gte=value[0])
+            if value[1]:
+                queryset = queryset.filter(num_items__lte=value[1])
         return queryset
 
 
