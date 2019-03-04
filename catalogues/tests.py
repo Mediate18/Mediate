@@ -5,6 +5,9 @@ from .models import *
 from transcriptions.models import *
 
 
+# View tests #
+
+
 class CollectionTests(GenericCRUDTestMixin, TestCase):
     model = Collection
 
@@ -277,4 +280,41 @@ class CategoryTests(GenericCRUDTestMixin, TestCase):
         """TODO: add a ParisianCategory detail template"""
         pass
 
+
+# Model tests #
+
+
+class LotModelTests(TestCase):
+    def test_catalogue_of_lot_and_category(self):
+        """
+        Test whether a exception is raised if the catalogue of a lot is not the same as
+        the catalogue of the category of that lot.
+        """
+        with self.assertRaises(Exception) as exception_context_manager:
+            # Create a dummy catalogue
+            dummy_catalogue = Catalogue(short_title="short_title test")
+            dummy_catalogue.save()
+
+            # Create a second dummy catalogue
+            dummy_catalogue2 = Catalogue(short_title="short_title test2")
+            dummy_catalogue2.save()
+
+            # Create a dummy category
+            dummy_category = Category(catalogue=dummy_catalogue, bookseller_category="bookseller_category test")
+            dummy_category.save()
+
+            # Create a dummy lot
+            dummy_lot = Lot(
+                catalogue=dummy_catalogue2,
+                number_in_catalogue=1,
+                lot_as_listed_in_catalogue="lot_as_listed_in_catalogue test",
+                category=dummy_category
+            )
+
+            dummy_lot.save()
+
+        exception = exception_context_manager.exception
+
+        self.assertEqual(exception.args, ("Lot {}: the catalogue is not the as the category's catalogue"
+                                         .format(dummy_lot),))
 
