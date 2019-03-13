@@ -41,7 +41,7 @@ class CatalogueFilter(django_filters.FilterSet):
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
         method='owner_profession_filter'
     )
-    owner_profession = django_filters.ModelMultipleChoiceFilter(
+    owner_religion = django_filters.ModelMultipleChoiceFilter(
         label="Owner religion",
         queryset=Religion.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
