@@ -40,6 +40,11 @@ class ItemFilter(django_filters.FilterSet):
         widget=CheckboxInput(),
         method='manifestation_isnull_filter'
     )
+    manifestation_isempty = django_filters.BooleanFilter(
+        label="Associated manifestation is empty",
+        widget=CheckboxInput(),
+        method='manifestation_isempty_filter'
+    )
     material_details = django_filters.ModelMultipleChoiceFilter(
         label="Material details",
         queryset=MaterialDetails.objects.all(),
@@ -68,6 +73,7 @@ class ItemFilter(django_filters.FilterSet):
             'index_in_lot',
             'manifestation',
             'manifestation_isnull',
+            'manifestation_isempty',
             'sales_price',
             'material_details',
             'tag'
@@ -90,6 +96,12 @@ class ItemFilter(django_filters.FilterSet):
     def manifestation_isnull_filter(self, queryset, name, value):
         if value:
             return queryset.filter(manifestation__isnull=True)
+        return queryset
+
+    def manifestation_isempty_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(manifestation__year__isnull=True, manifestation__place__isnull=True)\
+                .annotate(num_publishers=Count('manifestation__publisher')).filter(num_publishers=0)
         return queryset
 
 
