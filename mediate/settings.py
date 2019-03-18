@@ -112,7 +112,7 @@ DATABASES = {
             'charset': 'utf8mb4'
         },
         'TEST': {
-            'NAME': config('TEST_DB_NAME'),
+            'NAME': config('TEST_DB_NAME', None),
         }
     }
 }
