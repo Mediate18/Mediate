@@ -1,52 +1,47 @@
-{% extends "baselayout.html" %}
+{% extends "generic_list.html" %}
 {% load i18n %}
-{% load render_table from django_tables2 %}
 
+{% block extracss %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.13/c3.css"/>
+{% endblock %}
 
-{% block content %}
+{% block abstracts %}
+{% if extra_data %}
 
-<div class="row">
-    <div class="col-xs-10">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-              <h4 class="panel-title">
-                <a data-toggle="collapse" href="#collapse1">Filter <span class="glyphicon glyphicon-chevron-down"></span></a>
-              </h4>
-            </div>
-            <div id="collapse1" class="panel-collapse collapse">
-              <div class="panel-body">
-                <form action="" method="get">
-                    <table class="table">
-                    {{ filter.form.as_table }}
-                    </table>
-                    <div class="pull-right">
-                        <input type="submit" class="btn"/>
-                        <a href='{{ request.path }}' class="btn">Clear</a>
-                    </div>
-                </form>
-              </div>
-            </div>
-          </div>
-    </div>
+<h3>Number of items per decade</h3>
+<div class="item_count_per_decade">
+    <div id="item_count_per_decade__chart"></div>
 </div>
 
-<div class="row">
-    <div class="col-xs-10">
-        <h1>Catalogues</h1>
-        <div class="small">Displaying {{ filter.qs.count }} of {{ filter.queryset.count }} items.</div>
-        {% if table %}
-            {% render_table table %}
-        {% else %}
-            <div>No catalogues.</div>
-        {% endif %}
-    </div>
-    <div class="col-xs-2">
-        <h3>Actions</h3>
-        <ul>
-            <li>
-                <a href="{% url 'add_catalogue' %}">Create new catalogue</a>
-            </li>
-        </ul>
-    </div>
-</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.13/c3.js"></script>
+<script src="http://d3js.org/d3.v5.min.js"></script>
+<script type="text/javascript">
+    var extra_data = {{ extra_data|safe }};
+
+    var data = ['number of items'];
+    extra_data['item_count_per_decade'].forEach(function(el) { data.push(el['count']) });
+    var x = ['x']
+    extra_data['item_count_per_decade'].forEach(function(el) { x.push(el['decade']) });
+
+    var chart = c3.generate({
+        bindto: '#item_count_per_decade__chart',
+        data: {
+            x: 'x',
+            columns: [
+                x,
+                data
+            ],
+            type: 'bar'
+        },
+        bar: {
+            width: {
+                ratio: 0.7
+            }
+        }
+    });
+
+</script>
+{% endif %}
+
 {% endblock %}
