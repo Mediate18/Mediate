@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
-from django.db.models import Count, Min
+from django.db.models import Count, Min, Max
 
 from mediate.tools import put_layout_in_context, put_get_variable_in_context
 from mediate.views import GenericDetailView
@@ -15,13 +15,17 @@ from ..filters import *
 
 from ..models import *
 
+from items.models import Item
+from mediate.tools import Truncate
+import json
+
 import django_tables2
 
 
 # Catalogue views
 class CatalogueTableView(ListView):
     model = Catalogue
-    template_name = 'generic_list.html'
+    template_name = 'catalogue_list.html'
 
     def get_queryset(self):
         return Catalogue.objects.annotate(num_lots=Count('lot', distinct=True),
@@ -40,6 +44,17 @@ class CatalogueTableView(ListView):
         context['action'] = _("add")
         context['object_name'] = "catalogue"
         context['add_url'] = reverse_lazy('add_catalogue')
+
+        # Extra data, used for e.g. charts
+        max_publication_year = Catalogue.objects.aggregate(Max('lot__catalogue__year_of_publication'))['lot__catalogue__year_of_publication__max']
+        item_count_per_decade = Item.objects\
+            .filter(lot__catalogue__in=filter.qs, manifestation__year__lte=max_publication_year)\
+            .annotate(decade=Truncate('manifestation__year', -1))\
+            .values('decade')\
+            .order_by('decade')\
+            .annotate(count=Count('decade'))
+        extra_data = { 'item_count_per_decade': list(item_count_per_decade) }
+        context['extra_data'] = json.dumps(extra_data)
 
         return context
 

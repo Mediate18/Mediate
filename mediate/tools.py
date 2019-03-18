@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.db.models import Q
+from django.db.models import Q, Func, Count
 import re
 
 
@@ -95,3 +95,8 @@ def put_get_variable_in_context(mapping):
             return context
         return get_context_data_with_get_variable
     return wrapper
+
+
+class Truncate(Func):
+    function = 'TRUNCATE'
+    arity = 2
