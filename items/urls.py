@@ -209,7 +209,7 @@ urlpatterns = [
     path(r'manifestations/<uuid:pk>', login_required(ManifestationDetailView.as_view()),
          name="manifestation_detail"),
     path(r'manifestations/add',
-         permission_required('items.add_manifestation')(ManifestationCreateView.as_view()),
+         permission_required('items.add_manifestation')(ItemAndManifestationCreateView.as_view()),
          name="add_manifestation"),
     path(r'manifestations/edit/<uuid:pk>',
          permission_required('items.change_manifestation')(ManifestationUpdateView.as_view()),

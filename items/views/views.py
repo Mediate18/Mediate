@@ -1,13 +1,14 @@
 from django.contrib import messages
 from django.http import HttpResponseRedirect, Http404
 from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView, View
 from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 
 from django.utils.translation import ugettext_lazy as _
 from django.utils.html import escape
+from django.shortcuts import get_object_or_404
 import django_tables2
 
 from dal import autocomplete
@@ -1014,17 +1015,14 @@ class ManifestationCreateView(CreateView):
         return context
 
 
-class ManifestationUpdateView(UpdateView):
-    model = Manifestation
-    template_name = 'generic_form.html'
-    form_class = ManifestationModelForm
-    success_url = reverse_lazy('manifestations')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['action'] = _("update")
-        context['object_name'] = "manifestation"
-        return context
+class ManifestationUpdateView(View):
+    def get(self, request, **kwargs):
+        obj = get_object_or_404(Manifestation, pk=kwargs['pk'])
+        if obj.items.count() is not 1:
+            messages.add_message(request, messages.WARNING,
+                             _("Manifestation ({}) does not have exactly one item.".format(obj)))
+            return HttpResponseRedirect(self.request.META['HTTP_REFERER'])
+        return HttpResponseRedirect(reverse_lazy('change_item', kwargs={'pk': obj.items.all()[0].uuid}))
 
 
 class ManifestationDeleteView(DeleteView):
