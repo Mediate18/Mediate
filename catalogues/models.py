@@ -86,6 +86,10 @@ class Catalogue(models.Model):
     def get_absolute_url(self):
         return reverse_lazy('catalogue_detail', args=[str(self.uuid)])
 
+    def item_count(self):
+        from items.models import Item
+        return Item.objects.filter(lot__catalogue=self).count()
+    
 
 class CatalogueCatalogueTypeRelation(models.Model):
     """

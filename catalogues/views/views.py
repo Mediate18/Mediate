@@ -28,8 +28,7 @@ class CatalogueTableView(ListView):
     template_name = 'catalogue_list.html'
 
     def get_queryset(self):
-        return Catalogue.objects.annotate(num_lots=Count('lot', distinct=True),
-                                          num_items=Count('lot__item', distinct=True))
+        return Catalogue.objects.all()
 
     def get_context_data(self, **kwargs):
         context = super(CatalogueTableView, self).get_context_data(**kwargs)

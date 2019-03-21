@@ -56,10 +56,10 @@ class CatalogueTable(tables.Table):
         ))
 
     def render_number_of_lots(self, record):
-        return record.num_lots
+        return record.lot_set.count()
 
     def render_number_of_items(self, record):
-        return record.num_items
+        return record.item_count()
 
 
 # CatalogueHeldBy table
