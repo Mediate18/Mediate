@@ -1355,3 +1355,16 @@ class ItemAndManifestationCreateView(CreateView):
         messages.add_message(self.request, messages.SUCCESS,
                              _("Added an item and a manifestation."))
         return HttpResponseRedirect(self.success_url)
+
+
+class ItemAndManifestationUpdateView(ItemAndManifestationCreateView):
+    model = Item
+
+    def get_form_kwargs(self):
+        kwargs = super(ItemAndManifestationUpdateView, self).get_form_kwargs()
+        self.object = self.get_object()
+        kwargs.update(instance={
+            'item': self.object,
+            'manifestation': self.object.manifestation,
+        })
+        return kwargs

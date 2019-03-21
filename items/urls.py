@@ -26,7 +26,7 @@ urlpatterns = [
     path(r'items/<uuid:pk>', login_required(ItemDetailView.as_view()), name="item_detail"),
     path(r'items/add', permission_required('items.add_item')(ItemAndManifestationCreateView.as_view()),
        name="add_item"),
-    path(r'items/edit/<uuid:pk>', permission_required('items.change_item')(ItemUpdateView.as_view()),
+    path(r'items/edit/<uuid:pk>', permission_required('items.change_item')(ItemAndManifestationUpdateView.as_view()),
        name="change_item"),
     path(r'items/delete/<uuid:pk>', permission_required('items.delete_item')(ItemDeleteView.as_view()),
        name="delete_item"),
