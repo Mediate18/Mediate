@@ -10,6 +10,10 @@
 {% if extra_data %}
 
 <h3>Number of items per decade</h3>
+<span>{% trans "Total number of items:" %} {{ item_count_total}}</span> |
+<span>{% trans "Items without a date:" %} {{ item_count_without_year }}</span> |
+<span>{% trans "Number of items in the plot:" %} {{ item_count_in_plot }}</span>
+<span class="glyphicon glyphicon-info-sign" title="{% blocktrans %}Only items with a publication year lower or equal to the maximum publication year of all catalogues ({{ max_publication_year }}) are used. {% endblocktrans %}"></span>
 <div class="item_count_per_decade">
     <div id="item_count_per_decade__chart"></div>
 </div>
@@ -36,9 +40,10 @@
         },
         bar: {
             width: {
-                ratio: 0.7
+                ratio: 0.5,
+                max: 40
             }
-        }
+        },
     });
 
 </script>

@@ -46,14 +46,25 @@ class CatalogueTableView(ListView):
 
         # Extra data, used for e.g. charts
         max_publication_year = Catalogue.objects.aggregate(Max('lot__catalogue__year_of_publication'))['lot__catalogue__year_of_publication__max']
+        context['max_publication_year'] = max_publication_year
+
         item_count_per_decade = Item.objects\
             .filter(lot__catalogue__in=filter.qs, manifestation__year__lte=max_publication_year)\
             .annotate(decade=Truncate('manifestation__year', -1))\
             .values('decade')\
             .order_by('decade')\
             .annotate(count=Count('decade'))
-        extra_data = { 'item_count_per_decade': list(item_count_per_decade) }
+        extra_data = {
+            'item_count_per_decade': list(item_count_per_decade)
+        }
         context['extra_data'] = json.dumps(extra_data)
+
+        item_count_total = Item.objects.count()
+        context['item_count_total'] = item_count_total
+        item_count_without_year = Item.objects.filter(manifestation__year__isnull=True).count()
+        context['item_count_without_year'] = item_count_without_year
+        item_count_in_plot = Item.objects.filter(lot__catalogue__in=filter.qs, manifestation__year__lte=max_publication_year).count()
+        context['item_count_in_plot'] = item_count_in_plot
 
         return context
 
