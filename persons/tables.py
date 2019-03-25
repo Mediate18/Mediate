@@ -133,6 +133,20 @@ class PersonProfessionTable(tables.Table):
         ]
 
 
+# Country table
+class CountryTable(tables.Table):
+    uuid = ActionColumn('country_detail', 'change_country', 'delete_country',
+                        orderable=False)
+
+    class Meta:
+        model = Country
+        attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'name',
+            'uuid'
+        ]
+
+
 # Place table
 class PlaceTable(tables.Table):
     uuid = ActionColumn('place_detail', 'change_place', 'delete_place',
@@ -144,6 +158,7 @@ class PlaceTable(tables.Table):
         sequence = [
             'name',
             'cerl_id',
+            'country',
             'uuid'
         ]
 

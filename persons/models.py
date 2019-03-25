@@ -8,6 +8,23 @@ import uuid
 from simplemoderation.tools import moderated
 
 
+class Country(models.Model):
+    """
+    A country
+    """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(_("Name of the place"), max_length=128, null=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse_lazy('country_detail', args=[str(self.uuid)])
+
+
 class Place(models.Model):
     """
     A geographical place
@@ -15,6 +32,7 @@ class Place(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("Name of the place"), max_length=128, null=True)
     cerl_id = models.CharField(_("CERL ID of a place"), max_length=32, null=True, blank=True)
+    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         ordering = ['name']

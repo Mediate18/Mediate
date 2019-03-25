@@ -1,6 +1,6 @@
 from django import forms
 from django.urls import reverse_lazy
-from django_select2.forms import Select2Widget
+from django_select2.forms import Select2Widget, ModelSelect2Widget
 from django_date_extensions.fields import ApproximateDateFormField
 from apiconnectors.widgets import ApiSelectWidget
 from viapy.widgets import ViafWidget
@@ -55,6 +55,12 @@ class PersonProfessionModelForm(forms.ModelForm):
         fields = "__all__"
 
 
+class CountryModelForm(forms.ModelForm):
+    class Meta:
+        model = Country
+        fields = "__all__"
+
+
 class PlaceModelForm(forms.ModelForm):
     class Meta:
         model = Place
@@ -65,6 +71,10 @@ class PlaceModelForm(forms.ModelForm):
                 attrs={'data-html': True,
                        'data-placeholder': "Search for a place"},
             ),
+            'country': ModelSelect2Widget(
+                model=Country,
+                search_fields=['name__icontains']
+            )
         }
 
 

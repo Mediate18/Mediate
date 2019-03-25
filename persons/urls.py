@@ -66,6 +66,19 @@ urlpatterns = [
          permission_required('persons.delete_personprofession')(PersonProfessionDeleteView.as_view()),
          name="delete_personprofession"),
 
+    # Country urls
+    path('countries/', login_required(CountryTableView.as_view()), name='countries'),
+    path(r'countries/<uuid:pk>', login_required(CountryDetailView.as_view()),
+         name="country_detail"),
+    path(r'countries/add', permission_required('persons.add_country')(CountryCreateView.as_view()),
+         name="add_country"),
+    path(r'countries/edit/<uuid:pk>',
+         permission_required('persons.change_country')(CountryUpdateView.as_view()),
+         name="change_country"),
+    path(r'countries/delete/<uuid:pk>',
+         permission_required('persons.delete_country')(CountryDeleteView.as_view()),
+         name="delete_country"),
+
     # Place urls
     path('places/', login_required(PlaceTableView.as_view()), name='places'),
     path(r'places/<uuid:pk>', login_required(PlaceDetailView.as_view()),

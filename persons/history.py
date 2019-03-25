@@ -2,6 +2,7 @@ from simple_history import register
 from .models import *
 
 
+register(Country)
 register(Place)
 register(Religion)
 register(Person)

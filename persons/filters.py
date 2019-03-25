@@ -3,6 +3,7 @@ from .models import *
 from viapy.api import ViafAPI
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
+from django_select2.forms import Select2MultipleWidget
 
 from mediate.tools import filter_multiple_words
 from catalogues.models import PersonCatalogueRelationRole
@@ -11,7 +12,6 @@ from items.models import PersonItemRelationRole
 
 # Person filter
 class PersonFilter(django_filters.FilterSet):
-    from django_select2.forms import Select2MultipleWidget
     short_name = django_filters.Filter(lookup_expr='icontains')
     surname = django_filters.Filter(lookup_expr='icontains')
     sex = django_filters.MultipleChoiceFilter(
@@ -141,9 +141,25 @@ class PersonProfessionFilter(django_filters.FilterSet):
         exclude = ['uuid']
 
 
+# Country filter
+class CountryFilter(django_filters.FilterSet):
+    name = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
+
+    class Meta:
+        model = Country
+        exclude = ['uuid']
+
+    def multiple_words_filter(self, queryset, name, value):
+        return filter_multiple_words(self.filters[name].lookup_expr, queryset, name, value)
+
+
 # Place filter
 class PlaceFilter(django_filters.FilterSet):
     name = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
+    country = django_filters.ModelMultipleChoiceFilter(
+        queryset=Country.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
+    )
 
     class Meta:
         model = Place

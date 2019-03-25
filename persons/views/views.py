@@ -346,6 +346,67 @@ class PersonProfessionDeleteView(DeleteView):
     success_url = reverse_lazy('personprofessions')
 
 
+# Country views
+class CountryTableView(ListView):
+    model = Country
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return Country.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(CountryTableView, self).get_context_data(**kwargs)
+        filter = CountryFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = CountryTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name'] = "country"
+        context['add_url'] = reverse_lazy('add_country')
+
+        return context
+
+
+class CountryDetailView(GenericDetailView):
+    model = Country
+    object_fields = ['name', 'cerl_id']
+
+
+class CountryCreateView(CreateView):
+    model = Country
+    template_name = 'generic_form.html'
+    form_class = CountryModelForm
+    success_url = reverse_lazy('countries')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = "country"
+        return context
+
+
+class CountryUpdateView(UpdateView):
+    model = Country
+    template_name = 'generic_form.html'
+    form_class = CountryModelForm
+    success_url = reverse_lazy('countries')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("update")
+        context['object_name'] = "country"
+        return context
+
+
+class CountryDeleteView(DeleteView):
+    model = Country
+    success_url = reverse_lazy('countries')
+
+
 # Place views
 class PlaceTableView(ListView):
     model = Place
@@ -373,7 +434,7 @@ class PlaceTableView(ListView):
 
 class PlaceDetailView(GenericDetailView):
     model = Place
-    object_fields = ['name', 'cerl_id']
+    object_fields = ['name', 'cerl_id', 'country']
 
 
 class PlaceCreateView(CreateView):
