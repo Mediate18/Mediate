@@ -14,7 +14,7 @@ class Place(models.Model):
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("Name of the place"), max_length=128, null=True)
-    cerl_id = models.CharField(_("CERL ID of a place"), max_length=32, null=True)
+    cerl_id = models.CharField(_("CERL ID of a place"), max_length=32, null=True, blank=True)
 
     class Meta:
         ordering = ['name']

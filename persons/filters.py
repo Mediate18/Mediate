@@ -4,6 +4,7 @@ from viapy.api import ViafAPI
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
 
+from mediate.tools import filter_multiple_words
 from catalogues.models import PersonCatalogueRelationRole
 from items.models import PersonItemRelationRole
 
@@ -142,9 +143,14 @@ class PersonProfessionFilter(django_filters.FilterSet):
 
 # Place filter
 class PlaceFilter(django_filters.FilterSet):
+    name = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
+
     class Meta:
         model = Place
         exclude = ['uuid']
+
+    def multiple_words_filter(self, queryset, name, value):
+        return filter_multiple_words(self.filters[name].lookup_expr, queryset, name, value)
 
 
 # Profession filter
