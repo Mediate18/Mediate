@@ -59,12 +59,13 @@ class CatalogueTableView(ListView):
         }
         context['extra_data'] = json.dumps(extra_data)
 
-        item_count_total = Item.objects.count()
+        item_count_total = Item.objects.filter(lot__catalogue__in=filter.qs).count()
         context['item_count_total'] = item_count_total
-        item_count_without_year = Item.objects.filter(manifestation__year__isnull=True).count()
+        item_count_without_year = Item.objects.filter(lot__catalogue__in=filter.qs, manifestation__year__isnull=True).count()
         context['item_count_without_year'] = item_count_without_year
         item_count_in_plot = Item.objects.filter(lot__catalogue__in=filter.qs, manifestation__year__lte=max_publication_year).count()
         context['item_count_in_plot'] = item_count_in_plot
+        context['item_percentage_in_plot'] =  int(100 * item_count_in_plot / item_count_total)
 
         return context
 
