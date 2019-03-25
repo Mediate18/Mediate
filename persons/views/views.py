@@ -365,7 +365,7 @@ class CountryTableView(ListView):
         context['table'] = table
 
         context['action'] = _("add")
-        context['object_name'] = "country"
+        context['object_name_plural'] = self.model._meta.verbose_name_plural
         context['add_url'] = reverse_lazy('add_country')
 
         return context

@@ -47,6 +47,15 @@
                 {% endif %}
 
 
+                {% if perms.persons.change_country %}
+                <tr>
+                    <td>
+                        <a href="{% url 'countries' %}">Countries</a>
+                    </td>
+                </tr>
+                {% endif %}
+
+
                 {% if perms.persons.change_place %}
                 <tr>
                     <td>
@@ -112,6 +121,15 @@
                 <tr>
                     <td>
                         <a href="{% url 'catalogueheldbys' %}">CatalogueHeldBys</a>
+                    </td>
+                </tr>
+                {% endif %}
+
+
+                {% if perms.catalogues.change_cataloguepublicationplace %}
+                <tr>
+                    <td>
+                        <a href="{% url 'cataloguepublicationplaces' %}">CataloguePublicationPlaces</a>
                     </td>
                 </tr>
                 {% endif %}
