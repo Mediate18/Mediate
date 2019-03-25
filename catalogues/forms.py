@@ -15,6 +15,7 @@ class CatalogueModelForm(forms.ModelForm):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.add_types_field()
+        self.add_publication_places_field()
 
     def add_types_field(self):
         types = forms.ModelMultipleChoiceField(
@@ -28,9 +29,22 @@ class CatalogueModelForm(forms.ModelForm):
         )
         self.fields['types'] = types
 
+    def add_publication_places_field(self):
+        places = forms.ModelMultipleChoiceField(
+            widget=ModelSelect2MultipleWidget(
+                model=Place,
+                search_fields=['name__icontains'],
+            ),
+            queryset=Place.objects.all(),
+            required=False,
+            initial=Place.objects.filter(published_catalogues__catalogue=self.instance)
+        )
+        self.fields['publication_places'] = places
+
     def save(self, commit=True):
         if commit:
             self.save_types()
+            self.save_publication_places()
         return super(CatalogueModelForm, self).save(commit=commit)
 
     def save_types(self):
@@ -48,6 +62,22 @@ class CatalogueModelForm(forms.ModelForm):
         for new_type in new_types:
             catalogue_cataloguetype_relation = CatalogueCatalogueTypeRelation(catalogue=self.instance, type=new_type)
             catalogue_cataloguetype_relation.save()
+
+    def save_publication_places(self):
+        submitted_publication_places = self.cleaned_data['publication_places']
+
+        # Delete publication_places that are not in the submitted publication_places
+        publication_places_to_delete = CataloguePublicationPlace.objects \
+            .filter(catalogue=self.instance).exclude(place__in=submitted_publication_places)
+        for place in publication_places_to_delete:
+            place.delete()
+
+        # Add submitted publication_places that are not in the existing publication_places
+        new_publication_places = set(submitted_publication_places) - set(Place.objects.filter(
+            published_catalogues__catalogue=self.instance))
+        for new_publication_place in new_publication_places:
+            catalogue_publication_place = CataloguePublicationPlace(catalogue=self.instance, place=new_publication_place)
+            catalogue_publication_place.save()
 
 
 class CatalogueHeldByModelForm(forms.ModelForm):

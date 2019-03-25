@@ -13,6 +13,7 @@ class CatalogueTable(tables.Table):
     owner = tables.Column(empty_values=())
     number_of_lots = tables.Column(empty_values=(), orderable=False)
     number_of_items = tables.Column(empty_values=(), orderable=False)
+    publication_places = tables.Column(empty_values=(), verbose_name="Publication places", orderable=False)
 
     class Meta:
         model = Catalogue
@@ -25,7 +26,8 @@ class CatalogueTable(tables.Table):
             'terminus_post_quem',
             'owner',
             'number_of_lots',
-            'number_of_items'
+            'number_of_items',
+            'publication_places'
         ]
 
     def render_full_title(self, record, value):
@@ -60,6 +62,15 @@ class CatalogueTable(tables.Table):
 
     def render_number_of_items(self, record):
         return record.item_count()
+
+    def render_publication_places(self, record):
+        places = Place.objects.filter(published_catalogues__catalogue=record)
+        return format_html(", ".join(
+            [
+                '<a href="{}">{}</a>'.format(reverse_lazy('place_detail', args=[place.pk]), place)
+                for place in places
+            ]
+        ))
 
 
 # CatalogueHeldBy table
