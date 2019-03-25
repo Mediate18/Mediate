@@ -209,6 +209,20 @@ class PersonCollectionRelationTable(tables.Table):
         ]
 
 
+# CataloguePublicationPlace table
+class CataloguePublicationPlaceTable(tables.Table):
+    uuid = ActionColumn('cataloguepublicationplace_detail', 'change_cataloguepublicationplace',
+                        'delete_cataloguepublicationplace', orderable=False)
+
+    class Meta:
+        model = CataloguePublicationPlace
+        attr = {'class': 'table table-sortable'}
+        sequence = [
+            'catalogue',
+            'place',
+            'uuid'
+        ]
+
 # Category table
 class CategoryTable(tables.Table):
     uuid = ActionColumn('category_detail', 'change_category', 'delete_category', orderable=False)

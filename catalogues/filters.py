@@ -3,7 +3,7 @@ from django.db.models import Count
 from django_select2.forms import Select2MultipleWidget
 from .models import *
 from mediate.tools import filter_multiple_words
-from persons.models import Profession, Religion
+from persons.models import Profession, Religion, Place
 
 
 # Catalogue filter
@@ -245,6 +245,22 @@ class PersonCollectionRelationFilter(django_filters.FilterSet):
 
     class Meta:
         model = PersonCollectionRelation
+        exclude = ['uuid']
+
+
+# CataloguePublicationPlace filter
+class CataloguePublicationPlaceFilter(django_filters.FilterSet):
+    catalogue = django_filters.ModelMultipleChoiceFilter(
+        queryset=Catalogue.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
+    )
+    place = django_filters.ModelMultipleChoiceFilter(
+        queryset=Place.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
+    )
+
+    class Meta:
+        model = CataloguePublicationPlace
         exclude = ['uuid']
 
 

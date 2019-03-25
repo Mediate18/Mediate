@@ -752,6 +752,63 @@ class PersonCollectionRelationDeleteView(DeleteView):
     success_url = reverse_lazy('personcollectionrelations')
 
 
+class CataloguePublicationPlaceTableView(ListView):
+    model = CataloguePublicationPlace
+    template_name = 'generic_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        filter = CataloguePublicationPlaceFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = CataloguePublicationPlaceTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name_plural'] = self.model._meta.verbose_name_plural
+        context['add_url'] = reverse_lazy('add_cataloguepublicationplace')
+
+        return context
+
+
+class CataloguePublicationPlaceDetailView(DetailView):
+    model = CataloguePublicationPlace
+    template_name = 'generic_detail.html'
+
+
+class CataloguePublicationPlaceCreateView(CreateView):
+    model = CataloguePublicationPlace
+    template_name = 'generic_form.html'
+    form_class = CataloguePublicationPlaceModelForm
+    success_url = reverse_lazy('cataloguepublicationplaces')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = "catalogue publication place"
+        return context
+
+
+class CataloguePublicationPlaceUpdateView(UpdateView):
+    model = CataloguePublicationPlace
+    template_name = 'generic_form.html'
+    form_class = CataloguePublicationPlaceModelForm
+    success_url = reverse_lazy('cataloguepublicationplaces')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("update")
+        context['object_name'] = "catalogue publication place"
+        return context
+
+
+class CataloguePublicationPlaceDeleteView(DeleteView):
+    model = CataloguePublicationPlace
+    success_url = reverse_lazy('cataloguepublicationplaces')
+
+
 # Category views
 class CategoryTableView(ListView):
     model = Category

@@ -129,6 +129,22 @@ class PersonCollectionRelationModelForm(forms.ModelForm):
         fields = "__all__"
 
 
+class CataloguePublicationPlaceModelForm(forms.ModelForm):
+    class Meta:
+        model = CataloguePublicationPlace
+        fields = "__all__"
+        widgets = {
+            'catalogue': ModelSelect2Widget(
+                model=Catalogue,
+                search_fields=['short_title__icontains']
+            ),
+            'place': ModelSelect2Widget(
+                model=Place,
+                search_fields=['name__icontains']
+            )
+        }
+
+
 class CategoryModelForm(forms.ModelForm):
     class Meta:
         model = Category

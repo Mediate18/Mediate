@@ -167,6 +167,20 @@ urlpatterns = [
 
 
     # Category urls
+    path('cataloguepublicationplaces/', login_required(CataloguePublicationPlaceTableView.as_view()), name='cataloguepublicationplaces'),
+    path(r'cataloguepublicationplaces/<uuid:pk>', login_required(CataloguePublicationPlaceDetailView.as_view()),
+       name="cataloguepublicationplace_detail"),
+    path(r'cataloguepublicationplaces/add', permission_required('catalogues.add_add_cataloguepublicationplace')(CataloguePublicationPlaceCreateView.as_view()),
+       name="add_cataloguepublicationplace"),
+    path(r'cataloguepublicationplaces/edit/<uuid:pk>',
+       permission_required('catalogues.change_cataloguepublicationplace')(CataloguePublicationPlaceUpdateView.as_view()),
+       name="change_cataloguepublicationplace"),
+    path(r'cataloguepublicationplaces/delete/<uuid:pk>',
+       permission_required('catalogues.delete_cataloguepublicationplace')(CataloguePublicationPlaceDeleteView.as_view()),
+       name="delete_cataloguepublicationplace"),
+
+
+    # Category urls
     path('categories/', login_required(CategoryTableView.as_view()), name='categories'),
     path(r'categories/<uuid:pk>', login_required(CategoryDetailView.as_view()),
        name="category_detail"),

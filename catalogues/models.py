@@ -5,7 +5,7 @@ from django.urls import reverse_lazy
 
 import uuid
 
-from persons.models import Person
+from persons.models import Person, Place
 from transcriptions.models import Transcription
 from simplemoderation.tools import moderated
 
@@ -184,6 +184,18 @@ class PersonCatalogueRelation(models.Model):
 
     def __str__(self):
         return _("{} is {} of {}").format(self.person, self.role, self.catalogue)
+
+
+class CataloguePublicationPlace(models.Model):
+    """
+    Publication place for catalogues 
+    """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    place = models.ForeignKey(Place, on_delete=CASCADE)
+    catalogue = models.ForeignKey(Catalogue, on_delete=CASCADE)
+
+    def __str__(self):
+        return _("{} is published in {}").format(self.catalogue, self.place)
 
 
 class ParisianCategory(models.Model):
