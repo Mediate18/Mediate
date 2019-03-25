@@ -207,7 +207,7 @@ class ParisianCategory(models.Model):
     description = models.TextField(_("Description"), blank=True)
 
     class Meta:
-        verbose_name_plural = "parisiancategories"
+        verbose_name_plural = "parisian categories"
 
     def __str__(self):
         return "{} ({})".format(self.name, self.description)
@@ -229,6 +229,9 @@ class Category(models.Model):
 
     def __str__(self):
         return self.bookseller_category
+
+    def get_absolute_url(self):
+        return reverse_lazy('category_detail', args=[str(self.uuid)])
 
     def save(self, *args, **kwargs):
         # Check whether the catalogue of the parent is the same catalogue
