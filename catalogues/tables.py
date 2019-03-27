@@ -67,7 +67,8 @@ class CatalogueTable(tables.Table):
         places = Place.objects.filter(published_catalogues__catalogue=record)
         return format_html(", ".join(
             [
-                '<a href="{}">{}</a>'.format(reverse_lazy('place_detail', args=[place.pk]), place)
+                '<a href="{}">{}{}</a>'.format(reverse_lazy('place_detail', args=[place.pk]), place,
+                                               " ({})".format(place.country.name) if place.country else "")
                 for place in places
             ]
         ))

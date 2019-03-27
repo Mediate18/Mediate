@@ -3,7 +3,7 @@ from django.db.models import Count
 from django_select2.forms import Select2MultipleWidget
 from .models import *
 from mediate.tools import filter_multiple_words
-from persons.models import Profession, Religion, Place
+from persons.models import Profession, Religion, Place, Country
 
 
 # Catalogue filter
@@ -46,6 +46,18 @@ class CatalogueFilter(django_filters.FilterSet):
         queryset=Religion.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
         method='owner_religion_filter'
+    )
+    place = django_filters.ModelMultipleChoiceFilter(
+        label="Place",
+        queryset=Place.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
+        method='place_filter'
+    )
+    country = django_filters.ModelMultipleChoiceFilter(
+        label="Country",
+        queryset=Country.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
+        method='country_filter'
     )
 
     class Meta:
@@ -103,6 +115,16 @@ class CatalogueFilter(django_filters.FilterSet):
         if value:
             return queryset.filter(personcataloguerelation__role__name='owner',
                                    personcataloguerelation__person__religiousaffiliation__religion__in=value)
+        return queryset
+
+    def place_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(publication_places__place__in=value)
+        return queryset
+
+    def country_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(publication_places__place__country__in=value)
         return queryset
 
 
