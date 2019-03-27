@@ -373,7 +373,7 @@ class CountryTableView(ListView):
 
 class CountryDetailView(GenericDetailView):
     model = Country
-    object_fields = ['name', 'cerl_id']
+    object_fields = ['name']
 
 
 class CountryCreateView(CreateView):

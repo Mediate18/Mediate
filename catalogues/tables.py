@@ -4,7 +4,9 @@ from django.utils.html import format_html
 from .models import *
 
 from catalogues.models import PersonCatalogueRelation
+from persons.models import Country
 from mediate.columns import ActionColumn
+
 
 # Catalogue table
 class CatalogueTable(tables.Table):
@@ -14,6 +16,7 @@ class CatalogueTable(tables.Table):
     number_of_lots = tables.Column(empty_values=(), orderable=False)
     number_of_items = tables.Column(empty_values=(), orderable=False)
     publication_places = tables.Column(empty_values=(), verbose_name="Publication places", orderable=False)
+    countries = tables.Column(empty_values=(), verbose_name="Publication countries", orderable=False)
 
     class Meta:
         model = Catalogue
@@ -27,7 +30,8 @@ class CatalogueTable(tables.Table):
             'owner',
             'number_of_lots',
             'number_of_items',
-            'publication_places'
+            'publication_places',
+            'countries'
         ]
 
     def render_full_title(self, record, value):
@@ -67,11 +71,20 @@ class CatalogueTable(tables.Table):
         places = Place.objects.filter(published_catalogues__catalogue=record)
         return format_html(", ".join(
             [
-                '<a href="{}">{}{}</a>'.format(reverse_lazy('place_detail', args=[place.pk]), place,
-                                               " ({})".format(place.country.name) if place.country else "")
+                '<a href="{}">{}</a>'.format(reverse_lazy('place_detail', args=[place.pk]), place)
                 for place in places
             ]
         ))
+
+    def render_countries(self, record):
+        countries = Country.objects.filter(place__published_catalogues__catalogue=record).distinct()
+        return format_html(", ".join(
+            [
+                '<a href="{}">{}</a>'.format(reverse_lazy('country_detail', args=[country.pk]), country)
+                for country in countries
+            ]
+        ))
+
 
 
 # CatalogueHeldBy table
