@@ -3,8 +3,8 @@ from django_tables2.utils import A  # alias for Accessor
 from django.utils.html import format_html
 from .models import *
 from mediate.columns import ActionColumn
-from catalogues.models import PersonCatalogueRelation
-from items.models import PersonItemRelation
+from catalogues.models import PersonCatalogueRelation, Catalogue
+from items.models import PersonItemRelation, Manifestation
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -161,6 +161,74 @@ class PlaceTable(tables.Table):
             'country',
             'uuid'
         ]
+
+
+# Place links table
+class PlaceLinksTable(tables.Table):
+    uuid = ActionColumn('place_detail', 'change_place', 'delete_place',
+                        orderable=False)
+    catalogues = tables.Column(empty_values=(), verbose_name="Catalogues",
+                        orderable=False)
+    manifestations = tables.Column(empty_values=(), verbose_name="Manifestations",
+                        orderable=False)
+    people_born = tables.Column(empty_values=(), verbose_name="People born",
+                        orderable=False)
+    people_died = tables.Column(empty_values=(), verbose_name="People died",
+                        orderable=False)
+    residences = tables.Column(empty_values=(), verbose_name="People inhabiting",
+                        orderable=False)
+
+    class Meta:
+        model = Place
+        attrs = {'class': 'table table-sortable'}
+        fields = [
+            'name',
+            'catalogues',
+            'manifestations',
+            'people_born',
+            'people_died',
+            'residences',
+            'uuid'
+        ]
+
+    def render_catalogues(self, record):
+        catalogues = Catalogue.objects.filter(publication_places__place=record)
+        return format_html(", ".join(
+            ['<a href="{}">{}</a>'.format(reverse_lazy('catalogue_detail', args=[catalogue.pk]), catalogue)
+                for catalogue in catalogues]
+        ))
+
+    def render_manifestations(self, record):
+        manifestations = Manifestation.objects.filter(place=record)
+        return format_html(", ".join(
+            ['<a href="{}">{}</a>'.format(reverse_lazy('manifestation_detail', args=[manifestation.pk]),
+                                          manifestation)
+                for manifestation in manifestations]
+        ))
+
+    def render_people_born(self, record):
+        persons = Person.objects.filter(city_of_birth=record)
+        return format_html(", ".join(
+            ['<a href="{}">{}</a>'.format(reverse_lazy('person_detail', args=[person.pk]),
+                                          person)
+                for person in persons]
+        ))
+
+    def render_people_died(self, record):
+        persons = Person.objects.filter(city_of_death=record)
+        return format_html(", ".join(
+            ['<a href="{}">{}</a>'.format(reverse_lazy('person_detail', args=[person.pk]),
+                                          person)
+                for person in persons]
+        ))
+
+    def render_residences(self, record):
+        persons = Person.objects.filter(residence__place=record)
+        return format_html(", ".join(
+            ['<a href="{}">{}</a>'.format(reverse_lazy('person_detail', args=[person.pk]),
+                                          person)
+                for person in persons]
+        ))
 
 
 # Profession table

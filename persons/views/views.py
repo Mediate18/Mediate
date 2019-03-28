@@ -432,6 +432,27 @@ class PlaceTableView(ListView):
         return context
 
 
+class PlaceLinksTableView(ListView):
+    model = Place
+    template_name = 'generic_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(PlaceLinksTableView, self).get_context_data(**kwargs)
+        filter = PlaceFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = PlaceLinksTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name_plural'] = "Entities linked to places"
+        context['add_url'] = reverse_lazy('add_place')
+
+        return context
+
+
 class PlaceDetailView(GenericDetailView):
     model = Place
     object_fields = ['name', 'cerl_id', 'country']

@@ -92,6 +92,8 @@ urlpatterns = [
          permission_required('persons.delete_place')(PlaceDeleteView.as_view()),
          name="delete_place"),
 
+    path('placelinks', login_required(PlaceLinksTableView.as_view()), name='placelinks'),
+
     # Profession urls
     path('professions/', login_required(ProfessionTableView.as_view()), name='professions'),
     path(r'professions/<uuid:pk>', login_required(ProfessionDetailView.as_view()),

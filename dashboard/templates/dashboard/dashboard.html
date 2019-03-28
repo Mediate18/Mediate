@@ -65,6 +65,15 @@
                 {% endif %}
 
 
+                {% if perms.persons.change_place %}
+                <tr>
+                    <td>
+                        <a href="{% url 'placelinks' %}">PlaceLinks</a>
+                    </td>
+                </tr>
+                {% endif %}
+
+
                 {% if perms.persons.change_profession %}
                 <tr>
                     <td>
