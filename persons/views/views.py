@@ -438,7 +438,7 @@ class PlaceLinksTableView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(PlaceLinksTableView, self).get_context_data(**kwargs)
-        filter = PlaceFilter(self.request.GET, queryset=self.get_queryset())
+        filter = PlaceLinksFilter(self.request.GET, queryset=self.get_queryset())
 
         table = PlaceLinksTable(filter.qs)
         django_tables2.RequestConfig(self.request, ).configure(table)

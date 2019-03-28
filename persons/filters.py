@@ -6,8 +6,8 @@ from django.db.models import Q
 from django_select2.forms import Select2MultipleWidget
 
 from mediate.tools import filter_multiple_words
-from catalogues.models import PersonCatalogueRelationRole
-from items.models import PersonItemRelationRole
+from catalogues.models import PersonCatalogueRelationRole, Catalogue
+from items.models import PersonItemRelationRole, Manifestation
 
 
 # Person filter
@@ -167,6 +167,47 @@ class PlaceFilter(django_filters.FilterSet):
 
     def multiple_words_filter(self, queryset, name, value):
         return filter_multiple_words(self.filters[name].lookup_expr, queryset, name, value)
+
+
+# PlaceLinks filter
+class PlaceLinksFilter(django_filters.FilterSet):
+    name = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
+    country = django_filters.ModelMultipleChoiceFilter(
+        queryset=Country.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
+    )
+    published_catalogues = django_filters.ModelMultipleChoiceFilter(
+        label="Catalogues",
+        queryset=Catalogue.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
+        method='published_catalogues_filter'
+    )
+    persons = django_filters.ModelMultipleChoiceFilter(
+        label="People born/inhabiting/died",
+        queryset=Person.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
+        method='persons_filter'
+    )
+
+    class Meta:
+        model = Place
+        exclude = ['uuid', 'cerl_id']
+
+    def multiple_words_filter(self, queryset, name, value):
+        return filter_multiple_words(self.filters[name].lookup_expr, queryset, name, value)
+
+    def published_catalogues_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(published_catalogues__catalogue__in=value)
+        return queryset
+
+    def persons_filter(self, queryset, name, value):
+        if value:
+            people_born = Q(persons_born__in=value)
+            people_died = Q(persons_died__in=value)
+            inhabited = Q(residence__person__in=value)
+            return queryset.filter(people_born | people_died | inhabited)
+        return queryset
 
 
 # Profession filter
