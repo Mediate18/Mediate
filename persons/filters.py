@@ -206,7 +206,7 @@ class PlaceLinksFilter(django_filters.FilterSet):
             people_born = Q(persons_born__in=value)
             people_died = Q(persons_died__in=value)
             inhabited = Q(residence__person__in=value)
-            return queryset.filter(people_born | people_died | inhabited)
+            return queryset.filter(people_born | people_died | inhabited).distinct()
         return queryset
 
 
