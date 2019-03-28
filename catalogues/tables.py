@@ -26,7 +26,6 @@ class CatalogueTable(tables.Table):
             'full_title',
             'types',
             'year_of_publication',
-            'terminus_post_quem',
             'owner',
             'number_of_lots',
             'number_of_items',
