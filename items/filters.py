@@ -5,6 +5,7 @@ from django.forms import CheckboxInput
 from django_select2.forms import ModelSelect2MultipleWidget, Select2MultipleWidget
 from tagging.models import Tag, TaggedItem
 from .models import *
+from catalogues.models import Catalogue
 from mediate.tools import filter_multiple_words
 from viapy.api import ViafAPI
 
@@ -26,6 +27,17 @@ class ItemFilter(django_filters.FilterSet):
     book_format = django_filters.ModelMultipleChoiceFilter(
         queryset=BookFormat.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
+    )
+    catalogue = django_filters.ModelMultipleChoiceFilter(
+        label="Catalogue",
+        queryset=Catalogue.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Catalogue,
+            search_fields=['short_title__icontains', 'full_title__icontains',
+                           'preface_and_paratexts__icontains']
+        ),
+        method='catalogue_filter'
     )
     manifestation = django_filters.ModelMultipleChoiceFilter(
         queryset=Manifestation.objects.all(),
@@ -71,6 +83,7 @@ class ItemFilter(django_filters.FilterSet):
             'number_of_volumes',
             'book_format',
             'index_in_lot',
+            'catalogue',
             'manifestation',
             'manifestation_isnull',
             'manifestation_isempty',
@@ -102,6 +115,11 @@ class ItemFilter(django_filters.FilterSet):
         if value:
             return queryset.filter(manifestation__year__isnull=True, manifestation__place__isnull=True)\
                 .annotate(num_publishers=Count('manifestation__publisher')).filter(num_publishers=0)
+        return queryset
+
+    def catalogue_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(lot__catalogue__in=value)
         return queryset
 
 
@@ -203,6 +221,17 @@ class ManifestationFilter(django_filters.FilterSet):
         method='publisher_filter',
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
+    catalogue = django_filters.ModelMultipleChoiceFilter(
+        label="Catalogue",
+        queryset=Catalogue.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Catalogue,
+            search_fields=['short_title__icontains', 'full_title__icontains',
+                           'preface_and_paratexts__icontains']
+        ),
+        method='catalogue_filter'
+    )
     number_of_items = django_filters.Filter(label='Number of items', method='number_of_items_filter',
                                             widget=django_filters.widgets.RangeWidget())
 
@@ -220,6 +249,11 @@ class ManifestationFilter(django_filters.FilterSet):
             queryset = queryset.annotate(num_items=Count('items')).filter(num_items__gte=value[0])
         if value[1]:
             queryset = queryset.annotate(num_items=Count('items')).filter(num_items__lte=value[1])
+        return queryset
+
+    def catalogue_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(items__lot__catalogue__in=value)
         return queryset
 
 # Publisher filter
