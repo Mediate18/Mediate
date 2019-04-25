@@ -65,7 +65,7 @@ class CatalogueTableView(ListView):
         context['item_count_without_year'] = item_count_without_year
         item_count_in_plot = Item.objects.filter(lot__catalogue__in=filter.qs, manifestation__year__lte=max_publication_year).count()
         context['item_count_in_plot'] = item_count_in_plot
-        context['item_percentage_in_plot'] =  int(100 * item_count_in_plot / item_count_total)
+        context['item_percentage_in_plot'] = int(100 * item_count_in_plot / item_count_total) if item_count_total != 0 else 0
 
         return context
 
