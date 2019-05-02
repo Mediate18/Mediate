@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User, Group
+from django.contrib.contenttypes.models import ContentType
 from django.test import Client
 from django.urls import reverse_lazy
 
@@ -24,6 +25,10 @@ class GenericCRUDTestMixin:
         sandbox_group = Group.objects.get(name='sandbox')
         sandbox_group.user_set.add(self.user)
 
+    def get_permission_string(self, verb):
+        content_type = ContentType.objects.get_for_model(self.model)
+        return content_type.app_label + "." + verb + "_" + self.model.__name__.lower()
+
     def get_url_name(self, verb, postfix=False):
         """Get either the specified url name or a constructed one"""
         if hasattr(self, 'url_names'):
@@ -39,6 +44,7 @@ class GenericCRUDTestMixin:
         # Printing queries
         # from django.db import connection
         # print("Queries: {}".format(connection.queries))
+        self.user.delete()
         pass
 
     def test_List(self):
@@ -50,6 +56,10 @@ class GenericCRUDTestMixin:
 
     def test_Add(self):
         """Tests the Create view"""
+        # Test permission
+        permission = self.get_permission_string('add')
+        self.assertTrue(self.user.has_perm(permission))
+
         # Get the Add form
         client = Client()
         client.login(username=self.username, password=self.password)
@@ -73,6 +83,10 @@ class GenericCRUDTestMixin:
 
     def test_Change(self):
         """Tests the Change view"""
+        # Test permission
+        permission = self.get_permission_string('change')
+        self.assertTrue(self.user.has_perm(permission))
+
         # Get the Change form
         obj, created = self.model.objects.get_or_create(**self.get_add_form_data())
 

@@ -1,7 +1,9 @@
 from django.test import TestCase
+from django.test import Client
 from mediate.tools_testing import GenericCRUDTestMixin
 
 from .models import *
+from persons.tests import *
 from transcriptions.models import *
 
 
@@ -26,7 +28,8 @@ class CatalogueTests(GenericCRUDTestMixin, TestCase):
     model = Catalogue
 
     def get_add_form_data(self):
-        transcription = Transcription.objects.first()
+        source_material, created = SourceMaterial.objects.get_or_create(name="source_material test")
+        transcription, created = Transcription.objects.get_or_create(source_material=source_material, curator="curator test")
         collection, created = Collection.objects.get_or_create(**CollectionTests().get_add_form_data())
         return {
             'transcription': transcription,
@@ -43,12 +46,19 @@ class CatalogueTests(GenericCRUDTestMixin, TestCase):
             'short_title': 'short_title_test2'
         }
 
+    def test_List(self):
+        """Tests the List view"""
+        client = Client()
+        client.login(username=self.username, password=self.password)
+        response = client.get(reverse_lazy(self.get_url_name('list')))
+        self.assertEqual(response.status_code, 200)
+
 
 class CollectionYearTests(GenericCRUDTestMixin, TestCase):
     model = CollectionYear
 
     def get_add_form_data(self):
-        collection = Collection.objects.first()
+        collection, created = Collection.objects.get_or_create(**CollectionTests().get_add_form_data())
         return {
             'year': 1666,
             'collection': collection
@@ -153,7 +163,7 @@ class LotTests(GenericCRUDTestMixin, TestCase):
     model = Lot
 
     def get_add_form_data(self):
-        category = Category.objects.first()
+        category, created = Category.objects.get_or_create(**CategoryTests().get_add_form_data())
         catalogue = category.catalogue
         return {
             'catalogue_id': catalogue.pk,  # TODO: find out why the '_id' and '.pk' are necessary
@@ -162,7 +172,7 @@ class LotTests(GenericCRUDTestMixin, TestCase):
             'sales_price': '10 gulden',
             'lot_as_listed_in_catalogue': 'lot_as_listed_in_catalogue test',
             'index_in_catalogue': 1,
-            'category': category
+            'category_id': category.pk
         }
 
     def get_change_form_data(self):
@@ -175,7 +185,7 @@ class PersonCollectionRelationTests(GenericCRUDTestMixin, TestCase):
     model = PersonCollectionRelation
 
     def get_add_form_data(self):
-        person = Person.objects.first()
+        person, created = Person.objects.get_or_create(**PersonTests().get_add_form_data())
         collection, created = Collection.objects.get_or_create(**CollectionTests().get_add_form_data())
         return {
             'person': person,
@@ -183,7 +193,8 @@ class PersonCollectionRelationTests(GenericCRUDTestMixin, TestCase):
         }
 
     def get_change_form_data(self):
-        person = Person.objects.all()[1]
+        person_data = {**PersonTests().get_add_form_data(), **PersonTests().get_change_form_data()}
+        person, created = Person.objects.get_or_create(person_data)
         return {
             'person': person
         }
@@ -215,7 +226,7 @@ class PersonCatalogueRelationTests(GenericCRUDTestMixin, TestCase):
     model = PersonCatalogueRelation
 
     def get_add_form_data(self):
-        person = Person.objects.first()
+        person, created = Person.objects.get_or_create(**PersonTests().get_add_form_data())
         catalogue, created = Catalogue.objects.get_or_create(**CatalogueTests().get_add_form_data())
         role, created = PersonCatalogueRelationRole.objects.get_or_create(**PersonCatalogueRelationRoleTests().get_add_form_data())
         return {
@@ -225,7 +236,8 @@ class PersonCatalogueRelationTests(GenericCRUDTestMixin, TestCase):
         }
 
     def get_change_form_data(self):
-        person = Person.objects.all()[1]
+        person_data = {**PersonTests().get_add_form_data(), **PersonTests().get_change_form_data()}
+        person, created = Person.objects.get_or_create(person_data)
         return {
             'person': person
         }
@@ -261,8 +273,9 @@ class CategoryTests(GenericCRUDTestMixin, TestCase):
     url_names = {'list': 'categories'}
 
     def get_add_form_data(self):
-        parent = Category.objects.first()
-        catalogue = parent.catalogue
+        catalogue, created = Catalogue.objects.get_or_create(**CatalogueTests().get_add_form_data())
+        parent, created = Category.objects.get_or_create(catalogue=catalogue,
+                                                         bookseller_category='bookseller_category test2')
         parisian_category, create = ParisianCategory.objects.get_or_create(**ParisianCategoryTests().get_add_form_data())
         return {
             'catalogue': catalogue,

@@ -1,5 +1,8 @@
 from django.test import TestCase
+from django.test import Client
 from mediate.tools_testing import GenericCRUDTestMixin
+from catalogues.tests import LotTests
+from persons.tests import PersonTests
 
 from .models import *
 
@@ -123,7 +126,7 @@ class WorkAuthorTests(GenericCRUDTestMixin, TestCase):
 
     def get_add_form_data(self):
         work, created = Work.objects.get_or_create(**WorkTests().get_add_form_data())
-        person = Person.objects.first()
+        person, created = Person.objects.get_or_create(**PersonTests().get_add_form_data())
         return {
             'work_id': work.pk,
             'author_id': person.pk
@@ -143,12 +146,13 @@ class WorkAuthorTests(GenericCRUDTestMixin, TestCase):
 class ItemTests(GenericCRUDTestMixin, TestCase):
     model = Item
 
-    def get_add_form_data(self):
-        lot = Lot.objects.first()
+    @staticmethod
+    def get_add_form_data():
+        lot, created = Lot.objects.get_or_create(**LotTests().get_add_form_data())
         collection = lot.catalogue.collection
-        book_format = BookFormat.objects.first()
-        manifestation, created = Manifestation.objects\
-            .get_or_create(**ManifestationTests().get_add_form_data())
+        book_format, created = BookFormat.objects.get_or_create(**BookFormatTests().get_add_form_data())
+        edition, created = Edition.objects\
+            .get_or_create(**EditionTests().get_add_form_data())
         return {
             'short_title': 'short_title',
             'lot_id':  lot.pk,
@@ -156,7 +160,7 @@ class ItemTests(GenericCRUDTestMixin, TestCase):
             'number_of_volumes': 'number_of_volumes test',
             'book_format_id': book_format.pk,
             'index_in_lot': 1,
-            'manifestation_id': manifestation.pk
+            'edition_id': edition.pk
         }
 
     def get_change_form_data(self):
@@ -210,14 +214,14 @@ class ItemAuthorTests(GenericCRUDTestMixin, TestCase):
 
     def get_add_form_data(self):
         item, created = Item.objects.get_or_create(**ItemTests().get_add_form_data())
-        person = Person.objects.first()
+        person, created = Person.objects.get_or_create(**PersonTests().get_add_form_data())
         return {
             'item_id': item.pk,
             'author_id': person.pk
         }
 
     def get_change_form_data(self):
-        person = Person.objects.all()[1]
+        person, created = Person.objects.get_or_create(**PersonTests().get_add_form_data())
         return {
             'author_id': person.pk
         }
@@ -232,7 +236,7 @@ class ItemLanguageRelationTests(GenericCRUDTestMixin, TestCase):
 
     def get_add_form_data(self):
         item, created = Item.objects.get_or_create(**ItemTests().get_add_form_data())
-        language = Language.objects.first()
+        language, created = Language.objects.get_or_create(**LanguageTests().get_add_form_data())
         return {
             'item_id': item.pk,
             'language_id': language.pk
@@ -295,11 +299,11 @@ class ItemMaterialDetailsRelationTests(GenericCRUDTestMixin, TestCase):
         pass
 
 
-class ManifestationTests(GenericCRUDTestMixin, TestCase):
-    model = Manifestation
+class EditionTests(GenericCRUDTestMixin, TestCase):
+    model = Edition
 
     def get_add_form_data(self):
-        place = Place.objects.first()
+        place, created = Place.objects.get_or_create(name="name test")
         return {
             'year': 1678,
             'year_tag': 'year_tag test',
@@ -313,21 +317,48 @@ class ManifestationTests(GenericCRUDTestMixin, TestCase):
             'year_tag': 'year_tag test2'
         }
 
+    def test_Change(self):
+        """Tests the Change view"""
+        # Test permission
+        permission = self.get_permission_string('change')
+        self.assertTrue(self.user.has_perm(permission))
+
+        # Get the Change form
+        item_obj, created = Item.objects.get_or_create(**ItemTests.get_add_form_data())
+        obj, created = self.model.objects.get_or_create(**self.get_add_form_data())
+        item_obj.edition = obj
+        item_obj.save()
+
+        client = Client()
+        client.login(username=self.username, password=self.password)
+
+        # Note that the Edition update form is redirected to the item form (which is in fact
+        # a combined Item and Manifestation form
+        response = client.get(reverse_lazy(self.get_url_name('change'), args=[obj.uuid]))
+        self.assertEqual(response.status_code, 302)
+        redirect_url = response.url
+
+        # Post to the Change form
+        form_data = {**ItemTests.get_add_form_data(), **self.get_change_form_data()}
+        response = client.post(redirect_url, form_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
 
 class PublisherTests(GenericCRUDTestMixin, TestCase):
     model = Publisher
 
     def get_add_form_data(self):
-        publisher = Person.objects.first()
-        manifestation, created = Manifestation.objects\
-            .get_or_create(**ManifestationTests().get_add_form_data())
+        publisher, created = Person.objects.get_or_create(**PersonTests().get_add_form_data())
+        edition, created = Edition.objects\
+            .get_or_create(**EditionTests().get_add_form_data())
         return {
             'publisher_id': publisher.pk,
-            'manifestation_id': manifestation.pk
+            'edition_id': edition.pk
         }
 
     def get_change_form_data(self):
-        publisher = Person.objects.all()[1]
+        person_create_data = {**PersonTests().get_add_form_data(), ** PersonTests().get_change_form_data()}
+        publisher, created = Person.objects.get_or_create(**person_create_data)
         return {
             'publisher_id': publisher.pk
         }
@@ -359,7 +390,7 @@ class PersonItemRelationTests(GenericCRUDTestMixin, TestCase):
     model = PersonItemRelation
 
     def get_add_form_data(self):
-        person = Person.objects.first()
+        person, created = Person.objects.get_or_create(**PersonTests().get_add_form_data())
         item, created = Item.objects.get_or_create(**ItemTests().get_add_form_data())
         role, created = PersonItemRelationRole.objects\
             .get_or_create(**PersonItemRelationRoleTests().get_add_form_data())

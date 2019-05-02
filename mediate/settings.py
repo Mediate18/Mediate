@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'tagging',
     'dbbackup',
     'maintenance_mode',
+    'test_without_migrations',
     'simple_history',
     'simplemoderation',
     'items',
@@ -211,3 +212,5 @@ AVAILABLE_LAYOUTS = [
 ]
 
 MAINTENANCE_MODE = config('MAINTENANCE_MODE', False, cast=bool)
+
+TEST_WITHOUT_MIGRATIONS_COMMAND = 'django_nose.management.commands.test.Command'
