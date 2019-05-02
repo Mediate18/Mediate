@@ -972,62 +972,62 @@ class PersonItemRelationRoleDeleteView(DeleteView):
     success_url = reverse_lazy('personitemrelationroles')
 
 
-# Manifestation views
-class ManifestationTableView(ListView):
-    model = Manifestation
+# Edition views
+class EditionTableView(ListView):
+    model = Edition
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return Manifestation.objects.all()
+        return Edition.objects.all()
 
     def get_context_data(self, **kwargs):
-        context = super(ManifestationTableView, self).get_context_data(**kwargs)
-        filter = ManifestationFilter(self.request.GET, queryset=self.get_queryset())
+        context = super(EditionTableView, self).get_context_data(**kwargs)
+        filter = EditionFilter(self.request.GET, queryset=self.get_queryset())
 
-        table = ManifestationTable(filter.qs)
+        table = EditionTable(filter.qs)
         django_tables2.RequestConfig(self.request, ).configure(table)
 
         context['filter'] = filter
         context['table'] = table
 
         context['action'] = _("add")
-        context['object_name'] = "manifestation"
-        context['add_url'] = reverse_lazy('add_manifestation')
+        context['object_name'] = "edition"
+        context['add_url'] = reverse_lazy('add_edition')
 
         return context
 
 
-class ManifestationDetailView(GenericDetailView):
-    model = Manifestation
+class EditionDetailView(GenericDetailView):
+    model = Edition
     object_fields = ['year', 'year_tag', 'terminus_post_quem', 'place', 'url']
 
 
-class ManifestationCreateView(CreateView):
-    model = Manifestation
+class EditionCreateView(CreateView):
+    model = Edition
     template_name = 'generic_form.html'
-    form_class = ManifestationModelForm
-    success_url = reverse_lazy('manifestations')
+    form_class = EditionModelForm
+    success_url = reverse_lazy('editions')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("add")
-        context['object_name'] = "manifestation"
+        context['object_name'] = "edition"
         return context
 
 
-class ManifestationUpdateView(View):
+class EditionUpdateView(View):
     def get(self, request, **kwargs):
-        obj = get_object_or_404(Manifestation, pk=kwargs['pk'])
+        obj = get_object_or_404(Edition, pk=kwargs['pk'])
         if obj.items.count() is not 1:
             messages.add_message(request, messages.WARNING,
-                             _("Manifestation ({}) does not have exactly one item.".format(obj)))
+                             _("Edition ({}) does not have exactly one item.".format(obj)))
             return HttpResponseRedirect(self.request.META['HTTP_REFERER'])
         return HttpResponseRedirect(reverse_lazy('change_item', kwargs={'pk': obj.items.all()[0].uuid}))
 
 
-class ManifestationDeleteView(DeleteView):
-    model = Manifestation
-    success_url = reverse_lazy('manifestations')
+class EditionDeleteView(DeleteView):
+    model = Edition
+    success_url = reverse_lazy('editions')
 
 
 # Publisher views
@@ -1332,37 +1332,37 @@ class WorkSubjectDeleteView(DeleteView):
     success_url = reverse_lazy('worksubjects')
 
 
-class ItemAndManifestationCreateView(CreateView):
-    form_class = ItemAndManifestationForm
+class ItemAndEditionCreateView(CreateView):
+    form_class = ItemAndEditionForm
     template_name = 'generic_form.html'
     success_url = reverse_lazy('items')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("add")
-        context['object_name'] = "item and manifestation"
+        context['object_name'] = "item and edition"
         return context
 
     def form_valid(self, form):
-        # Save the manifestation first, because the item needs a manifestation before it
+        # Save the edition first, because the item needs a edition before it
         # can be saved.
-        manifestation = form['manifestation'].save()
+        edition = form['edition'].save()
         item = form['item'].save(commit=False)
-        item.manifestation = manifestation
+        item.edition = edition
         item.save()
         messages.add_message(self.request, messages.SUCCESS,
-                             _("Added an item and a manifestation."))
+                             _("Added an item and a edition."))
         return HttpResponseRedirect(self.success_url)
 
 
-class ItemAndManifestationUpdateView(ItemAndManifestationCreateView):
+class ItemAndEditionUpdateView(ItemAndEditionCreateView):
     model = Item
 
     def get_form_kwargs(self):
-        kwargs = super(ItemAndManifestationUpdateView, self).get_form_kwargs()
+        kwargs = super(ItemAndEditionUpdateView, self).get_form_kwargs()
         self.object = self.get_object()
         kwargs.update(instance={
             'item': self.object,
-            'manifestation': self.object.manifestation,
+            'edition': self.object.edition,
         })
         return kwargs

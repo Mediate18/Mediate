@@ -39,23 +39,23 @@ class ItemFilter(django_filters.FilterSet):
         ),
         method='catalogue_filter'
     )
-    manifestation = django_filters.ModelMultipleChoiceFilter(
-        queryset=Manifestation.objects.all(),
+    edition = django_filters.ModelMultipleChoiceFilter(
+        queryset=Edition.objects.all(),
         widget=ModelSelect2MultipleWidget(
             attrs={'data-placeholder': "Select multiple"},
-            model=Manifestation,
+            model=Edition,
             search_fields=['place__name__icontains', 'year__icontains', 'url__icontains']
         )
     )
-    manifestation_isnull = django_filters.BooleanFilter(
-        label="No associated manifestation",
+    edition_isnull = django_filters.BooleanFilter(
+        label="No associated edition",
         widget=CheckboxInput(),
-        method='manifestation_isnull_filter'
+        method='edition_isnull_filter'
     )
-    manifestation_isempty = django_filters.BooleanFilter(
-        label="Associated manifestation is empty",
+    edition_isempty = django_filters.BooleanFilter(
+        label="Associated edition is empty",
         widget=CheckboxInput(),
-        method='manifestation_isempty_filter'
+        method='edition_isempty_filter'
     )
     material_details = django_filters.ModelMultipleChoiceFilter(
         label="Material details",
@@ -84,9 +84,9 @@ class ItemFilter(django_filters.FilterSet):
             'book_format',
             'index_in_lot',
             'catalogue',
-            'manifestation',
-            'manifestation_isnull',
-            'manifestation_isempty',
+            'edition',
+            'edition_isnull',
+            'edition_isempty',
             'sales_price',
             'material_details',
             'tag'
@@ -106,15 +106,15 @@ class ItemFilter(django_filters.FilterSet):
         else:
             return queryset
 
-    def manifestation_isnull_filter(self, queryset, name, value):
+    def edition_isnull_filter(self, queryset, name, value):
         if value:
-            return queryset.filter(manifestation__isnull=True)
+            return queryset.filter(edition__isnull=True)
         return queryset
 
-    def manifestation_isempty_filter(self, queryset, name, value):
+    def edition_isempty_filter(self, queryset, name, value):
         if value:
-            return queryset.filter(manifestation__year__isnull=True, manifestation__place__isnull=True)\
-                .annotate(num_publishers=Count('manifestation__publisher')).filter(num_publishers=0)
+            return queryset.filter(edition__year__isnull=True, edition__place__isnull=True)\
+                .annotate(num_publishers=Count('edition__publisher')).filter(num_publishers=0)
         return queryset
 
     def catalogue_filter(self, queryset, name, value):
@@ -205,8 +205,8 @@ class PersonItemRelationRoleFilter(django_filters.FilterSet):
         exclude = ['uuid']
 
 
-# Manifestation filter
-class ManifestationFilter(django_filters.FilterSet):
+# Edition filter
+class EditionFilter(django_filters.FilterSet):
     items = django_filters.Filter(name='items__short_title', lookup_expr='icontains')
     year = django_filters.RangeFilter(widget=RangeWidget())
     year_tag = django_filters.Filter(lookup_expr='icontains')
@@ -236,7 +236,7 @@ class ManifestationFilter(django_filters.FilterSet):
                                             widget=django_filters.widgets.RangeWidget())
 
     class Meta:
-        model = Manifestation
+        model = Edition
         exclude = ['uuid']
 
     def publisher_filter(self, queryset, name, value):
@@ -259,8 +259,8 @@ class ManifestationFilter(django_filters.FilterSet):
 # Publisher filter
 class PublisherFilter(django_filters.FilterSet):
     publisher = django_filters.Filter(name='publisher__short_name', lookup_expr='icontains')
-    manifestation = django_filters.Filter(name='manifestation__item__short_title', lookup_expr='icontains')
-    manifestation__place = django_filters.ModelMultipleChoiceFilter(
+    edition = django_filters.Filter(name='edition__item__short_title', lookup_expr='icontains')
+    edition__place = django_filters.ModelMultipleChoiceFilter(
         queryset=Place.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )

@@ -63,11 +63,11 @@
 
                 {% with object.publisher_set.all as publisher_relations %}
                     {% if publisher_relations %}
-                        <h3>{% trans "Manifestations" %}</h3>
+                        <h3>{% trans "Editions" %}</h3>
                         <ul>
                         {% for relation in publisher_relations %}
                             <li>
-                                <a href="{{ relation.manifestation.get_absolute_url }}">{{ relation.manifestation }}</a>
+                                <a href="{{ relation.edition.get_absolute_url }}">{{ relation.edition }}</a>
                             </li>
                         {% endfor %}
                         </ul>

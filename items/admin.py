@@ -67,8 +67,8 @@ class PersonItemRelationRoleAdmin(SimpleHistoryAdmin):
     pass
 
 
-@admin.register(Manifestation)
-class ManifestationAdmin(SimpleHistoryAdmin):
+@admin.register(Edition)
+class EditionAdmin(SimpleHistoryAdmin):
     pass
 
 

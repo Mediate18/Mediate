@@ -7,7 +7,7 @@ from django_select2.forms import Select2MultipleWidget
 
 from mediate.tools import filter_multiple_words
 from catalogues.models import PersonCatalogueRelationRole, Catalogue
-from items.models import PersonItemRelationRole, Manifestation
+from items.models import PersonItemRelationRole, Edition
 
 
 # Person filter

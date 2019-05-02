@@ -120,7 +120,7 @@ class Item(models.Model):
                                          max_length=128, null=True, blank=True)
     book_format = models.ForeignKey(BookFormat, on_delete=SET_NULL, null=True, related_name='items', blank=True)
     index_in_lot = models.IntegerField(_("Index in the lot"))
-    manifestation = models.ForeignKey('Manifestation', on_delete=models.PROTECT, related_name="items")
+    edition = models.ForeignKey('Edition', on_delete=models.PROTECT, related_name="items")
 
     class Meta:
         ordering = ['lot__catalogue__year_of_publication', 'lot__catalogue__short_title',
@@ -143,7 +143,7 @@ class Item(models.Model):
 
     def delete(self, using=None, keep_parents=False):
         super().delete(using=using, keep_parents=keep_parents)
-        self.manifestation.delete()
+        self.edition.delete()
 
 tagging.register(Item)
 
@@ -231,9 +231,9 @@ class ItemMaterialDetailsRelation(models.Model):
         return _("{} contains {}").format(self.item, self.material_details)
 
 
-class Manifestation(models.Model):
+class Edition(models.Model):
     """
-    The manifestation information for an item
+    The edition information for an item
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     year = models.IntegerField(_("Year of publication"), null=True, blank=True)
@@ -246,16 +246,16 @@ class Manifestation(models.Model):
         str_elements = []
         if self.place:
             str_elements.append("{}".format(self.place.name))
-        publishers = Publisher.objects.filter(manifestation=self)
+        publishers = Publisher.objects.filter(edition=self)
         if publishers and publishers[0].publisher.short_name:
             str_elements.append(publishers[0].publisher.short_name)
         if self.year:
             str_elements.append("{}".format(self.year))
-        published_str = ", ".join(str_elements)if str_elements else _("Empty manifestation").format()
+        published_str = ", ".join(str_elements)if str_elements else _("Empty edition").format()
         return published_str
 
     def get_absolute_url(self):
-        return reverse_lazy('manifestation_detail', args=[str(self.uuid)])
+        return reverse_lazy('edition_detail', args=[str(self.uuid)])
 
 
 class Publisher(models.Model):
@@ -264,13 +264,13 @@ class Publisher(models.Model):
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     publisher = models.ForeignKey(Person, on_delete=CASCADE)
-    manifestation = models.ForeignKey(Manifestation, on_delete=CASCADE)
+    edition = models.ForeignKey(Edition, on_delete=CASCADE)
 
     class Meta:
-        unique_together = (("publisher", "manifestation"),)
+        unique_together = (("publisher", "edition"),)
 
     def __str__(self):
-        return _("{} published {}").format(self.publisher, self.manifestation)
+        return _("{} published {}").format(self.publisher, self.edition)
 
 
 class PersonItemRelationRole(models.Model):
@@ -288,7 +288,7 @@ class PersonItemRelationRole(models.Model):
 class PersonItemRelation(models.Model):
     """
     A person-item relation (e.g. author, translator, illustrator, owner)
-    Note that the publisher relation is handled by the Manifestation/Publisher models.
+    Note that the publisher relation is handled by the Edition/Publisher models.
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     person = models.ForeignKey(Person, on_delete=CASCADE)

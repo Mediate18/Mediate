@@ -41,8 +41,8 @@ class ItemModelForm(forms.ModelForm):
                 model=Lot,
                 search_fields=['lot_as_listed_in_catalogue__icontains']
             ),
-            'manifestation': ModelSelect2Widget(
-                model=Manifestation,
+            'edition': ModelSelect2Widget(
+                model=Edition,
                 search_fields=['place__name__icontains', 'year__icontains']
             ),
             'book_format': Select2Widget,
@@ -218,9 +218,9 @@ class PersonItemRelationRoleModelForm(forms.ModelForm):
         fields = "__all__"
 
 
-class ManifestationModelForm(forms.ModelForm):
+class EditionModelForm(forms.ModelForm):
     class Meta:
-        model = Manifestation
+        model = Edition
         fields = "__all__"
         widgets = {
             'place': ModelSelect2Widget(
@@ -239,8 +239,8 @@ class PublisherModelForm(forms.ModelForm):
                 model=Person,
                 search_fields=['short_name__icontains']
             ),
-            'manifestation': ModelSelect2Widget(
-                model=Manifestation,
+            'edition': ModelSelect2Widget(
+                model=Edition,
                 search_fields=['year__icontains', 'place__name__icontains']
             )
         }
@@ -295,7 +295,7 @@ class WorkSubjectModelForm(forms.ModelForm):
 class ItemModelForm2(ItemModelForm):
     class Meta:
         model = Item
-        exclude = ['manifestation']
+        exclude = ['edition']
         widgets = {
             'collection': Select2Widget,
             'lot': ModelSelect2Widget(
@@ -309,8 +309,8 @@ class ItemModelForm2(ItemModelForm):
         }
 
 
-class ItemAndManifestationForm(MultiModelForm):
+class ItemAndEditionForm(MultiModelForm):
     form_classes = OrderedDict([
         ('item', ItemModelForm2),
-        ('manifestation', ManifestationModelForm)
+        ('edition', EditionModelForm)
     ])

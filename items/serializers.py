@@ -74,9 +74,9 @@ class PersonItemRelationRoleSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
-class ManifestationSerializer(serializers.HyperlinkedModelSerializer):
+class EditionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Manifestation
+        model = Edition
         fields = "__all__"
 
 

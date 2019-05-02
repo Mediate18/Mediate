@@ -33,7 +33,7 @@ class ItemTable(tables.Table):
     collection = tables.RelatedLinkColumn()
     number_of_volumes = tables.Column(verbose_name=_('Number of volumes'))
     material_details = tables.Column(empty_values=())
-    manifestation = tables.LinkColumn()
+    edition = tables.LinkColumn()
     manage_works = tables.LinkColumn('add_workstoitem',
         text=format_html('<span class="glyphicon glyphicon-list" data-toggle="tooltip" data-original-title="Manage works"></span>'),
         args=[A('pk')], orderable=False, empty_values=())
@@ -56,7 +56,7 @@ class ItemTable(tables.Table):
             'number_of_volumes',
             'book_format',
             'material_details',
-            'manifestation',
+            'edition',
             'uuid',
             'manage_works',
             'manage_persons',
@@ -271,16 +271,16 @@ class PersonItemRelationRoleTable(tables.Table):
         ]
 
 
-# Manifestation table
-class ManifestationTable(tables.Table):
-    uuid = ActionColumn('manifestation_detail', 'change_manifestation', 'delete_manifestation', orderable=False)
+# Edition table
+class EditionTable(tables.Table):
+    uuid = ActionColumn('edition_detail', 'change_edition', 'delete_edition', orderable=False)
     items = tables.Column(empty_values=(), verbose_name=_("Items"))
     place = tables.RelatedLinkColumn()
     url = tables.Column(linkify=lambda record: record.url)
     publisher = tables.Column(verbose_name=_("Publisher"), empty_values=())
 
     class Meta:
-        model = Manifestation
+        model = Edition
         attrs = {'class': 'table table-sortable'}
         sequence = [
             'items',
@@ -294,7 +294,7 @@ class ManifestationTable(tables.Table):
         ]
 
     def render_items(self, record):
-        items = Item.objects.filter(manifestation=record).distinct()
+        items = Item.objects.filter(edition=record).distinct()
         return format_html(
             ", ".join(
                 ['<a href="{}">{}</a>'.format(item.get_absolute_url(), item) for item in items]
@@ -302,7 +302,7 @@ class ManifestationTable(tables.Table):
         )
 
     def render_publisher(self, record):
-        publishers = Person.objects.filter(publisher__manifestation=record).distinct()
+        publishers = Person.objects.filter(publisher__edition=record).distinct()
         return format_html(
             ", ".join(
                 ['<a href="{}">{}</a>'.format(publisher.get_absolute_url(), publisher) for publisher in publishers]
@@ -314,14 +314,14 @@ class ManifestationTable(tables.Table):
 class PublisherTable(tables.Table):
     uuid = ActionColumn('publisher_detail', 'change_publisher', 'delete_publisher', orderable=False)
     publisher = tables.RelatedLinkColumn()
-    manifestation = tables.RelatedLinkColumn()
+    edition = tables.RelatedLinkColumn()
 
     class Meta:
         model = Publisher
         attrs = {'class': 'table table-sortable'}
         sequence = [
             'publisher',
-            'manifestation',
+            'edition',
         ]
 
 

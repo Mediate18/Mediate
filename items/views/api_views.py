@@ -74,9 +74,9 @@ class PersonItemRelationRoleViewSet(viewsets.ModelViewSet):
     http_method_names = ['get']
 
 
-class ManifestationViewSet(viewsets.ModelViewSet):
-    queryset = Manifestation.objects.all()
-    serializer_class = ManifestationSerializer
+class EditionViewSet(viewsets.ModelViewSet):
+    queryset = Edition.objects.all()
+    serializer_class = EditionSerializer
     http_method_names = ['get']
 
 

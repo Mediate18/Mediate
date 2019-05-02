@@ -4,7 +4,7 @@ from django.utils.html import format_html
 from .models import *
 from mediate.columns import ActionColumn
 from catalogues.models import PersonCatalogueRelation, Catalogue
-from items.models import PersonItemRelation, Manifestation
+from items.models import PersonItemRelation, Edition
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -63,10 +63,10 @@ class PersonTable(tables.Table):
         if item_roles:
             roles_dict['items'] = item_roles
 
-        # Manifestations
-        manifestations_count = record.publisher_set.count()
-        if manifestations_count:
-            roles_dict['manifestation'] = ['publisher']
+        # Editions
+        editions_count = record.publisher_set.count()
+        if editions_count:
+            roles_dict['edition'] = ['publisher']
 
         # Works
         work_count = record.works.count()
@@ -169,7 +169,7 @@ class PlaceLinksTable(tables.Table):
                         orderable=False)
     catalogues = tables.Column(empty_values=(), verbose_name="Catalogues",
                         orderable=False)
-    manifestations = tables.Column(empty_values=(), verbose_name="Manifestations",
+    editions = tables.Column(empty_values=(), verbose_name="Editions",
                         orderable=False)
     people_born = tables.Column(empty_values=(), verbose_name="People born",
                         orderable=False)
@@ -184,7 +184,7 @@ class PlaceLinksTable(tables.Table):
         fields = [
             'name',
             'catalogues',
-            'manifestations',
+            'editions',
             'people_born',
             'people_died',
             'residences',
@@ -198,12 +198,12 @@ class PlaceLinksTable(tables.Table):
                 for catalogue in catalogues]
         ))
 
-    def render_manifestations(self, record):
-        manifestations = Manifestation.objects.filter(place=record)
+    def render_editions(self, record):
+        editions = Edition.objects.filter(place=record)
         return format_html(", ".join(
-            ['<a href="{}">{}</a>'.format(reverse_lazy('manifestation_detail', args=[manifestation.pk]),
-                                          manifestation)
-                for manifestation in manifestations]
+            ['<a href="{}">{}</a>'.format(reverse_lazy('edition_detail', args=[edition.pk]),
+                                          edition)
+                for edition in editions]
         ))
 
     def render_people_born(self, record):

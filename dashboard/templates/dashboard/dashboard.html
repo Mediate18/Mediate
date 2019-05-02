@@ -267,35 +267,35 @@
         <h3>{% trans "Items" %}</h3>
         {% if request.user.is_superuser %}
         <div class="panel panel-default">
-            <div class="panel-heading">Item-manifestation links</div>
+            <div class="panel-heading">Item-edition links</div>
             <div class="panel-body">
                 <div class="list-group">
                     <div class="list-group-item">
-                        <span>Manifestations without items: </span>
-                        <span>{{ number_of_manifestations_without_items }}</span>
-                        {% if number_of_manifestations_without_items > 0 %}
-                            <a title="View manifestations without items"
-                               href="{% url 'manifestations' %}?number_of_items_0=0&number_of_items_1=0">
+                        <span>Editions without items: </span>
+                        <span>{{ number_of_editions_without_items }}</span>
+                        {% if number_of_editions_without_items > 0 %}
+                            <a title="View editions without items"
+                               href="{% url 'editions' %}?number_of_items_0=0&number_of_items_1=0">
                                 <span class="glyphicon glyphicon-th-list"></span>
                             </a>
                         {% endif %}
                     </div>
                     <div class="list-group-item">
-                        <span>Manifestation with more than one item: </span>
-                        <span>{{ number_of_manifestations_gt_1_item }}</span>
-                        {% if number_of_manifestations_gt_1_item > 0 %}
-                            <a title="View manifestation with more than one item"
-                               href="{% url 'manifestations' %}?number_of_items_0=2">
+                        <span>Edition with more than one item: </span>
+                        <span>{{ number_of_editions_gt_1_item }}</span>
+                        {% if number_of_editions_gt_1_item > 0 %}
+                            <a title="View edition with more than one item"
+                               href="{% url 'editions' %}?number_of_items_0=2">
                                 <span class="glyphicon glyphicon-th-list"></span>
                             </a>
                         {% endif %}
                     </div>
                     <div class="list-group-item">
-                        <span>Items without manifestation: </span>
-                        <span>{{ number_of_items_without_manifestations }}</span>
-                        {% if number_of_items_without_manifestations > 0 %}
-                            <a title="View items without manifestation"
-                               href="{% url 'items' %}?manifestation_isnull=on">
+                        <span>Items without edition: </span>
+                        <span>{{ number_of_items_without_editions }}</span>
+                        {% if number_of_items_without_editions > 0 %}
+                            <a title="View items without edition"
+                               href="{% url 'items' %}?edition_isnull=on">
                                 <span class="glyphicon glyphicon-th-list"></span>
                             </a>
                         {% endif %}
@@ -415,10 +415,10 @@
                 {% endif %}
 
 
-                {% if perms.items.change_manifestation %}
+                {% if perms.items.change_edition %}
                 <tr>
                     <td>
-                        <a href="{% url 'manifestations' %}">Manifestations</a>
+                        <a href="{% url 'editions' %}">Editions</a>
                     </td>
                 </tr>
                 {% endif %}
