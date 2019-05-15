@@ -72,6 +72,36 @@ class ItemFilter(django_filters.FilterSet):
             search_fields=['name__icontains'],
         ),
     )
+    person = django_filters.ModelMultipleChoiceFilter(
+        label='Person',
+        queryset=Person.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Person,
+            search_fields=['short_name__icontains']
+        ),
+        method='person_filter'
+    )
+    role = django_filters.ModelMultipleChoiceFilter(
+        label='Role',
+        queryset=PersonItemRelationRole.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=PersonItemRelationRole,
+            search_fields=['name__icontains']
+        ),
+        method='role_filter'
+    )
+    person_role = django_filters.MultipleChoiceFilter(
+        label='Person and Role',
+        choices=[("{}|{}".format(rel['person'], rel['role']),
+                  "{} - {}".format(rel['person__short_name'], rel['role__name']))
+                 for rel in PersonItemRelation.objects.all()
+                     .values('person', 'person__short_name', 'role', 'role__name').distinct()
+                     .order_by('person__short_name')],
+        method='person_role_filter',
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"})
+    )
 
     class Meta:
         model = Item
@@ -120,6 +150,24 @@ class ItemFilter(django_filters.FilterSet):
     def catalogue_filter(self, queryset, name, value):
         if value:
             return queryset.filter(lot__catalogue__in=value)
+        return queryset
+
+    def person_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(personitemrelation__person__in=value).distinct()
+        return queryset
+
+    def role_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(personitemrelation__role__in=value).distinct()
+        return queryset
+
+    def person_role_filter(self, queryset, name, value):
+        if value:
+            for person_role in value:
+                person_id, role_id = person_role.split('|')
+                queryset = queryset.filter(personitemrelation__person__uuid=person_id, personitemrelation__role__uuid=role_id)
+            return queryset
         return queryset
 
 
