@@ -29,7 +29,7 @@ class ItemTable(tables.Table):
     works = tables.Column(empty_values=(), verbose_name=_("Works"))
     lot = tables.Column(order_by='lot__lot_as_listed_in_catalogue', )
     sales_price = tables.Column(empty_values=(), order_by='lot__sales_price')
-    catalogue = tables.Column(empty_values=())
+    catalogue = tables.Column(empty_values=(), order_by='lot__catalogue__short_title')
     collection = tables.RelatedLinkColumn()
     number_of_volumes = tables.Column(verbose_name=_('Number of volumes'))
     material_details = tables.Column(empty_values=())
