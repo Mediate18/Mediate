@@ -5,6 +5,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormVi
 from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
+from django.forms import formset_factory
 
 from django.utils.translation import ugettext_lazy as _
 from django.utils.html import escape
@@ -89,6 +90,9 @@ class BookFormatDeleteView(DeleteView):
 
 
 # Item views
+PersonItemRelationAddFormSet = formset_factory(PersonItemRelationAddForm, extra=3)
+
+
 class ItemTableView(ListView):
     model = Item
     template_name = 'generic_list.html'
@@ -120,7 +124,7 @@ class ItemTableView(ListView):
                 'id': 'add_person',
                 'label': _("Add person"),
                 'url': reverse_lazy('add_persontoitems'),
-                'form': PersonItemRelationAddForm()
+                'form_set': PersonItemRelationAddFormSet
             }
         ]
 
@@ -893,16 +897,19 @@ def add_person_to_items(request):
             items = request.POST.getlist('items')
             for item_id in items:
                 item = Item.objects.get(uuid=item_id)
-                personitemrelation = PersonItemRelation(item=item)
-                form = PersonItemRelationAddForm(instance=personitemrelation, data=request.POST)
-                if form.is_valid():
-                    try:
-                        form.save()
-                    except IntegrityError as ie:
-                        # Probably a unique constraint error which means the relation already exists
-                        messages.add_message(request, messages.ERROR,
-                                             _("{} is already {} of {}".format(form.cleaned_data['person'],
-                                                                               form.cleaned_data['role'], item)))
+                form_set = PersonItemRelationAddFormSet(data=request.POST)
+                if form_set.is_valid():
+                    for form in form_set:
+                        if form.is_valid() and form.has_changed():
+                            try:
+                                personitemrelation = form.save(commit=False)
+                                personitemrelation.item = item
+                                personitemrelation.save()
+                            except IntegrityError as ie:
+                                # Probably a unique constraint error which means the relation already exists
+                                messages.add_message(request, messages.ERROR,
+                                                     _("{} is already {} of {}".format(form.cleaned_data['person'],
+                                                                                       form.cleaned_data['role'], item)))
                 else:
                     messages.add_message(request, messages.ERROR,
                                 _("Item {} could not be used for adding a person.".format(item)))

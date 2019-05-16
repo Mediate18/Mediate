@@ -62,9 +62,20 @@
 
                               <div class="modal-body">
                                 <!-- batch edit form -->
-                                <table class="table">
-                                    {{ option.form.as_table }}
-                                </table>
+                                {% if option.form %}
+                                    <table class="table">
+                                        {{ option.form.as_table }}
+                                    </table>
+                                {% endif %}
+                                {% if option.form_set %}
+                                    {{ option.form_set.management_form }}
+                                    {% for form in option.form_set %}
+                                        <h5>Person and role {{ forloop.counter0|add:1 }}</h5>
+                                        <table class="table">
+                                            {{ form.as_table }}
+                                        </table>
+                                    {% endfor %}
+                                {% endif %}
                               </div>
                               <div class="modal-footer">
                                 <input type="submit" class="btn btn-success" value="{% trans 'Add' %}"/>
