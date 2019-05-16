@@ -69,12 +69,21 @@
                                 {% endif %}
                                 {% if option.form_set %}
                                     {{ option.form_set.management_form }}
-                                    {% for form in option.form_set %}
-                                        <h5>Person and role {{ forloop.counter0|add:1 }}</h5>
-                                        <table class="table">
-                                            {{ form.as_table }}
-                                        </table>
-                                    {% endfor %}
+                                    <div id="form_set">
+                                        {% for form in option.form_set %}
+                                            <h5>Relation {{ forloop.counter0|add:1 }}</h5>
+                                            <table class="table">
+                                                {{ form.as_table }}
+                                            </table>
+                                        {% endfor %}
+                                        <div id="empty_form" style="display:none">
+                                            <h5>Relation __prefixplusone__</h5>
+                                            <table class='table'>
+                                                {{ option.form_set.empty_form }}
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <input type="button" class="btn btn-default" value="Add another relation" id="add_more">
                                 {% endif %}
                               </div>
                               <div class="modal-footer">
@@ -150,7 +159,14 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title"><span class="glyphicon glyphicon-list"></span> {% trans "Add relations to" %}</h4>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-list"></span>
+            {% trans "Add relations to selected " %}
+            {% if object_name_plural %}
+                {{ object_name_plural|title }}
+            {% else %}
+                {{ object_name|title }}s
+            {% endif %}
+        </h4>
       </div>
       <div id="batcheditformcontainer"></div>
     </div>
@@ -268,6 +284,20 @@ $(document).ready(function(){
             $(this).closest('td').find('.expand-cell').show();
             // Make the surrounding div enable 'max-height'
             $(this).closest('td').find('.expandable-cell').toggleClass('collapsed-cell');
+        });
+
+        // Dynamically add a form to the form set
+        $('#add_more').click(function() {
+            var form_idx = $('#id_form-TOTAL_FORMS').val();
+            $('#form_set').append($('#empty_form').html()
+                .replace(/__prefix__/g, form_idx)
+                .replace(/__prefixplusone__/g, parseInt(form_idx) + 1));
+            $('#form_set').find('select').djangoSelect2();
+
+            // Workaround for the fact that djangoSelect2() as used above duplicates the selects.
+            $('#form_set').find('select ~ span:nth-of-type(2)').hide();
+
+            $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
         });
 });
 </script>

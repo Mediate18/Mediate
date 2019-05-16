@@ -90,7 +90,7 @@ class BookFormatDeleteView(DeleteView):
 
 
 # Item views
-PersonItemRelationAddFormSet = formset_factory(PersonItemRelationAddForm, extra=3)
+PersonItemRelationAddFormSet = formset_factory(PersonItemRelationAddForm, extra=1)
 
 
 class ItemTableView(ListView):
