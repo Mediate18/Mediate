@@ -107,12 +107,14 @@ class ItemTableView(ListView):
         return items
 
     def get(self, request, *args, **kwargs):
+        # Handle the _export query
         export_format = request.GET.get('_export', None)
         if TableExport.is_valid_format(export_format):
             filter = ItemFilter(self.request.GET, queryset=self.get_queryset())
-            table = ItemTableExport(filter.qs)
+            table = ItemTable(filter.qs)
             RequestConfig(request).configure(table)
-            exporter = TableExport(export_format, table)
+            exporter = TableExport(export_format, table,
+                                   exclude_columns=('uuid', 'manage_works', 'manage_persons', 'checkbox'))
             return exporter.response('table.{}'.format(export_format))
         else:
             return super().get(request, *args, **kwargs)
