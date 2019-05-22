@@ -124,6 +124,73 @@ class ItemTable(tables.Table):
         return ", ".join(MaterialDetails.objects.filter(items__item=record).values_list('description', flat=True))
 
 
+class ItemTableExport(tables.Table):
+    """
+    A Tables2 table for exporting (XSLX, CSV, etc.)
+    """
+    people = tables.Column(empty_values=())
+    works = tables.Column(empty_values=(), verbose_name=_("Works"))
+    lot = tables.Column(order_by='lot__lot_as_listed_in_catalogue', )
+    sales_price = tables.Column(empty_values=(), order_by='lot__sales_price')
+    catalogue = tables.Column(empty_values=(), order_by='lot__catalogue__short_title')
+    collection = tables.RelatedLinkColumn()
+    number_of_volumes = tables.Column(empty_values=[None], verbose_name=_('Number of volumes'), default="")
+    material_details = tables.Column(empty_values=())
+    edition = tables.LinkColumn()
+
+    class Meta:
+        model = Item
+        fields = [
+            'short_title',
+            'people',
+            'works',
+            'lot',
+            'index_in_lot',
+            'sales_price',
+            'catalogue',
+            'collection',
+            'number_of_volumes',
+            'book_format',
+            'material_details',
+            'edition',
+        ]
+
+    def render_people(self, record):
+        person_item_relations = PersonItemRelation.objects.filter(item=record)
+        relation_groups = []
+        for role in set([relation.role for relation in person_item_relations]):
+            role_relations = person_item_relations.filter(role=role)
+            persons = []
+            for relation in role_relations:
+                person = relation.person
+                name = person.short_name
+                person_entry = name
+                persons.append(person_entry)
+
+            relation_groups.append(
+                role.name.capitalize() + ": " + ", ".join(persons)
+            )
+        return "\n".join(relation_groups)
+
+    def render_works(self, record):
+        item_work_relations = ItemWorkRelation.objects.filter(item=record)
+        work_entries = []
+        for relation in item_work_relations:
+            work = relation.work
+            work_entry = work.title
+            work_entries.append(work_entry)
+        return " | ".join(work_entries)
+
+    def render_catalogue(self, record):
+        return str(record.lot.catalogue) or ""
+
+    def render_sales_price(self, record):
+        return record.lot.sales_price or ""
+
+    def render_material_details(self, record):
+        return ", ".join(MaterialDetails.objects.filter(items__item=record).values_list('description', flat=True))
+
+
 # ItemAuthor table
 class ItemAuthorTable(tables.Table):
     uuid = ActionColumn('itemauthor_detail', 'change_itemauthor', 'delete_itemauthor', orderable=False)

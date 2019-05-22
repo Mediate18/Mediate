@@ -6,6 +6,8 @@ from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.forms import formset_factory
+from django_tables2.config import RequestConfig
+from django_tables2.export.export import TableExport
 
 from django.utils.translation import ugettext_lazy as _
 from django.utils.html import escape
@@ -103,6 +105,17 @@ class ItemTableView(ListView):
         if lot_uuid:
             items = items.filter(lot__uuid=uuid.UUID(lot_uuid))
         return items
+
+    def get(self, request, *args, **kwargs):
+        export_format = request.GET.get('_export', None)
+        if TableExport.is_valid_format(export_format):
+            filter = ItemFilter(self.request.GET, queryset=self.get_queryset())
+            table = ItemTableExport(filter.qs)
+            RequestConfig(request).configure(table)
+            exporter = TableExport(export_format, table)
+            return exporter.response('table.{}'.format(export_format))
+        else:
+            return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(ItemTableView, self).get_context_data(**kwargs)
