@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'test_without_migrations',
     'simple_history',
     'simplemoderation',
+    'mediate',
     'items',
     'transcriptions',
     'persons',
