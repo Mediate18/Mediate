@@ -39,6 +39,8 @@ class ItemFilter(django_filters.FilterSet):
         ),
         method='catalogue_filter'
     )
+    catalogue_publication_year = django_filters.RangeFilter(label="Catalogue publication year", widget=RangeWidget(),
+                                                            field_name='lot__catalogue__year_of_publication')
     edition = django_filters.ModelMultipleChoiceFilter(
         queryset=Edition.objects.all(),
         widget=ModelSelect2MultipleWidget(
@@ -114,6 +116,7 @@ class ItemFilter(django_filters.FilterSet):
             'book_format',
             'index_in_lot',
             'catalogue',
+            'catalogue_publication_year',
             'edition',
             'edition_isnull',
             'edition_isempty',
