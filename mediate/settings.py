@@ -121,8 +121,8 @@ DATABASES = {
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': config('CACHE_LOCATION', default="mediate"),
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': config('CACHE_LOCATION', default="mediate_cache"),
         'TIMEOUT': 3600
     }
 }
