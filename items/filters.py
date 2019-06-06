@@ -3,7 +3,7 @@ from django_filters.widgets import RangeWidget
 from django.db.models import Count
 from django.forms import CheckboxInput
 from django_select2.forms import ModelSelect2MultipleWidget, Select2MultipleWidget
-from tagging.models import Tag, TaggedItem
+from tagme.models import Tag
 from .models import *
 from catalogues.models import Catalogue
 from mediate.tools import filter_multiple_words
@@ -127,7 +127,7 @@ class ItemFilter(django_filters.FilterSet):
 
     def tag_filter(self, queryset, name, value):
         if value:
-            return TaggedItem.objects.get_by_model(queryset, value)
+            return queryset.filter(tags__tag__in=value)
         return queryset
 
     def multiple_words_filter(self, queryset, name, value):

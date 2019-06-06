@@ -1,10 +1,11 @@
 from collections import OrderedDict
 from django import forms
+from django.contrib.contenttypes.models import ContentType
 from django_select2.forms import Select2Widget, ModelSelect2Widget, ModelSelect2MultipleWidget
 from apiconnectors.widgets import ApiSelectWidget
 from .models import *
 
-from tagging.models import Tag
+from tagme.models import Tag
 from betterforms.multiform import MultiModelForm
 
 
@@ -17,6 +18,7 @@ class BookFormatModelForm(forms.ModelForm):
 class ItemModelForm(forms.ModelForm):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.content_type = ContentType.objects.get_for_model(self.instance)
         self.add_tag_field()
 
     def add_tag_field(self):
@@ -28,7 +30,8 @@ class ItemModelForm(forms.ModelForm):
                 ),
             queryset=Tag.objects.all(),  # ... filter(namespace='item'),
             required=False,
-            initial=self.instance.tags
+            initial=Tag.objects.filter(taggedentity__object_id=self.instance.pk,
+                                       taggedentity__content_type=self.content_type)
         )
         self.fields['tag'] = tag
 
@@ -52,7 +55,20 @@ class ItemModelForm(forms.ModelForm):
         }
 
     def save(self, commit=True):
-        self.instance.tags = self.cleaned_data['tag']
+        tags_in_form = self.cleaned_data['tag']
+        existing_tags = Tag.objects.filter(taggedentity__object_id=self.instance.pk,
+                                       taggedentity__content_type=self.content_type)
+
+        # Delete tags that were removed in the form
+        tags_to_delete = existing_tags.exclude(pk__in=tags_in_form.values_list('pk', flat=True))
+        for tag in tags_to_delete:
+            TaggedEntity.objects.get(tag=tag, object_id=self.instance.pk, content_type=self.content_type).delete()
+
+        # Add tags that were added in the form
+        new_tags = tags_in_form.exclude(pk__in=existing_tags.values_list('pk', flat=True))
+        for tag in new_tags:
+            self.instance.tags.create(tag=tag)
+
         return super(ItemModelForm, self).save(commit=commit)
 
 

@@ -3,12 +3,13 @@ from django.db.models.deletion import CASCADE, SET_NULL
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
+from django.contrib.contenttypes.fields import GenericRelation
 
 import uuid
-import tagging
 
 from persons.models import Place, Person
 from catalogues.models import Collection, Lot
+from tagme.models import TaggedEntity
 
 from simplemoderation.tools import moderated
 
@@ -122,6 +123,8 @@ class Item(models.Model):
     index_in_lot = models.IntegerField(_("Index in the lot"))
     edition = models.ForeignKey('Edition', on_delete=models.PROTECT, related_name="items")
 
+    tags = GenericRelation(TaggedEntity, related_query_name='items')
+
     class Meta:
         ordering = ['lot__catalogue__year_of_publication', 'lot__catalogue__short_title',
                     'lot__lot_as_listed_in_catalogue']
@@ -144,8 +147,6 @@ class Item(models.Model):
     def delete(self, using=None, keep_parents=False):
         super().delete(using=using, keep_parents=keep_parents)
         self.edition.delete()
-
-tagging.register(Item)
 
 
 class ItemType(models.Model):

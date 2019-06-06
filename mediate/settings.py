@@ -47,12 +47,12 @@ INSTALLED_APPS = [
     'dal',
     'dal_select2',
     'viapy',
-    'tagging',
     'dbbackup',
     'maintenance_mode',
     'test_without_migrations',
     'simple_history',
     'simplemoderation',
+    'tagme',
     'mediate',
     'items',
     'transcriptions',
@@ -198,7 +198,7 @@ BOOTSTRAP3 = {
 MODERATED_OBJECT_PK = "use_uuid"
 MODERATION_OFF = config('MODERATION_OFF', False, cast=bool)
 
-TAGGING_OBJECT_ID_TYPE = "uuid"
+TAGME_OBJECT_ID_TYPE = "uuid"
 
 APPLICATION_INSTANCE_TYPE = config('APPLICATION_INSTANCE_TYPE', default="")
 

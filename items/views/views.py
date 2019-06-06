@@ -146,6 +146,57 @@ class ItemTableView(ListView):
         return context
 
 
+class TaggedItemTableView(ListView):
+    model = Item
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        items = Item.objects.all()
+        lot_uuid = self.request.GET.get('lot__uuid')
+        if lot_uuid:
+            items = items.filter(lot__uuid=uuid.UUID(lot_uuid))
+        return items
+
+    def get(self, request, *args, **kwargs):
+        # Handle the _export query
+        export_format = request.GET.get('_export', None)
+        if TableExport.is_valid_format(export_format):
+            filter = ItemFilter(self.request.GET, queryset=self.get_queryset())
+            table = ItemTable(filter.qs)
+            RequestConfig(request).configure(table)
+            exporter = TableExport(export_format, table,
+                                   exclude_columns=('uuid', 'manage_works', 'manage_persons', 'checkbox'))
+            return exporter.response('table.{}'.format(export_format))
+        else:
+            return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(ItemTableView, self).get_context_data(**kwargs)
+        filter = ItemFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = ItemTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name'] = "item"
+        context['add_url'] = reverse_lazy('add_item')
+
+        context['addanother_person_form'] = PersonModelForm()
+        context['batch_edit_options'] = [
+            {
+                'id': 'add_person',
+                'label': _("Add person"),
+                'url': reverse_lazy('add_persontoitems'),
+                'form_set': PersonItemRelationAddFormSet
+            }
+        ]
+
+        return context
+
+
 class ItemDetailView(DetailView):
     model = Item
     template_name = 'items/item_detail.html'
