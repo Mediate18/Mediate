@@ -10,6 +10,11 @@ class Tag(models.Model):
     name = models.CharField(max_length=128)
     value = models.CharField(max_length=128, null=True, blank=True)
 
+    class Meta:
+        permissions = [
+            ("view_entities_with_this_tag", "Can view entities with this tag"),
+        ]
+
     def __str__(self):
         namespace_part = "{}:".format(self.namespace) if self.namespace else ""
         value_part = "={}".format(self.value) if self.value else ""

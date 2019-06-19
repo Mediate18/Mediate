@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'bootstrap3',
     'rest_framework',
+    'guardian',
     'django_filters',
     'django_tables2',
     'django_select2',
@@ -146,6 +147,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend', # this is default
+    'guardian.backends.ObjectPermissionBackend',
+)
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/

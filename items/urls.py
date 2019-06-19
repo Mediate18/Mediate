@@ -31,6 +31,9 @@ urlpatterns = [
     path(r'items/delete/<uuid:pk>', permission_required('items.delete_item')(ItemDeleteView.as_view()),
        name="delete_item"),
 
+    # Tagged Item urls
+    path('taggeditems/', login_required(TaggedItemTableView.as_view()), name='taggeditems'),
+
     # ItemAuthor urls
     path('itemauthors/', login_required(ItemAuthorTableView.as_view()), name='itemauthors'),
     path(r'itemauthors/<uuid:pk>', login_required(ItemAuthorDetailView.as_view()),

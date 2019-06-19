@@ -43,9 +43,11 @@
                 {{ object_name|title }}s
             {% endif %}
             <div class="pull-right">
-                <a href="{{ add_url }}" class="btn btn-default">
-                  <span class="glyphicon glyphicon-plus"></span> New
-                </a>
+                {% if add_url %}
+                    <a href="{{ add_url }}" class="btn btn-default">
+                      <span class="glyphicon glyphicon-plus"></span> New
+                    </a>
+                {% endif %}
                 {% if batch_edit_options %}
                     {% if batch_edit_options|length > 1 %}
                         <div class="btn-group" role="group" aria-label="batch edit">
@@ -107,6 +109,18 @@
                       </div>
                     </div>
                 </div>
+                {% if export %}
+                    <div class="dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                            <span class="glyphicon glyphicon-export"></span> Export
+                        <span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                            {% for format, name in export.items %}
+                                <li><a href="?_export={{ format }}">{{ name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
             </div>
         </h1>
         <div class="small">Displaying {{ filter.qs.count }} of {{ filter.queryset.count }}</div>
