@@ -9,8 +9,8 @@ urlpatterns = [
     path(r'', RedirectView.as_view(url='persons/')),
 
     # Person urls
-    path('persons/', login_required(PersonTableView.as_view()), name='persons'),
-    path(r'persons/<uuid:pk>', login_required(PersonDetailView.as_view()),
+    path('persons/', permission_required('global.view_all')(PersonTableView.as_view()), name='persons'),
+    path(r'persons/<uuid:pk>', permission_required('global.view_all')(PersonDetailView.as_view()),
          name="person_detail"),
     path(r'persons/add', permission_required('persons.add_person')(PersonCreateView.as_view()),
          name="add_person"),
@@ -22,9 +22,9 @@ urlpatterns = [
          name="delete_person"),
 
     # PersonPersonRelation urls
-    path('personpersonrelations/', login_required(PersonPersonRelationTableView.as_view()),
+    path('personpersonrelations/', permission_required('global.view_all')(PersonPersonRelationTableView.as_view()),
          name='personpersonrelations'),
-    path(r'personpersonrelations/<uuid:pk>', login_required(PersonPersonRelationDetailView.as_view()),
+    path(r'personpersonrelations/<uuid:pk>', permission_required('global.view_all')(PersonPersonRelationDetailView.as_view()),
          name="personpersonrelation_detail"),
     path(r'personpersonrelations/add',
          permission_required('persons.add_personpersonrelation')(PersonPersonRelationCreateView.as_view()),
@@ -37,9 +37,9 @@ urlpatterns = [
          name="delete_personpersonrelation"),
 
     # PersonPersonRelationType urls
-    path('personpersonrelationtypes/', login_required(PersonPersonRelationTypeTableView.as_view()),
+    path('personpersonrelationtypes/', permission_required('global.view_all')(PersonPersonRelationTypeTableView.as_view()),
          name='personpersonrelationtypes'),
-    path(r'personpersonrelationtypes/<uuid:pk>', login_required(PersonPersonRelationTypeDetailView.as_view()),
+    path(r'personpersonrelationtypes/<uuid:pk>', permission_required('global.view_all')(PersonPersonRelationTypeDetailView.as_view()),
          name="personpersonrelationtype_detail"),
     path(r'personpersonrelationtypes/add',
          permission_required('persons.add_personpersonrelationtype')(PersonPersonRelationTypeCreateView.as_view()),
@@ -53,8 +53,8 @@ urlpatterns = [
          name="delete_personpersonrelationtype"),
 
     # PersonProfession urls
-    path('personprofessions/', login_required(PersonProfessionTableView.as_view()), name='personprofessions'),
-    path(r'personprofessions/<uuid:pk>', login_required(PersonProfessionDetailView.as_view()),
+    path('personprofessions/', permission_required('global.view_all')(PersonProfessionTableView.as_view()), name='personprofessions'),
+    path(r'personprofessions/<uuid:pk>', permission_required('global.view_all')(PersonProfessionDetailView.as_view()),
          name="personprofession_detail"),
     path(r'personprofessions/add',
          permission_required('persons.add_personprofession')(PersonProfessionCreateView.as_view()),
@@ -67,8 +67,8 @@ urlpatterns = [
          name="delete_personprofession"),
 
     # Country urls
-    path('countries/', login_required(CountryTableView.as_view()), name='countries'),
-    path(r'countries/<uuid:pk>', login_required(CountryDetailView.as_view()),
+    path('countries/', permission_required('global.view_all')(CountryTableView.as_view()), name='countries'),
+    path(r'countries/<uuid:pk>', permission_required('global.view_all')(CountryDetailView.as_view()),
          name="country_detail"),
     path(r'countries/add', permission_required('persons.add_country')(CountryCreateView.as_view()),
          name="add_country"),
@@ -80,8 +80,8 @@ urlpatterns = [
          name="delete_country"),
 
     # Place urls
-    path('places/', login_required(PlaceTableView.as_view()), name='places'),
-    path(r'places/<uuid:pk>', login_required(PlaceDetailView.as_view()),
+    path('places/', permission_required('global.view_all')(PlaceTableView.as_view()), name='places'),
+    path(r'places/<uuid:pk>', permission_required('global.view_all')(PlaceDetailView.as_view()),
          name="place_detail"),
     path(r'places/add', permission_required('persons.add_place')(PlaceCreateView.as_view()),
          name="add_place"),
@@ -92,11 +92,11 @@ urlpatterns = [
          permission_required('persons.delete_place')(PlaceDeleteView.as_view()),
          name="delete_place"),
 
-    path('placelinks', login_required(PlaceLinksTableView.as_view()), name='placelinks'),
+    path('placelinks', permission_required('global.view_all')(PlaceLinksTableView.as_view()), name='placelinks'),
 
     # Profession urls
-    path('professions/', login_required(ProfessionTableView.as_view()), name='professions'),
-    path(r'professions/<uuid:pk>', login_required(ProfessionDetailView.as_view()),
+    path('professions/', permission_required('global.view_all')(ProfessionTableView.as_view()), name='professions'),
+    path(r'professions/<uuid:pk>', permission_required('global.view_all')(ProfessionDetailView.as_view()),
          name="profession_detail"),
     path(r'professions/add', permission_required('persons.add_profession')(ProfessionCreateView.as_view()),
          name="add_profession"),
@@ -108,8 +108,8 @@ urlpatterns = [
          name="delete_profession"),
 
     # Religion urls
-    path('religions/', login_required(ReligionTableView.as_view()), name='religions'),
-    path(r'religions/<uuid:pk>', login_required(ReligionDetailView.as_view()),
+    path('religions/', permission_required('global.view_all')(ReligionTableView.as_view()), name='religions'),
+    path(r'religions/<uuid:pk>', permission_required('global.view_all')(ReligionDetailView.as_view()),
          name="religion_detail"),
     path(r'religions/add', permission_required('persons.add_religion')(ReligionCreateView.as_view()),
          name="add_religion"),
@@ -121,9 +121,9 @@ urlpatterns = [
          name="delete_religion"),
 
     # ReligiousAffiliation urls
-    path('religiousaffiliations/', login_required(ReligiousAffiliationTableView.as_view()),
+    path('religiousaffiliations/', permission_required('global.view_all')(ReligiousAffiliationTableView.as_view()),
          name='religiousaffiliations'),
-    path(r'religiousaffiliations/<uuid:pk>', login_required(ReligiousAffiliationDetailView.as_view()),
+    path(r'religiousaffiliations/<uuid:pk>', permission_required('global.view_all')(ReligiousAffiliationDetailView.as_view()),
          name="religiousaffiliation_detail"),
     path(r'religiousaffiliations/add',
          permission_required('persons.add_religiousaffiliation')(ReligiousAffiliationCreateView.as_view()),
@@ -136,8 +136,8 @@ urlpatterns = [
          name="delete_religiousaffiliation"),
 
     # Residence urls
-    path('residences/', login_required(ResidenceTableView.as_view()), name='residences'),
-    path(r'residences/<uuid:pk>', login_required(ResidenceDetailView.as_view()),
+    path('residences/', permission_required('global.view_all')(ResidenceTableView.as_view()), name='residences'),
+    path(r'residences/<uuid:pk>', permission_required('global.view_all')(ResidenceDetailView.as_view()),
          name="residence_detail"),
     path(r'residences/add', permission_required('persons.add_residence')(ResidenceCreateView.as_view()),
          name="add_residence"),

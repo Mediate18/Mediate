@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'simplemoderation',
     'tagme',
     'mediate',
+    'global',
     'items',
     'transcriptions',
     'persons',

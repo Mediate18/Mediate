@@ -1,4 +1,4 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import permission_required
 from django.utils.translation import ugettext_lazy as _
 import os
 import mimetypes
@@ -8,7 +8,7 @@ from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 
 
-@login_required
+@permission_required('global.view_all')
 def protected_media(request, filename):
     """
     View to send file via X-Sendfile

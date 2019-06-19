@@ -7,8 +7,8 @@ urlpatterns = [
     path(r'', RedirectView.as_view(url='transcriptions/')),
 
     # DocumentScan urls
-    path('documentscans/', login_required(DocumentScanTableView.as_view()), name='documentscans'),
-    path(r'documentscans/<uuid:pk>', login_required(DocumentScanDetailView.as_view()),
+    path('documentscans/', permission_required('global.view_all')(DocumentScanTableView.as_view()), name='documentscans'),
+    path(r'documentscans/<uuid:pk>', permission_required('global.view_all')(DocumentScanDetailView.as_view()),
          name="documentscan_detail"),
     path(r'documentscans/add', permission_required('transcriptions.add_documentscan')(DocumentScanCreateView.as_view()),
          name="add_documentscan"),
@@ -20,8 +20,8 @@ urlpatterns = [
          name="delete_documentscan"),
 
     # SourceMaterial urls
-    path('sourcematerials/', login_required(SourceMaterialTableView.as_view()), name='sourcematerials'),
-    path(r'sourcematerials/<uuid:pk>', login_required(SourceMaterialDetailView.as_view()),
+    path('sourcematerials/', permission_required('global.view_all')(SourceMaterialTableView.as_view()), name='sourcematerials'),
+    path(r'sourcematerials/<uuid:pk>', permission_required('global.view_all')(SourceMaterialDetailView.as_view()),
          name="sourcematerial_detail"),
     path(r'sourcematerials/add', permission_required('transcriptions.add_sourcematerial')(SourceMaterialCreateView.as_view()),
          name="add_sourcematerial"),
@@ -33,8 +33,8 @@ urlpatterns = [
          name="delete_sourcematerial"),
 
     # Transcription urls
-    path('transcriptions/', login_required(TranscriptionTableView.as_view()), name='transcriptions'),
-    path(r'transcriptions/<uuid:pk>', login_required(TranscriptionDetailView.as_view()),
+    path('transcriptions/', permission_required('global.view_all')(TranscriptionTableView.as_view()), name='transcriptions'),
+    path(r'transcriptions/<uuid:pk>', permission_required('global.view_all')(TranscriptionDetailView.as_view()),
          name="transcription_detail"),
     path(r'transcriptions/add', permission_required('transcriptions.add_transcription')(TranscriptionCreateView.as_view()),
          name="add_transcription"),
