@@ -322,6 +322,12 @@
                         <a href="{% url 'items' %}">Items</a>
                     </td>
                 </tr>
+                {% else %}
+                <tr>
+                    <td>
+                        <a href="{% url 'taggeditems' %}">Tagged Items</a>
+                    </td>
+                </tr>
                 {% endif %}
 
 

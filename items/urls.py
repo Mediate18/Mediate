@@ -32,7 +32,7 @@ urlpatterns = [
        name="delete_item"),
 
     # Tagged Item urls
-    path('taggeditems/', permission_required('global.view_all')(TaggedItemTableView.as_view()), name='taggeditems'),
+    path('taggeditems/', login_required(TaggedItemTableView.as_view()), name='taggeditems'),
 
     # ItemAuthor urls
     path('itemauthors/', permission_required('global.view_all')(ItemAuthorTableView.as_view()), name='itemauthors'),

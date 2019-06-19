@@ -58,14 +58,30 @@
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             {% with url_name=request.resolver_match.url_name %}
-            <li class="{% if url_name == 'persons' %}active{% endif %}"><a href="{% url 'persons' %}">{% trans "Persons" %}</a></li>
-            <li class="{% if url_name == 'collections' %}active{% endif %}"><a href="{% url 'collections' %}">{% trans "Collections" %}</a></li>
-            <li class="{% if url_name == 'catalogues' %}active{% endif %}"><a href="{% url 'catalogues' %}">{% trans "Catalogues" %}</a></li>
-            <li class="{% if url_name == 'lots' %}active{% endif %}"><a href="{% url 'lots' %}">{% trans "Lots" %}</a></li>
-            <li class="{% if url_name == 'categories' %}active{% endif %}"><a href="{% url 'categories' %}">{% trans "Categories" %}</a></li>
-            <li class="{% if url_name == 'items' %}active{% endif %}"><a href="{% url 'items' %}">{% trans "Items" %}</a></li>
-            <li class="{% if url_name == 'editions' %}active{% endif %}"><a href="{% url 'editions' %}">{% trans "Editions" %}</a></li>
-            <li class="{% if url_name == 'works' %}active{% endif %}"><a href="{% url 'works' %}">{% trans "Works" %}</a></li>
+              {% if perms.persons.change_person or perms.global.view_all %}
+                <li class="{% if url_name == 'persons' %}active{% endif %}"><a href="{% url 'persons' %}">{% trans "Persons" %}</a></li>
+              {% endif %}
+              {% if perms.persons.change_collection or perms.global.view_all %}
+                <li class="{% if url_name == 'collections' %}active{% endif %}"><a href="{% url 'collections' %}">{% trans "Collections" %}</a></li>
+              {% endif %}
+              {% if perms.persons.change_catalogue or perms.global.view_all %}
+                <li class="{% if url_name == 'catalogues' %}active{% endif %}"><a href="{% url 'catalogues' %}">{% trans "Catalogues" %}</a></li>
+              {% endif %}
+              {% if perms.persons.change_lot or perms.global.view_all %}
+                <li class="{% if url_name == 'lots' %}active{% endif %}"><a href="{% url 'lots' %}">{% trans "Lots" %}</a></li>
+              {% endif %}
+              {% if perms.persons.change_category or perms.global.view_all %}
+                <li class="{% if url_name == 'categories' %}active{% endif %}"><a href="{% url 'categories' %}">{% trans "Categories" %}</a></li>
+              {% endif %}
+              {% if perms.persons.change_item or perms.global.view_all %}
+                <li class="{% if url_name == 'items' %}active{% endif %}"><a href="{% url 'items' %}">{% trans "Items" %}</a></li>
+              {% endif %}
+              {% if perms.persons.change_edition or perms.global.view_all %}
+                <li class="{% if url_name == 'editions' %}active{% endif %}"><a href="{% url 'editions' %}">{% trans "Editions" %}</a></li>
+              {% endif %}
+              {% if perms.persons.change_work or perms.global.view_all %}
+                <li class="{% if url_name == 'works' %}active{% endif %}"><a href="{% url 'works' %}">{% trans "Works" %}</a></li>
+              {% endif %}
             {% endwith %}
           </ul>
           <ul class="nav navbar-nav navbar-right">
