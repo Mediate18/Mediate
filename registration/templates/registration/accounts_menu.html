@@ -3,7 +3,12 @@
 {% if user.is_authenticated %}
 <li>
     <a href="{% url 'dashboard' %}"> <span class="glyphicon glyphicon-user"> </span>
-        {{ user.first_name }} {{ user.last_name }} </a>
+        {% if user.first_name or user.last_name %}
+            {{ user.first_name }} {{ user.last_name }}
+        {% else %}
+            {{ user.username }}
+        {% endif %}
+    </a>
 </li>
 <li>
     <a href="{% url 'logout' %}"><span class="glyphicon glyphicon-log-out"> </span> Log out</a>
