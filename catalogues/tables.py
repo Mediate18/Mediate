@@ -3,6 +3,8 @@ from django_tables2.utils import A  # alias for Accessor
 from django.utils.html import format_html
 from .models import *
 
+from collections import defaultdict
+
 from catalogues.models import PersonCatalogueRelation
 from persons.models import Country
 from mediate.columns import ActionColumn
@@ -15,7 +17,7 @@ class CatalogueTable(tables.Table):
     owner = tables.Column(empty_values=())
     number_of_lots = tables.Column(empty_values=(), orderable=False)
     number_of_items = tables.Column(empty_values=(), orderable=False)
-    publication_places = tables.Column(empty_values=(), verbose_name="Publication places", orderable=False)
+    related_places = tables.Column(empty_values=(), verbose_name="Related places", orderable=False)
     countries = tables.Column(empty_values=(), verbose_name="Publication countries", orderable=False)
 
     class Meta:
@@ -29,7 +31,7 @@ class CatalogueTable(tables.Table):
             'owner',
             'number_of_lots',
             'number_of_items',
-            'publication_places',
+            'related_places',
             'countries'
         ]
 
@@ -66,17 +68,21 @@ class CatalogueTable(tables.Table):
     def render_number_of_items(self, record):
         return record.item_count()
 
-    def render_publication_places(self, record):
-        places = Place.objects.filter(published_catalogues__catalogue=record)
-        return format_html(", ".join(
-            [
-                '<a href="{}">{}</a>'.format(reverse_lazy('place_detail', args=[place.pk]), place)
-                for place in places
-            ]
-        ))
+    def render_related_places(self, record):
+        relations = CataloguePlaceRelation.objects.filter(catalogue=record).prefetch_related('type')
+        type_dict = defaultdict(list)
+        for relation in relations:
+            type_dict[relation.type.name].append(relation.place)
+
+        return format_html("<br/>".join([
+            type.capitalize() + ": " + ", ".join([
+                    '<a href="{}">{}</a>'.format(reverse_lazy('place_detail', args=[place.pk]), place)
+                    for place in places
+                ]) for type, places in type_dict.items()
+            ]))
 
     def render_countries(self, record):
-        countries = Country.objects.filter(place__published_catalogues__catalogue=record).distinct()
+        countries = Country.objects.filter(place__related_catalogues__catalogue=record).distinct()
         return format_html(", ".join(
             [
                 '<a href="{}">{}</a>'.format(reverse_lazy('country_detail', args=[country.pk]), country)
@@ -233,17 +239,18 @@ class PersonCollectionRelationTable(tables.Table):
         ]
 
 
-# CataloguePublicationPlace table
-class CataloguePublicationPlaceTable(tables.Table):
-    uuid = ActionColumn('cataloguepublicationplace_detail', 'change_cataloguepublicationplace',
-                        'delete_cataloguepublicationplace', orderable=False)
+# CataloguePlaceRelation table
+class CataloguePlaceRelationTable(tables.Table):
+    uuid = ActionColumn('catalogueplacerelation_detail', 'change_catalogueplacerelation',
+                        'delete_catalogueplacerelation', orderable=False)
 
     class Meta:
-        model = CataloguePublicationPlace
+        model = CataloguePlaceRelation
         attr = {'class': 'table table-sortable'}
         sequence = [
             'catalogue',
             'place',
+            'type',
             'uuid'
         ]
 
@@ -274,5 +281,18 @@ class ParisianCategoryTable(tables.Table):
         sequence = [
             'name',
             'description',
+            'uuid'
+        ]
+
+
+# CataloguePlaceRelationType table
+class CataloguePlaceRelationTypeTable(tables.Table):
+    uuid = ActionColumn('catalogueplacerelationtype_detail', 'change_catalogueplacerelationtype', 'delete_catalogueplacerelationtype', orderable=False)
+
+    class Meta:
+        model = CataloguePlaceRelationType
+        attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'name',
             'uuid'
         ]

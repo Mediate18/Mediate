@@ -135,10 +135,19 @@
                 {% endif %}
 
 
-                {% if perms.catalogues.change_cataloguepublicationplace %}
+                {% if perms.catalogues.change_catalogueplacerelation %}
                 <tr>
                     <td>
-                        <a href="{% url 'cataloguepublicationplaces' %}">CataloguePublicationPlaces</a>
+                        <a href="{% url 'catalogueplacerelations' %}">CataloguePlaceRelation</a>
+                    </td>
+                </tr>
+                {% endif %}
+
+
+                {% if perms.catalogues.change_catalogueplacerelationtype %}
+                <tr>
+                    <td>
+                        <a href="{% url 'catalogueplacerelationtypes' %}">CataloguePlaceRelationType</a>
                     </td>
                 </tr>
                 {% endif %}

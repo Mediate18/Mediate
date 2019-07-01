@@ -166,18 +166,18 @@ urlpatterns = [
        name="delete_personcollectionrelation"),
 
 
-    # Category urls
-    path('cataloguepublicationplaces/', permission_required('global.view_all')(CataloguePublicationPlaceTableView.as_view()), name='cataloguepublicationplaces'),
-    path(r'cataloguepublicationplaces/<uuid:pk>', permission_required('global.view_all')(CataloguePublicationPlaceDetailView.as_view()),
-       name="cataloguepublicationplace_detail"),
-    path(r'cataloguepublicationplaces/add', permission_required('catalogues.add_add_cataloguepublicationplace')(CataloguePublicationPlaceCreateView.as_view()),
-       name="add_cataloguepublicationplace"),
-    path(r'cataloguepublicationplaces/edit/<uuid:pk>',
-       permission_required('catalogues.change_cataloguepublicationplace')(CataloguePublicationPlaceUpdateView.as_view()),
-       name="change_cataloguepublicationplace"),
-    path(r'cataloguepublicationplaces/delete/<uuid:pk>',
-       permission_required('catalogues.delete_cataloguepublicationplace')(CataloguePublicationPlaceDeleteView.as_view()),
-       name="delete_cataloguepublicationplace"),
+    # CataloguePlaceRelation urls
+    path('catalogueplacerelations/', permission_required('global.view_all')(CataloguePlaceRelationTableView.as_view()), name='catalogueplacerelations'),
+    path(r'catalogueplacerelations/<uuid:pk>', permission_required('global.view_all')(CataloguePlaceRelationDetailView.as_view()),
+         name="catalogueplacerelation_detail"),
+    path(r'catalogueplacerelations/add', permission_required('catalogues.add_catalogueplacerelation')(CataloguePlaceRelationCreateView.as_view()),
+         name="add_catalogueplacerelation"),
+    path(r'catalogueplacerelations/edit/<uuid:pk>',
+         permission_required('catalogues.change_catalogueplacerelation')(CataloguePlaceRelationUpdateView.as_view()),
+         name="change_catalogueplacerelation"),
+    path(r'catalogueplacerelations/delete/<uuid:pk>',
+         permission_required('catalogues.delete_catalogueplacerelation')(CataloguePlaceRelationDeleteView.as_view()),
+         name="delete_catalogueplacerelation"),
 
 
     # Category urls
@@ -206,4 +206,19 @@ urlpatterns = [
     path(r'parisiancategories/delete/<uuid:pk>',
        permission_required('catalogues.delete_parisiancategory')(ParisianCategoryDeleteView.as_view()),
        name="delete_parisiancategory"),
+
+
+    # CataloguePlaceRelationType urls
+    path('catalogueplacerelationtypes/', permission_required('global.view_all')(CataloguePlaceRelationTypeTableView.as_view()), name='catalogueplacerelationtypes'),
+    path(r'catalogueplacerelationtypes/<uuid:pk>', permission_required('global.view_all')(CataloguePlaceRelationTypeDetailView.as_view()),
+       name="catalogueplacerelationtype_detail"),
+    path(r'catalogueplacerelationtypes/add', permission_required('catalogues.add_catalogueplacerelationtype')(CataloguePlaceRelationTypeCreateView.as_view()),
+       name="add_catalogueplacerelationtype"),
+    path(r'catalogueplacerelationtypes/edit/<uuid:pk>',
+       permission_required('catalogues.change_catalogueplacerelationtype')(CataloguePlaceRelationTypeUpdateView.as_view()),
+       name="change_catalogueplacerelationtype"),
+    path(r'catalogueplacerelationtypes/delete/<uuid:pk>',
+       permission_required('catalogues.delete_catalogueplacerelationtype')(CataloguePlaceRelationTypeDeleteView.as_view()),
+       name="delete_catalogueplacerelationtype"),
+
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

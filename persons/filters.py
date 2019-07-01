@@ -176,11 +176,11 @@ class PlaceLinksFilter(django_filters.FilterSet):
         queryset=Country.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
-    published_catalogues = django_filters.ModelMultipleChoiceFilter(
+    related_catalogues = django_filters.ModelMultipleChoiceFilter(
         label="Catalogues",
         queryset=Catalogue.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
-        method='published_catalogues_filter'
+        method='related_catalogues_filter'
     )
     persons = django_filters.ModelMultipleChoiceFilter(
         label="People born/inhabiting/died",
@@ -196,9 +196,9 @@ class PlaceLinksFilter(django_filters.FilterSet):
     def multiple_words_filter(self, queryset, name, value):
         return filter_multiple_words(self.filters[name].lookup_expr, queryset, name, value)
 
-    def published_catalogues_filter(self, queryset, name, value):
+    def related_catalogues_filter(self, queryset, name, value):
         if value:
-            return queryset.filter(published_catalogues__catalogue__in=value)
+            return queryset.filter(related_catalogues__catalogue__in=value)
         return queryset
 
     def persons_filter(self, queryset, name, value):

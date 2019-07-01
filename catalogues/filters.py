@@ -119,12 +119,12 @@ class CatalogueFilter(django_filters.FilterSet):
 
     def place_filter(self, queryset, name, value):
         if value:
-            return queryset.filter(publication_places__place__in=value)
+            return queryset.filter(related_places__place__in=value)
         return queryset
 
     def country_filter(self, queryset, name, value):
         if value:
-            return queryset.filter(publication_places__place__country__in=value)
+            return queryset.filter(related_places__place__country__in=value)
         return queryset
 
 
@@ -270,8 +270,8 @@ class PersonCollectionRelationFilter(django_filters.FilterSet):
         exclude = ['uuid']
 
 
-# CataloguePublicationPlace filter
-class CataloguePublicationPlaceFilter(django_filters.FilterSet):
+# CataloguePlaceRelation filter
+class CataloguePlaceRelationFilter(django_filters.FilterSet):
     catalogue = django_filters.ModelMultipleChoiceFilter(
         queryset=Catalogue.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
@@ -282,7 +282,7 @@ class CataloguePublicationPlaceFilter(django_filters.FilterSet):
     )
 
     class Meta:
-        model = CataloguePublicationPlace
+        model = CataloguePlaceRelation
         exclude = ['uuid']
 
 
@@ -314,4 +314,13 @@ class ParisianCategoryFilter(django_filters.FilterSet):
         fields = {
             'name': ['icontains'],
             'description': ['icontains']
+        }
+
+
+# CataloguePlaceRelationType Filter
+class CataloguePlaceRelationTypeFilter(django_filters.FilterSet):
+    class Meta:
+        model = CataloguePlaceRelationType
+        fields = {
+            'name': ['icontains'],
         }

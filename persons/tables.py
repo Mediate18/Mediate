@@ -3,9 +3,11 @@ from django_tables2.utils import A  # alias for Accessor
 from django.utils.html import format_html
 from .models import *
 from mediate.columns import ActionColumn
-from catalogues.models import PersonCatalogueRelation, Catalogue
+from catalogues.models import PersonCatalogueRelation, Catalogue, CataloguePlaceRelation
 from items.models import PersonItemRelation, Edition
 from django.utils.translation import ugettext_lazy as _
+
+from collections import defaultdict
 
 
 # Person table
@@ -192,11 +194,17 @@ class PlaceLinksTable(tables.Table):
         ]
 
     def render_catalogues(self, record):
-        catalogues = Catalogue.objects.filter(publication_places__place=record)
-        return format_html(", ".join(
-            ['<a href="{}">{}</a>'.format(reverse_lazy('catalogue_detail', args=[catalogue.pk]), catalogue)
-                for catalogue in catalogues]
-        ))
+        relations = CataloguePlaceRelation.objects.filter(place=record).prefetch_related('type')
+        type_dict = defaultdict(list)
+        for relation in relations:
+            type_dict[relation.type.name].append(relation.catalogue)
+
+        return format_html("<br/>".join([
+            type.capitalize() + ": " + ", ".join([
+                '<a href="{}">{}</a>'.format(reverse_lazy('catalogue_detail', args=[catalogue.pk]), catalogue)
+                for catalogue in catalogues
+            ]) for type, catalogues in type_dict.items()
+        ]))
 
     def render_editions(self, record):
         editions = Edition.objects.filter(place=record)

@@ -754,15 +754,15 @@ class PersonCollectionRelationDeleteView(DeleteView):
     success_url = reverse_lazy('personcollectionrelations')
 
 
-class CataloguePublicationPlaceTableView(ListView):
-    model = CataloguePublicationPlace
+class CataloguePlaceRelationTableView(ListView):
+    model = CataloguePlaceRelation
     template_name = 'generic_list.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        filter = CataloguePublicationPlaceFilter(self.request.GET, queryset=self.get_queryset())
+        filter = CataloguePlaceRelationFilter(self.request.GET, queryset=self.get_queryset())
 
-        table = CataloguePublicationPlaceTable(filter.qs)
+        table = CataloguePlaceRelationTable(filter.qs)
         django_tables2.RequestConfig(self.request, ).configure(table)
 
         context['filter'] = filter
@@ -770,21 +770,21 @@ class CataloguePublicationPlaceTableView(ListView):
 
         context['action'] = _("add")
         context['object_name_plural'] = self.model._meta.verbose_name_plural
-        context['add_url'] = reverse_lazy('add_cataloguepublicationplace')
+        context['add_url'] = reverse_lazy('add_catalogueplacerelation')
 
         return context
 
 
-class CataloguePublicationPlaceDetailView(DetailView):
-    model = CataloguePublicationPlace
+class CataloguePlaceRelationDetailView(DetailView):
+    model = CataloguePlaceRelation
     template_name = 'generic_detail.html'
 
 
-class CataloguePublicationPlaceCreateView(CreateView):
-    model = CataloguePublicationPlace
+class CataloguePlaceRelationCreateView(CreateView):
+    model = CataloguePlaceRelation
     template_name = 'generic_form.html'
-    form_class = CataloguePublicationPlaceModelForm
-    success_url = reverse_lazy('cataloguepublicationplaces')
+    form_class = CataloguePlaceRelationModelForm
+    success_url = reverse_lazy('catalogueplacerelations')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -793,11 +793,11 @@ class CataloguePublicationPlaceCreateView(CreateView):
         return context
 
 
-class CataloguePublicationPlaceUpdateView(UpdateView):
-    model = CataloguePublicationPlace
+class CataloguePlaceRelationUpdateView(UpdateView):
+    model = CataloguePlaceRelation
     template_name = 'generic_form.html'
-    form_class = CataloguePublicationPlaceModelForm
-    success_url = reverse_lazy('cataloguepublicationplaces')
+    form_class = CataloguePlaceRelationModelForm
+    success_url = reverse_lazy('catalogueplacerelations')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -806,9 +806,9 @@ class CataloguePublicationPlaceUpdateView(UpdateView):
         return context
 
 
-class CataloguePublicationPlaceDeleteView(DeleteView):
-    model = CataloguePublicationPlace
-    success_url = reverse_lazy('cataloguepublicationplaces')
+class CataloguePlaceRelationDeleteView(DeleteView):
+    model = CataloguePlaceRelation
+    success_url = reverse_lazy('catalogueplacerelations')
 
 
 # Category views
@@ -930,3 +930,63 @@ class ParisianCategoryUpdateView(UpdateView):
 class ParisianCategoryDeleteView(DeleteView):
     model = ParisianCategory
     success_url = reverse_lazy('parisiancategories')
+
+
+# CataloguePlaceRelationType views
+class CataloguePlaceRelationTypeTableView(ListView):
+    model = CataloguePlaceRelationType
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return CataloguePlaceRelationType.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        filter = CataloguePlaceRelationTypeFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = CataloguePlaceRelationTypeTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name_plural'] = self.model._meta.verbose_name_plural
+        context['add_url'] = reverse_lazy('add_catalogueplacerelationtype')
+
+        return context
+
+
+class CataloguePlaceRelationTypeDetailView(DetailView):
+    model = CataloguePlaceRelationType
+
+
+class CataloguePlaceRelationTypeCreateView(CreateView):
+    model = CataloguePlaceRelationType
+    template_name = 'generic_form.html'
+    form_class = CataloguePlaceRelationTypeModelForm
+    success_url = reverse_lazy('catalogueplacerelationtypes')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = "catalogueplacerelationtype"
+        return context
+
+
+class CataloguePlaceRelationTypeUpdateView(UpdateView):
+    model = CataloguePlaceRelationType
+    template_name = 'generic_form.html'
+    form_class = CataloguePlaceRelationTypeModelForm
+    success_url = reverse_lazy('catalogueplacerelationtypes')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("update")
+        context['object_name'] = "catalogueplacerelationtype"
+        return context
+
+
+class CataloguePlaceRelationTypeDeleteView(DeleteView):
+    model = CataloguePlaceRelationType
+    success_url = reverse_lazy('catalogueplacerelationtypes')

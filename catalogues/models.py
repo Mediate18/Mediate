@@ -186,13 +186,25 @@ class PersonCatalogueRelation(models.Model):
         return _("{} is {} of {}").format(self.person, self.role, self.catalogue)
 
 
-class CataloguePublicationPlace(models.Model):
+class CataloguePlaceRelationType(models.Model):
+    """
+    Type of relation between a catalogue and a place
+    """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=128, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
+class CataloguePlaceRelation(models.Model):
     """
     Publication place for catalogues 
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    place = models.ForeignKey(Place, on_delete=CASCADE, related_name='published_catalogues')
-    catalogue = models.ForeignKey(Catalogue, on_delete=CASCADE, related_name='publication_places')
+    place = models.ForeignKey(Place, on_delete=CASCADE, related_name='related_catalogues')
+    catalogue = models.ForeignKey(Catalogue, on_delete=CASCADE, related_name='related_places')
+    type = models.ForeignKey(CataloguePlaceRelationType, on_delete=SET_NULL, null=True)
 
     def __str__(self):
         return _("{} is published in {}").format(self.catalogue, self.place)
