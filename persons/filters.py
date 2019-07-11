@@ -12,8 +12,9 @@ from items.models import PersonItemRelationRole, Edition
 
 # Person filter
 class PersonFilter(django_filters.FilterSet):
-    short_name = django_filters.Filter(lookup_expr='icontains')
-    surname = django_filters.Filter(lookup_expr='icontains')
+    short_name = django_filters.Filter(method='short_name_filter')
+    first_names = django_filters.Filter(method='first_names_filter')
+    surname = django_filters.Filter(method='surname_filter')
     sex = django_filters.MultipleChoiceFilter(
         choices=Person.SEX_CHOICES,
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
@@ -99,6 +100,30 @@ class PersonFilter(django_filters.FilterSet):
             'related_to',
             'nature_of_relation'
         ]
+
+    def short_name_filter(self, queryset, name, value):
+        from django.db.models import Q
+        if value:
+            short_name_q = Q(short_name=value)
+            alternative_short_name_q = Q(alternative_names__short_name__icontains=value)
+            return queryset.filter(short_name_q | alternative_short_name_q)
+        return queryset
+
+    def surname_filter(self, queryset, name, value):
+        from django.db.models import Q
+        if value:
+            surname_q = Q(surname=value)
+            alternative_surname_q = Q(alternative_names__surname__icontains=value)
+            return queryset.filter(surname_q | alternative_surname_q)
+        return queryset
+
+    def first_names_filter(self, queryset, name, value):
+        from django.db.models import Q
+        if value:
+            first_names_q = Q(first_names=value)
+            alternative_first_names_q = Q(alternative_names__first_names__icontains=value)
+            return queryset.filter(first_names_q | alternative_first_names_q)
+        return queryset
 
     def viaf_id_filter(self, queryset, name, value):
         if value:
