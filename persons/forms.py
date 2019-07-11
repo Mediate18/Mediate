@@ -1,6 +1,6 @@
 from django import forms
 from django.urls import reverse_lazy
-from django_select2.forms import Select2Widget, ModelSelect2Widget
+from django_select2.forms import Select2Widget, ModelSelect2Widget, ModelSelect2MultipleWidget
 from django_date_extensions.fields import ApproximateDateFormField
 from apiconnectors.widgets import ApiSelectWidget
 from viapy.widgets import ViafWidget
@@ -36,6 +36,76 @@ class PersonModelForm(forms.ModelForm):
 
     class Media:
         js = ('js/viaf_select.js',)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.add_religious_affiliation_field()
+        self.add_person_profession_field()
+
+    def add_religious_affiliation_field(self):
+        religions = forms.ModelMultipleChoiceField(
+            label="Religions",
+            widget=ModelSelect2MultipleWidget(
+                model=Religion,
+                search_fields=['name__icontains'],
+            ),
+            queryset=Religion.objects.all(),
+            required=False,
+            initial=Religion.objects.filter(religiousaffiliation__person=self.instance)
+        )
+        self.fields['religions'] = religions
+
+    def add_person_profession_field(self):
+        professions = forms.ModelMultipleChoiceField(
+            label="Professions",
+            widget=ModelSelect2MultipleWidget(
+                model=Profession,
+                search_fields=['name__icontains'],
+            ),
+            queryset=Profession.objects.all(),
+            required=False,
+            initial=Profession.objects.filter(personprofession__person=self.instance)
+        )
+        self.fields['professions'] = professions
+
+    def save(self, commit=True):
+        if commit:
+            self.save_religions()
+            self.save_professions()
+        return super().save(commit=commit)
+
+    def save_religions(self):
+        submitted_religions = self.cleaned_data['religions']
+
+        # Delete relations for religions that are not in the submitted religions
+        relations_to_delete = ReligiousAffiliation.objects \
+            .filter(person=self.instance).exclude(religion__in=submitted_religions)
+        for relation in relations_to_delete:
+            relation.delete()
+
+        # Add relations for submitted religions that are not in the existing religions
+        new_religions = set(submitted_religions) - set(Religion.objects.filter(
+            religiousaffiliation__person=self.instance))
+        for religion in new_religions:
+            religious_affiliation = ReligiousAffiliation(person=self.instance, religion=religion)
+            religious_affiliation.save()
+
+    def save_professions(self):
+        submitted_professions = self.cleaned_data['professions']
+
+        # Delete relations for professions that are not in the submitted professions
+        relations_to_delete = PersonProfession.objects \
+            .filter(person=self.instance).exclude(profession__in=submitted_professions)
+        for relation in relations_to_delete:
+            relation.delete()
+
+        # Add relations for submitted professions that are not in the existing professions
+        new_professions = set(submitted_professions) - set(Profession.objects.filter(
+            personprofession__person=self.instance))
+        for profession in new_professions:
+            person_profession = PersonProfession(person=self.instance, profession=profession)
+            person_profession.save()
+
 
 class PersonPersonRelationModelForm(forms.ModelForm):
     class Meta:
