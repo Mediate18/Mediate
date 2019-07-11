@@ -1,0 +1,82 @@
+{% extends extended_layout|default:"baselayout.html" %}
+{% load i18n %}
+
+
+{% block extracss %}
+{{ form.media.css }}
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-xs-12">
+        <h1>{% trans action|title %} {% trans object_name %}</h1>
+        <form action="{{ request.path }}?next={{ next_url }}" method="post" enctype="multipart/form-data">
+            <table class="table">
+                {% csrf_token %}
+                    {% if form_as == 'p' %}
+                        {{ form.as_p }}
+                    {% else %}
+                        {{ form.as_table }}
+                    {% endif %}
+            </table>
+            {% if alternativepersonnames %}
+                {{ alternativepersonnames.management_form }}
+                <div id="form_set">
+                    {% for form in alternativepersonnames %}
+                        <h5>Alternative name {{ forloop.counter0|add:1 }}</h5>
+                        <table class="table">
+                            {{ form.as_table }}
+                        </table>
+                    {% endfor %}
+                    <div id="empty_form" style="display:none">
+                        <h5>Alternative name __prefixplusone__</h5>
+                        <table class='table'>
+                            {{ alternativepersonnames.empty_form }}
+                        </table>
+                    </div>
+                </div>
+                <input type="button" class="btn btn-default" value="Add another relation" id="add_more">
+            {% endif %}
+            <div class="pull-right">
+                <input type="submit" class="btn" value="{% trans 'Save' %}"/>
+                {% if next_url %}
+                    <a href="{{ next_url }}">{% trans 'Cancel' %}</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    {% if js_variables %}
+        js_variables = {{ js_variables|safe }}
+    {% endif %}
+</script>
+{{ form.media.js }}
+<script>
+$(document).ready(function(){
+        $('.django-select2').djangoSelect2({placeholder: 'Select an option'});
+});
+</script>
+<script>
+$(document).ready(function(){
+    // Dynamically add a form to the form set
+    $('#add_more').click(function() {
+        var form_idx = $('#id_alternative_names-TOTAL_FORMS').val();
+        $('#form_set').append($('#empty_form').html()
+            .replace(/__prefix__/g, form_idx)
+            .replace(/__prefixplusone__/g, parseInt(form_idx) + 1));
+        $('#form_set').find('select').djangoSelect2();
+
+        // Workaround for the fact that djangoSelect2() as used above duplicates the selects.
+        $('#form_set').find('select ~ span:nth-of-type(2)').hide();
+
+        $('#id_alternative_names-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+    });
+});
+</script>
+{% endblock %}

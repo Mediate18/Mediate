@@ -46,3 +46,8 @@ class ReligiousAffiliationAdmin(SimpleHistoryAdmin):
 @admin.register(Residence)
 class ResidenceAdmin(SimpleHistoryAdmin):
     pass
+
+
+@admin.register(AlternativePersonName)
+class AlternativePersonNameAdmin(SimpleHistoryAdmin):
+    pass

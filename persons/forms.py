@@ -2,6 +2,7 @@ from django import forms
 from django.urls import reverse_lazy
 from django_select2.forms import Select2Widget, ModelSelect2Widget, ModelSelect2MultipleWidget
 from django_date_extensions.fields import ApproximateDateFormField
+from django.forms import inlineformset_factory
 from apiconnectors.widgets import ApiSelectWidget
 from viapy.widgets import ViafWidget
 from .models import *
@@ -105,6 +106,16 @@ class PersonModelForm(forms.ModelForm):
         for profession in new_professions:
             person_profession = PersonProfession(person=self.instance, profession=profession)
             person_profession.save()
+
+
+class AlternativePersonNameForm(forms.ModelForm):
+    class Meta:
+        model = AlternativePersonName
+        fields = "__all__"
+
+
+AlternativePersonNameFormSet = inlineformset_factory(Person, AlternativePersonName, form=AlternativePersonNameForm,
+                                                     can_delete=True, extra=1)
 
 
 class PersonPersonRelationModelForm(forms.ModelForm):

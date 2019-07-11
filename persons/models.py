@@ -96,6 +96,18 @@ class Person(models.Model):
         return reverse_lazy('person_detail', args=[str(self.uuid)])
 
 
+class AlternativePersonName(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    person = models.ForeignKey(Person, on_delete=models.SET_NULL, null=True, blank=True,
+                                      related_name='alternative_names')
+    short_name = models.CharField(_("Short name"), max_length=128, null=True)
+    surname = models.CharField(_("Surname"), max_length=128)
+    first_names = models.CharField(_("First names"), max_length=512)
+
+    def __str__(self):
+        return self.short_name
+
+
 class ReligiousAffiliation(models.Model):
     """
     Religious affiliation of a person

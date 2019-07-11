@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.detail import DetailView
+from django.db import transaction
 
 from django.utils.translation import ugettext_lazy as _
 from django.utils.html import escape
@@ -54,7 +55,7 @@ class PersonDetailView(DetailView):
 
 class PersonCreateView(CreateView):
     model = Person
-    template_name = 'generic_form.html'
+    template_name = 'persons/person_form.html'
     form_class = PersonModelForm
     success_url = reverse_lazy('persons')
 
@@ -63,6 +64,11 @@ class PersonCreateView(CreateView):
         context['action'] = _("add")
         context['object_name'] = "person"
         context['js_variables'] = json.dumps({'viaf_select_id': PersonModelForm.suggest_select_ids})
+        if self.request.POST:
+            context['alternativepersonnames'] = AlternativePersonNameFormSet(self.request.POST,
+                                                                                   instance=self.object)
+        else:
+            context['alternativepersonnames'] = AlternativePersonNameFormSet(instance=self.object)
         return context
 
     def post(self, request, *args, **kwargs):
@@ -84,8 +90,14 @@ class PersonCreateView(CreateView):
         form = PersonModelForm(data=post_parameters)
         self.object = form.instance
         if form.is_valid():
-            print("Form city_of_birth", form.cleaned_data['city_of_birth'])
-            self.object = form.save()
+            context = self.get_context_data()
+            alternativepersonnames = context['alternativepersonnames']
+            with transaction.atomic():
+                print("Form city_of_birth", form.cleaned_data['city_of_birth'])
+                self.object = form.save()
+                if alternativepersonnames.is_valid():
+                    alternativepersonnames.instance = self.object
+                    alternativepersonnames.save()
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
@@ -112,7 +124,7 @@ class PersonCreateView(CreateView):
 @moderate()
 class PersonUpdateView(UpdateView):
     model = Person
-    template_name = 'generic_form.html'
+    template_name = 'persons/person_form.html'
     form_class = PersonModelForm
     success_url = reverse_lazy('persons')
 
@@ -122,6 +134,11 @@ class PersonUpdateView(UpdateView):
         context['action'] = _("update")
         context['object_name'] = "person"
         context['js_variables'] = json.dumps({'viaf_select_id': PersonModelForm.suggest_select_ids})
+        if self.request.POST:
+            context['alternativepersonnames'] = AlternativePersonNameFormSet(self.request.POST,
+                                                                                   instance=self.object)
+        else:
+            context['alternativepersonnames'] = AlternativePersonNameFormSet(instance=self.object)
         return context
 
     def post(self, request, *args, **kwargs):
@@ -142,8 +159,14 @@ class PersonUpdateView(UpdateView):
 
         form = PersonModelForm(instance=self.get_object(), data=post_parameters)
         if form.is_valid():
-            print("Form city_of_birth", form.cleaned_data['city_of_birth'])
-            self.object = form.save()
+            context = self.get_context_data()
+            alternativepersonnames = context['alternativepersonnames']
+            with transaction.atomic():
+                print("Form city_of_birth", form.cleaned_data['city_of_birth'])
+                self.object = form.save()
+                if alternativepersonnames.is_valid():
+                    alternativepersonnames.instance = self.object
+                    alternativepersonnames.save()
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
