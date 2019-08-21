@@ -56,7 +56,7 @@ class PersonFilter(django_filters.FilterSet):
         label="Religious affiliation",
         queryset=Religion.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
-        field_name='religious_affiliation__religion',
+        field_name='religiousaffiliation__religion',
         lookup_expr='in'
     )
     city_of_residence = django_filters.ModelMultipleChoiceFilter(
