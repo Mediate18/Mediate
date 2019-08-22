@@ -14,6 +14,8 @@ urlpatterns = [
          name="person_detail"),
     path(r'persons/add', permission_required('persons.add_person')(PersonCreateView.as_view()),
          name="add_person"),
+    path(r'persons/simple_add', permission_required('persons.add_person')(PersonCreateViewSimple.as_view()),
+         name="add_person_simple"),
     path(r'persons/edit/<uuid:pk>',
          permission_required('persons.change_person')(PersonUpdateView.as_view()),
          name="change_person"),

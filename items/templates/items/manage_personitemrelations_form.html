@@ -77,7 +77,7 @@
         <button type="button" class="close" data-dismiss="modal">&times;</button>
         <h4 class="modal-title"><span class="glyphicon glyphicon-plus"></span> {% trans "Add another person" %}</h4>
       </div>
-        <form id="addanother-person-form" action="{% url 'add_person' %}" method="post">
+        <form id="addanother-person-form" action="{% url 'add_person_simple' %}" method="post">
           <div class="modal-body">
                 <table class="table">
                     {% csrf_token %}

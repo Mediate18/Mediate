@@ -200,7 +200,7 @@
         <button type="button" class="close" data-dismiss="modal">&times;</button>
         <h4 class="modal-title"><span class="glyphicon glyphicon-plus"></span> {% trans "Add another person" %}</h4>
       </div>
-        <form id="addanother-person-form" action="{% url 'add_person' %}" method="post">
+        <form id="addanother-person-form" action="{% url 'add_person_simple' %}" method="post">
           <div class="modal-body">
                 <table class="table">
                     {% csrf_token %}
@@ -241,7 +241,8 @@
 function handleAddanotherPersonResponse(response) {
     console.log(response);
     if(response.pk) { // Success!
-        $('#id_person').append(
+        var source_id = $('#addanother-person-message').attr('source_id');
+        $('#'+source_id).append(
             '<option value="'+response.pk+'">'+response.short_name+'</option>'
         );
         $('#addanotherModal').modal('toggle');
@@ -259,6 +260,14 @@ $(document).ready(function(){
 
         $('[data-toggle="tooltip"]').tooltip({
             placement : 'bottom'
+        });
+
+        // Determine where the addanotherModal was triggered
+        // and register the id in the form of the modal.
+        $('#addanotherModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget)
+            var source_id = button.parent().children("select").attr('id')
+            $('#addanother-person-message').attr('source_id', source_id)
         });
 
         $('#addanother-person-form').submit(function(event) {

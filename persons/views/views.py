@@ -93,9 +93,8 @@ class PersonCreateView(CreateView):
             context = self.get_context_data()
             alternativepersonnames = context['alternativepersonnames']
             with transaction.atomic():
-                print("Form city_of_birth", form.cleaned_data['city_of_birth'])
                 self.object = form.save()
-                if alternativepersonnames.is_valid():
+                if alternativepersonnames and alternativepersonnames.is_valid():
                     alternativepersonnames.instance = self.object
                     alternativepersonnames.save()
             return self.form_valid(form)
@@ -120,6 +119,12 @@ class PersonCreateView(CreateView):
         else:
             return response
 
+
+class PersonCreateViewSimple(PersonCreateView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['alternativepersonnames'] = None
+        return context
 
 @moderate()
 class PersonUpdateView(UpdateView):
