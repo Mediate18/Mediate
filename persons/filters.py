@@ -104,7 +104,7 @@ class PersonFilter(django_filters.FilterSet):
     def short_name_filter(self, queryset, name, value):
         from django.db.models import Q
         if value:
-            short_name_q = Q(short_name=value)
+            short_name_q = Q(short_name__icontains=value)
             alternative_short_name_q = Q(alternative_names__short_name__icontains=value)
             return queryset.filter(short_name_q | alternative_short_name_q)
         return queryset
@@ -112,7 +112,7 @@ class PersonFilter(django_filters.FilterSet):
     def surname_filter(self, queryset, name, value):
         from django.db.models import Q
         if value:
-            surname_q = Q(surname=value)
+            surname_q = Q(surname__icontains=value)
             alternative_surname_q = Q(alternative_names__surname__icontains=value)
             return queryset.filter(surname_q | alternative_surname_q)
         return queryset
