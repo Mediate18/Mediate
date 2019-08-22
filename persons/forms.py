@@ -70,10 +70,11 @@ class PersonModelForm(forms.ModelForm):
         self.fields['professions'] = professions
 
     def save(self, commit=True):
+        self.instance = super().save(commit=commit)
         if commit:
             self.save_religions()
             self.save_professions()
-        return super().save(commit=commit)
+        return self.instance
 
     def save_religions(self):
         submitted_religions = self.cleaned_data['religions']
