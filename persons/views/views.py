@@ -156,8 +156,7 @@ class PersonUpdateView(UpdateView):
                 if city[0].startswith('cnl'):
                     response = requests.get(cerl_record_url + city[0], headers={'accept': 'application/json'})
                     place_name = response.json().get('data')['heading'][0]['part'][0]['entry']
-                    (city_obj, created) = Place.objects.get_or_create(name=place_name, cerl_id=city[0])
-                    print(city_obj)
+                    (city_obj, created) = Place.objects.get_or_create(cerl_id=city[0])
                     post_parameters[city_field] = str(city_obj.uuid)
                 else:
                     post_parameters[city_field] = city[0]
