@@ -3,6 +3,8 @@ from django.utils.safestring import mark_safe
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.html import escape
 
+from apiconnectors.cerlapi import cerl_record_url
+
 
 class ApiSelectWidget(autocomplete.Select2):
     '''Custom autocomplete select widget that displays the selection as a link if possible.
@@ -27,6 +29,8 @@ class ApiSelectWidget(autocomplete.Select2):
                     url = obj.get_absolute_url()
                 except ObjectDoesNotExist:
                     pass
+            if url.startswith('cnl'):
+                url = cerl_record_url + url
         widget = super(ApiSelectWidget, self).render(name, id, attrs)
         return mark_safe(
             '%s<p><br /><a id="%s_uri" target="_blank" href="%s">%s</a></p>' % \
