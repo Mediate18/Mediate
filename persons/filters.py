@@ -191,6 +191,26 @@ class RangeFilterQ(django_filters.RangeFilter):
         return q
 
 
+class MultipleChoiceFilterQ(django_filters.MultipleChoiceFilter):
+    """
+    Subclass of django_filters.MultipleChoiceFilter for the purpose of
+    using Q objects within one filter instead of chaining filters.
+    """
+
+    def filter(self, q, value):
+        """MultipleChoiceFilter filter method override for use of Q(...) """
+        if isinstance(value, Lookup):
+            lookup = six.text_type(value.lookup_type)
+            value = value.value
+        else:
+            lookup = self.lookup_expr
+        if not value:
+            return q
+        q &= Q(**{'%s__%s' % (self.field_name, lookup): value})
+        return q
+
+
+
 class PersonRankingFilter(django_filters.FilterSet):
     item_roles = ModelMultipleChoiceFilterQ(
         label="Item roles",
@@ -211,6 +231,12 @@ class PersonRankingFilter(django_filters.FilterSet):
         queryset=Country.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
         field_name='personitemrelation__item__lot__catalogue__related_places__place__country',
+        lookup_expr='in',
+    )
+    sex = MultipleChoiceFilterQ(
+        label="Gender",
+        choices=Person.SEX_CHOICES,
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
         lookup_expr='in',
     )
 
