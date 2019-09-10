@@ -152,35 +152,47 @@ class PersonFilter(django_filters.FilterSet):
         return queryset
 
 
-def mmcf_filter(self, q, value):
-    """ModelMultipleChoiceFilter filter method override for use of Q(...) """
-    if isinstance(value, Lookup):
-        lookup = six.text_type(value.lookup_type)
-        value = value.value
-    else:
-        lookup = self.lookup_expr
-    if value in EMPTY_VALUES:
-        return q
-    q = q & Q(**{'%s__%s' % (self.field_name, lookup): value})
-    return q
+class ModelMultipleChoiceFilterQ(django_filters.ModelMultipleChoiceFilter):
+    """
+    Subclass of django_filters.ModelMultipleChoiceFilter for the purpose of
+    using Q objects within one filter instead of chaining filters.
+    """
 
-
-def rf_filter(self, q, value):
-    """RangeFilter filter method override for use of Q(...) """
-    if value:
-        if value.start is not None and value.stop is not None:
-            lookup = '%s__range' % self.field_name
-            return q & Q(**{lookup: (value.start, value.stop)})
+    def filter(self, q, value):
+        """ModelMultipleChoiceFilter filter method override for use of Q(...) """
+        if isinstance(value, Lookup):
+            lookup = six.text_type(value.lookup_type)
+            value = value.value
         else:
-            if value.start is not None:
-                q = q & Q(**{'%s__gte' % self.field_name: value.start})
-            if value.stop is not None:
-                q = q & Q(**{'%s__lte' % self.field_name: value.stop})
-    return q
+            lookup = self.lookup_expr
+        if value in EMPTY_VALUES:
+            return q
+        q = q & Q(**{'%s__%s' % (self.field_name, lookup): value})
+        return q
+
+
+class RangeFilterQ(django_filters.RangeFilter):
+    """
+    Subclass of django_filters.RangeFilter for the purpose of
+    using Q objects within one filter instead of chaining filters.
+    """
+
+    def filter(self, q, value):
+        """RangeFilter filter method override for use of Q(...) """
+        if value:
+            if value.start is not None and value.stop is not None:
+                lookup = '%s__range' % self.field_name
+                return q & Q(**{lookup: (value.start, value.stop)})
+            else:
+                if value.start is not None:
+                    q = q & Q(**{'%s__gte' % self.field_name: value.start})
+                if value.stop is not None:
+                    q = q & Q(**{'%s__lte' % self.field_name: value.stop})
+        return q
 
 
 class PersonRankingFilter(django_filters.FilterSet):
-    item_roles = django_filters.ModelMultipleChoiceFilter(
+    item_roles = ModelMultipleChoiceFilterQ(
         label="Item roles",
         queryset=PersonItemRelationRole.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
@@ -188,20 +200,20 @@ class PersonRankingFilter(django_filters.FilterSet):
         lookup_expr='in',
         required=True
     )
-    edition_year = django_filters.RangeFilter(
+    edition_year = RangeFilterQ(
         label="Item publication year",
         widget=RangeWidget(),
         field_name='personitemrelation__item__edition__year',
         lookup_expr='range',
         required=True
     )
-    catalogue_publication_country = django_filters.ModelMultipleChoiceFilter(
+    catalogue_publication_country = ModelMultipleChoiceFilterQ(
         label="Catalogue country",
         queryset=Country.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
         field_name='personitemrelation__item__lot__catalogue__related_places__place__country',
         lookup_expr='in',
-        required = True
+        required=True
     )
 
     class Meta:
@@ -211,10 +223,6 @@ class PersonRankingFilter(django_filters.FilterSet):
             'edition_year',
             'catalogue_publication_country'
         ]
-
-    item_roles.filter = mmcf_filter.__get__(item_roles, django_filters.ModelMultipleChoiceFilter)
-    edition_year.filter = rf_filter.__get__(edition_year, django_filters.RangeFilter)
-    catalogue_publication_country.filter = mmcf_filter.__get__(catalogue_publication_country, django_filters.ModelMultipleChoiceFilter)
 
     # Override method
     @property
