@@ -3,6 +3,7 @@ from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.detail import DetailView
 from django.db import transaction
+from django.db.models import Count
 
 from django.utils.translation import ugettext_lazy as _
 from django.utils.html import escape
@@ -44,6 +45,30 @@ class PersonTableView(ListView):
 
         context['action'] = _("add")
         context['object_name'] = "person"
+        context['add_url'] = reverse_lazy('add_person')
+
+        return context
+
+
+class PersonRankingTableView(ListView):
+    model = Person
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return Person.objects.all().annotate(person_count=Count('uuid')).order_by('-person_count')
+
+    def get_context_data(self, **kwargs):
+        context = super(PersonRankingTableView, self).get_context_data(**kwargs)
+        filter = PersonRankingFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = PersonRankingTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name_plural'] = "person ranking"
         context['add_url'] = reverse_lazy('add_person')
 
         return context

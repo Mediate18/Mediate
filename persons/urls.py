@@ -23,6 +23,10 @@ urlpatterns = [
          permission_required('persons.delete_person')(PersonDeleteView.as_view()),
          name="delete_person"),
 
+    # PersonRanking urls
+    path(r'persons/rank', permission_required('global.view_all')(PersonRankingTableView.as_view()),
+         name='persons_ranking'),
+
     # PersonPersonRelation urls
     path('personpersonrelations/', permission_required('global.view_all')(PersonPersonRelationTableView.as_view()),
          name='personpersonrelations'),

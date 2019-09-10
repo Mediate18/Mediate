@@ -3,7 +3,14 @@ from .models import *
 from viapy.api import ViafAPI
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
+from django import forms
 from django_select2.forms import Select2MultipleWidget
+from django_filters.widgets import RangeWidget
+
+import six
+from django_filters.constants import STRICTNESS
+from django_filters.filters import Lookup
+from django_filters.constants import EMPTY_VALUES
 
 from mediate.tools import filter_multiple_words
 from catalogues.models import PersonCatalogueRelationRole, Catalogue
@@ -143,6 +150,100 @@ class PersonFilter(django_filters.FilterSet):
             second_person_query = Q(relations_when_second__type__in=value)
             return queryset.filter(first_person_query | second_person_query).distinct()
         return queryset
+
+
+def mmcf_filter(self, q, value):
+    """ModelMultipleChoiceFilter filter method override for use of Q(...) """
+    if isinstance(value, Lookup):
+        lookup = six.text_type(value.lookup_type)
+        value = value.value
+    else:
+        lookup = self.lookup_expr
+    if value in EMPTY_VALUES:
+        return q
+    q = q & Q(**{'%s__%s' % (self.field_name, lookup): value})
+    return q
+
+
+def rf_filter(self, q, value):
+    """RangeFilter filter method override for use of Q(...) """
+    if value:
+        if value.start is not None and value.stop is not None:
+            lookup = '%s__range' % self.field_name
+            return q & Q(**{lookup: (value.start, value.stop)})
+        else:
+            if value.start is not None:
+                q = q & Q(**{'%s__gte' % self.field_name: value.start})
+            if value.stop is not None:
+                q = q & Q(**{'%s__lte' % self.field_name: value.stop})
+    return q
+
+
+class PersonRankingFilter(django_filters.FilterSet):
+    item_roles = django_filters.ModelMultipleChoiceFilter(
+        label="Item roles",
+        queryset=PersonItemRelationRole.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
+        field_name='personitemrelation__role',
+        lookup_expr='in',
+        required=True
+    )
+    edition_year = django_filters.RangeFilter(
+        label="Item publication year",
+        widget=RangeWidget(),
+        field_name='personitemrelation__item__edition__year',
+        lookup_expr='range',
+        required=True
+    )
+    catalogue_publication_country = django_filters.ModelMultipleChoiceFilter(
+        label="Catalogue country",
+        queryset=Country.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
+        field_name='personitemrelation__item__lot__catalogue__related_places__place__country',
+        lookup_expr='in',
+        required = True
+    )
+
+    class Meta:
+        model = Person
+        fields = [
+            'item_roles',
+            'edition_year',
+            'catalogue_publication_country'
+        ]
+
+    item_roles.filter = mmcf_filter.__get__(item_roles, django_filters.ModelMultipleChoiceFilter)
+    edition_year.filter = rf_filter.__get__(edition_year, django_filters.RangeFilter)
+    catalogue_publication_country.filter = mmcf_filter.__get__(catalogue_publication_country, django_filters.ModelMultipleChoiceFilter)
+
+    # Override method
+    @property
+    def qs(self):
+        if not hasattr(self, '_qs'):
+            if not self.is_bound:
+                self._qs = self.queryset.all()
+                return self._qs
+
+            if not self.form.is_valid():
+                if self.strict == STRICTNESS.RAISE_VALIDATION_ERROR:
+                    raise forms.ValidationError(self.form.errors)
+                elif self.strict == STRICTNESS.RETURN_NO_RESULTS:
+                    self._qs = self.queryset.none()
+                    return self._qs
+                # else STRICTNESS.IGNORE...  ignoring
+
+            # start with all the results and filter from there
+            qs = self.queryset.all()
+            query = Q()
+            for name, filter_ in six.iteritems(self.filters):
+                value = self.form.cleaned_data.get(name)
+
+                if value is not None:  # valid & clean data
+                    query = filter_.filter(query, value)
+
+            self._qs = qs.filter(query).distinct()
+
+        return self._qs
 
 
 # PersonPersonRelation filter

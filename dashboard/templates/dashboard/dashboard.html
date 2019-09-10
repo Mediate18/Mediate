@@ -19,6 +19,14 @@
                 </tr>
                 {% endif %}
 
+                {% if perms.global.view_all %}
+                <tr>
+                    <td>
+                        <a href="{% url 'persons_ranking' %}">Person Ranking</a>
+                    </td>
+                </tr>
+                {% endif %}
+
 
                 {% if perms.persons.change_personpersonrelation %}
                 <tr>

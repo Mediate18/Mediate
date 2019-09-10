@@ -87,6 +87,30 @@ class PersonTable(tables.Table):
             return format_html('-')
 
 
+# PersonRanking table
+class PersonRankingTable(PersonTable):
+    person_count = tables.Column(empty_values=(), verbose_name=_("#"))
+
+    class Meta:
+        model = Person
+        attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'person_count',
+            'short_name',
+            'first_names',
+            'surname',
+            'sex',
+            'roles',
+            'city_of_birth',
+            'date_of_birth',
+            'city_of_death',
+            'date_of_death',
+            'catalogues',
+            'viaf_id',
+            'uuid'
+        ]
+
+
 # PersonPersonRelation table
 class PersonPersonRelationTable(tables.Table):
     uuid = ActionColumn('personpersonrelation_detail', 'change_personpersonrelation', 'delete_personpersonrelation',
