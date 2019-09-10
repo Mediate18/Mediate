@@ -165,9 +165,9 @@ class ModelMultipleChoiceFilterQ(django_filters.ModelMultipleChoiceFilter):
             value = value.value
         else:
             lookup = self.lookup_expr
-        if value in EMPTY_VALUES:
+        if not value:
             return q
-        q = q & Q(**{'%s__%s' % (self.field_name, lookup): value})
+        q &= Q(**{'%s__%s' % (self.field_name, lookup): value})
         return q
 
 
@@ -185,9 +185,9 @@ class RangeFilterQ(django_filters.RangeFilter):
                 return q & Q(**{lookup: (value.start, value.stop)})
             else:
                 if value.start is not None:
-                    q = q & Q(**{'%s__gte' % self.field_name: value.start})
+                    q &= Q(**{'%s__gte' % self.field_name: value.start})
                 if value.stop is not None:
-                    q = q & Q(**{'%s__lte' % self.field_name: value.stop})
+                    q &= Q(**{'%s__lte' % self.field_name: value.stop})
         return q
 
 
@@ -205,7 +205,6 @@ class PersonRankingFilter(django_filters.FilterSet):
         widget=RangeWidget(),
         field_name='personitemrelation__item__edition__year',
         lookup_expr='range',
-        required=True
     )
     catalogue_publication_country = ModelMultipleChoiceFilterQ(
         label="Catalogue country",
@@ -213,7 +212,6 @@ class PersonRankingFilter(django_filters.FilterSet):
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
         field_name='personitemrelation__item__lot__catalogue__related_places__place__country',
         lookup_expr='in',
-        required=True
     )
 
     class Meta:
