@@ -10,11 +10,10 @@ from django_filters.widgets import RangeWidget
 import six
 from django_filters.constants import STRICTNESS
 from django_filters.filters import Lookup
-from django_filters.constants import EMPTY_VALUES
 
 from mediate.tools import filter_multiple_words
 from catalogues.models import PersonCatalogueRelationRole, Catalogue
-from items.models import PersonItemRelationRole, Edition
+from items.models import PersonItemRelationRole
 
 
 # Person filter
@@ -191,32 +190,17 @@ class RangeFilterQ(django_filters.RangeFilter):
         return q
 
 
-class MultipleChoiceFilterQ(django_filters.MultipleChoiceFilter):
-    """
-    Subclass of django_filters.MultipleChoiceFilter for the purpose of
-    using Q objects within one filter instead of chaining filters.
-    """
-
-    def filter(self, q, value):
-        """MultipleChoiceFilter filter method override for use of Q(...) """
-        if isinstance(value, Lookup):
-            lookup = six.text_type(value.lookup_type)
-            value = value.value
-        else:
-            lookup = self.lookup_expr
-        if not value:
-            return q
-        q &= Q(**{'%s__%s' % (self.field_name, lookup): value})
-        return q
-
-
-class CatalogueOwnerSexFilterQ(django_filters.MultipleChoiceFilter):
+class MultipleChoiceFilterQWithExtraLookups(django_filters.MultipleChoiceFilter):
     """
     Subclass of django_filters.MultipleChoiceFilter for the purpose of
     using Q objects within one filter instead of chaining filters.
     Specific version for the catalogue_owner_sex in PersonRankingFilter.
     """
 
+    def __init__(self, *args, **kwargs):
+        self.extra_field_lookups = kwargs.pop('extra_field_lookups', {})
+        super().__init__(*args, **kwargs)
+
     def filter(self, q, value):
         """MultipleChoiceFilter filter method override for use of Q(...) """
         if isinstance(value, Lookup):
@@ -226,8 +210,7 @@ class CatalogueOwnerSexFilterQ(django_filters.MultipleChoiceFilter):
             lookup = self.lookup_expr
         if not value:
             return q
-        q &= Q(**{'%s__%s' % (self.field_name, lookup): value,
-                  'personitemrelation__item__lot__catalogue__personcataloguerelation__role__name': 'owner'})
+        q &= Q(**{'%s__%s' % (self.field_name, lookup): value, **self.extra_field_lookups})
         return q
 
 
@@ -253,7 +236,7 @@ class PersonRankingFilter(django_filters.FilterSet):
         field_name='personitemrelation__item__lot__catalogue__related_places__place__country',
         lookup_expr='in',
     )
-    sex = MultipleChoiceFilterQ(
+    sex = MultipleChoiceFilterQWithExtraLookups(
         label="Gender of Person related to Item",
         choices=Person.SEX_CHOICES,
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
@@ -265,12 +248,13 @@ class PersonRankingFilter(django_filters.FilterSet):
         field_name='personitemrelation__item__lot__catalogue__year_of_publication',
         lookup_expr='range'
     )
-    catalogue_owner_sex = CatalogueOwnerSexFilterQ(
+    catalogue_owner_sex = MultipleChoiceFilterQWithExtraLookups(
         label="Catalogue owner gender",
         choices=Person.SEX_CHOICES,
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
         field_name='personitemrelation__item__lot__catalogue__personcataloguerelation__person__sex',
-        lookup_expr='in'
+        lookup_expr='in',
+        extra_field_lookups={'personitemrelation__item__lot__catalogue__personcataloguerelation__role__name': 'owner'}
     )
 
     class Meta:
