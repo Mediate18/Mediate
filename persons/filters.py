@@ -256,6 +256,13 @@ class PersonRankingFilter(django_filters.FilterSet):
         lookup_expr='in',
         extra_field_lookups={'personitemrelation__item__lot__catalogue__personcataloguerelation__role__name': 'owner'}
     )
+    country_of_birth = ModelMultipleChoiceFilterQ(
+        label="Country of birth of Person related to Item",
+        queryset=Country.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
+        field_name='city_of_birth__country',
+        lookup_expr='in'
+    )
 
     class Meta:
         model = Person
@@ -265,7 +272,8 @@ class PersonRankingFilter(django_filters.FilterSet):
             'catalogue_publication_country',
             'sex',
             'catalogue_year',
-            'catalogue_owner_sex'
+            'catalogue_owner_sex',
+            'country_of_birth'
         ]
 
     # Override method
