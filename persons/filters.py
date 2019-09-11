@@ -210,6 +210,26 @@ class MultipleChoiceFilterQ(django_filters.MultipleChoiceFilter):
         return q
 
 
+class CatalogueOwnerSexFilterQ(django_filters.MultipleChoiceFilter):
+    """
+    Subclass of django_filters.MultipleChoiceFilter for the purpose of
+    using Q objects within one filter instead of chaining filters.
+    Specific version for the catalogue_owner_sex in PersonRankingFilter.
+    """
+
+    def filter(self, q, value):
+        """MultipleChoiceFilter filter method override for use of Q(...) """
+        if isinstance(value, Lookup):
+            lookup = six.text_type(value.lookup_type)
+            value = value.value
+        else:
+            lookup = self.lookup_expr
+        if not value:
+            return q
+        q &= Q(**{'%s__%s' % (self.field_name, lookup): value,
+                  'personitemrelation__item__lot__catalogue__personcataloguerelation__role__name': 'owner'})
+        return q
+
 
 class PersonRankingFilter(django_filters.FilterSet):
     item_roles = ModelMultipleChoiceFilterQ(
@@ -234,10 +254,23 @@ class PersonRankingFilter(django_filters.FilterSet):
         lookup_expr='in',
     )
     sex = MultipleChoiceFilterQ(
-        label="Gender",
+        label="Gender of Person related to Item",
         choices=Person.SEX_CHOICES,
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
         lookup_expr='in',
+    )
+    catalogue_year = RangeFilterQ(
+        label="Catalogue publication year",
+        widget=RangeWidget(),
+        field_name='personitemrelation__item__lot__catalogue__year_of_publication',
+        lookup_expr='range'
+    )
+    catalogue_owner_sex = CatalogueOwnerSexFilterQ(
+        label="Catalogue owner gender",
+        choices=Person.SEX_CHOICES,
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
+        field_name='personitemrelation__item__lot__catalogue__personcataloguerelation__person__sex',
+        lookup_expr='in'
     )
 
     class Meta:
@@ -245,7 +278,10 @@ class PersonRankingFilter(django_filters.FilterSet):
         fields = [
             'item_roles',
             'edition_year',
-            'catalogue_publication_country'
+            'catalogue_publication_country',
+            'sex',
+            'catalogue_year',
+            'catalogue_owner_sex'
         ]
 
     # Override method
