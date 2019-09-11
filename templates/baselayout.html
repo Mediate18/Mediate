@@ -59,8 +59,8 @@
           <ul class="nav navbar-nav">
             {% with url_name=request.resolver_match.url_name %}
               {% if perms.persons.change_person or perms.global.view_all %}
-                <li class="{% if url_name == 'persons' %}active{% endif %}"><a href="{% url 'persons' %}">{% trans "Persons" %}</a></li>
                 <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Persons" %} <span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         <li><a href="{% url 'persons' %}">{% trans "Search" %}</a></li>
                         <li><a href="{% url 'persons_ranking' %}">{% trans "Rank by item count" %}</a></li>
