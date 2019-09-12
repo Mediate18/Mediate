@@ -342,16 +342,18 @@ class PersonRankingFilter(django_filters.FilterSet):
         """
         if value:
             if value[0] and value[1]:
-                queryset = queryset.filter(**{name+'__regex': r'^[0-9]{4}$'}) \
-                    .annotate(**{name+'_int': Cast(name, IntegerField())})
-                queryset = queryset.filter(**{name+'_int__range': (value[0], value[1])})
+                queryset = queryset.filter(**{name+'__regex': r'^[0-9]{3,4}$'}) \
+                    .annotate(**{name+'_int': Cast(name, IntegerField())})\
+                    .filter(**{name+'_int__range': (value[0], value[1])})
             else:
-                queryset = queryset.filter(**{name+'__regex': r'^[0-9]{4}$'}) \
-                    .annotate(**{name+'_int': Cast(name, IntegerField())})
                 if value[0]:
-                    queryset = queryset.filter(**{name+'_int__gte': value[0]})
+                    queryset = queryset.filter(**{name+'__regex': r'^[0-9]{3,4}$'}) \
+                        .annotate(**{name+'_int': Cast(name, IntegerField())})\
+                        .filter(**{name+'_int__gte': value[0]})
                 if value[1]:
-                    queryset = queryset.filter(**{name+'_int__lte': value[1]})
+                    queryset = queryset.filter(**{name+'__regex': r'^[0-9]{3,4}$'}) \
+                        .annotate(**{name+'_int': Cast(name, IntegerField())})\
+                        .filter(**{name+'_int__lte': value[1]})
 
         return queryset
 
