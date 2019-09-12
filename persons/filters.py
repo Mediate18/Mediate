@@ -2,7 +2,8 @@ import django_filters
 from .models import *
 from viapy.api import ViafAPI
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import Q
+from django.db.models import Q, IntegerField
+from django.db.models.functions import Cast
 from django import forms
 from django_select2.forms import Select2MultipleWidget
 from django_filters.widgets import RangeWidget
@@ -151,7 +152,14 @@ class PersonFilter(django_filters.FilterSet):
         return queryset
 
 
-class ModelMultipleChoiceFilterQ(django_filters.ModelMultipleChoiceFilter):
+class QBasedFilter:
+    """
+    Merely a super class for testing with isinstance.
+    """
+    pass
+
+
+class ModelMultipleChoiceFilterQ(QBasedFilter, django_filters.ModelMultipleChoiceFilter):
     """
     Subclass of django_filters.ModelMultipleChoiceFilter for the purpose of
     using Q objects within one filter instead of chaining filters.
@@ -170,7 +178,7 @@ class ModelMultipleChoiceFilterQ(django_filters.ModelMultipleChoiceFilter):
         return q
 
 
-class RangeFilterQ(django_filters.RangeFilter):
+class RangeFilterQ(QBasedFilter, django_filters.RangeFilter):
     """
     Subclass of django_filters.RangeFilter for the purpose of
     using Q objects within one filter instead of chaining filters.
@@ -190,7 +198,7 @@ class RangeFilterQ(django_filters.RangeFilter):
         return q
 
 
-class MultipleChoiceFilterQWithExtraLookups(django_filters.MultipleChoiceFilter):
+class MultipleChoiceFilterQWithExtraLookups(QBasedFilter, django_filters.MultipleChoiceFilter):
     """
     Subclass of django_filters.MultipleChoiceFilter for the purpose of
     using Q objects within one filter instead of chaining filters.
@@ -263,6 +271,14 @@ class PersonRankingFilter(django_filters.FilterSet):
         field_name='city_of_birth__country',
         lookup_expr='in'
     )
+    date_of_birth = django_filters.Filter(
+        widget=RangeWidget(),
+        method='year_text_range_filter'
+    )
+    date_of_death = django_filters.Filter(
+        widget=RangeWidget(),
+        method='year_text_range_filter'
+    )
 
     class Meta:
         model = Person
@@ -296,14 +312,48 @@ class PersonRankingFilter(django_filters.FilterSet):
             qs = self.queryset.all()
             query = Q()
             for name, filter_ in six.iteritems(self.filters):
-                value = self.form.cleaned_data.get(name)
+                if isinstance(filter_, QBasedFilter):
+                    value = self.form.cleaned_data.get(name)
 
-                if value is not None:  # valid & clean data
-                    query = filter_.filter(query, value)
+                    if value is not None:  # valid & clean data
+                        query = filter_.filter(query, value)
 
-            self._qs = qs.filter(query).distinct()
+            qs = qs.filter(query)
+
+            for name, filter_ in six.iteritems(self.filters):
+                if not isinstance(filter_, QBasedFilter):
+                    value = self.form.cleaned_data.get(name)
+
+                    if value is not None:  # valid & clean data
+                        qs = filter_.filter(qs, value)
+
+            self._qs = qs.distinct()
 
         return self._qs
+
+    def year_text_range_filter(self, queryset, name, value):
+        """
+        Filters on text fields containing year data using a range value.
+        The name of the filter should reflect the field name in the model.
+        :param queryset: the queryset to alter 
+        :param name: the name of the filter
+        :param value: the value from the form
+        :return: 
+        """
+        if value:
+            if value[0] and value[1]:
+                queryset = queryset.filter(**{name+'__regex': r'^[0-9]{4}$'}) \
+                    .annotate(**{name+'_int': Cast(name, IntegerField())})
+                queryset = queryset.filter(**{name+'_int__range': (value[0], value[1])})
+            else:
+                queryset = queryset.filter(**{name+'__regex': r'^[0-9]{4}$'}) \
+                    .annotate(**{name+'_int': Cast(name, IntegerField())})
+                if value[0]:
+                    queryset = queryset.filter(**{name+'_int__gte': value[0]})
+                if value[1]:
+                    queryset = queryset.filter(**{name+'_int__lte': value[1]})
+
+        return queryset
 
 
 # PersonPersonRelation filter
