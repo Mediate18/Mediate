@@ -185,6 +185,8 @@ class PlaceTable(tables.Table):
             'name',
             'cerl_id',
             'country',
+            'longitude',
+            'latitude',
             'uuid'
         ]
 
