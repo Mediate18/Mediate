@@ -2,7 +2,7 @@ import django_filters
 from .models import *
 from viapy.api import ViafAPI
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import Q, IntegerField
+from django.db.models import Q, IntegerField, Count
 from django.db.models.functions import Cast
 from django import forms
 from django_select2.forms import Select2MultipleWidget
@@ -337,7 +337,10 @@ class PersonRankingFilter(django_filters.FilterSet):
                     if value is not None:  # valid & clean data
                         qs = filter_.filter(qs, value)
 
-            self._qs = qs.distinct()
+            self._qs = qs.distinct()\
+                .annotate(item_count=Count('uuid'))\
+                .annotate(catalogue_count=Count('personitemrelation__item__lot__catalogue', distinct=True))\
+                .order_by('-item_count')
 
         return self._qs
 

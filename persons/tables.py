@@ -89,13 +89,15 @@ class PersonTable(tables.Table):
 
 # PersonRanking table
 class PersonRankingTable(PersonTable):
-    person_count = tables.Column(empty_values=(), verbose_name=_("#"))
+    item_count = tables.Column(empty_values=(), verbose_name=_("# items"))
+    catalogue_count = tables.Column(empty_values=(), verbose_name=_("# catalogues"))
 
     class Meta:
         model = Person
         attrs = {'class': 'table table-sortable'}
         sequence = [
-            'person_count',
+            'item_count',
+            'catalogue_count',
             'short_name',
             'first_names',
             'surname',

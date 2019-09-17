@@ -55,7 +55,7 @@ class PersonRankingTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return Person.objects.all().annotate(person_count=Count('uuid')).order_by('-person_count')
+        return Person.objects.all()
 
     def get_context_data(self, **kwargs):
         context = super(PersonRankingTableView, self).get_context_data(**kwargs)
