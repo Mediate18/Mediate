@@ -30,6 +30,7 @@ urlpatterns = [
        name="change_item"),
     path(r'items/delete/<uuid:pk>', permission_required('items.delete_item')(ItemDeleteView.as_view()),
        name="delete_item"),
+    path('items/map', permission_required('global.view_all')(ItemLocationMapView.as_view()), name='itemsmap'),
 
     # Tagged Item urls
     path('taggeditems/', login_required(TaggedItemTableView.as_view()), name='taggeditems'),

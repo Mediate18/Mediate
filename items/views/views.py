@@ -188,6 +188,29 @@ class TaggedItemTableView(ListView):
         return context
 
 
+class ItemLocationMapView(ListView):
+    model = Item
+    template_name = 'items/itemlocation_map.html'
+
+    def get_queryset(self):
+        items = Item.objects.filter(edition__place__latitude__isnull=False, edition__place__longitude__isnull=False)
+        return items
+
+    def get_context_data(self, **kwargs):
+        queryset = self.get_queryset()
+        context = super(ItemLocationMapView, self).get_context_data(**kwargs)
+        filter = ItemFilter(self.request.GET, queryset=queryset)
+
+        context['filter'] = filter
+        context['object_name'] = "item"
+
+        context['object_list'] = filter.qs
+        context['places'] = Place.objects.filter(edition__items__in=filter.qs)\
+                                .annotate(item_count=Count('edition__items'))
+
+        return context
+
+
 class ItemDetailView(DetailView):
     model = Item
     template_name = 'items/item_detail.html'

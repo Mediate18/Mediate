@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'maintenance_mode',
     'test_without_migrations',
     'simple_history',
+    'leaflet',
     'simplemoderation',
     'tagme',
     'mediate',

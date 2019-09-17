@@ -25,7 +25,7 @@ class PersonProfessionAdmin(SimpleHistoryAdmin):
 
 @admin.register(Place)
 class PlaceAdmin(SimpleHistoryAdmin):
-    pass
+    list_display = ('name', 'cerl_id', 'country', 'latitude', 'longitude')
 
 
 @admin.register(Profession)

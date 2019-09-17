@@ -1,0 +1,85 @@
+{% extends "baselayout.html" %}
+{% load i18n %}
+{% load render_table from django_tables2 %}
+{% load static %}
+
+{% load leaflet_tags %}
+
+{% block extracss %}
+<link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" type="text/css" media="screen" rel="stylesheet">
+{% leaflet_css %}
+<style>
+    .leaflet-container-default {
+        height: 600px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+              <h4 class="panel-title">
+                <a data-toggle="collapse" href="#collapse1">Filter <span class="glyphicon glyphicon-chevron-down"></span></a>
+              </h4>
+            </div>
+            <div id="collapse1" class="panel-collapse collapse">
+              <div class="panel-body">
+                <form action="" method="get">
+                    <table class="table">
+                    {{ filter.form.as_table }}
+                    </table>
+                    <div class="pull-right">
+                        <input type="submit" class="btn"/>
+                        <a href='{{ request.path }}' class="btn">Clear</a>
+                    </div>
+                </form>
+              </div>
+            </div>
+          </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12">
+        <h1>
+            {{ object_name|title }}
+            {% trans "publication places" %}
+        </h1>
+        <div class="small">Displaying {{ filter.qs.count }} of {{ filter.queryset.count }}</div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        {% leaflet_map "main" callback="map_init" %}
+    </div>
+</div>
+
+{% block abstracts %}
+{% endblock %}
+
+{% endblock %}
+
+{% block extrajs %}
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+{% leaflet_js %}
+{{ form.media.js }}
+<script>
+
+function map_init(map, options) {
+    // zoom to point
+    map.setView([50.106, 8.723], 5);
+    {% for place in places %}
+        // add it to map
+        L.marker([{{ place.latitude }}, {{ place.longitude }}])
+            .bindTooltip("{{ place.name }}: {{ place.item_count }}")
+            .addTo(map);
+    {% endfor %}
+}
+
+$(document).ready(function(){
+});
+</script>
+{% endblock %}

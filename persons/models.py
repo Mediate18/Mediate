@@ -3,6 +3,9 @@ from django.utils.translation import ugettext_lazy as _
 from django_date_extensions.fields import ApproximateDateField
 from django.urls import reverse_lazy
 
+import requests
+from apiconnectors.cerlapi import cerl_record_url
+
 import uuid
 
 from simplemoderation.tools import moderated
@@ -34,6 +37,8 @@ class Place(models.Model):
     name = models.CharField(_("Name of the place"), max_length=128, null=True)
     cerl_id = models.CharField(_("CERL ID of a place"), max_length=32, null=True, blank=True)
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True, blank=True)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
 
     class Meta:
         ordering = ['name']
@@ -43,6 +48,27 @@ class Place(models.Model):
 
     def get_absolute_url(self):
         return reverse_lazy('place_detail', args=[str(self.uuid)])
+
+    def get_lat_long(self, overwrite=False):
+        if self.cerl_id and (overwrite or (not self.latitude or not self.longitude)):
+            response = requests.get(cerl_record_url + self.cerl_id, headers={'accept': 'application/json'})
+            cerl_record_json = response.json()
+            try:
+                if overwrite or not self.latitude:
+                    self.latitude = cerl_record_json['data']['location']['point']['lat']
+            except KeyError:
+                pass
+            try:
+                if overwrite or not self.longitude:
+                    self.longitude = cerl_record_json['data']['location']['point']['long']
+            except KeyError:
+                pass
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        self.get_lat_long()
+        super().save(force_insert=False, force_update=False, using=None,
+             update_fields=None)
 
 
 class Religion(models.Model):
