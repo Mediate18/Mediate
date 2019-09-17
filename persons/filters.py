@@ -271,6 +271,13 @@ class PersonRankingFilter(django_filters.FilterSet):
         field_name='city_of_birth__country',
         lookup_expr='in'
     )
+    country_of_death = ModelMultipleChoiceFilterQ(
+        label="Country of death of Person related to Item",
+        queryset=Country.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
+        field_name='city_of_death__country',
+        lookup_expr='in'
+    )
     date_of_birth = django_filters.Filter(
         widget=RangeWidget(),
         method='year_text_range_filter'
@@ -289,7 +296,10 @@ class PersonRankingFilter(django_filters.FilterSet):
             'sex',
             'catalogue_year',
             'catalogue_owner_sex',
-            'country_of_birth'
+            'country_of_birth',
+            'date_of_birth',
+            'country_of_death',
+            'date_of_death'
         ]
 
     # Override method
