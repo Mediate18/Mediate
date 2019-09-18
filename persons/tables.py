@@ -1,6 +1,8 @@
 import django_tables2 as tables
 from django_tables2.utils import A  # alias for Accessor
 from django.utils.html import format_html
+import itertools
+
 from .models import *
 from mediate.columns import ActionColumn
 from catalogues.models import PersonCatalogueRelation, Catalogue, CataloguePlaceRelation
@@ -89,6 +91,7 @@ class PersonTable(tables.Table):
 
 # PersonRanking table
 class PersonRankingTable(PersonTable):
+    row_index = tables.Column(empty_values=(), orderable=False, verbose_name="")
     item_count = tables.Column(empty_values=(), verbose_name=_("# items"))
     catalogue_count = tables.Column(empty_values=(), verbose_name=_("# catalogues"))
 
@@ -96,6 +99,7 @@ class PersonRankingTable(PersonTable):
         model = Person
         attrs = {'class': 'table table-sortable'}
         sequence = [
+            'row_index',
             'item_count',
             'catalogue_count',
             'short_name',
@@ -111,6 +115,10 @@ class PersonRankingTable(PersonTable):
             'viaf_id',
             'uuid'
         ]
+
+    def render_row_index(self):
+        self.row_index = getattr(self, 'row_index', itertools.count(self.page.start_index()))
+        return next(self.row_index)
 
 
 # PersonPersonRelation table
