@@ -115,8 +115,12 @@ function map_init(map, options) {
 
     markerGroup.on("click", function (e) {
         var marker = e.layer;
-        var list_url = window.location.origin + items_url + window.location.search +
-                        "&edition_place=" + marker.place_id;
+        var list_url = window.location.origin + items_url;
+        if(window.location.search != "") {
+            list_url += window.location.search + "&edition_place=" + marker.place_id;
+        } else {
+            list_url += "?edition_place=" + marker.place_id;
+        }
         window.open(list_url);
     });
 }
