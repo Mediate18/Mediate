@@ -68,6 +68,8 @@
 {{ form.media.js }}
 <script>
 
+var items_url = "{% url 'items' %}";
+
 function stratify_item_count(item_count) {
     if(item_count < 10) {
         return 5;
@@ -93,10 +95,11 @@ function stratify_item_count(item_count) {
 function map_init(map, options) {
     // zoom to point
     map.setView([50.106, 8.723], 5);
+    var markerGroup = L.featureGroup().addTo(map);
     {% for place in places %}
         var item_count = {{ place.item_count }};
         // add it to map
-        L.circleMarker(
+        marker = L.circleMarker(
             [{{ place.latitude }}, {{ place.longitude }}],
             {
                 radius: stratify_item_count(item_count),
@@ -104,8 +107,18 @@ function map_init(map, options) {
                 fillColor: '#b82b22',
                 fillOpacity: 0.5
             }
-        ).bindTooltip("{{ place.name }}: {{ place.item_count }}").addTo(map);
+        ).bindTooltip("{{ place.name }}: {{ place.item_count }}").addTo(markerGroup);
+
+        // Add an extra field for later use
+        marker.place_id = "{{ place.uuid }}";
     {% endfor %}
+
+    markerGroup.on("click", function (e) {
+        var marker = e.layer;
+        var list_url = window.location.origin + items_url + window.location.search +
+                        "&edition_place=" + marker.place_id;
+        window.open(list_url);
+    });
 }
 
 $(document).ready(function(){

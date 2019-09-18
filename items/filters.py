@@ -59,6 +59,16 @@ class ItemFilter(django_filters.FilterSet):
         widget=CheckboxInput(),
         method='edition_isempty_filter'
     )
+    edition_place = django_filters.ModelMultipleChoiceFilter(
+        label="Place of publication",
+        queryset=Place.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Place,
+            search_fields=['name__icontains']
+        ),
+        method='edition_place_filter'
+    )
     material_details = django_filters.ModelMultipleChoiceFilter(
         label="Material details",
         queryset=MaterialDetails.objects.all(),
@@ -120,6 +130,7 @@ class ItemFilter(django_filters.FilterSet):
             'edition',
             'edition_isnull',
             'edition_isempty',
+            'edition_place',
             'sales_price',
             'material_details',
             'tag'
@@ -148,6 +159,11 @@ class ItemFilter(django_filters.FilterSet):
         if value:
             return queryset.filter(edition__year__isnull=True, edition__place__isnull=True)\
                 .annotate(num_publishers=Count('edition__publisher')).filter(num_publishers=0)
+        return queryset
+
+    def edition_place_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(edition__place__in=value)
         return queryset
 
     def catalogue_filter(self, queryset, name, value):
