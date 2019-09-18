@@ -68,14 +68,43 @@
 {{ form.media.js }}
 <script>
 
+function stratify_item_count(item_count) {
+    if(item_count < 10) {
+        return 5;
+    }
+    if(item_count < 50) {
+        return 10;
+    }
+    if(item_count < 100) {
+        return 15;
+    }
+    if(item_count < 500) {
+        return 20;
+    }
+    if(item_count < 1000) {
+        return 25
+    }
+    if(item_count < 5000) {
+        return 30;
+    }
+    return 35;
+}
+
 function map_init(map, options) {
     // zoom to point
     map.setView([50.106, 8.723], 5);
     {% for place in places %}
+        var item_count = {{ place.item_count }};
         // add it to map
-        L.marker([{{ place.latitude }}, {{ place.longitude }}])
-            .bindTooltip("{{ place.name }}: {{ place.item_count }}")
-            .addTo(map);
+        L.circleMarker(
+            [{{ place.latitude }}, {{ place.longitude }}],
+            {
+                radius: stratify_item_count(item_count),
+                color: '#b82b22',
+                fillColor: '#b82b22',
+                fillOpacity: 0.5
+            }
+        ).bindTooltip("{{ place.name }}: {{ place.item_count }}").addTo(map);
     {% endfor %}
 }
 
