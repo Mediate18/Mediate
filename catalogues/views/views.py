@@ -69,6 +69,8 @@ class CatalogueTableView(ListView):
         context['item_count_in_plot'] = item_count_in_plot
         context['item_percentage_in_plot'] = int(100 * item_count_in_plot / item_count_total) if item_count_total != 0 else 0
 
+        context['map_url'] = reverse_lazy('cataloguesmap')
+
         return context
 
 

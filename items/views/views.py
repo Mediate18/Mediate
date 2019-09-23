@@ -133,6 +133,7 @@ class ItemTableView(ListView):
         context['action'] = _("add")
         context['object_name'] = "item"
         context['add_url'] = reverse_lazy('add_item')
+        context['map_url'] = reverse_lazy('itemsmap')
 
         context['addanother_person_form'] = PersonModelForm()
         context['batch_edit_options'] = [

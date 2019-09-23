@@ -121,6 +121,11 @@
                         </ul>
                     </div>
                 {% endif %}
+                {% if map_url %}
+                    <a href="{{ map_url }}" class="btn btn-default" id="map_url">
+                      <span class="glyphicon glyphicon-map-marker"></span> Map
+                    </a>
+                {% endif %}
             </div>
         </h1>
         <div class="small">Displaying {{ filter.qs.count }} of {{ filter.queryset.count }}</div>
@@ -322,6 +327,9 @@ $(document).ready(function(){
 
             $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
         });
+
+        var map_url_href = $('#map_url').attr('href');
+        $('#map_url').attr('href', map_url_href + window.location.search);
 });
 </script>
 {% endblock %}
