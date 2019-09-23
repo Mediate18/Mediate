@@ -8,11 +8,6 @@
 {% block extracss %}
 <link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" type="text/css" media="screen" rel="stylesheet">
 {% leaflet_css %}
-<style>
-    .leaflet-container-default {
-        height: 600px;
-    }
-</style>
 {% endblock %}
 
 {% block content %}
@@ -53,7 +48,7 @@
 </div>
 <div class="row">
     <div class="col-xs-12">
-        {% leaflet_map "main" callback="map_init" %}
+        {% leaflet_map "map" callback="map_init" %}
     </div>
 </div>
 
@@ -126,6 +121,14 @@ function map_init(map, options) {
 }
 
 $(document).ready(function(){
+
+    // Stretch the map to the bottom of the window
+    $(window).resize(function() {
+        $('#map').height($(window).height() - Math.ceil($('#map').offset().top)
+                            - parseInt($('body').css("padding-bottom")) - 1);
+    });
+    $(window).trigger('resize');
+
 });
 </script>
 {% endblock %}
