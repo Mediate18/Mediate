@@ -190,7 +190,7 @@ class TaggedItemTableView(ListView):
 
 class ItemLocationMapView(ListView):
     model = Item
-    template_name = 'items/itemlocation_map.html'
+    template_name = 'generic_location_map.html'
 
     def get_queryset(self):
         items = Item.objects.filter(edition__place__latitude__isnull=False, edition__place__longitude__isnull=False)
@@ -206,7 +206,9 @@ class ItemLocationMapView(ListView):
 
         context['object_list'] = filter.qs
         context['places'] = Place.objects.filter(edition__items__in=filter.qs)\
-                                .annotate(item_count=Count('edition__items'))
+                                .annotate(object_count=Count('edition__items'))
+        context['objects_url_name'] = 'items'
+        context['place_search_field'] = 'edition_place'
 
         return context
 

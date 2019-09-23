@@ -22,6 +22,8 @@ urlpatterns = [
     path(r'catalogues/delete/<uuid:pk>',
        permission_required('catalogues.delete_catalogue')(CatalogueDeleteView.as_view()),
        name="delete_catalogue"),
+    path('catalogues/map', permission_required('global.view_all')(CatalogueLocationMapView.as_view()),
+         name='cataloguesmap'),
 
 
     # CatalogueHeldBy urls

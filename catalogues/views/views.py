@@ -72,6 +72,32 @@ class CatalogueTableView(ListView):
         return context
 
 
+class CatalogueLocationMapView(ListView):
+    model = Catalogue
+    template_name = 'generic_location_map.html'
+
+    def get_queryset(self):
+        catalogues = Catalogue.objects.filter(related_places__place__latitude__isnull=False,
+                                         related_places__place__longitude__isnull=False)
+        return catalogues
+
+    def get_context_data(self, **kwargs):
+        queryset = self.get_queryset()
+        context = super(CatalogueLocationMapView, self).get_context_data(**kwargs)
+        filter = CatalogueFilter(self.request.GET, queryset=queryset)
+
+        context['filter'] = filter
+        context['object_name'] = "catalogue"
+
+        context['object_list'] = filter.qs
+        context['places'] = Place.objects.filter(related_catalogues__catalogue__in=filter.qs)\
+                                .annotate(object_count=Count('related_catalogues__catalogue'))
+        context['objects_url_name'] = 'catalogues'
+        context['place_search_field'] = 'place'
+
+        return context
+
+
 class CatalogueDetailView(DetailView):
     model = Catalogue
 
