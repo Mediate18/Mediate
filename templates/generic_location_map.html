@@ -40,8 +40,12 @@
 <div class="row">
     <div class="col-xs-12">
         <h1>
-            {{ object_name|title }}
-            {% trans "publication places" %}
+            {% if page_heading %}
+                {{ page_heading }}
+            {% else %}
+                {{ object_name|title }}
+                {% trans " places" %}
+            {% endif %}
         </h1>
         <div class="small">Displaying {{ filter.qs.count }} of {{ filter.queryset.count }}</div>
     </div>

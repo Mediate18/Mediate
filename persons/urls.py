@@ -22,6 +22,10 @@ urlpatterns = [
     path(r'persons/delete/<uuid:pk>',
          permission_required('persons.delete_person')(PersonDeleteView.as_view()),
          name="delete_person"),
+    path('persons/placesofbirth', permission_required('global.view_all')(PlacesOfBirthMapView.as_view()),
+         name='placesofbirth'),
+    path('persons/placesofdeath', permission_required('global.view_all')(PlacesOfDeathMapView.as_view()),
+         name='placesofdeath'),
 
     # PersonRanking urls
     path(r'persons/rank', permission_required('global.view_all')(PersonRankingTableView.as_view()),

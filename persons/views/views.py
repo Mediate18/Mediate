@@ -50,6 +50,60 @@ class PersonTableView(ListView):
         return context
 
 
+class PlacesOfBirthMapView(ListView):
+    model = Person
+    template_name = 'generic_location_map.html'
+
+    def get_queryset(self):
+        from django.db.models import Q
+        city_of_birth_longlat = Q(city_of_birth__latitude__isnull=False, city_of_birth__longitude__isnull=False)
+        persons = Person.objects.filter(city_of_birth_longlat)
+        return persons
+
+    def get_context_data(self, **kwargs):
+        queryset = self.get_queryset()
+        context = super(PlacesOfBirthMapView, self).get_context_data(**kwargs)
+        filter = PersonFilter(self.request.GET, queryset=queryset)
+
+        context['filter'] = filter
+        context['page_heading'] = "Places of birth"
+
+        context['object_list'] = filter.qs
+        context['places'] = Place.objects.filter(persons_born__in=filter.qs)\
+                                .annotate(object_count=Count('persons_born'))
+        context['objects_url_name'] = 'persons'
+        context['place_search_field'] = 'city_of_birth'
+
+        return context
+
+
+class PlacesOfDeathMapView(ListView):
+    model = Person
+    template_name = 'generic_location_map.html'
+
+    def get_queryset(self):
+        from django.db.models import Q
+        city_of_death_longlat = Q(city_of_death__latitude__isnull=False, city_of_death__longitude__isnull=False)
+        persons = Person.objects.filter(city_of_death_longlat)
+        return persons
+
+    def get_context_data(self, **kwargs):
+        queryset = self.get_queryset()
+        context = super(PlacesOfDeathMapView, self).get_context_data(**kwargs)
+        filter = PersonFilter(self.request.GET, queryset=queryset)
+
+        context['filter'] = filter
+        context['page_heading'] = "Places of death"
+
+        context['object_list'] = filter.qs
+        context['places'] = Place.objects.filter(persons_died__in=filter.qs)\
+                                .annotate(object_count=Count('persons_died'))
+        context['objects_url_name'] = 'persons'
+        context['place_search_field'] = 'city_of_death'
+
+        return context
+
+
 class PersonRankingTableView(ListView):
     model = Person
     template_name = 'generic_list.html'
