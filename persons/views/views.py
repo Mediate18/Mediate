@@ -843,7 +843,7 @@ class PlaceAndCerlSuggest(CerlSuggest):
         for obj in place_result_raw:
             id_number = re.match(r'.*?(\d+)$', obj.cerl_id).group(1) if obj.cerl_id else obj.uuid
             obj_dict = dict(
-                id=obj.cerl_id if obj.cerl_id else obj.uuid,
+                id=obj.uuid,
                 id_number=id_number,
                 text='<i>' + escape(obj.name) + '</i>',
                 nametype='',
