@@ -28,6 +28,10 @@ DEBUG = config('DEBUG', cast=bool)
 
 ALLOWED_HOSTS = [config('ALLOWED_HOSTS')]
 
+ADMINS = [
+    ('Micha Hulsbosch', 'm.hulsbosch@let.ru.nl')
+]
+
 
 # Application definition
 
