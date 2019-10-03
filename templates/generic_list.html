@@ -51,18 +51,36 @@
             {% endif %}
             {% if batch_edit_options %}
                 {% if batch_edit_options|length > 1 %}
-                    <div class="btn-group" role="group" aria-label="batch edit">
-                {% endif %}
-                {% for option in batch_edit_options %}
-                    <button class="btn btn-default" id="open-batch-edit" batcheditoptionid="{{ option.id }}"
-                       data-toggle="modal" data-target="#batchEditModal-{{ option.id }}"
-                            onclick="batch_edit_option = '{{ option.id }}'">
-                      <span class="glyphicon glyphicon-list"></span> {{ option.label }}
-                    </button>
-                    {% include 'batcheditmodal.html' %}
-                {% endfor %}
-                {% if batch_edit_options|length > 1 %}
-                    </div>
+                    <span class="dropdown">
+                      <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                          <span class="glyphicon glyphicon-list"></span>
+                          Batch edit
+                          <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu" style="top: 32px">
+                        {% for option in batch_edit_options %}
+                          <li>
+                            <button class="btn btn-link" id="open-batch-edit" batcheditoptionid="{{ option.id }}"
+                               data-toggle="modal" data-target="#batchEditModal-{{ option.id }}"
+                                    onclick="batch_edit_option = '{{ option.id }}'">
+                               {{ option.label }}
+                            </button>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    </span>
+                    {% for option in batch_edit_options %}
+                          {% include 'batcheditmodal.html' %}
+                    {% endfor %}
+                {% else %}
+                    {% for option in batch_edit_options %}
+                        <button class="btn btn-default" id="open-batch-edit" batcheditoptionid="{{ option.id }}"
+                           data-toggle="modal" data-target="#batchEditModal-{{ option.id }}"
+                                onclick="batch_edit_option = '{{ option.id }}'">
+                          <span class="glyphicon glyphicon-list"></span> {{ option.label }}
+                        </button>
+                        {% include 'batcheditmodal.html' %}
+                    {% endfor %}
                 {% endif %}
             {% endif %}
 
