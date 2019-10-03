@@ -1,0 +1,70 @@
+{% load i18n %}
+{% load render_table from django_tables2 %}
+{% load static %}
+
+<!-- Batch Edit Modal -->
+<div id="batchEditModal-{{ option.id }}" class="batchEditModal modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-list"></span>
+            {% if object_name_plural %}
+                {{ object_name_plural|title }}
+            {% else %}
+                {{ object_name|title }}s
+            {% endif %}
+            : {{ option.label }}
+        </h4>
+      </div>
+      <div id="batcheditmessagecontainer-{{ option.id }}">
+          <div class="modal-body">
+              <p>{% trans "No entries selected" %}</p>
+          </div>
+          <div class="modal-footer">
+            <input type="reset" class="btn btn-default" data-dismiss="modal" value="{% trans 'Close' %}"/>
+          </div>
+      </div>
+      <div id="batcheditformcontainer-{{ option.id }}">
+
+        <form method="POST" action="{{ option.url }}" id="form_{{ option.id }}">
+            {% csrf_token %}
+
+          <div class="modal-body">
+            <!-- batch edit form -->
+            {% if option.form %}
+                <table class="table">
+                    {{ option.form.as_table }}
+                </table>
+            {% endif %}
+            {% if option.form_set %}
+                {{ option.form_set.management_form }}
+                <div id="form_set">
+                    {% for form in option.form_set %}
+                        <h5>Relation {{ forloop.counter0|add:1 }}</h5>
+                        <table class="table">
+                            {{ form.as_table }}
+                        </table>
+                    {% endfor %}
+                    <div id="empty_form" style="display:none">
+                        <h5>Relation __prefixplusone__</h5>
+                        <table class='table'>
+                            {{ option.form_set.empty_form }}
+                        </table>
+                    </div>
+                </div>
+                <input type="button" class="btn btn-default" value="Add another relation" id="add_more">
+            {% endif %}
+          </div>
+          <div class="modal-footer">
+            <input type="submit" class="btn btn-success" value="{% trans 'Add' %}"/>
+            <input type="reset" class="btn btn-default" data-dismiss="modal" value="{% trans 'Cancel' %}"/>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -32,22 +32,19 @@ $(document).ready(function(){
 
     // When the batch edit modal is opened, remove all inputs of selected entries
     // and move the form of the current batch edit type to the modal
-    $('#batchEditModal').on('show.bs.modal', function(event) {
-        // If no selection is made, don't open the modal
+    $('.batchEditModal').on('show.bs.modal', function(event) {
+        // If no selection is made, show a warning
         if(selected_entries.size == 0) {
-//            alert("Please, first select one or more entries.");
-            // Move the form to the modal
-            $('#batcheditformcontainer').children().each(function(index) {
-                $(this).appendTo('#batch-edit-modal-content');
-            });
-            $('#no-selected-entries-warning').appendTo('#batcheditformcontainer');
+            $('#batcheditmessagecontainer-'+batch_edit_option).show();
+            $('#batcheditformcontainer-'+batch_edit_option).hide();
         } else {
-            var batcheditoptionid = $('#open-batch-edit').attr('batcheditoptionid')
+            $('#batcheditmessagecontainer-'+batch_edit_option).hide();
+            $('#batcheditformcontainer-'+batch_edit_option).show();
 
             // Remove and add all selected entries
             $(".selected-entry").remove();
             selected_entries.forEach(entry => {
-                $('#form_'+batcheditoptionid).append($('<input>', {
+                $('#form_'+batch_edit_option).append($('<input>', {
                     class: "selected-entry",
                     type: 'hidden',
                     name: "items",
@@ -55,11 +52,8 @@ $(document).ready(function(){
                 }));
             });
 
-            // Move the form to the modal
-            $('#batcheditformcontainer').children().each(function(index) {
-                $(this).appendTo('#batch-edit-modal-content');
-            });
-            $('#form_'+batcheditoptionid).appendTo('#batcheditformcontainer');
+            // Reset the form
+            $('#form_'+batch_edit_option).trigger("reset").find(".django-select2").val(null).trigger('change');
         }
     });
 });

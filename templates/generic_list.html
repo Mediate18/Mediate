@@ -42,92 +42,48 @@
             {% else %}
                 {{ object_name|title }}s
             {% endif %}
-            <div class="pull-right">
-                {% if add_url %}
-                    <a href="{{ add_url }}" class="btn btn-default">
-                      <span class="glyphicon glyphicon-plus"></span> New
-                    </a>
-                {% endif %}
-                {% if batch_edit_options %}
-                    {% if batch_edit_options|length > 1 %}
-                        <div class="btn-group" role="group" aria-label="batch edit">
-                    {% endif %}
-                    {% for option in batch_edit_options %}
-                        <button class="btn btn-default" id="open-batch-edit" batcheditoptionid="{{ option.id }}"
-                           data-toggle="modal" data-target="#batchEditModal"
-                                onclick="batch_edit_option = '{{console.log('bla')">
-                          <span class="glyphicon glyphicon-list"></span> {{ option.label }}
-                        </button>
-                        <div class="hidden">
-                            <form method="POST" action="{{ option.url }}" id="form_{{ option.id }}">
-                                {% csrf_token %}
-
-                              <div class="modal-body">
-                                <!-- batch edit form -->
-                                {% if option.form %}
-                                    <table class="table">
-                                        {{ option.form.as_table }}
-                                    </table>
-                                {% endif %}
-                                {% if option.form_set %}
-                                    {{ option.form_set.management_form }}
-                                    <div id="form_set">
-                                        {% for form in option.form_set %}
-                                            <h5>Relation {{ forloop.counter0|add:1 }}</h5>
-                                            <table class="table">
-                                                {{ form.as_table }}
-                                            </table>
-                                        {% endfor %}
-                                        <div id="empty_form" style="display:none">
-                                            <h5>Relation __prefixplusone__</h5>
-                                            <table class='table'>
-                                                {{ option.form_set.empty_form }}
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <input type="button" class="btn btn-default" value="Add another relation" id="add_more">
-                                {% endif %}
-                              </div>
-                              <div class="modal-footer">
-                                <input type="submit" class="btn btn-success" value="{% trans 'Add' %}"/>
-                                <input type="reset" class="btn btn-default" data-dismiss="modal" value="{% trans 'Cancel' %}"/>
-                              </div>
-                            </form>
-                        </div>
-                    {% endfor %}
-                    {% if batch_edit_options|length > 1 %}
-                        </div>
-                    {% endif %}
-                {% endif %}
-                <div class="hidden" id="batch-edit-modal-content">
-                    <div id="no-selected-entries-warning">
-                      <div class="modal-body">
-                          <p>{% trans "No entries selected" %}</p>
-                      </div>
-                      <div class="modal-footer">
-                        <input type="reset" class="btn btn-default" data-dismiss="modal" value="{% trans 'Close' %}"/>
-                      </div>
-                    </div>
-                </div>
-                {% if export %}
-                    <div class="dropdown">
-                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-                            <span class="glyphicon glyphicon-export"></span> Export
-                        <span class="caret"></span></button>
-                        <ul class="dropdown-menu">
-                            {% for format, name in export.items %}
-                                <li><a href="?_export={{ format }}">{{ name }}</a></li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                {% endif %}
-                {% if map_url %}
-                    <a href="{{ map_url }}" class="btn btn-default" id="map_url">
-                      <span class="glyphicon glyphicon-map-marker"></span> Map
-                    </a>
-                {% endif %}
-            </div>
         </h1>
+        <div class="pull-right">
+            {% if add_url %}
+                <a href="{{ add_url }}" class="btn btn-default">
+                  <span class="glyphicon glyphicon-plus"></span> New
+                </a>
+            {% endif %}
+            {% if batch_edit_options %}
+                {% if batch_edit_options|length > 1 %}
+                    <div class="btn-group" role="group" aria-label="batch edit">
+                {% endif %}
+                {% for option in batch_edit_options %}
+                    <button class="btn btn-default" id="open-batch-edit" batcheditoptionid="{{ option.id }}"
+                       data-toggle="modal" data-target="#batchEditModal-{{ option.id }}"
+                            onclick="batch_edit_option = '{{ option.id }}'">
+                      <span class="glyphicon glyphicon-list"></span> {{ option.label }}
+                    </button>
+                    {% include 'batcheditmodal.html' %}
+                {% endfor %}
+                {% if batch_edit_options|length > 1 %}
+                    </div>
+                {% endif %}
+            {% endif %}
+
+            {% if export %}
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                        <span class="glyphicon glyphicon-export"></span> Export
+                    <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        {% for format, name in export.items %}
+                            <li><a href="?_export={{ format }}">{{ name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            {% if map_url %}
+                <a href="{{ map_url }}" class="btn btn-default" id="map_url">
+                  <span class="glyphicon glyphicon-map-marker"></span> Map
+                </a>
+            {% endif %}
+        </div>
         <div class="small">Displaying {{ filter.qs.count }} of {{ filter.queryset.count }}</div>
     </div>
 </div>
@@ -168,31 +124,6 @@
 
   </div>
 </div>
-
-{% if batch_edit_options %}
-<!-- Batch Edit Modal -->
-<div id="batchEditModal" class="modal fade" role="dialog">
-  <div class="modal-dialog">
-
-    <!-- Modal content-->
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title"><span class="glyphicon glyphicon-list"></span>
-            {% trans "Add relations to selected " %}
-            {% if object_name_plural %}
-                {{ object_name_plural|title }}
-            {% else %}
-                {{ object_name|title }}s
-            {% endif %}
-        </h4>
-      </div>
-      <div id="batcheditformcontainer"></div>
-    </div>
-
-  </div>
-</div>
-{% endif %}
 
 {% if addanother_person_form %}
 <!-- Add another Modal -->

@@ -221,6 +221,8 @@ urlpatterns = [
     path(r'editions/delete/<uuid:pk>',
          permission_required('items.delete_edition')(EditionDeleteView.as_view()),
          name="delete_edition"),
+    path(r'editions/setplace/', permission_required('global.view_all')(set_publication_place_for_items),
+         name="set_editionplace"),
 
     # Publisher urls
     path('publishers/', permission_required('global.view_all')(PublisherTableView.as_view()), name='publishers'),

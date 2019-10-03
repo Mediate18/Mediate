@@ -142,6 +142,12 @@ class ItemTableView(ListView):
                 'label': _("Add person"),
                 'url': reverse_lazy('add_persontoitems'),
                 'form_set': PersonItemRelationAddFormSet
+            },
+            {
+                'id': 'set_editionplace',
+                'label': _("Set publication place"),
+                'url': reverse_lazy('set_editionplace'),
+                'form': EditionPlaceForm
             }
         ]
 
@@ -996,6 +1002,28 @@ def add_person_to_items(request):
                 else:
                     messages.add_message(request, messages.ERROR,
                                 _("Item {} could not be used for adding a person.".format(item)))
+
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    else:
+        raise Http404
+
+
+def set_publication_place_for_items(request):
+    """
+    Set the publication place (= Edition.place) for a list of items
+    :param request:
+    :return:
+    """
+    if request.method == 'POST':
+        if 'items' in request.POST:
+            items = request.POST.getlist('items')
+            for item_id in items:
+                item = Item.objects.get(uuid=item_id)
+                if not item.edition:
+                    item.edition = Edition()
+                    item.save()
+                item.edition.place = Place.objects.get(uuid=request.POST['place'])
+                item.edition.save()
 
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
     else:

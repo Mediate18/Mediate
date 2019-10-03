@@ -228,6 +228,18 @@ class PersonItemRelationAddForm(forms.ModelForm):
         js = ('js/viaf_select.js',)
 
 
+class EditionPlaceForm(forms.ModelForm):
+    class Meta:
+        model = Edition
+        fields = ['place']
+        widgets = {
+            'place': ModelSelect2Widget(
+                model=Place,
+                search_fields=['name__icontains']
+            )
+        }
+
+
 class PersonItemRelationRoleModelForm(forms.ModelForm):
     class Meta:
         model = PersonItemRelationRole
