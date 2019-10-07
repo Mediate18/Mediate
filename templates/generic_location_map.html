@@ -70,20 +70,23 @@
 var objects_url = "{% url objects_url_name %}";
 
 function stratify_object_count(object_count) {
-    if(object_count < 10) {
-        return 5;
-    }
-    if(object_count < 50) {
-        return 10;
-    }
     if(object_count < 100) {
-        return 15;
+        return 2;
     }
     if(object_count < 500) {
-        return 20;
+        return 5;
     }
     if(object_count < 1000) {
-        return 25
+        return 10;
+    }
+    if(object_count < 2000) {
+        return 15;
+    }
+    if(object_count < 3000) {
+        return 20;
+    }
+    if(object_count < 4000) {
+        return 25;
     }
     if(object_count < 5000) {
         return 30;
