@@ -1023,14 +1023,17 @@ def set_publication_place_for_items(request):
     if request.method == 'POST':
         if 'items' in request.POST:
             items = request.POST.getlist('items')
-            for item_id in items:
-                item = Item.objects.get(uuid=item_id)
-                if not item.edition:
-                    item.edition = Edition()
-                    item.save()
-                item.edition.place = Place.objects.get(uuid=request.POST['place'])
-                item.edition.save()
-
+            publicationplaceform = EditionPlaceForm(data=request.POST)
+            if publicationplaceform.is_valid():
+                for item_id in items:
+                    item = Item.objects.get(uuid=item_id)
+                    if not item.edition:
+                        item.edition = Edition()
+                        item.save()
+                    item.edition.place = publicationplaceform.cleaned_data['place']
+                    item.edition.save()
+            else:
+                messages.add_message(request, messages.WARNING, _("The Place form was invalid."))
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
     else:
         raise Http404
@@ -1051,6 +1054,8 @@ def set_bookformat_for_items(request):
                     item = Item.objects.get(uuid=item_id)
                     item.book_format = itemformatform.cleaned_data['book_format']
                     item.save()
+            else:
+                messages.add_message(request, messages.WARNING, _("The Book Format form was invalid."))
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
     else:
         raise Http404
