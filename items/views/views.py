@@ -150,6 +150,12 @@ class ItemTableView(ListView):
                 'form': EditionPlaceForm
             },
             {
+                'id': 'set_publisher',
+                'label': _("Set publisher"),
+                'url': reverse_lazy('set_publisher'),
+                'form': PublisherForm
+            },
+            {
                 'id': 'set_bookformat',
                 'label': _("Set book format"),
                 'url': reverse_lazy('set_bookformat'),
@@ -1056,6 +1062,40 @@ def set_bookformat_for_items(request):
                     item.save()
             else:
                 messages.add_message(request, messages.WARNING, _("The Book Format form was invalid."))
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    else:
+        raise Http404
+
+
+def set_publisher_for_items(request):
+    """
+    Set the publisher (= Edition.publisher) for a list of items
+    :param request:
+    :return:
+    """
+    if request.method == 'POST':
+        print('1')
+        if 'items' in request.POST:
+            print('2')
+            items = request.POST.getlist('items')
+            publisherform = PublisherForm(data=request.POST)
+            if publisherform.is_valid():
+                print('3')
+                for item_id in items:
+                    print('4')
+                    item = Item.objects.get(uuid=item_id)
+                    if not item.edition:
+                        print('5')
+                        item.edition = Edition()
+                        item.save()
+                    try:
+                        publisher = Publisher(edition=item.edition, publisher=publisherform.cleaned_data['publisher'])
+                        publisher.save()
+                    except IntegrityError:
+                        # Unique constraint failed; the Publisher already exists
+                        pass
+            else:
+                messages.add_message(request, messages.WARNING, _("The Publisher form was invalid."))
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
     else:
         raise Http404

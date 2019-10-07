@@ -356,11 +356,11 @@ h1 {
 /* END TABLE SORTING */
 
 .select2, input[type="text"] {
-  min-width: 500px;
+  min-width: 490px;
 }
 
 .select2-container {
-  min-width: 500px;
+  min-width: 490px;
 }
 
 .select2-selection {

@@ -252,6 +252,18 @@ class ItemFormatForm(forms.ModelForm):
         }
 
 
+class PublisherForm(forms.ModelForm):
+    class Meta:
+        model = Publisher
+        fields = ['publisher']
+        widgets = {
+            'publisher': ModelSelect2Widget(
+                model=Person,
+                search_fields=['short_name', 'surname', 'first_names']
+            )
+        }
+
+
 class PersonItemRelationRoleModelForm(forms.ModelForm):
     class Meta:
         model = PersonItemRelationRole
