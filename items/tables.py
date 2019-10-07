@@ -428,6 +428,8 @@ class PersonItemRelationRoleTable(tables.Table):
 # Edition table
 class EditionTable(tables.Table):
     uuid = ActionColumn('edition_detail', 'change_edition', 'delete_edition', orderable=False)
+    checkbox = tables.CheckBoxColumn(empty_values=(), orderable=False,
+                                     attrs={'th__input': {'id': 'checkbox_column', 'title': 'Select/deselect all'}})
     items = tables.Column(empty_values=(), verbose_name=_("Items"))
     place = tables.RelatedLinkColumn()
     url = tables.Column(linkify=lambda record: record.url)
@@ -444,7 +446,8 @@ class EditionTable(tables.Table):
             'place',
             'url',
             'publisher',
-            'uuid'
+            'uuid',
+            'checkbox'
         ]
 
     def render_items(self, record):
@@ -461,6 +464,11 @@ class EditionTable(tables.Table):
             ", ".join(
                 ['<a href="{}">{}</a>'.format(publisher.get_absolute_url(), publisher) for publisher in publishers]
             )
+        )
+
+    def render_checkbox(self, record):
+        return format_html(
+            '<input id="{}" class="checkbox" type="checkbox" name="checkbox"/>'.format(record.uuid)
         )
 
 

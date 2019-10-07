@@ -225,8 +225,10 @@ urlpatterns = [
          name="delete_edition"),
     path(r'editions/setplace/', permission_required('items.change_edition')(set_publication_place_for_items),
          name="set_editionplace"),
-    path(r'editions/setpublisher', permission_required('items.change_edition')(set_publisher_for_items),
+    path(r'editions/setpublisher', permission_required('items.add_publisher')(set_publisher_for_items),
          name="set_publisher"),
+    path(r'editions/setpublisherforedition', permission_required('items.add_publisher')(set_publisher_for_editions),
+         name="set_publisher_for_editions"),
 
     # Publisher urls
     path('publishers/', permission_required('global.view_all')(PublisherTableView.as_view()), name='publishers'),

@@ -47,7 +47,7 @@ $(document).ready(function(){
                 $('#form_'+batch_edit_option).append($('<input>', {
                     class: "selected-entry",
                     type: 'hidden',
-                    name: "items",
+                    name: "entries",
                     value: entry
                 }));
             });

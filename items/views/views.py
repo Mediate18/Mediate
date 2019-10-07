@@ -994,8 +994,8 @@ def add_person_to_items(request):
     :return: 
     """
     if request.method == 'POST':
-        if 'items' in request.POST:
-            items = request.POST.getlist('items')
+        if 'entries' in request.POST:
+            items = request.POST.getlist('entries')
             for item_id in items:
                 item = Item.objects.get(uuid=item_id)
                 form_set = PersonItemRelationAddFormSet(data=request.POST)
@@ -1027,8 +1027,8 @@ def set_publication_place_for_items(request):
     :return:
     """
     if request.method == 'POST':
-        if 'items' in request.POST:
-            items = request.POST.getlist('items')
+        if 'entries' in request.POST:
+            items = request.POST.getlist('entries')
             publicationplaceform = EditionPlaceForm(data=request.POST)
             if publicationplaceform.is_valid():
                 for item_id in items:
@@ -1052,8 +1052,8 @@ def set_bookformat_for_items(request):
     :return: 
     """
     if request.method == 'POST':
-        if 'items' in request.POST:
-            items = request.POST.getlist('items')
+        if 'entries' in request.POST:
+            items = request.POST.getlist('entries')
             itemformatform = ItemFormatForm(data=request.POST)
             if itemformatform.is_valid():
                 for item_id in items:
@@ -1074,8 +1074,8 @@ def set_publisher_for_items(request):
     :return:
     """
     if request.method == 'POST':
-        if 'items' in request.POST:
-            items = request.POST.getlist('items')
+        if 'entries' in request.POST:
+            items = request.POST.getlist('entries')
             publisherform = PublisherForm(data=request.POST)
             if publisherform.is_valid():
                 for item_id in items:
@@ -1085,6 +1085,36 @@ def set_publisher_for_items(request):
                         item.save()
                     try:
                         publisher = Publisher(edition=item.edition, publisher=publisherform.cleaned_data['publisher'])
+                        publisher.save()
+                    except IntegrityError:
+                        # Unique constraint failed; the Publisher already exists
+                        pass
+            else:
+                messages.add_message(request, messages.WARNING, _("The Publisher form was invalid."))
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    else:
+        raise Http404
+
+
+def set_publisher_for_editions(request):
+    """
+    Set the publisher for a list of editions
+    :param request:
+    :return:
+    """
+    if request.method == 'POST':
+        print(1)
+        print(request.POST)
+        if 'entries' in request.POST:
+            print(2)
+            editions = request.POST.getlist('entries')
+            publisherform = PublisherForm(data=request.POST)
+            if publisherform.is_valid():
+                print(3)
+                for edition_id in editions:
+                    edition = Edition.objects.get(uuid=edition_id)
+                    try:
+                        publisher = Publisher(edition=edition, publisher=publisherform.cleaned_data['publisher'])
                         publisher.save()
                     except IntegrityError:
                         # Unique constraint failed; the Publisher already exists
@@ -1177,6 +1207,14 @@ class EditionTableView(ListView):
         context['action'] = _("add")
         context['object_name'] = "edition"
         context['add_url'] = reverse_lazy('add_edition')
+        context['batch_edit_options'] = [
+            {
+                'id': 'set_publisher',
+                'label': _("Set publisher"),
+                'url': reverse_lazy('set_publisher_for_editions'),
+                'form': PublisherForm
+            },
+        ]
 
         return context
 
