@@ -1074,18 +1074,13 @@ def set_publisher_for_items(request):
     :return:
     """
     if request.method == 'POST':
-        print('1')
         if 'items' in request.POST:
-            print('2')
             items = request.POST.getlist('items')
             publisherform = PublisherForm(data=request.POST)
             if publisherform.is_valid():
-                print('3')
                 for item_id in items:
-                    print('4')
                     item = Item.objects.get(uuid=item_id)
                     if not item.edition:
-                        print('5')
                         item.edition = Edition()
                         item.save()
                     try:
