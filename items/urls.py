@@ -31,6 +31,8 @@ urlpatterns = [
     path(r'items/delete/<uuid:pk>', permission_required('items.delete_item')(ItemDeleteView.as_view()),
        name="delete_item"),
     path('items/map', permission_required('global.view_all')(ItemLocationMapView.as_view()), name='itemsmap'),
+    path('items/set_bookformat', permission_required('items.change_item')(set_bookformat_for_items),
+         name='set_bookformat'),
 
     # Tagged Item urls
     path('taggeditems/', login_required(TaggedItemTableView.as_view()), name='taggeditems'),

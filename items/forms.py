@@ -240,6 +240,18 @@ class EditionPlaceForm(forms.ModelForm):
         }
 
 
+class ItemFormatForm(forms.ModelForm):
+    class Meta:
+        model = Item
+        fields = ['book_format']
+        widgets = {
+            'book_format': ModelSelect2Widget(
+                model=BookFormat,
+                search_fields=['name']
+            )
+        }
+
+
 class PersonItemRelationRoleModelForm(forms.ModelForm):
     class Meta:
         model = PersonItemRelationRole

@@ -148,6 +148,12 @@ class ItemTableView(ListView):
                 'label': _("Set publication place"),
                 'url': reverse_lazy('set_editionplace'),
                 'form': EditionPlaceForm
+            },
+            {
+                'id': 'set_bookformat',
+                'label': _("Set book format"),
+                'url': reverse_lazy('set_bookformat'),
+                'form': ItemFormatForm
             }
         ]
 
@@ -1025,6 +1031,26 @@ def set_publication_place_for_items(request):
                 item.edition.place = Place.objects.get(uuid=request.POST['place'])
                 item.edition.save()
 
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    else:
+        raise Http404
+
+
+def set_bookformat_for_items(request):
+    """
+    Set the book_format for a list of items
+    :param request: 
+    :return: 
+    """
+    if request.method == 'POST':
+        if 'items' in request.POST:
+            items = request.POST.getlist('items')
+            itemformatform = ItemFormatForm(data=request.POST)
+            if itemformatform.is_valid():
+                for item_id in items:
+                    item = Item.objects.get(uuid=item_id)
+                    item.book_format = itemformatform.cleaned_data['book_format']
+                    item.save()
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
     else:
         raise Http404
