@@ -247,9 +247,10 @@ class Edition(models.Model):
         str_elements = []
         if self.place:
             str_elements.append("{}".format(self.place.name))
-        publishers = Publisher.objects.filter(edition=self)
-        if publishers and publishers[0].publisher.short_name:
-            str_elements.append(publishers[0].publisher.short_name)
+        publishers = [publisher.publisher.short_name for publisher in Publisher.objects.filter(edition=self)
+                      if publisher.publisher.short_name]
+        if publishers:
+            str_elements += publishers
         if self.year:
             str_elements.append("{}".format(self.year))
         published_str = ", ".join(str_elements)if str_elements else _("Empty edition").format()

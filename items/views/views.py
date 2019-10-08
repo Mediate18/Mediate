@@ -146,13 +146,13 @@ class ItemTableView(ListView):
             {
                 'id': 'set_editionplace',
                 'label': _("Set publication place"),
-                'url': reverse_lazy('set_editionplace'),
+                'url': reverse_lazy('set_editionplace_for_items'),
                 'form': EditionPlaceForm
             },
             {
                 'id': 'set_publisher',
                 'label': _("Set publisher"),
-                'url': reverse_lazy('set_publisher'),
+                'url': reverse_lazy('set_publisher_for_items'),
                 'form': PublisherForm
             },
             {

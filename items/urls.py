@@ -223,13 +223,13 @@ urlpatterns = [
     path(r'editions/delete/<uuid:pk>',
          permission_required('items.delete_edition')(EditionDeleteView.as_view()),
          name="delete_edition"),
-    path(r'editions/setplace/', permission_required('items.change_edition')(set_publication_place_for_items),
-         name="set_editionplace"),
+    path(r'editions/setplaceforitems', permission_required('items.change_edition')(set_publication_place_for_items),
+         name="set_editionplace_for_items"),
     path(r'editions/setplaceforeditions/', permission_required('items.change_edition')(set_publication_place_for_editions),
          name="set_editionplace_for_editions"),
-    path(r'editions/setpublisher', permission_required('items.add_publisher')(set_publisher_for_items),
-         name="set_publisher"),
-    path(r'editions/setpublisherforedition', permission_required('items.add_publisher')(set_publisher_for_editions),
+    path(r'editions/setpublisherforitems', permission_required('items.add_publisher')(set_publisher_for_items),
+         name="set_publisher_for_items"),
+    path(r'editions/setpublisherforeditions', permission_required('items.add_publisher')(set_publisher_for_editions),
          name="set_publisher_for_editions"),
 
     # Publisher urls
