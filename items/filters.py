@@ -114,6 +114,16 @@ class ItemFilter(django_filters.FilterSet):
         method='person_role_filter',
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"})
     )
+    language = django_filters.ModelMultipleChoiceFilter(
+        label='Language',
+        queryset=Language.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Language,
+            search_fields=['name__icontains', 'language_code_2char__iexact', 'language_code_3char__iexact']
+        ),
+        method='language_filter'
+    )
 
     class Meta:
         model = Item
@@ -188,6 +198,12 @@ class ItemFilter(django_filters.FilterSet):
                 queryset = queryset.filter(personitemrelation__person__uuid=person_id, personitemrelation__role__uuid=role_id)
             return queryset
         return queryset
+
+    def language_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(languages__language__in=value)
+        return queryset
+
 
 
 # ItemAuthor filter
