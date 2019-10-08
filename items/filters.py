@@ -60,7 +60,7 @@ class ItemFilter(django_filters.FilterSet):
         method='edition_isempty_filter'
     )
     edition_place = django_filters.ModelMultipleChoiceFilter(
-        label="Place of publication",
+        label="Stated place of publication",
         queryset=Place.objects.all(),
         widget=ModelSelect2MultipleWidget(
             attrs={'data-placeholder': "Select multiple"},
