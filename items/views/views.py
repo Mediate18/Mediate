@@ -1096,6 +1096,28 @@ def set_publisher_for_items(request):
         raise Http404
 
 
+def set_publication_place_for_editions(request):
+    """
+    Set the publication place for a list of editions
+    :param request:
+    :return:
+    """
+    if request.method == 'POST':
+        if 'entries' in request.POST:
+            editions = request.POST.getlist('entries')
+            publicationplaceform = EditionPlaceForm(data=request.POST)
+            if publicationplaceform.is_valid():
+                for edition_id in editions:
+                    edition = Edition.objects.get(uuid=edition_id)
+                    edition.place = publicationplaceform.cleaned_data['place']
+                    edition.save()
+            else:
+                messages.add_message(request, messages.WARNING, _("The Place form was invalid."))
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    else:
+        raise Http404
+
+
 def set_publisher_for_editions(request):
     """
     Set the publisher for a list of editions
@@ -1208,6 +1230,12 @@ class EditionTableView(ListView):
         context['object_name'] = "edition"
         context['add_url'] = reverse_lazy('add_edition')
         context['batch_edit_options'] = [
+            {
+                'id': 'set_editionplace',
+                'label': _("Set publication place"),
+                'url': reverse_lazy('set_editionplace_for_editions'),
+                'form': EditionPlaceForm
+            },
             {
                 'id': 'set_publisher',
                 'label': _("Set publisher"),

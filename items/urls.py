@@ -225,6 +225,8 @@ urlpatterns = [
          name="delete_edition"),
     path(r'editions/setplace/', permission_required('items.change_edition')(set_publication_place_for_items),
          name="set_editionplace"),
+    path(r'editions/setplaceforeditions/', permission_required('items.change_edition')(set_publication_place_for_editions),
+         name="set_editionplace_for_editions"),
     path(r'editions/setpublisher', permission_required('items.add_publisher')(set_publisher_for_items),
          name="set_publisher"),
     path(r'editions/setpublisherforedition', permission_required('items.add_publisher')(set_publisher_for_editions),
