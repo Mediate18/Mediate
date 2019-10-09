@@ -247,7 +247,7 @@ class ItemFormatForm(forms.ModelForm):
         widgets = {
             'book_format': ModelSelect2Widget(
                 model=BookFormat,
-                search_fields=['name']
+                search_fields=['name__icontains']
             )
         }
 
@@ -259,7 +259,7 @@ class PublisherForm(forms.ModelForm):
         widgets = {
             'publisher': ModelSelect2Widget(
                 model=Person,
-                search_fields=['short_name', 'surname', 'first_names']
+                search_fields=['short_name__icontains', 'surname__icontains', 'first_names__icontains']
             )
         }
 
