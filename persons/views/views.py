@@ -146,8 +146,10 @@ class PersonCreateView(CreateView):
         if self.request.POST:
             context['alternativepersonnames'] = AlternativePersonNameFormSet(self.request.POST,
                                                                                    instance=self.object)
+            context['residences'] = ResidenceFormSet(self.request.POST, instance=self.object)
         else:
             context['alternativepersonnames'] = AlternativePersonNameFormSet(instance=self.object)
+            context['residences'] = ResidenceFormSet(instance=self.object)
         return context
 
     def post(self, request, *args, **kwargs):
@@ -171,11 +173,15 @@ class PersonCreateView(CreateView):
         if form.is_valid():
             context = self.get_context_data()
             alternativepersonnames = context['alternativepersonnames']
+            residences = context['residences']
             with transaction.atomic():
                 self.object = form.save()
                 if alternativepersonnames and alternativepersonnames.is_valid():
                     alternativepersonnames.instance = self.object
                     alternativepersonnames.save()
+                if residences and residences.is_valid():
+                    residences.instance = self.object
+                    residences.save()
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
@@ -203,6 +209,7 @@ class PersonCreateViewSimple(PersonCreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['alternativepersonnames'] = None
+        context['residences'] = None
         return context
 
 @moderate()
@@ -246,7 +253,6 @@ class PersonUpdateView(UpdateView):
             alternativepersonnames = context['alternativepersonnames']
             residences = context['residences']
             with transaction.atomic():
-                print("Form city_of_birth", form.cleaned_data['city_of_birth'])
                 self.object = form.save()
                 if alternativepersonnames.is_valid():
                     alternativepersonnames.instance = self.object
