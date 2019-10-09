@@ -20,23 +20,51 @@
                         {{ form.as_table }}
                     {% endif %}
             </table>
+            <hr/>
+            <h3>{% trans "Alternative names" %}</h3>
             {% if alternativepersonnames %}
                 {{ alternativepersonnames.management_form }}
-                <div id="form_set">
+                <div id="form_set_alternativepersonnames">
                     {% for form in alternativepersonnames %}
                         <h5>Alternative name {{ forloop.counter0|add:1 }}</h5>
                         <table class="table">
                             {{ form.as_table }}
                         </table>
                     {% endfor %}
-                    <div id="empty_form" style="display:none">
+                    <div id="empty_form_alternativepersonnames" style="display:none">
                         <h5>Alternative name __prefixplusone__</h5>
                         <table class='table'>
                             {{ alternativepersonnames.empty_form }}
                         </table>
                     </div>
                 </div>
-                <input type="button" class="btn btn-default" value="Add another relation" id="add_more">
+                <button type="button" class="btn btn-default" id="add_more_alternativepersonnames"
+                title="Add another alternative person name">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </button>
+            {% endif %}
+            <hr/>
+            <h3>{% trans "Residences" %}</h3>
+            {% if residences %}
+                {{ residences.management_form }}
+                <div id="form_set_residences">
+                    {% for form in residences %}
+                        <h5>Residence {{ forloop.counter0|add:1 }}</h5>
+                        <table class="table">
+                            {{ form.as_table }}
+                        </table>
+                    {% endfor %}
+                    <div id="empty_form_residences" style="display:none">
+                        <h5>Residence __prefixplusone__</h5>
+                        <table class='table'>
+                            {{ residences.empty_form }}
+                        </table>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-default" id="add_more_residences"
+                title="Add another residence">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </button>
             {% endif %}
             <div class="pull-right">
                 <input type="submit" class="btn" value="{% trans 'Save' %}"/>
@@ -64,18 +92,32 @@ $(document).ready(function(){
 </script>
 <script>
 $(document).ready(function(){
-    // Dynamically add a form to the form set
-    $('#add_more').click(function() {
+    // Dynamically add a Alternative names form to the form set
+    $('#add_more_alternativepersonnames').click(function() {
         var form_idx = $('#id_alternative_names-TOTAL_FORMS').val();
-        $('#form_set').append($('#empty_form').html()
+        $('#form_set_alternativepersonnames').append($('#empty_form_alternativepersonnames').html()
             .replace(/__prefix__/g, form_idx)
             .replace(/__prefixplusone__/g, parseInt(form_idx) + 1));
-        $('#form_set').find('select').djangoSelect2();
+        $('#form_set_alternativepersonnames').find('select').djangoSelect2();
 
         // Workaround for the fact that djangoSelect2() as used above duplicates the selects.
-        $('#form_set').find('select ~ span:nth-of-type(2)').hide();
+        $('#form_set_alternativepersonnames').find('select ~ span:nth-of-type(2)').hide();
 
         $('#id_alternative_names-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+    });
+
+    // Dynamically add a Alternative names form to the form set
+    $('#add_more_residences').click(function() {
+        var form_idx = $('#id_residence_set-TOTAL_FORMS').val();
+        $('#form_set_residences').append($('#empty_form_residences').html()
+            .replace(/__prefix__/g, form_idx)
+            .replace(/__prefixplusone__/g, parseInt(form_idx) + 1));
+        $('#form_set_residences').find('select').djangoSelect2();
+
+        // Workaround for the fact that djangoSelect2() as used above duplicates the selects.
+        $('#form_set_residences').find('select ~ span:nth-of-type(2)').hide();
+
+        $('#id_residence_set-TOTAL_FORMS').val(parseInt(form_idx) + 1);
     });
 });
 </script>

@@ -182,5 +182,16 @@ class ResidenceModelForm(forms.ModelForm):
     class Meta:
         model = Residence
         fields = "__all__"
+        widgets = {
+            'person': ModelSelect2Widget(
+                model=Person,
+                search_fields=['short_name__icontains', 'surname__icontains', 'first_names__icontains']
+            ),
+            'place': ModelSelect2Widget(
+                model=Place,
+                search_fields=['name__icontains']
+            )
+        }
 
 
+ResidenceFormSet = inlineformset_factory(Person, Residence, form=ResidenceModelForm, can_delete=True, extra=1)
