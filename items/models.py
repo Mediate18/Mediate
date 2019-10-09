@@ -148,6 +148,10 @@ class Item(models.Model):
         super().delete(using=using, keep_parents=keep_parents)
         self.edition.delete()
 
+    def get_other_items_in_lot(self):
+        return Item.objects.prefetch_related('edition')\
+            .filter(lot=self.lot).exclude(index_in_lot=self.index_in_lot).order_by('index_in_lot')
+
 
 class ItemType(models.Model):
     """

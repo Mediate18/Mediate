@@ -1,0 +1,68 @@
+{% extends extended_layout|default:"baselayout.html" %}
+{% load i18n %}
+
+
+{% block extracss %}
+{{ form.media.css }}
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-xs-12">
+        <h1>{% trans action|title %} {% trans object_name %}</h1>
+    </div>
+    <div class="col-xs-6">
+        <form action="{{ request.path }}?next={{ next_url }}" method="post" enctype="multipart/form-data">
+            <table class="table">
+                {% csrf_token %}
+                    {% if form_as == 'p' %}
+                        {{ form.as_p }}
+                    {% else %}
+                        {{ form.as_table }}
+                    {% endif %}
+            </table>
+            <div class="pull-right">
+                <input type="submit" class="btn" value="{% trans 'Save' %}"/>
+                {% if next_url %}
+                    <a href="{{ next_url }}">{% trans 'Cancel' %}</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+    <div class="col-xs-6">
+        <h4>{% trans "Other items in the same lot" %}</h4>
+        <table class="table">
+            <tr>
+                <th>{% trans "Index in lot" %}</th>
+                <th>{% trans "Short title" %}</th>
+                <th>{% trans "Place of publication" %}</th>
+                <th>{% trans "Year of publication" %}</th>
+            </tr>
+            {% for item in object.get_other_items_in_lot %}
+                <tr>
+                    <td>{{ item.index_in_lot }}</td>
+                    <td>{{ item.short_title }}</td>
+                    <td>{% if item.edition.place %}{{ item.edition.place }}{% endif %}</td>
+                    <td>{% if item.edition.year %}{{ item.edition.year }}{% endif %}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    {% if js_variables %}
+        js_variables = {{ js_variables|safe }}
+    {% endif %}
+</script>
+{{ form.media.js }}
+<script>
+$(document).ready(function(){
+        $('.django-select2').djangoSelect2({placeholder: 'Select an option'});
+});
+</script>
+{% endblock %}

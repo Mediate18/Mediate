@@ -361,10 +361,12 @@ h1 {
 
 .select2-container {
   min-width: 490px;
+  max-width: 500px;
 }
 
 .select2-selection {
   outline: 0;
+  max-width: 500px;
 }
 
 .expand-cell {
