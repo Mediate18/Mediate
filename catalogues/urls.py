@@ -24,6 +24,8 @@ urlpatterns = [
        name="delete_catalogue"),
     path('catalogues/map', permission_required('global.view_all')(CatalogueLocationMapView.as_view()),
          name='cataloguesmap'),
+    path(r'previouslot/<uuid:pk>/<int:index>', permission_required('global.view_all')(previous_lot_view),
+         name='get_previous_lot'),
 
 
     # CatalogueHeldBy urls

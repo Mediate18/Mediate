@@ -4,6 +4,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 from django.db.models import Count, Min, Max
+from django.http import JsonResponse
 
 from mediate.tools import put_layout_in_context, put_get_variable_in_context
 from mediate.views import GenericDetailView
@@ -600,6 +601,20 @@ class LotUpdateView(UpdateView):
 class LotDeleteView(DeleteView):
     model = Lot
     success_url = reverse_lazy('lots')
+
+
+def previous_lot_view(request, pk, index):
+    try:
+        lot = Lot.objects.get(catalogue__uuid=pk, index_in_catalogue=index)
+        return JsonResponse({
+            'success': True,
+            'lot_as_listed_in_catalogue': lot.lot_as_listed_in_catalogue,
+            'index_in_catalogue': lot.index_in_catalogue
+        })
+    except:
+        return JsonResponse({
+            'success': False
+        })
 
 
 # PersonCatalogueRelation views

@@ -380,3 +380,11 @@ h1 {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.panel-body {
+    font-size: 13px;
+}
+
+.panel-body td {
+    font-weight: 500;
+}
