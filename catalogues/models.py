@@ -146,6 +146,13 @@ class Lot(models.Model):
     def get_absolute_url(self):
         return reverse_lazy('lot_detail', args=[str(self.uuid)])
 
+    def get_previous_lots(self, number=4):
+        index_in_catalogue = self.index_in_catalogue
+        index_start = index_in_catalogue - number
+        index_end = index_in_catalogue - 1
+        return Lot.objects.filter(catalogue=self.catalogue, index_in_catalogue__gte=index_start,
+                                  index_in_catalogue__lte=index_end)
+
 
 class PersonCollectionRelation(models.Model):
     """

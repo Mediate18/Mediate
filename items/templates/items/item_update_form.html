@@ -12,7 +12,7 @@
     <div class="col-xs-12">
         <h1>{% trans action|title %} {% trans object_name %}</h1>
     </div>
-    <div class="col-xs-6">
+    <div class="col-lg-6">
         <form action="{{ request.path }}?next={{ next_url }}" method="post" enctype="multipart/form-data">
             <table class="table">
                 {% csrf_token %}
@@ -30,24 +30,64 @@
             </div>
         </form>
     </div>
-    <div class="col-xs-6">
-        <h4>{% trans "Other items in the same lot" %}</h4>
-        <table class="table">
-            <tr>
-                <th>{% trans "Index in lot" %}</th>
-                <th>{% trans "Short title" %}</th>
-                <th>{% trans "Place of publication" %}</th>
-                <th>{% trans "Year of publication" %}</th>
-            </tr>
-            {% for item in object.get_other_items_in_lot %}
-                <tr>
-                    <td>{{ item.index_in_lot }}</td>
-                    <td>{{ item.short_title }}</td>
-                    <td>{% if item.edition.place %}{{ item.edition.place }}{% endif %}</td>
-                    <td>{% if item.edition.year %}{{ item.edition.year }}{% endif %}</td>
-                </tr>
-            {% endfor %}
-        </table>
+    <div class="col-lg-6">
+        <div class="panel-group">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4>
+                    <a data-toggle="collapse" href="#previouslotspanel">{% trans "Previous lots" %}
+                    <span class="glyphicon glyphicon-chevron-down"></span></a>
+                </h4>
+            </div>
+            <div id="previouslotspanel" class="panel-collapse collapse">
+              <div class="panel-body">
+                <table class="table">
+                    <tr>
+                        <th>{% trans "Index in catalogue" %}</th>
+                        <th>{% trans "Lot text" %}</th>
+                    </tr>
+                    {% for lot in object.lot.get_previous_lots %}
+                    <tr>
+                        <td>{{ lot.index_in_catalogue }}</td>
+                        <td>{{ lot.lot_as_listed_in_catalogue}}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+              </div>
+            </div>
+          </div>
+        <div>
+            <p></p>
+        <div class="panel-group">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4>
+                    <a data-toggle="collapse" href="#otheritemspanel">{% trans "Other items in the same lot" %}
+                    <span class="glyphicon glyphicon-chevron-down"></span></a>
+                </h4>
+            </div>
+            <div id="otheritemspanel" class="panel-collapse collapse">
+              <div class="panel-body">
+                  <table class="table">
+                    <tr>
+                        <th>{% trans "Index in lot" %}</th>
+                        <th>{% trans "Short title" %}</th>
+                        <th>{% trans "Place of publication" %}</th>
+                        <th>{% trans "Year of publication" %}</th>
+                    </tr>
+                    {% for item in object.get_other_items_in_lot %}
+                        <tr>
+                            <td>{{ item.index_in_lot }}</td>
+                            <td>{{ item.short_title }}</td>
+                            <td>{% if item.edition.place %}{{ item.edition.place }}{% endif %}</td>
+                            <td>{% if item.edition.year %}{{ item.edition.year }}{% endif %}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            </div>
+          </div>
+        </div>
     </div>
 </div>
 
