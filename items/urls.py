@@ -33,6 +33,8 @@ urlpatterns = [
     path('items/map', permission_required('global.view_all')(ItemLocationMapView.as_view()), name='itemsmap'),
     path('items/set_bookformat', permission_required('items.change_item')(set_bookformat_for_items),
          name='set_bookformat'),
+    path('items/add_language_to_items', permission_required('items.add_itemlanguagerelation')(add_language_to_items),
+         name='add_language_to_items'),
 
     # Tagged Item urls
     path('taggeditems/', login_required(TaggedItemTableView.as_view()), name='taggeditems'),

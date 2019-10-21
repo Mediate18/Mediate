@@ -160,6 +160,12 @@ class ItemTableView(ListView):
                 'label': _("Set book format"),
                 'url': reverse_lazy('set_bookformat'),
                 'form': ItemFormatForm
+            },
+            {
+                'id': 'add_language',
+                'label': _("Add language"),
+                'url': reverse_lazy('add_language_to_items'),
+                'form': ItemLanguageFrom
             }
         ]
 
@@ -1091,6 +1097,33 @@ def set_publisher_for_items(request):
                         pass
             else:
                 messages.add_message(request, messages.WARNING, _("The Publisher form was invalid."))
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    else:
+        raise Http404
+
+
+def add_language_to_items(request):
+    """
+    Add language to a list of items
+    :param request: 
+    :return: 
+    """
+    if request.method == 'POST':
+        if 'entries' in request.POST:
+            items = request.POST.getlist('entries')
+            itemlanguageform = ItemLanguageFrom(data=request.POST)
+            if itemlanguageform.is_valid():
+                for item_id in items:
+                    item = Item.objects.get(uuid=item_id)
+                    try:
+                        itemlanguagerelation = ItemLanguageRelation(item=item,
+                                                                    language=itemlanguageform.cleaned_data['language'])
+                        itemlanguagerelation.save()
+                    except IntegrityError:
+                        # Unique constraint failed; the ItemLanguageRelation already exists
+                        pass
+            else:
+                messages.add_message(request, messages.WARNING, _("The ItemLanguage form was invalid."))
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
     else:
         raise Http404
