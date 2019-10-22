@@ -12,6 +12,8 @@ from django_tables2.export.export import TableExport
 from django.utils.translation import ugettext_lazy as _
 from django.utils.html import escape
 from django.shortcuts import get_object_or_404
+from django.db import transaction
+
 import django_tables2
 from guardian.shortcuts import get_objects_for_user
 
@@ -1619,6 +1621,7 @@ class ItemAndEditionCreateView(CreateView):
     form_class = ItemAndEditionForm
     template_name = 'generic_form.html'
     success_url = reverse_lazy('items')
+    success_msg = _("Added an item and a edition.")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1626,6 +1629,7 @@ class ItemAndEditionCreateView(CreateView):
         context['object_name'] = "item and edition"
         return context
 
+    @transaction.atomic
     def form_valid(self, form):
         # Save the edition first, because the item needs a edition before it
         # can be saved.
@@ -1633,14 +1637,14 @@ class ItemAndEditionCreateView(CreateView):
         item = form['item'].save(commit=False)
         item.edition = edition
         item.save()
-        messages.add_message(self.request, messages.SUCCESS,
-                             _("Added an item and a edition."))
+        messages.add_message(self.request, messages.SUCCESS, self.success_msg)
         return HttpResponseRedirect(self.success_url)
 
 
 class ItemAndEditionUpdateView(ItemAndEditionCreateView):
     model = Item
     template_name = 'items/item_update_form.html'
+    success_msg = _("Changed an item and a edition.")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

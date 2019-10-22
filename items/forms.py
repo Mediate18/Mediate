@@ -20,6 +20,7 @@ class ItemModelForm(forms.ModelForm):
         super().__init__(**kwargs)
         self.content_type = ContentType.objects.get_for_model(self.instance)
         self.add_tag_field()
+        self.add_languages_field()
 
     def add_tag_field(self):
         tag = forms.ModelMultipleChoiceField(
@@ -34,6 +35,18 @@ class ItemModelForm(forms.ModelForm):
                                        taggedentity__content_type=self.content_type)
         )
         self.fields['tag'] = tag
+
+    def add_languages_field(self):
+        languages = forms.ModelMultipleChoiceField(
+            widget=ModelSelect2MultipleWidget(
+                model=Language,
+                search_fields=['name__icontains', 'language_code_2char__iexact', 'language_code_3char__iexact'],
+            ),
+            queryset=Language.objects.all(),
+            required=False,
+            initial=Language.objects.filter(items__item=self.instance)
+        )
+        self.fields['languages'] = languages
 
     class Meta:
         model = Item
@@ -54,10 +67,10 @@ class ItemModelForm(forms.ModelForm):
             'work': Select2Widget,
         }
 
-    def save(self, commit=True):
+    def save_tags(self, commit=True):
         tags_in_form = self.cleaned_data['tag']
         existing_tags = Tag.objects.filter(taggedentity__object_id=self.instance.pk,
-                                       taggedentity__content_type=self.content_type)
+                                           taggedentity__content_type=self.content_type)
 
         # Delete tags that were removed in the form
         tags_to_delete = existing_tags.exclude(pk__in=tags_in_form.values_list('pk', flat=True))
@@ -68,6 +81,24 @@ class ItemModelForm(forms.ModelForm):
         new_tags = tags_in_form.exclude(pk__in=existing_tags.values_list('pk', flat=True))
         for tag in new_tags:
             self.instance.tags.create(tag=tag)
+
+    def save_languages(self, commit):
+        languages_in_form = self.cleaned_data['languages']
+        existing_languages = Language.objects.filter(items__item=self.instance)
+
+        # Delete languages that were removed in the form
+        languages_to_delete = existing_languages.exclude(pk__in=languages_in_form.values_list('pk', flat=True))
+        for language in languages_to_delete:
+            ItemLanguageRelation.objects.get(item=self.instance, language=language).delete()
+
+        # Add languages taht were added in the form
+        new_languages = languages_in_form.exclude(pk__in=existing_languages.values_list('pk', flat=True))
+        for language in new_languages:
+            ItemLanguageRelation(item=self.instance, language=language).save()
+
+    def save(self, commit=True):
+        self.save_tags(commit=commit)
+        self.save_languages(commit=commit)
 
         return super(ItemModelForm, self).save(commit=commit)
 
