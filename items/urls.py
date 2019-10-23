@@ -212,6 +212,9 @@ urlpatterns = [
            PersonItemRelationRoleDeleteView.as_view()),
        name="delete_personitemrelationrole"),
 
+    path(r'personroleautoresponse', permission_required('global.view_all')(PersonAndRoleAutocompleteView.as_view()),
+         name='personroleautoresponse'),
+
     # Edition urls
     path('editions/', permission_required('global.view_all')(EditionTableView.as_view()), name='editions'),
     path(r'editions/<uuid:pk>', permission_required('global.view_all')(EditionDetailView.as_view()),

@@ -13,9 +13,11 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.html import escape
 from django.shortcuts import get_object_or_404
 from django.db import transaction
+from django.db.models import Q
 
 import django_tables2
 from guardian.shortcuts import get_objects_for_user
+from django_select2.views import AutoResponseView
 
 from dal import autocomplete
 from django.http import JsonResponse
@@ -172,6 +174,38 @@ class ItemTableView(ListView):
         ]
 
         return context
+
+
+class PersonAndRoleAutocompleteView(AutoResponseView):
+    page_size = 10
+
+    def get(self, request, *args, **kwargs):
+        term = request.GET.get('term', '')
+        page = int(request.GET.get('page', 1))
+        begin = (page - 1) * self.page_size
+        end = page * self.page_size
+        person_query = Q(person__short_name__icontains=term)
+        role_query = Q(role__name__icontains=term)
+
+        person_item_relations = PersonItemRelation.objects.filter(person_query | role_query)\
+                                    .values('person', 'person__short_name', 'role', 'role__name')\
+                                    .distinct().order_by('person__short_name')[begin:end]
+
+        more = True
+        if len(person_item_relations) != self.page_size:
+            more = False
+
+        person_roles = [
+            {
+                'id': "{}|{}".format(rel['person'], rel['role']),
+                'text': "{} - {}".format(rel['person__short_name'], rel['role__name'])
+            }
+            for rel in person_item_relations
+        ]
+        return JsonResponse({
+            'results': person_roles,
+            'more': more
+        })
 
 
 class TaggedItemTableView(ListView):

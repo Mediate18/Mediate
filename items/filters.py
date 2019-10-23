@@ -2,12 +2,14 @@ import django_filters
 from django_filters.widgets import RangeWidget
 from django.db.models import Count
 from django.forms import CheckboxInput
-from django_select2.forms import ModelSelect2MultipleWidget, Select2MultipleWidget
+from django_select2.forms import ModelSelect2MultipleWidget, Select2MultipleWidget, HeavySelect2MultipleWidget
 from tagme.models import Tag
 from .models import *
 from catalogues.models import Catalogue
 from mediate.tools import filter_multiple_words
 from viapy.api import ViafAPI
+
+from django.urls import reverse_lazy
 
 
 # BookFormat filter
@@ -106,13 +108,12 @@ class ItemFilter(django_filters.FilterSet):
     )
     person_role = django_filters.MultipleChoiceFilter(
         label='Person and Role',
-        choices=[("{}|{}".format(rel['person'], rel['role']),
-                  "{} - {}".format(rel['person__short_name'], rel['role__name']))
-                 for rel in PersonItemRelation.objects.all()
-                     .values('person', 'person__short_name', 'role', 'role__name').distinct()
-                     .order_by('person__short_name')],
+        choices=[],
         method='person_role_filter',
-        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"})
+        widget=HeavySelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            data_view='personroleautoresponse'
+        )
     )
     language = django_filters.ModelMultipleChoiceFilter(
         label='Language',
