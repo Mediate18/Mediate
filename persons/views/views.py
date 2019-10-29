@@ -31,7 +31,7 @@ class PersonTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return Person.objects.all()
+        return Person.objects.all().distinct()
 
     def get_context_data(self, **kwargs):
         context = super(PersonTableView, self).get_context_data(**kwargs)
@@ -179,10 +179,14 @@ class PersonCreateView(CreateView):
                 if alternativepersonnames and alternativepersonnames.is_valid():
                     alternativepersonnames.instance = self.object
                     alternativepersonnames.save()
+                else:
+                    return self.form_invalid(form)
                 if residences and residences.is_valid():
                     residences.instance = self.object
                     residences.save()
-            return self.form_valid(form)
+                else:
+                    return self.form_invalid(form)
+                return self.form_valid(form)
         else:
             return self.form_invalid(form)
 
@@ -257,10 +261,14 @@ class PersonUpdateView(UpdateView):
                 if alternativepersonnames.is_valid():
                     alternativepersonnames.instance = self.object
                     alternativepersonnames.save()
+                else:
+                    return self.form_invalid(form)
                 if residences.is_valid():
                     residences.instance = self.object
                     residences.save()
-            return self.form_valid(form)
+                else:
+                    return self.form_invalid(form)
+                return self.form_valid(form)
         else:
             return self.form_invalid(form)
 
