@@ -29,7 +29,9 @@ class CerlSuggest(autocomplete.Select2ListView):
         return [dict(
                 id=item['id'],
                 id_number=item['id'],
-                text=item['name_display_line'] + " - <small>" + ", ".join(item['placeName']) + "</small>",
+                text=item['name_display_line'] + " - <small>"
+                     + ", ".join([str(name) for name in item['placeName'] if name])
+                     + "</small>",
                 nametype='',
                 external_url=cerl_record_url+item['id'],
                 url_type='Cerl',
