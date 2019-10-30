@@ -14,7 +14,7 @@ from mediate.columns import ActionColumn
 class CatalogueTable(tables.Table):
     uuid = ActionColumn('catalogue_detail', 'change_catalogue', 'delete_catalogue', orderable=False)
     types = tables.Column(empty_values=(), verbose_name="Type(s)")
-    owner = tables.Column(empty_values=())
+    owner = tables.Column(empty_values=(), orderable=False)
     number_of_lots = tables.Column(empty_values=(), orderable=False)
     number_of_items = tables.Column(empty_values=(), orderable=False)
     related_places = tables.Column(empty_values=(), verbose_name="Related places", orderable=False)
