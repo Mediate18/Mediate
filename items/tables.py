@@ -71,8 +71,8 @@ class ItemTable(tables.Table):
             '<div class="col-xs-1">'
             '<span class="expand-cell glyphicon glyphicon-chevron-down" title="Expand"></span>'
             '<span class="collapse-cell glyphicon glyphicon-chevron-up" title="Collapse"></span>'
-            '</div>'
-                .format(reverse_lazy('change_lot', args=[record.lot.uuid]), record.lot.lot_as_listed_in_catalogue)
+            '</div>',
+            reverse_lazy('change_lot', args=[record.lot.uuid]), record.lot.lot_as_listed_in_catalogue
         )
 
     def render_checkbox(self, record):
