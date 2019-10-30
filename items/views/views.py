@@ -718,7 +718,7 @@ class WorkAndVIAFSuggest(autocomplete.Select2ListView):
             work_result.append(obj_dict)
 
             if obj.viaf_id:
-                id_number = re.match(r'.*?(\d+)$', obj.viaf_id).group(1)
+                id_number = re.match(r'.*?(\d+)/?$', obj.viaf_id).group(1)
                 work_viaf_ids.add(id_number)
 
         viaf_result = VIAFSuggest.find_viaf(self.q, discard_viaf_ids=work_viaf_ids, json_output=False,
