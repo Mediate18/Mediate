@@ -32,7 +32,7 @@ class ItemTable(tables.Table):
     catalogue = tables.Column(empty_values=(), order_by='lot__catalogue__short_title')
     collection = tables.RelatedLinkColumn()
     number_of_volumes = tables.Column(empty_values=(), verbose_name=_('Number of volumes'))
-    material_details = tables.Column(empty_values=())
+    material_details = tables.Column(empty_values=(), orderable=False)
     edition = tables.LinkColumn()
     manage_works = tables.LinkColumn('add_workstoitem',
         text=format_html('<span class="glyphicon glyphicon-list" data-toggle="tooltip" data-original-title="Manage works"></span>'),
