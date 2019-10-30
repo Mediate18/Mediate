@@ -25,7 +25,7 @@ class ItemTable(tables.Table):
     uuid = ActionColumn('item_detail', 'change_item', 'delete_item', orderable=False)
     checkbox = tables.CheckBoxColumn(empty_values=(), orderable=False,
                                      attrs={'th__input': {'id': 'checkbox_column', 'title': 'Select/deselect all'}})
-    people = tables.Column(empty_values=())
+    people = tables.Column(empty_values=(), orderable=False)
     works = tables.Column(empty_values=(), verbose_name=_("Works"))
     lot = tables.Column(order_by='lot__lot_as_listed_in_catalogue', )
     sales_price = tables.Column(empty_values=(), order_by='lot__sales_price')
