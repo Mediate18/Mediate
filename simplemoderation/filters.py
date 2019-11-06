@@ -9,8 +9,8 @@ from .models import *
 class ModerationFilter(django_filters.FilterSet):
     editor = django_filters.ModelMultipleChoiceFilter(
         queryset=User.objects.filter(
-            Q(groups__permissions=Permission.objects.get(codename='add_moderation')) |
-            Q(user_permissions=Permission.objects.get(codename='add_moderation'))
+            Q(groups__permissions__codename='add_moderation') |
+            Q(user_permissions__codename='add_moderation')
         ).distinct(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
     )
@@ -36,8 +36,8 @@ class ModerationFilter(django_filters.FilterSet):
     )
     moderator = django_filters.ModelMultipleChoiceFilter(
         queryset=User.objects.filter(
-            Q(groups__permissions=Permission.objects.get(codename='change_moderation')) |
-            Q(user_permissions=Permission.objects.get(codename='change_moderation'))
+            Q(groups__permissions__codename='change_moderation') |
+            Q(user_permissions__codename='change_moderation')
         ).distinct(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
     )
