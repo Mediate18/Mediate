@@ -48,7 +48,8 @@ class ItemFilter(django_filters.FilterSet):
         widget=ModelSelect2MultipleWidget(
             attrs={'data-placeholder': "Select multiple"},
             model=Edition,
-            search_fields=['place__name__icontains', 'year__icontains', 'url__icontains']
+            search_fields=['place__name__icontains', 'year__icontains', 'url__icontains',
+                           'publisher__publisher__short_name__icontains']
         )
     )
     edition_isnull = django_filters.BooleanFilter(
