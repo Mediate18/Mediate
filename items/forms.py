@@ -67,7 +67,7 @@ class ItemModelForm(forms.ModelForm):
             'work': Select2Widget,
         }
 
-    def save_tags(self, commit=True):
+    def save_tags(self):
         tags_in_form = self.cleaned_data['tag']
         existing_tags = Tag.objects.filter(taggedentity__object_id=self.instance.pk,
                                            taggedentity__content_type=self.content_type)
@@ -82,7 +82,7 @@ class ItemModelForm(forms.ModelForm):
         for tag in new_tags:
             self.instance.tags.create(tag=tag)
 
-    def save_languages(self, commit):
+    def save_languages(self):
         languages_in_form = self.cleaned_data['languages']
         existing_languages = Language.objects.filter(items__item=self.instance)
 
@@ -94,13 +94,17 @@ class ItemModelForm(forms.ModelForm):
         # Add languages taht were added in the form
         new_languages = languages_in_form.exclude(pk__in=existing_languages.values_list('pk', flat=True))
         for language in new_languages:
-            ItemLanguageRelation(item=self.instance, language=language).save()
+            item = self.instance
+            pk = item.pk
+            ItemLanguageRelation(item=item, language=language).save()
 
     def save(self, commit=True):
-        self.save_tags(commit=commit)
-        self.save_languages(commit=commit)
+        self.instance = super(ItemModelForm, self).save(commit=commit)
+        if commit:
+            self.save_tags()
+            self.save_languages()
 
-        return super(ItemModelForm, self).save(commit=commit)
+        return self.instance
 
 
 class ItemAuthorModelForm(forms.ModelForm):
