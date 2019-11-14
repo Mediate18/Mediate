@@ -21,6 +21,7 @@ class ItemModelForm(forms.ModelForm):
         self.content_type = ContentType.objects.get_for_model(self.instance)
         self.add_tag_field()
         self.add_languages_field()
+        self.add_publishers_field()
 
     def add_tag_field(self):
         tag = forms.ModelMultipleChoiceField(
@@ -47,6 +48,18 @@ class ItemModelForm(forms.ModelForm):
             initial=Language.objects.filter(items__item=self.instance)
         )
         self.fields['languages'] = languages
+
+    def add_publishers_field(self):
+        publishers = forms.ModelMultipleChoiceField(
+            widget=ModelSelect2MultipleWidget(
+                model=Person,
+                search_fields=['short_name__icontains', 'first_names__icontains', 'surname__icontains'],
+            ),
+            queryset=Person.objects.all(),
+            required=False,
+            initial=Person.objects.filter(publisher__edition__items=self.instance)
+        )
+        self.fields['publishers'] = publishers
 
     class Meta:
         model = Item
@@ -95,14 +108,29 @@ class ItemModelForm(forms.ModelForm):
         new_languages = languages_in_form.exclude(pk__in=existing_languages.values_list('pk', flat=True))
         for language in new_languages:
             item = self.instance
-            pk = item.pk
             ItemLanguageRelation(item=item, language=language).save()
+            
+    def save_publishers(self):
+        persons_in_form = self.cleaned_data['publishers']
+        existing_persons = Person.objects.filter(publisher__edition__items=self.instance)
+
+        # Delete publishers that were removed in the form
+        persons_to_delete = existing_persons.exclude(pk__in=persons_in_form.values_list('pk', flat=True))
+        for person in persons_to_delete:
+            Publisher.objects.get(edition__items=self.instance, publisher=person).delete()
+
+        # Add publishers that were added in the form
+        new_persons = persons_in_form.exclude(pk__in=existing_persons.values_list('pk', flat=True))
+        for person in new_persons:
+            item = self.instance
+            Publisher(edition=item.edition, publisher=person).save()
 
     def save(self, commit=True):
         self.instance = super(ItemModelForm, self).save(commit=commit)
         if commit:
             self.save_tags()
             self.save_languages()
+            self.save_publishers()
 
         return self.instance
 

@@ -1671,8 +1671,12 @@ class ItemAndEditionCreateView(CreateView):
         item = form['item'].save(commit=False)
         item.edition = edition
         item.save()
+
+        # Because Item form was not saved (commit=False)
         form['item'].save_tags()
         form['item'].save_languages()
+        form['item'].save_publishers()
+
         messages.add_message(self.request, messages.SUCCESS, self.success_msg)
         return HttpResponseRedirect(self.success_url)
 
