@@ -315,12 +315,12 @@ class ItemFormatForm(forms.ModelForm):
         }
 
 
-class ItemLanguageFrom(forms.ModelForm):
+class ItemLanguageForm(forms.ModelForm):
     class Meta:
         model = ItemLanguageRelation
         fields = ['language']
         widgets = {
-            'language': ModelSelect2Widget(
+            'language': ModelSelect2MultipleWidget(
                 model=Language,
                 search_fields=['name__icontains', 'language_code_2char__iexact', 'language_code_3char__iexact']
             )

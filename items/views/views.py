@@ -169,7 +169,7 @@ class ItemTableView(ListView):
                 'id': 'add_language',
                 'label': _("Add language"),
                 'url': reverse_lazy('add_language_to_items'),
-                'form': ItemLanguageFrom
+                'form': ItemLanguageForm
             }
         ]
 
@@ -1148,21 +1148,22 @@ def add_language_to_items(request):
     :return: 
     """
     if request.method == 'POST':
-        if 'entries' in request.POST:
+        if 'entries' in request.POST and 'language' in request.POST:
             items = request.POST.getlist('entries')
-            itemlanguageform = ItemLanguageFrom(data=request.POST)
-            if itemlanguageform.is_valid():
+            languages = request.POST.getlist('language')
+            for language_id in languages:
+                language = Language.objects.get(uuid=language_id)
                 for item_id in items:
                     item = Item.objects.get(uuid=item_id)
                     try:
                         itemlanguagerelation = ItemLanguageRelation(item=item,
-                                                                    language=itemlanguageform.cleaned_data['language'])
+                                                                    language=language)
                         itemlanguagerelation.save()
                     except IntegrityError:
                         # Unique constraint failed; the ItemLanguageRelation already exists
                         pass
-            else:
-                messages.add_message(request, messages.WARNING, _("The ItemLanguage form was invalid."))
+        else:
+            messages.add_message(request, messages.WARNING, _("No items and/or no language selected."))
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
     else:
         raise Http404
