@@ -47,6 +47,8 @@ class PersonTableView(ListView):
         context['object_name'] = "person"
         context['add_url'] = reverse_lazy('add_person')
 
+        context['per_page_choices'] = [25, 50, 100]
+
         return context
 
 

@@ -173,6 +173,8 @@ class ItemTableView(ListView):
             }
         ]
 
+        context['per_page_choices'] = [25, 50, 100, 500, 1000]
+
         return context
 
 

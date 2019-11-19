@@ -72,6 +72,8 @@ class CatalogueTableView(ListView):
 
         context['map_url'] = reverse_lazy('cataloguesmap')
 
+        context['per_page_choices'] = [10, 25, 50, 100]
+
         return context
 
 

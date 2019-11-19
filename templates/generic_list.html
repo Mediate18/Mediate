@@ -24,8 +24,16 @@
                     {{ filter.form.as_table }}
                     </table>
                     <div class="pull-right">
+                        {% if per_page_choices and table %}
+                            <select name="per_page">
+                                {% for per_page in per_page_choices %}
+                                    <option value="{{ per_page }}" {% if per_page == table.paginator.per_page %}selected{% endif %}>{{ per_page }}</option>
+                                {% endfor %}
+                            </select>
+                            results per page {{ current_per_page }}
+                        {% endif %}
                         <input type="submit" class="btn"/>
-                        <a href='{{ request.path }}' class="btn">Clear</a>
+                        <a href='{{ request.path }}' class="btn btn-default">Clear</a>
                     </div>
                 </form>
               </div>
