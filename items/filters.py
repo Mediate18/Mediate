@@ -107,6 +107,16 @@ class ItemFilter(django_filters.FilterSet):
         ),
         method='role_filter'
     )
+    exclude_person = django_filters.ModelMultipleChoiceFilter(
+        label='Not related person',
+        queryset=Person.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Person,
+            search_fields=['short_name__icontains']
+        ),
+        method='exclude_person_filter'
+    )
     person_role = django_filters.MultipleChoiceFilter(
         label='Person and Role',
         choices=[],
@@ -191,6 +201,11 @@ class ItemFilter(django_filters.FilterSet):
     def role_filter(self, queryset, name, value):
         if value:
             return queryset.filter(personitemrelation__role__in=value).distinct()
+        return queryset
+
+    def exclude_person_filter(self, queryset, name, value):
+        if value:
+            return queryset.exclude(personitemrelation__person__in=value).distinct()
         return queryset
 
     def person_role_filter(self, queryset, name, value):
