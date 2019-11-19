@@ -13,8 +13,18 @@
 {% block content %}
 
 <div class="row">
-    <div class="col-xs-12">
-        <div class="panel panel-default">
+    <div class="col-md-2">
+        <h4>
+            {% if page_heading %}
+                {{ page_heading }}
+            {% else %}
+                {{ object_name|title }}
+                {% trans " places" %}
+            {% endif %}
+        </h4>
+    </div>
+    <div class="col-md-8">
+        <div class="panel panel-default" style="margin-bottom: 10px">
             <div class="panel-heading">
               <h4 class="panel-title">
                 <a data-toggle="collapse" href="#collapse1">Filter <span class="glyphicon glyphicon-chevron-down"></span></a>
@@ -35,19 +45,10 @@
             </div>
           </div>
     </div>
-</div>
-
-<div class="row">
-    <div class="col-xs-12">
-        <h1>
-            {% if page_heading %}
-                {{ page_heading }}
-            {% else %}
-                {{ object_name|title }}
-                {% trans " places" %}
-            {% endif %}
-        </h1>
-        <div class="small">Displaying {{ filter.qs.count }} of {{ filter.queryset.count }}</div>
+    <div class="col-md-2">
+        <div class="small pull-right" style="margin-top: 10px">
+            <p>Displaying {{ filter.qs.count }} of {{ filter.queryset.count }}</p>
+        </div>
     </div>
 </div>
 <div class="row">

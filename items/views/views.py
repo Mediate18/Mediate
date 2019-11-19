@@ -272,6 +272,7 @@ class ItemLocationMapView(ListView):
                                 .annotate(object_count=Count('edition__items'))
         context['objects_url_name'] = 'items'
         context['place_search_field'] = 'edition_place'
+        context['page_heading'] = _("Item: places of publication")
 
         return context
 
