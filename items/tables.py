@@ -90,7 +90,7 @@ class ItemTable(tables.Table):
                 person = relation.person
                 name = person.short_name
                 viaf = person.viaf_id
-                person_entry = "<a href='{}'>{}</a>".format(reverse_lazy('change_person', args=[person.pk]), name)
+                person_entry = "<a href='{}'>{}</a>".format(reverse_lazy('person_detail', args=[person.pk]), name)
                 if viaf:
                     person_entry += " (<a target='blank' href='{}'>VIAF</a>)".format(viaf)
                 persons.append(person_entry)
