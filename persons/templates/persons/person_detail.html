@@ -10,7 +10,7 @@
 {% block content %}
 
 <div class="row flex-row">
-    <div class="col-xs-12">
+    <div class="col-xs-6 col-xs-offset-3">
         <div class="flex-col">
             <!-- Put content header here -->
             <h2>
@@ -88,6 +88,13 @@
                 {% endwith %}
             </div>
 
+        </div>
+    </div>
+    <div class="col-xs-3">
+        <div>
+            <a href="{% url 'change_person' object.uuid %}" class="btn btn-default">
+                <span class="glyphicon glyphicon-pencil"></span> {% trans "Edit" %}
+            </a>
         </div>
     </div>
 </div>
