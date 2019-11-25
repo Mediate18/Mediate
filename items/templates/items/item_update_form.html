@@ -113,12 +113,13 @@
                     <span class="glyphicon glyphicon-chevron-down"></span></a>
                 </h4>
             </div>
-            <div id="relatedpersonspanel" class="panel-collapse">
+            <div id="relatedpersonspanel" class="panel-collapse collapse in">
               <div class="panel-body">
                   <table class="table">
                       <thead>
                         <tr>
                             <th>{% trans "Person" %}</th>
+                            <th>{% trans "Role" %}</th>
                             <th>{% trans "Notes" %}</th>
                             <th></th>
                         </tr>
@@ -127,6 +128,7 @@
                         {% for relation in object.personitemrelation_set.all %}
                             <tr>
                                 <td><a href="{{ relation.person.get_absolute_url }}">{{ relation.person }}</a></td>
+                                <td>{{ relation.role }}</td>
                                 <td>{% if relation.notes %}{{ relation.notes|linebreaks }}{% endif %}</td>
                                 <td>
                                     <a href="{{ relation.get_absolute_url }}" title="{% trans 'Change relation' %}">
