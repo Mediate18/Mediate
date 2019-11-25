@@ -81,22 +81,63 @@
             <div id="otheritemspanel" class="panel-collapse collapse">
               <div class="panel-body">
                   <table class="table">
-                    <tr>
-                        <th>{% trans "Index in lot" %}</th>
-                        <th>{% trans "Short title" %}</th>
-                        <th>{% trans "Place of publication" %}</th>
-                        <th>{% trans "Year of publication" %}</th>
-                    </tr>
-                    {% for item in object.get_other_items_in_lot %}
+                      <thead>
                         <tr>
-                            <td>{{ item.index_in_lot }}</td>
-                            <td>{{ item.short_title }}</td>
-                            <td>{% if item.edition.place %}{{ item.edition.place }}{% endif %}</td>
-                            <td>{% if item.edition.year %}{{ item.edition.year }}{% endif %}</td>
+                            <th>{% trans "Index in lot" %}</th>
+                            <th>{% trans "Short title" %}</th>
+                            <th>{% trans "Place of publication" %}</th>
+                            <th>{% trans "Year of publication" %}</th>
                         </tr>
-                    {% endfor %}
-                </table>
+                      </thead>
+                      <tbody>
+                        {% for item in object.get_other_items_in_lot %}
+                            <tr>
+                                <td>{{ item.index_in_lot }}</td>
+                                <td>{{ item.short_title }}</td>
+                                <td>{% if item.edition.place %}{{ item.edition.place }}{% endif %}</td>
+                                <td>{% if item.edition.year %}{{ item.edition.year }}{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                      </tbody>
+                  </table>
+              </div>
             </div>
+          </div>
+        </div>
+
+        <div class="panel-group">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" href="#relatedpersonspanel">{% trans "Related persons" %}
+                    <span class="glyphicon glyphicon-chevron-down"></span></a>
+                </h4>
+            </div>
+            <div id="relatedpersonspanel" class="panel-collapse">
+              <div class="panel-body">
+                  <table class="table">
+                      <thead>
+                        <tr>
+                            <th>{% trans "Person" %}</th>
+                            <th>{% trans "Notes" %}</th>
+                            <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for relation in object.personitemrelation_set.all %}
+                            <tr>
+                                <td><a href="{{ relation.person.get_absolute_url }}">{{ relation.person }}</a></td>
+                                <td>{% if relation.notes %}{{ relation.notes|linebreaks }}{% endif %}</td>
+                                <td>
+                                    <a href="{{ relation.get_absolute_url }}" title="{% trans 'Change relation' %}">
+                                        <span class="glyphicon glyphicon-pencil"></span>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                      </tbody>
+                  </table>
+              </div>
             </div>
           </div>
         </div>
