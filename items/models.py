@@ -300,12 +300,16 @@ class PersonItemRelation(models.Model):
     person = models.ForeignKey(Person, on_delete=CASCADE)
     item = models.ForeignKey(Item, on_delete=CASCADE)
     role = models.ForeignKey(PersonItemRelationRole, on_delete=CASCADE)
+    notes = models.TextField(_("Notes"), null=True, blank=True)
 
     class Meta:
         unique_together = (("person", "item", "role"),)
 
     def __str__(self):
         return _("{} is {} of {}").format(self.person, self.role, self.item)
+
+    def get_absolute_url(self):
+        return reverse_lazy('change_personitemrelation', args=[str(self.uuid)])
 
 
 # Enable the simple-history registration:

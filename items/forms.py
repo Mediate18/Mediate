@@ -275,7 +275,7 @@ class PersonItemRelationAddForm(forms.ModelForm):
 
     class Meta:
         model = PersonItemRelation
-        fields = ['person', 'role']
+        fields = ['person', 'role', 'notes']
         widgets = {
             'person': AddAnotherWidget(
                 model=Person,

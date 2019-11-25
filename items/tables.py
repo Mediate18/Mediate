@@ -93,6 +93,9 @@ class ItemTable(tables.Table):
                 person_entry = "<a href='{}'>{}</a>".format(reverse_lazy('person_detail', args=[person.pk]), name)
                 if viaf:
                     person_entry += " (<a target='blank' href='{}'>VIAF</a>)".format(viaf)
+                if relation.notes:
+                    person_entry += ' <a href="{}"><span class="glyphicon glyphicon-comment" title="{}"></span></a>'\
+                        .format(relation.get_absolute_url(), relation.notes)
                 persons.append(person_entry)
 
             relation_groups.append(
