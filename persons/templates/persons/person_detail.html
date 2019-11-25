@@ -54,7 +54,13 @@
                         <ul>
                         {% for relation in item_relations %}
                             <li>
-                                <a href="{{ relation.item.get_absolute_url }}">{{ relation.item }}</a> ({{ relation.role }})
+                                <a href="{{ relation.item.get_absolute_url }}">{{ relation.item }}</a>
+                                ({{ relation.role }})
+                                {% if relation.notes %}
+                                    <a href="{{ relation.get_absolute_url }}">
+                                        <span class="glyphicon glyphicon-comment" title="{{ relation.notes }}"></span>
+                                    </a>
+                                {% endif %}
                             </li>
                         {% endfor %}
                         </ul>
