@@ -40,7 +40,7 @@ class ItemTable(tables.Table):
          text=format_html('<span class="glyphicon glyphicon-list" data-toggle="tooltip" data-original-title="Manage people"></span>'),
          args=[A('pk')], orderable=False, empty_values=())
     languages = tables.Column(empty_values=(), verbose_name=_("Languages"), orderable=False)
-    parisian_category = tables.Column(accessor='lot.category')
+    parisian_category = tables.Column(accessor='lot.category.parisian_category')
 
     class Meta:
         model = Item
