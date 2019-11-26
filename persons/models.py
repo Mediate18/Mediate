@@ -111,6 +111,8 @@ class Person(models.Model):
     sex = models.CharField(_("Sex"), choices=SEX_CHOICES, max_length=7)
     city_of_birth = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True, blank=True, related_name='persons_born')
     city_of_death = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True, blank=True, related_name='persons_died')
+    notes = models.TextField(_("Notes"), null=True, blank=True)
+    bibliography = models.TextField(_("Bibiliography"), null=True, blank=True)
 
     class Meta:
         ordering = ['short_name']

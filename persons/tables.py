@@ -34,6 +34,8 @@ class PersonTable(tables.Table):
             'date_of_death',
             'catalogues',
             'viaf_id',
+            'notes',
+            'bibliography',
             'uuid'
         ]
 

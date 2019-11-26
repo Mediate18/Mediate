@@ -32,6 +32,12 @@
 
                 <dt>{% trans "Sex" %}</dt>
                 <dd>{{ object.sex }}</dd>
+
+                <dt>{% trans "Notes" %}</dt>
+                <dd>{{ object.notes|default:"—" }}</dd>
+
+                <dt>{% trans "Bibliography" %}</dt>
+                <dd>{{ object.bibliography|default:"—" }}</dd>
             </dl>
 
             <div>
