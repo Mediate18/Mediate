@@ -35,6 +35,8 @@ urlpatterns = [
          name='set_bookformat'),
     path('items/add_language_to_items', permission_required('items.add_itemlanguagerelation')(add_language_to_items),
          name='add_language_to_items'),
+    path('items/add_type_to_items', permission_required('items.add_itemitemtyperelation')(add_type_to_items),
+         name='add_type_to_items'),
 
     # Tagged Item urls
     path('taggeditems/', login_required(TaggedItemTableView.as_view()), name='taggeditems'),

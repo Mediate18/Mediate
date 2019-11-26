@@ -170,6 +170,12 @@ class ItemTableView(ListView):
                 'label': _("Add language"),
                 'url': reverse_lazy('add_language_to_items'),
                 'form': ItemLanguageForm
+            },
+            {
+                'id': 'add_type',
+                'label': _("Add type"),
+                'url': reverse_lazy('add_type_to_items'),
+                'form': ItemItemTypeForm
             }
         ]
 
@@ -1164,6 +1170,33 @@ def add_language_to_items(request):
                         pass
         else:
             messages.add_message(request, messages.WARNING, _("No items and/or no language selected."))
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    else:
+        raise Http404
+
+
+def add_type_to_items(request):
+    """
+    Add type to a list of items
+    :param request: 
+    :return: 
+    """
+    if request.method == 'POST':
+        if 'entries' in request.POST and 'type' in request.POST:
+            items = request.POST.getlist('entries')
+            types = request.POST.getlist('type')
+            for type_id in types:
+                itemtype = ItemType.objects.get(uuid=type_id)
+                for item_id in items:
+                    item = Item.objects.get(uuid=item_id)
+                    try:
+                        itemitemtyperelation = ItemItemTypeRelation(item=item, type=itemtype)
+                        itemitemtyperelation.save()
+                    except IntegrityError:
+                        # Unique constraint failed; the ItemItemTypeRelation already exists
+                        pass
+        else:
+            messages.add_message(request, messages.WARNING, _("No items and/or no types selected."))
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
     else:
         raise Http404

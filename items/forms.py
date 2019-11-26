@@ -327,6 +327,18 @@ class ItemLanguageForm(forms.ModelForm):
         }
 
 
+class ItemItemTypeForm(forms.ModelForm):
+    class Meta:
+        model = ItemItemTypeRelation
+        fields = ['type']
+        widgets = {
+            'type': ModelSelect2MultipleWidget(
+                model=ItemType,
+                search_fields=['name__icontains']
+            )
+        }
+
+
 class PublisherForm(forms.ModelForm):
     class Meta:
         model = Publisher
