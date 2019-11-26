@@ -122,6 +122,7 @@ class Item(models.Model):
     book_format = models.ForeignKey(BookFormat, on_delete=SET_NULL, null=True, related_name='items', blank=True)
     index_in_lot = models.IntegerField(_("Index in the lot"))
     edition = models.ForeignKey('Edition', on_delete=models.PROTECT, related_name="items")  # See also the delete method
+    non_book = models.BooleanField(default=False)
 
     tags = GenericRelation(TaggedEntity, related_query_name='items')
 
