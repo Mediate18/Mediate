@@ -121,7 +121,7 @@ class Item(models.Model):
                                          max_length=128, null=True, blank=True)
     book_format = models.ForeignKey(BookFormat, on_delete=SET_NULL, null=True, related_name='items', blank=True)
     index_in_lot = models.IntegerField(_("Index in the lot"))
-    edition = models.ForeignKey('Edition', on_delete=models.PROTECT, related_name="items")
+    edition = models.ForeignKey('Edition', on_delete=models.PROTECT, related_name="items")  # See also the delete method
 
     tags = GenericRelation(TaggedEntity, related_query_name='items')
 
@@ -146,6 +146,9 @@ class Item(models.Model):
 
     def delete(self, using=None, keep_parents=False):
         super().delete(using=using, keep_parents=keep_parents)
+
+        # As long as Item.edition has on_delete=models.PROTECT,
+        # the following will only succeed if this is the only Item of the Edition
         self.edition.delete()
 
     def get_other_items_in_lot(self):
