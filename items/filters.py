@@ -30,6 +30,11 @@ class ItemFilter(django_filters.FilterSet):
         queryset=BookFormat.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
+    include_non_book_items = django_filters.BooleanFilter(
+        label="Include non-book items",
+        widget=CheckboxInput,
+        method='include_non_book_items_filter'
+    )
     catalogue = django_filters.ModelMultipleChoiceFilter(
         label="Catalogue",
         queryset=Catalogue.objects.all(),
@@ -146,6 +151,7 @@ class ItemFilter(django_filters.FilterSet):
             'collection',
             'number_of_volumes',
             'book_format',
+            'include_non_book_items',
             'index_in_lot',
             'catalogue',
             'catalogue_publication_year',
@@ -171,6 +177,19 @@ class ItemFilter(django_filters.FilterSet):
             return queryset.filter(itemmaterialdetailsrelation__material_details__in=value)
         else:
             return queryset
+
+    def include_non_book_items_filter(self, queryset, name, value):
+        """
+        If value is True Items with ItemType containing 'book' are included.
+        Those Items are excluded by default.
+        :param queryset: the filter queryset
+        :param name: the name of the field
+        :param value: the value of field
+        :return: the filter queryset
+        """
+        if value:
+            return queryset
+        return queryset.exclude(itemitemtyperelation__type__name__icontains='book')
 
     def edition_isnull_filter(self, queryset, name, value):
         if value:
