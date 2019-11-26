@@ -28,7 +28,6 @@ class PersonFilter(django_filters.FilterSet):
                  'In other cases, it lists a region, county, or other geographic entity."></span>'
 
     short_name = django_filters.Filter(method='short_name_filter')
-    first_names = django_filters.Filter(method='first_names_filter')
     surname = django_filters.Filter(method='surname_filter')
     sex = django_filters.MultipleChoiceFilter(
         choices=Person.SEX_CHOICES,
@@ -100,7 +99,6 @@ class PersonFilter(django_filters.FilterSet):
         model = Person
         fields = [
             'short_name',
-            'first_names',
             'surname',
             'sex',
             'city_of_birth',
@@ -132,14 +130,6 @@ class PersonFilter(django_filters.FilterSet):
             surname_q = Q(surname__icontains=value)
             alternative_surname_q = Q(alternative_names__surname__icontains=value)
             return queryset.filter(surname_q | alternative_surname_q)
-        return queryset
-
-    def first_names_filter(self, queryset, name, value):
-        from django.db.models import Q
-        if value:
-            first_names_q = Q(first_names=value)
-            alternative_first_names_q = Q(alternative_names__first_names__icontains=value)
-            return queryset.filter(first_names_q | alternative_first_names_q)
         return queryset
 
     def viaf_id_filter(self, queryset, name, value):
