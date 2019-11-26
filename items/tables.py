@@ -30,7 +30,6 @@ class ItemTable(tables.Table):
     lot = tables.Column(order_by='lot__lot_as_listed_in_catalogue', )
     sales_price = tables.Column(empty_values=(), order_by='lot__sales_price')
     catalogue = tables.Column(empty_values=(), order_by='lot__catalogue__short_title')
-    collection = tables.RelatedLinkColumn()
     number_of_volumes = tables.Column(empty_values=(), verbose_name=_('Number of volumes'))
     material_details = tables.Column(empty_values=(), orderable=False)
     edition = tables.LinkColumn()
@@ -53,7 +52,6 @@ class ItemTable(tables.Table):
             'index_in_lot',
             'sales_price',
             'catalogue',
-            'collection',
             'number_of_volumes',
             'book_format',
             'material_details',
