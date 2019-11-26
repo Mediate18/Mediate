@@ -30,7 +30,7 @@ class ItemFilter(django_filters.FilterSet):
         queryset=BookFormat.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
-    include_non_book_items = django_filters.BooleanFilter(
+    non_book = django_filters.BooleanFilter(
         label="Include non-book items",
         widget=CheckboxInput,
         method='include_non_book_items_filter'
@@ -151,7 +151,7 @@ class ItemFilter(django_filters.FilterSet):
             'collection',
             'number_of_volumes',
             'book_format',
-            'include_non_book_items',
+            'non_book',
             'index_in_lot',
             'catalogue',
             'catalogue_publication_year',
@@ -189,7 +189,7 @@ class ItemFilter(django_filters.FilterSet):
         """
         if value:
             return queryset
-        return queryset.exclude(itemitemtyperelation__type__name__icontains='book')
+        return queryset.exclude(non_book=True)
 
     def edition_isnull_filter(self, queryset, name, value):
         if value:
