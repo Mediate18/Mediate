@@ -7,6 +7,7 @@ from django.db.models.functions import Cast
 from django import forms
 from django_select2.forms import Select2MultipleWidget
 from django_filters.widgets import RangeWidget
+from django.utils.safestring import mark_safe
 
 import six
 from django_filters.constants import STRICTNESS
@@ -19,6 +20,13 @@ from items.models import PersonItemRelationRole
 
 # Person filter
 class PersonFilter(django_filters.FilterSet):
+    city_of_birth_text = 'city of birth'
+    city_of_death_text = 'city of death'
+    city_of_residence_text = 'city of residence'
+    place_help = ' <span class="glyphicon glyphicon-question-sign" ' \
+                 'title="When known, the MEDIATE database lists the {} of Persons. ' \
+                 'In other cases, it lists a region, county, or other geographic entity."></span>'
+
     short_name = django_filters.Filter(method='short_name_filter')
     first_names = django_filters.Filter(method='first_names_filter')
     surname = django_filters.Filter(method='surname_filter')
@@ -27,10 +35,12 @@ class PersonFilter(django_filters.FilterSet):
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
     city_of_birth = django_filters.ModelMultipleChoiceFilter(
+        label=mark_safe(_("Place of birth") + place_help.format(city_of_birth_text)),
         queryset=Place.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
     city_of_death = django_filters.ModelMultipleChoiceFilter(
+        label=mark_safe(_("Place of death") + place_help.format(city_of_death_text)),
         queryset=Place.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
@@ -67,7 +77,7 @@ class PersonFilter(django_filters.FilterSet):
         lookup_expr='in'
     )
     city_of_residence = django_filters.ModelMultipleChoiceFilter(
-        label="City of residence",
+        label=mark_safe(_("Place of residence") + place_help.format(city_of_residence_text)),
         queryset=Place.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
         field_name='residence__place',
