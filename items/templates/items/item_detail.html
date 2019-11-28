@@ -16,6 +16,11 @@
                     <dd class="col-sm-9">{{ object.lot }}</dd>
                     <dt class="col-sm-3">{% trans "Collection" %}:</dt>
                     <dd class="col-sm-9">{{ object.collection }}</dd>
+                    <dt class="col-sm-3">{% trans "Non-book" %}:</dt>
+                    <dd class="col-sm-9">
+                        {% if object.non_book %}{% trans "Yes" %}
+                        {% else %}{% trans "No" %}{% endif %}
+                    </dd>
                     <dt class="col-sm-3">{% trans "Number of volumes, as listed in the catalogue" %}:</dt>
                     <dd class="col-sm-9">
                         {% if object.number_of_volumes %}

@@ -1,4 +1,5 @@
 from django.db import models
+from django.dispatch import receiver
 from django.db.models.deletion import CASCADE, SET_NULL
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
@@ -122,7 +123,7 @@ class Item(models.Model):
     book_format = models.ForeignKey(BookFormat, on_delete=SET_NULL, null=True, related_name='items', blank=True)
     index_in_lot = models.IntegerField(_("Index in the lot"))
     edition = models.ForeignKey('Edition', on_delete=models.PROTECT, related_name="items")  # See also the delete method
-    non_book = models.BooleanField(default=False)
+    non_book = models.BooleanField(default=False, editable=False)
 
     tags = GenericRelation(TaggedEntity, related_query_name='items')
 
@@ -141,6 +142,23 @@ class Item(models.Model):
                 raise ValidationError({'collection':
                     _("The collection of this item and the collection of the catalogue of this item, are not the same.")
                                    })
+
+    def determine_non_book(self):
+        original_non_book = self.non_book
+        if ItemItemTypeRelation.objects.filter(item=self):
+            if ItemItemTypeRelation.objects.exclude(item=self, type__name__icontains='book'):
+                self.non_book = True
+            else:
+                self.non_book = False
+        else:
+            self.non_book = False
+
+        # Return whether non_book is changed
+        return not original_non_book == self.non_book
+
+    def save(self):
+        self.determine_non_book()
+        super().save()
 
     def get_absolute_url(self):
         return reverse_lazy('item_detail', args=[str(self.uuid)])
@@ -178,6 +196,22 @@ class ItemItemTypeRelation(models.Model):
 
     class Meta:
         unique_together = (('item', 'type'),)
+
+
+@receiver(models.signals.post_save, sender=ItemItemTypeRelation)
+@receiver(models.signals.post_delete, sender=ItemItemTypeRelation)
+def set_item_non_book(sender, instance, **kwargs):
+    """
+    Triggers and propagates the non-book check. 
+    :param sender: 
+    :param instance: 
+    :param kwargs: 
+    :return: 
+    """
+    item = instance.item
+    changed = item.determine_non_book()
+    if changed:
+        item.save()
 
 
 class ItemAuthor(models.Model):
