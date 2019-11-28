@@ -204,9 +204,9 @@ function handleAddanotherPersonResponse(response) {
     console.log(response);
     if(response.pk) { // Success!
         var source_id = $('#addanother-person-message').attr('source_id');
-        $('#'+source_id).append(
-            '<option value="'+response.pk+'">'+response.short_name+'</option>'
-        );
+        $('#'+source_id).val(null).trigger('change');
+        var newOption = new Option(response.short_name, response.pk, true, true);
+        $('#'+source_id).append(newOption).trigger('change');
         $('#addanotherModal').modal('toggle');
     } else {
         $('#addanother-person-message').append('{% trans "Something went wrong. Please review the form." %}');
