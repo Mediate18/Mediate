@@ -10,8 +10,6 @@ from django_filters.widgets import RangeWidget
 from django.utils.safestring import mark_safe
 
 import six
-from django_filters.constants import STRICTNESS
-from django_filters.filters import Lookup
 
 from mediate.tools import filter_multiple_words
 from catalogues.models import PersonCatalogueRelationRole, Catalogue
@@ -167,13 +165,10 @@ class ModelMultipleChoiceFilterQ(QBasedFilter, django_filters.ModelMultipleChoic
 
     def filter(self, q, value):
         """ModelMultipleChoiceFilter filter method override for use of Q(...) """
-        if isinstance(value, Lookup):
-            lookup = six.text_type(value.lookup_type)
-            value = value.value
-        else:
-            lookup = self.lookup_expr
+        lookup = self.lookup_expr
         if not value:
             return q
+        fieldname = self.field_name
         q &= Q(**{'%s__%s' % (self.field_name, lookup): value})
         return q
 
@@ -211,11 +206,7 @@ class MultipleChoiceFilterQWithExtraLookups(QBasedFilter, django_filters.Multipl
 
     def filter(self, q, value):
         """MultipleChoiceFilter filter method override for use of Q(...) """
-        if isinstance(value, Lookup):
-            lookup = six.text_type(value.lookup_type)
-            value = value.value
-        else:
-            lookup = self.lookup_expr
+        lookup = self.lookup_expr
         if not value:
             return q
         q &= Q(**{'%s__%s' % (self.field_name, lookup): value, **self.extra_field_lookups})
@@ -305,18 +296,11 @@ class PersonRankingFilter(django_filters.FilterSet):
     # Override method
     @property
     def qs(self):
+        print("QS")
         if not hasattr(self, '_qs'):
             if not self.is_bound:
                 self._qs = self.queryset.all()
                 return self._qs
-
-            if not self.form.is_valid():
-                if self.strict == STRICTNESS.RAISE_VALIDATION_ERROR:
-                    raise forms.ValidationError(self.form.errors)
-                elif self.strict == STRICTNESS.RETURN_NO_RESULTS:
-                    self._qs = self.queryset.none()
-                    return self._qs
-                # else STRICTNESS.IGNORE...  ignoring
 
             # start with all the results and filter from there
             qs = self.queryset.all()
@@ -337,9 +321,9 @@ class PersonRankingFilter(django_filters.FilterSet):
                     if value is not None:  # valid & clean data
                         qs = filter_.filter(qs, value)
 
-            self._qs = qs.distinct()\
-                .annotate(item_count=Count('uuid'))\
-                .annotate(catalogue_count=Count('personitemrelation__item__lot__catalogue', distinct=True))\
+            self._qs = qs.distinct() \
+                .annotate(item_count=Count('uuid')) \
+                .annotate(catalogue_count=Count('personitemrelation__item__lot__catalogue', distinct=True)) \
                 .order_by('-item_count')
 
         return self._qs

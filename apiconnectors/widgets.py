@@ -14,7 +14,7 @@ class ApiSelectWidget(autocomplete.Select2):
         super(autocomplete.Select2, ApiSelectWidget).__init__(self, *args, **kwargs)
         self.model=model
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         # select2 filters based on existing choices (non-existent here),
         # so when a value is set, add it to the list of choices
         id = value

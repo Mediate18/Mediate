@@ -117,6 +117,9 @@ class PersonRankingTableView(ListView):
         context = super(PersonRankingTableView, self).get_context_data(**kwargs)
         filter = PersonRankingFilter(self.request.GET, queryset=self.get_queryset())
 
+        if not filter.form.is_valid():
+            filter._qs = filter.queryset.none()
+
         table = PersonRankingTable(filter.qs)
         django_tables2.RequestConfig(self.request, ).configure(table)
 

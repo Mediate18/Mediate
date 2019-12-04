@@ -202,8 +202,8 @@ class LibraryFilter(django_filters.FilterSet):
 
 # Lot filter
 class LotFilter(django_filters.FilterSet):
-    catalogue = django_filters.Filter(name='catalogue__short_title', lookup_expr='icontains')
-    category = django_filters.Filter(name='category__bookseller_category', lookup_expr='icontains')
+    catalogue = django_filters.Filter(field_name='catalogue__short_title', lookup_expr='icontains')
+    category = django_filters.Filter(field_name='category__bookseller_category', lookup_expr='icontains')
     number_in_catalogue = django_filters.RangeFilter(widget=django_filters.widgets.RangeWidget())
     page_in_catalogue = django_filters.RangeFilter(widget=django_filters.widgets.RangeWidget())
     sales_price = django_filters.Filter(lookup_expr='icontains')

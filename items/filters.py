@@ -22,9 +22,9 @@ class BookFormatFilter(django_filters.FilterSet):
 # Item filter
 class ItemFilter(django_filters.FilterSet):
     short_title = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
-    lot = django_filters.Filter(name='lot__lot_as_listed_in_catalogue', lookup_expr='icontains')
-    sales_price = django_filters.Filter(name='lot__sales_price', lookup_expr='icontains')
-    collection = django_filters.Filter(name='collection__name', lookup_expr='icontains')
+    lot = django_filters.Filter(field_name='lot__lot_as_listed_in_catalogue', lookup_expr='icontains')
+    sales_price = django_filters.Filter(field_name='lot__sales_price', lookup_expr='icontains')
+    collection = django_filters.Filter(field_name='collection__name', lookup_expr='icontains')
     number_of_volumes = django_filters.Filter(lookup_expr='icontains')
     book_format = django_filters.ModelMultipleChoiceFilter(
         queryset=BookFormat.objects.all(),
@@ -244,7 +244,7 @@ class ItemFilter(django_filters.FilterSet):
 
 # ItemAuthor filter
 class ItemAuthorFilter(django_filters.FilterSet):
-    item = django_filters.Filter(name='item__short_title', lookup_expr='icontains')
+    item = django_filters.Filter(field_name='item__short_title', lookup_expr='icontains')
 
     class Meta:
         model = ItemAuthor
@@ -253,7 +253,7 @@ class ItemAuthorFilter(django_filters.FilterSet):
 
 # ItemItemTypeRelation filter
 class ItemItemTypeRelationFilter(django_filters.FilterSet):
-    item = django_filters.Filter(name='item__short_title', lookup_expr='icontains')
+    item = django_filters.Filter(field_name='item__short_title', lookup_expr='icontains')
 
     class Meta:
         model = ItemItemTypeRelation
@@ -262,7 +262,7 @@ class ItemItemTypeRelationFilter(django_filters.FilterSet):
 
 # ItemLanguageRelation filter
 class ItemLanguageRelationFilter(django_filters.FilterSet):
-    item = django_filters.Filter(name='item__short_title', lookup_expr='icontains')
+    item = django_filters.Filter(field_name='item__short_title', lookup_expr='icontains')
 
     class Meta:
         model = ItemLanguageRelation
@@ -271,7 +271,7 @@ class ItemLanguageRelationFilter(django_filters.FilterSet):
 
 # ItemMaterialDetailsRelation filter
 class ItemMaterialDetailsRelationFilter(django_filters.FilterSet):
-    item = django_filters.Filter(name='item__short_title', lookup_expr='icontains')
+    item = django_filters.Filter(field_name='item__short_title', lookup_expr='icontains')
 
     class Meta:
         model = ItemMaterialDetailsRelation
@@ -287,7 +287,7 @@ class ItemTypeFilter(django_filters.FilterSet):
 
 # ItemWorkRelation filter
 class ItemWorkRelationFilter(django_filters.FilterSet):
-    item = django_filters.Filter(name='item__short_title', lookup_expr='icontains')
+    item = django_filters.Filter(field_name='item__short_title', lookup_expr='icontains')
 
     class Meta:
         model = ItemWorkRelation
@@ -310,7 +310,7 @@ class MaterialDetailsFilter(django_filters.FilterSet):
 
 # PersonItemRelation filter
 class PersonItemRelationFilter(django_filters.FilterSet):
-    item = django_filters.Filter(name='item__short_title', lookup_expr='icontains')
+    item = django_filters.Filter(field_name='item__short_title', lookup_expr='icontains')
 
     class Meta:
         model = PersonItemRelation
@@ -326,7 +326,7 @@ class PersonItemRelationRoleFilter(django_filters.FilterSet):
 
 # Edition filter
 class EditionFilter(django_filters.FilterSet):
-    items = django_filters.Filter(name='items__short_title', lookup_expr='icontains')
+    items = django_filters.Filter(field_name='items__short_title', lookup_expr='icontains')
     year = django_filters.RangeFilter(widget=RangeWidget())
     year_tag = django_filters.Filter(lookup_expr='icontains')
     place = django_filters.ModelMultipleChoiceFilter(
@@ -377,8 +377,8 @@ class EditionFilter(django_filters.FilterSet):
 
 # Publisher filter
 class PublisherFilter(django_filters.FilterSet):
-    publisher = django_filters.Filter(name='publisher__short_name', lookup_expr='icontains')
-    edition = django_filters.Filter(name='edition__item__short_title', lookup_expr='icontains')
+    publisher = django_filters.Filter(field_name='publisher__short_name', lookup_expr='icontains')
+    edition = django_filters.Filter(field_name='edition__item__short_title', lookup_expr='icontains')
     edition__place = django_filters.ModelMultipleChoiceFilter(
         queryset=Place.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
