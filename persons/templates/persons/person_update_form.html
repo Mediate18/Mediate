@@ -1,0 +1,166 @@
+{% extends extended_layout|default:"baselayout.html" %}
+{% load i18n %}
+
+
+{% block extracss %}
+{{ form.media.css }}
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-xs-12">
+        <h1>{% trans action|title %} {% trans object_name %}</h1>
+    </div>
+    <div class="col-lg-6">
+        <form action="{{ request.path }}?next={{ next_url }}" method="post" enctype="multipart/form-data">
+            <table class="table">
+                {% csrf_token %}
+                    {% if form_as == 'p' %}
+                        {{ form.as_p }}
+                    {% else %}
+                        {{ form.as_table }}
+                    {% endif %}
+            </table>
+            <hr/>
+            <h3>{% trans "Alternative names" %}</h3>
+            {% if alternativepersonnames %}
+                {{ alternativepersonnames.management_form }}
+                <div id="form_set_alternativepersonnames">
+                    {% for form in alternativepersonnames %}
+                        <h5>Alternative name {{ forloop.counter0|add:1 }}</h5>
+                        <table class="table">
+                            {{ form.as_table }}
+                        </table>
+                    {% endfor %}
+                    <div id="empty_form_alternativepersonnames" style="display:none">
+                        <h5>Alternative name __prefixplusone__</h5>
+                        <table class='table'>
+                            {{ alternativepersonnames.empty_form }}
+                        </table>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-default" id="add_more_alternativepersonnames"
+                title="Add another alternative person name">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </button>
+            {% endif %}
+            <hr/>
+            <h3>{% trans "Residences" %}</h3>
+            {% if residences %}
+                {{ residences.management_form }}
+                <div id="form_set_residences">
+                    {% for form in residences %}
+                        <h5>Residence {{ forloop.counter0|add:1 }}</h5>
+                        <table class="table">
+                            {{ form.as_table }}
+                        </table>
+                    {% endfor %}
+                    <div id="empty_form_residences" style="display:none">
+                        <h5>Residence __prefixplusone__</h5>
+                        <table class='table'>
+                            {{ residences.empty_form }}
+                        </table>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-default" id="add_more_residences"
+                title="Add another residence">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </button>
+            {% endif %}
+            <div class="pull-right">
+                <input type="submit" class="btn" value="{% trans 'Save' %}"/>
+                {% if next_url %}
+                    <a href="{{ next_url }}">{% trans 'Cancel' %}</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+    <div class="col-lg-6">
+        <div class="panel-group">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" href="#relatedpersonspanel">{% trans "Related items" %}
+                    <span class="glyphicon glyphicon-chevron-down"></span></a>
+                </h4>
+            </div>
+            <div id="relatedpersonspanel" class="panel-collapse collapse in">
+              <div class="panel-body">
+                  <table class="table">
+                      <thead>
+                        <tr>
+                            <th>{% trans "Item" %}</th>
+                            <th>{% trans "Role" %}</th>
+                            <th>{% trans "Notes" %}</th>
+                            <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for relation in object.personitemrelation_set.all %}
+                            <tr>
+                                <td><a href="{{ relation.item.get_absolute_url }}">{{ relation.item }}</a></td>
+                                <td>{{ relation.role }}</td>
+                                <td>{% if relation.notes %}{{ relation.notes|linebreaks }}{% else %}-{% endif %}</td>
+                                <td>
+                                    <a href="{{ relation.get_absolute_url }}" title="{% trans 'Change relation' %}">
+                                        <span class="glyphicon glyphicon-pencil"></span>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                      </tbody>
+                  </table>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    {% if js_variables %}
+        js_variables = {{ js_variables|safe }}
+    {% endif %}
+</script>
+{{ form.media.js }}
+<script>
+$(document).ready(function(){
+        $('.django-select2').djangoSelect2({placeholder: 'Select an option'});
+});
+</script>
+<script>
+$(document).ready(function(){
+    // Dynamically add a Alternative names form to the form set
+    $('#add_more_alternativepersonnames').click(function() {
+        var form_idx = $('#id_alternative_names-TOTAL_FORMS').val();
+        $('#form_set_alternativepersonnames').append($('#empty_form_alternativepersonnames').html()
+            .replace(/__prefix__/g, form_idx)
+            .replace(/__prefixplusone__/g, parseInt(form_idx) + 1));
+        $('#form_set_alternativepersonnames').find('select').djangoSelect2();
+
+        // Workaround for the fact that djangoSelect2() as used above duplicates the selects.
+        $('#form_set_alternativepersonnames').find('select ~ span:nth-of-type(2)').hide();
+
+        $('#id_alternative_names-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+    });
+
+    // Dynamically add a Alternative names form to the form set
+    $('#add_more_residences').click(function() {
+        var form_idx = $('#id_residence_set-TOTAL_FORMS').val();
+        $('#form_set_residences').append($('#empty_form_residences').html()
+            .replace(/__prefix__/g, form_idx)
+            .replace(/__prefixplusone__/g, parseInt(form_idx) + 1));
+        $('#form_set_residences').find('select').djangoSelect2();
+
+        // Workaround for the fact that djangoSelect2() as used above duplicates the selects.
+        $('#form_set_residences').find('select ~ span:nth-of-type(2)').hide();
+
+        $('#id_residence_set-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+    });
+});
+</script>
+{% endblock %}

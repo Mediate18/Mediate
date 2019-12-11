@@ -223,7 +223,7 @@ class PersonCreateViewSimple(PersonCreateView):
 @moderate()
 class PersonUpdateView(UpdateView):
     model = Person
-    template_name = 'persons/person_form.html'
+    template_name = 'persons/person_update_form.html'
     form_class = PersonModelForm
     success_url = reverse_lazy('persons')
 
