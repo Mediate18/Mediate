@@ -68,8 +68,136 @@
                     <span class="glyphicon glyphicon-plus"></span>
                 </button>
             {% endif %}
-            <div class="pull-right">
-                <input type="submit" class="btn" value="{% trans 'Save' %}"/>
+            <hr/>
+            <h3>{% blocktrans %} Person relations  {% endblocktrans %}</h3>
+            <h5>{% blocktrans %} <i>{{ object }}</i> is the first person in the relation {% endblocktrans %}</h5>
+            {% if firstpersonrelations %}
+                {{ firstpersonrelations.management_form }}
+
+                <table class="table">
+                {% for form in firstpersonrelations %}
+                    {% if forloop.first %}
+                        <thead>
+                        <tr>
+                            <th>
+                                <button type="button" class="btn btn-default" id="add_more_firstpersonrelations"
+                                title="Add another person relation">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                </button>
+                            </th>
+                            {% for field in form.visible_fields %}
+                                <th>{{ field.label|capfirst }}</th>
+                            {% endfor %}
+                        </tr>
+                        </thead>
+                    {% endif %}
+                    <tbody id="form_set_firstpersonrelations">
+                        <tr>
+                            <td>{{ forloop.counter0|add:1 }}</td>
+                            {% for field in form.visible_fields %}
+                                <td>
+                                    {# Include the hidden fields in the form #}
+                                    {% if forloop.first %}
+                                        {% for hidden in form.hidden_fields %}
+                                            {{ hidden }}
+                                        {% endfor %}
+                                    {% endif %}
+                                    {{ field.errors.as_ul }}
+                                    {{ field }}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                {% endfor %}
+                </table>
+
+                <table style="display:none">
+                    <tbody id="empty_form_firstpersonrelations">
+                        <tr>
+                            <td>__prefixplusone__</td>
+                            {% for field in firstpersonrelations.empty_form.visible_fields %}
+                           <td>
+                                    {# Include the hidden fields in the form #}
+                                    {% if forloop.first %}
+                                        {% for hidden in firstpersonrelations.empty_form.hidden_fields %}
+                                            {{ hidden }}
+                                        {% endfor %}
+                                    {% endif %}
+                                    {{ field.errors.as_ul }}
+                                    {{ field }}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+            {% endif %}
+            <hr/>
+            <h5>{% blocktrans %} <i>{{ object }}</i> is the second person in the relation {% endblocktrans %}</h5>
+            {% if secondpersonrelations %}
+                {{ secondpersonrelations.management_form }}
+
+                <table class="table">
+                {% for secondpersonrelationsform in secondpersonrelations %}
+                    {% if forloop.first %}
+                        <thead>
+                        <tr>
+                            <th>
+                                <button type="button" class="btn btn-default" id="add_more_secondpersonrelations"
+                                title="Add another person relation">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                </button>
+                            </th>
+                            {% for field in secondpersonrelationsform.visible_fields %}
+                                <th>{{ field.label|capfirst }}</th>
+                            {% endfor %}
+                        </tr>
+                        </thead>
+                    {% endif %}
+                    <tbody id="form_set_secondpersonrelations">
+                        <tr>
+                            <td>{{ forloop.counter0|add:1 }}</td>
+                            {% for field in secondpersonrelationsform.visible_fields %}
+                                <td>
+                                    {# Include the hidden fields in the form #}
+                                    {% if forloop.first %}
+                                        {% for hidden in secondpersonrelationsform.hidden_fields %}
+                                            {{ hidden }}
+                                        {% endfor %}
+                                    {% endif %}
+                                    {{ field.errors.as_ul }}
+                                    {{ field }}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                {% endfor %}
+                </table>
+
+                <table style="display:none">
+                    <tbody id="empty_form_secondpersonrelations">
+                        <tr>
+                            <td>__prefixplusone__</td>
+                            {% for field in secondpersonrelations.empty_form.visible_fields %}
+                           <td>
+                                    {# Include the hidden fields in the form #}
+                                    {% if forloop.first %}
+                                        {% for hidden in secondpersonrelations.empty_form.hidden_fields %}
+                                            {{ hidden }}
+                                        {% endfor %}
+                                    {% endif %}
+                                    {{ field.errors.as_ul }}
+                                    {{ field }}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+            {% endif %}
+
+            <hr/>
+
+            <div>
+                <input type="submit" class="btn pull-right" value="{% trans 'Save' %}"/>
                 {% if next_url %}
                     <a href="{{ next_url }}">{% trans 'Cancel' %}</a>
                 {% endif %}
@@ -160,6 +288,34 @@ $(document).ready(function(){
         $('#form_set_residences').find('select ~ span:nth-of-type(2)').hide();
 
         $('#id_residence_set-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+    });
+
+    // Dynamically add a Person relations form to the form set
+    $('#add_more_firstpersonrelations').click(function() {
+        var form_idx = $('#id_relations_when_first-TOTAL_FORMS').val();
+        $('#form_set_firstpersonrelations').append($('#empty_form_firstpersonrelations').html()
+            .replace(/__prefix__/g, form_idx)
+            .replace(/__prefixplusone__/g, parseInt(form_idx) + 1));
+        $('#form_set_firstpersonrelations').find('select').djangoSelect2();
+
+        // Workaround for the fact that djangoSelect2() as used above duplicates the selects.
+        $('#form_set_firstpersonrelations').find('select ~ span:nth-of-type(2)').hide();
+
+        $('#id_relations_when_first-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+    });
+
+    // Dynamically add a Person relations form to the form set
+    $('#add_more_secondpersonrelations').click(function() {
+        var form_idx = $('#id_relations_when_second-TOTAL_FORMS').val();
+        $('#form_set_secondpersonrelations').append($('#empty_form_secondpersonrelations').html()
+            .replace(/__prefix__/g, form_idx)
+            .replace(/__prefixplusone__/g, parseInt(form_idx) + 1));
+        $('#form_set_secondpersonrelations').find('select').djangoSelect2();
+
+        // Workaround for the fact that djangoSelect2() as used above duplicates the selects.
+        $('#form_set_secondpersonrelations').find('select ~ span:nth-of-type(2)').hide();
+
+        $('#id_relations_when_second-TOTAL_FORMS').val(parseInt(form_idx) + 1);
     });
 });
 </script>

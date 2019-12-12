@@ -237,9 +237,13 @@ class PersonUpdateView(UpdateView):
             context['alternativepersonnames'] = AlternativePersonNameFormSet(self.request.POST,
                                                                                    instance=self.object)
             context['residences'] = ResidenceFormSet(self.request.POST, instance=self.object)
+            context['firstpersonrelations'] = FirstPersonPersonRelationFormSet(self.request.POST, instance=self.object)
+            context['secondpersonrelations'] = SecondPersonPersonRelationFormSet(self.request.POST, instance=self.object)
         else:
             context['alternativepersonnames'] = AlternativePersonNameFormSet(instance=self.object)
             context['residences'] = ResidenceFormSet(instance=self.object)
+            context['firstpersonrelations'] = FirstPersonPersonRelationFormSet(instance=self.object)
+            context['secondpersonrelations'] = SecondPersonPersonRelationFormSet(instance=self.object)
         return context
 
     def post(self, request, *args, **kwargs):
@@ -260,6 +264,8 @@ class PersonUpdateView(UpdateView):
             context = self.get_context_data()
             alternativepersonnames = context['alternativepersonnames']
             residences = context['residences']
+            firstpersonrelations = context['firstpersonrelations']
+            secondpersonrelations = context['secondpersonrelations']
             with transaction.atomic():
                 self.object = form.save()
                 if alternativepersonnames.is_valid():
@@ -271,6 +277,19 @@ class PersonUpdateView(UpdateView):
                     residences.instance = self.object
                     residences.save()
                 else:
+                    return self.form_invalid(form)
+                if firstpersonrelations.is_valid():
+                    firstpersonrelations.instance = self.object
+                    firstpersonrelations.save()
+                else:
+                    return self.form_invalid(form)
+                if secondpersonrelations.is_valid():
+                    print("secondpersonrelations.is_valid()")
+                    secondpersonrelations.instance = self.object
+                    secondpersonrelations.save()
+                else:
+                    print("NOT secondpersonrelations.is_valid()")
+                    print(secondpersonrelations)
                     return self.form_invalid(form)
                 return self.form_valid(form)
         else:

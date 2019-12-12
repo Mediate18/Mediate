@@ -122,7 +122,38 @@ AlternativePersonNameFormSet = inlineformset_factory(Person, AlternativePersonNa
 class PersonPersonRelationModelForm(forms.ModelForm):
     class Meta:
         model = PersonPersonRelation
-        fields = "__all__"
+        fields = (
+            'first_person',
+            'type',
+            'second_person',
+            'start_year',
+            'end_year'
+        )
+        widgets = {
+            'first_person': ModelSelect2Widget(
+                label="Person",
+                model=Person,
+                search_fields=['short_name__icontains']
+            ),
+            'second_person': ModelSelect2Widget(
+                label="Person",
+                model=Person,
+                search_fields=['short_name__icontains'],
+                attrs={'style': 'width: 200px;'}
+            ),
+            'type': ModelSelect2Widget(
+                model=PersonPersonRelationType,
+                search_fields=['name__icontains'],
+                attrs={'style': 'width: 150px;'}
+            )
+        }
+
+
+FirstPersonPersonRelationFormSet = inlineformset_factory(Person, PersonPersonRelation, fk_name='first_person',
+                                                         form=PersonPersonRelationModelForm, can_delete=True, extra=1)
+
+SecondPersonPersonRelationFormSet = inlineformset_factory(Person, PersonPersonRelation, fk_name='second_person',
+                                                         form=PersonPersonRelationModelForm, can_delete=True, extra=1)
 
 
 class PersonPersonRelationTypeModelForm(forms.ModelForm):
