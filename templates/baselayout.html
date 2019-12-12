@@ -67,14 +67,11 @@
                     </ul>
                 </li>
               {% endif %}
-              {% if perms.persons.change_collection or perms.global.view_all %}
-                <li class="{% if url_name == 'collections' %}active{% endif %}"><a href="{% url 'collections' %}">{% trans "Collections" %}</a></li>
+              {% if perms.persons.change_place or perms.global.view_all %}
+                <li class="{% if url_name == 'places' %}active{% endif %}"><a href="{% url 'places' %}">{% trans "Places" %}</a></li>
               {% endif %}
               {% if perms.persons.change_catalogue or perms.global.view_all %}
                 <li class="{% if url_name == 'catalogues' %}active{% endif %}"><a href="{% url 'catalogues' %}">{% trans "Catalogues" %}</a></li>
-              {% endif %}
-              {% if perms.persons.change_lot or perms.global.view_all %}
-                <li class="{% if url_name == 'lots' %}active{% endif %}"><a href="{% url 'lots' %}">{% trans "Lots" %}</a></li>
               {% endif %}
               {% if perms.persons.change_category or perms.global.view_all %}
                 <li class="{% if url_name == 'categories' %}active{% endif %}"><a href="{% url 'categories' %}">{% trans "Categories" %}</a></li>
