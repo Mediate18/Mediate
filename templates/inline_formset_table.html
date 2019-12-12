@@ -1,0 +1,60 @@
+{% load i18n %}
+
+{{ formset.management_form }}
+
+<table class="table">
+{% for formsetform in formset %}
+	{% if forloop.first %}
+		<thead>
+			<tr>
+				<th>
+					<button type="button" class="btn btn-default btn-xs" id="add_more_{{formset_name}}"
+					title="Add another person relation">
+						<span class="glyphicon glyphicon-plus"></span>
+					</button>
+				</th>
+				{% for field in formsetform.visible_fields %}
+					<th>{{ field.label|capfirst }}</th>
+				{% endfor %}
+			</tr>
+		</thead>
+		<tbody id="form_set_{{formset_name}}">
+		{% endif %}
+		<tr>
+			<td>{{ forloop.counter0|add:1 }}</td>
+			{% for field in formsetform.visible_fields %}
+				<td>
+					{# Include the hidden fields in the form #}
+					{% if forloop.first %}
+						{% for hidden in formsetform.hidden_fields %}
+							{{ hidden }}
+						{% endfor %}
+					{% endif %}
+					{{ field.errors.as_ul }}
+					{{ field }}
+				</td>
+			{% endfor %}
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>
+
+<table style="display:none">
+	<tbody id="empty_form_{{formset_name}}">
+		<tr>
+			<td>__prefixplusone__</td>
+			{% for field in formset.empty_form.visible_fields %}
+		   <td>
+					{# Include the hidden fields in the form #}
+					{% if forloop.first %}
+						{% for hidden in formset.empty_form.hidden_fields %}
+							{{ hidden }}
+						{% endfor %}
+					{% endif %}
+					{{ field.errors.as_ul }}
+					{{ field }}
+				</td>
+			{% endfor %}
+		</tr>
+	</tbody>
+</table>

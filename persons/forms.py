@@ -220,7 +220,8 @@ class ResidenceModelForm(forms.ModelForm):
             ),
             'place': ModelSelect2Widget(
                 model=Place,
-                search_fields=['name__icontains']
+                search_fields=['name__icontains'],
+                attrs={'style': 'width: 300px'}
             )
         }
 

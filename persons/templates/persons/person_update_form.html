@@ -1,6 +1,6 @@
 {% extends extended_layout|default:"baselayout.html" %}
 {% load i18n %}
-
+{% load static %}
 
 {% block extracss %}
 {{ form.media.css }}
@@ -22,176 +22,41 @@
                         {{ form.as_table }}
                     {% endif %}
             </table>
-            <hr/>
-            <h3>{% trans "Alternative names" %}</h3>
+            
             {% if alternativepersonnames %}
-                {{ alternativepersonnames.management_form }}
-                <div id="form_set_alternativepersonnames">
-                    {% for form in alternativepersonnames %}
-                        <h5>Alternative name {{ forloop.counter0|add:1 }}</h5>
-                        <table class="table">
-                            {{ form.as_table }}
-                        </table>
-                    {% endfor %}
-                    <div id="empty_form_alternativepersonnames" style="display:none">
-                        <h5>Alternative name __prefixplusone__</h5>
-                        <table class='table'>
-                            {{ alternativepersonnames.empty_form }}
-                        </table>
-                    </div>
-                </div>
-                <button type="button" class="btn btn-default" id="add_more_alternativepersonnames"
-                title="Add another alternative person name">
-                    <span class="glyphicon glyphicon-plus"></span>
-                </button>
+                <hr/>
+                <h3>{% trans "Alternative names" %}</h3>
+
+                {% with formset=alternativepersonnames formset_name='alternativepersonnames' %}
+                    {% include "inline_formset_table.html" %}
+                {% endwith %}
             {% endif %}
-            <hr/>
-            <h3>{% trans "Residences" %}</h3>
+
             {% if residences %}
-                {{ residences.management_form }}
-                <div id="form_set_residences">
-                    {% for form in residences %}
-                        <h5>Residence {{ forloop.counter0|add:1 }}</h5>
-                        <table class="table">
-                            {{ form.as_table }}
-                        </table>
-                    {% endfor %}
-                    <div id="empty_form_residences" style="display:none">
-                        <h5>Residence __prefixplusone__</h5>
-                        <table class='table'>
-                            {{ residences.empty_form }}
-                        </table>
-                    </div>
-                </div>
-                <button type="button" class="btn btn-default" id="add_more_residences"
-                title="Add another residence">
-                    <span class="glyphicon glyphicon-plus"></span>
-                </button>
+                <hr/>
+                <h3>{% trans "Residences" %}</h3>
+                {% with formset=residences formset_name='residences' %}
+                    {% include "inline_formset_table.html" %}
+                {% endwith %}
             {% endif %}
+
             <hr/>
-            <h3>{% blocktrans %} Person relations  {% endblocktrans %}</h3>
-            <h5>{% blocktrans %} <i>{{ object }}</i> is the first person in the relation {% endblocktrans %}</h5>
+            {% if firstpersonrelations or secondpersonrelations %}
+                <h3>{% blocktrans %} Person relations  {% endblocktrans %}</h3>
+            {% endif %}
+
             {% if firstpersonrelations %}
-                {{ firstpersonrelations.management_form }}
-
-                <table class="table">
-                    {% for form in firstpersonrelations %}
-                        {% if forloop.first %}
-                            <thead>
-                                <tr>
-                                    <th>
-                                        <button type="button" class="btn btn-default" id="add_more_firstpersonrelations"
-                                        title="Add another person relation">
-                                            <span class="glyphicon glyphicon-plus"></span>
-                                        </button>
-                                    </th>
-                                    {% for field in form.visible_fields %}
-                                        <th>{{ field.label|capfirst }}</th>
-                                    {% endfor %}
-                                </tr>
-                            </thead>
-                        <tbody id="form_set_firstpersonrelations">
-                        {% endif %}
-                            <tr>
-                                <td>{{ forloop.counter0|add:1 }}</td>
-                                {% for field in form.visible_fields %}
-                                    <td>
-                                        {# Include the hidden fields in the form #}
-                                        {% if forloop.first %}
-                                            {% for hidden in form.hidden_fields %}
-                                                {{ hidden }}
-                                            {% endfor %}
-                                        {% endif %}
-                                        {{ field.errors.as_ul }}
-                                        {{ field }}
-                                    </td>
-                                {% endfor %}
-                            </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-
-                <table style="display:none">
-                    <tbody id="empty_form_firstpersonrelations">
-                        <tr>
-                            <td>__prefixplusone__</td>
-                            {% for field in firstpersonrelations.empty_form.visible_fields %}
-                           <td>
-                                    {# Include the hidden fields in the form #}
-                                    {% if forloop.first %}
-                                        {% for hidden in firstpersonrelations.empty_form.hidden_fields %}
-                                            {{ hidden }}
-                                        {% endfor %}
-                                    {% endif %}
-                                    {{ field.errors.as_ul }}
-                                    {{ field }}
-                                </td>
-                            {% endfor %}
-                        </tr>
-                    </tbody>
-                </table>
+                <h5>{% blocktrans %} <i>{{ object }}</i> is the first person in the relation {% endblocktrans %}</h5>
+                {% with formset=firstpersonrelations formset_name='firstpersonrelations' %}
+                    {% include "inline_formset_table.html" %}
+                {% endwith %}
             {% endif %}
-            <hr/>
-            <h5>{% blocktrans %} <i>{{ object }}</i> is the second person in the relation {% endblocktrans %}</h5>
+
             {% if secondpersonrelations %}
-                {{ secondpersonrelations.management_form }}
-
-                <table class="table">
-                {% for secondpersonrelationsform in secondpersonrelations %}
-                    {% if forloop.first %}
-                        <thead>
-                            <tr>
-                                <th>
-                                    <button type="button" class="btn btn-default" id="add_more_secondpersonrelations"
-                                    title="Add another person relation">
-                                        <span class="glyphicon glyphicon-plus"></span>
-                                    </button>
-                                </th>
-                                {% for field in secondpersonrelationsform.visible_fields %}
-                                    <th>{{ field.label|capfirst }}</th>
-                                {% endfor %}
-                            </tr>
-                        </thead>
-                        <tbody id="form_set_secondpersonrelations">
-                        {% endif %}
-                        <tr>
-                            <td>{{ forloop.counter0|add:1 }}</td>
-                            {% for field in secondpersonrelationsform.visible_fields %}
-                                <td>
-                                    {# Include the hidden fields in the form #}
-                                    {% if forloop.first %}
-                                        {% for hidden in secondpersonrelationsform.hidden_fields %}
-                                            {{ hidden }}
-                                        {% endfor %}
-                                    {% endif %}
-                                    {{ field.errors.as_ul }}
-                                    {{ field }}
-                                </td>
-                            {% endfor %}
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-
-                <table style="display:none">
-                    <tbody id="empty_form_secondpersonrelations">
-                        <tr>
-                            <td>__prefixplusone__</td>
-                            {% for field in secondpersonrelations.empty_form.visible_fields %}
-                           <td>
-                                    {# Include the hidden fields in the form #}
-                                    {% if forloop.first %}
-                                        {% for hidden in secondpersonrelations.empty_form.hidden_fields %}
-                                            {{ hidden }}
-                                        {% endfor %}
-                                    {% endif %}
-                                    {{ field.errors.as_ul }}
-                                    {{ field }}
-                                </td>
-                            {% endfor %}
-                        </tr>
-                    </tbody>
-                </table>
+                <h5>{% blocktrans %} <i>{{ object }}</i> is the second person in the relation {% endblocktrans %}</h5>
+                {% with formset=secondpersonrelations formset_name='secondpersonrelations' %}
+                    {% include "inline_formset_table.html" %}
+                {% endwith %}
             {% endif %}
 
             <hr/>
@@ -260,24 +125,8 @@ $(document).ready(function(){
         $('.django-select2').djangoSelect2({placeholder: 'Select an option'});
 });
 </script>
+<script src="{% static 'js/make_inline_formset_dynamic.js' %}"></script>
 <script>
-
-function make_inline_formset_dynamic(formset_name, formset_prefix) {
-    // Dynamically add a form to the form set
-    $('#add_more_'+formset_name).click(function() {
-        var form_idx = $('#id_'+formset_prefix+'-TOTAL_FORMS').val();
-        $('#form_set_'+formset_name).append($('#empty_form_'+formset_name).html()
-            .replace(/__prefix__/g, form_idx)
-            .replace(/__prefixplusone__/g, parseInt(form_idx) + 1));
-        $('#form_set_'+formset_name).find('select').djangoSelect2();
-
-        // Workaround for the fact that djangoSelect2() as used above duplicates the selects.
-        $('#form_set_'+formset_name).find('select ~ span:nth-of-type(2)').hide();
-
-        $('#id_'+formset_prefix+'-TOTAL_FORMS').val(parseInt(form_idx) + 1);
-    });
-}
-
 $(document).ready(function(){
     make_inline_formset_dynamic('alternativepersonnames', '{{ alternativepersonnames.prefix }}');
     make_inline_formset_dynamic('residences', '{{ residences.prefix }}');
