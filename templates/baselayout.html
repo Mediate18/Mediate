@@ -33,30 +33,34 @@
     <nav class="navbar navbar-default navbar-fixed-top">
       <div class="container-fluid">
         {% if APPLICATION_INSTANCE_TYPE %}
-        <div class="navbar-header">
+        <div>
             <div class="navbar-brand">
             <span class="label label-warning">{{ APPLICATION_INSTANCE_TYPE }}</span>
             </div>
 		</div>
         {% endif %}
         {% if user.is_superuser %}
-        <div class="navbar-header">
+        <div>
             <div class="navbar-brand">
             <span class="label label-info" title="{% trans 'For a superuser changes to the data will not be moderated.' %}">{% trans "Superuser" %}</span>
             </div>
 		</div>
         {% endif %}
         <div class="navbar-header">
-			<a class="navbar-brand navbar-img" href="http://www.ru.nl/" target="_blank"><img src="{% static 'img/ru.png' %}" alt="Radboud University" class="mini-logo"></a>
-		</div>
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <button type="button" class="navbar-toggle collapsed glyphicon glyphicon-menu-hamburger" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
             <span class="sr-only">Toggle navigation</span>
           </button>
-          <a class="navbar-brand" href="http://www.mediate18.nl"><i>Mediate</i></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
+              <li>
+                <a href="http://www.ru.nl/" target="_blank" style="padding: 5px 15px 0px 15px">
+                    <img src="{% static 'img/ru.png' %}" alt="Radboud University" style="height: 40px">
+                </a>
+              </li>
+              <li>
+                <a href="http://www.mediate18.nl"><i>Mediate</i></a>
+              </li>
             {% with url_name=request.resolver_match.url_name %}
               {% if perms.persons.change_person or perms.global.view_all %}
                 <li class="dropdown">
