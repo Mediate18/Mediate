@@ -35,6 +35,16 @@ class ItemFilter(django_filters.FilterSet):
         widget=CheckboxInput,
         method='include_non_book_items_filter'
     )
+    item_type = django_filters.ModelMultipleChoiceFilter(
+        label="Item Type",
+        queryset=ItemType.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=ItemType,
+            search_fields=['name__icontains']
+        ),
+        method='item_type_filter'
+    )
     catalogue = django_filters.ModelMultipleChoiceFilter(
         label="Catalogue",
         queryset=Catalogue.objects.all(),
@@ -152,6 +162,7 @@ class ItemFilter(django_filters.FilterSet):
             'number_of_volumes',
             'book_format',
             'non_book',
+            'item_type',
             'index_in_lot',
             'catalogue',
             'catalogue_publication_year',
@@ -190,6 +201,11 @@ class ItemFilter(django_filters.FilterSet):
         if value:
             return queryset
         return queryset.exclude(non_book=True)
+
+    def item_type_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(itemitemtyperelation__type__name__in=value)
+        return queryset
 
     def edition_isnull_filter(self, queryset, name, value):
         if value:
