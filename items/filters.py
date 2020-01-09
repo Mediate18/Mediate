@@ -24,7 +24,6 @@ class BookFormatFilter(django_filters.FilterSet):
 class ItemFilter(django_filters.FilterSet):
     short_title = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
     lot = django_filters.Filter(name='lot__lot_as_listed_in_catalogue', lookup_expr='icontains')
-    collection = django_filters.Filter(name='collection__name', lookup_expr='icontains')
     number_of_volumes = django_filters.Filter(lookup_expr='icontains')
     book_format = django_filters.ModelMultipleChoiceFilter(
         queryset=BookFormat.objects.all(),
@@ -209,7 +208,6 @@ class ItemFilter(django_filters.FilterSet):
         fields = [
             'short_title',
             'lot',
-            'collection',
             'number_of_volumes',
             'book_format',
             'non_book',
