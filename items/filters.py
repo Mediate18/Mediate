@@ -431,7 +431,10 @@ class EditionFilter(django_filters.FilterSet):
         queryset=Place.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
-    url = django_filters.Filter(lookup_expr='icontains')
+    url = django_filters.BooleanFilter(
+        label="Has URL",
+        method='has_url_filter'
+    )
     publisher = django_filters.ModelMultipleChoiceFilter(
         label='Publisher',
         queryset=Person.objects.all(),
@@ -475,6 +478,13 @@ class EditionFilter(django_filters.FilterSet):
     class Meta:
         model = Edition
         exclude = ['uuid']
+
+    def has_url_filter(self, queryset, name, value):
+        print("value", value, str(value), type(value))
+        if value:
+            return queryset.exclude(url__exact="")
+        else:
+            return queryset.filter(url__exact="")
 
     def publisher_filter(self, queryset, name, value):
         if value:
