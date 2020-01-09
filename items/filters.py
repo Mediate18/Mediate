@@ -5,6 +5,7 @@ from django.forms import CheckboxInput
 from django_select2.forms import ModelSelect2MultipleWidget, Select2MultipleWidget, HeavySelect2MultipleWidget
 from tagme.models import Tag
 from .models import *
+from persons.models import Country
 from catalogues.models import Catalogue, ParisianCategory, PersonCatalogueRelation
 from mediate.tools import filter_multiple_words
 from viapy.api import ViafAPI
@@ -151,6 +152,26 @@ class ItemFilter(django_filters.FilterSet):
         choices=Person.SEX_CHOICES,
         method='owner_gender_filter'
     )
+    owner_country_of_birth = django_filters.ModelMultipleChoiceFilter(
+        label="Owner country of birth",
+        queryset=Country.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Country,
+            search_fields=['name__icontains']
+        ),
+        method='owner_country_of_birth_filter'
+    )
+    owner_country_of_death = django_filters.ModelMultipleChoiceFilter(
+        label="Owner country of death",
+        queryset=Country.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Country,
+            search_fields=['name__icontains']
+        ),
+        method='owner_country_of_death_filter'
+    )
     language = django_filters.ModelMultipleChoiceFilter(
         label='Language',
         queryset=Language.objects.all(),
@@ -275,6 +296,18 @@ class ItemFilter(django_filters.FilterSet):
         if value:
             return queryset.filter(lot__catalogue__personcataloguerelation__in=
                                    PersonCatalogueRelation.objects.filter(role__name__iexact='owner', person__sex=value))
+        return queryset
+
+    def owner_country_of_birth_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(lot__catalogue__personcataloguerelation__in=PersonCatalogueRelation.objects.filter(
+                role__name__iexact='owner', person__city_of_birth__country__in=value))
+        return queryset
+
+    def owner_country_of_death_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(lot__catalogue__personcataloguerelation__in=PersonCatalogueRelation.objects.filter(
+                role__name__iexact='owner', person__city_of_death__country__in=value))
         return queryset
 
 
