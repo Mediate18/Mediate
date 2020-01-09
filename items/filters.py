@@ -87,6 +87,11 @@ class ItemFilter(django_filters.FilterSet):
         ),
         method='edition_place_filter'
     )
+    edition_year_tag = django_filters.Filter(
+        label="Date of publication tag",
+        name='edition__year_tag',
+        lookup_expr='icontains'
+    )
     material_details = django_filters.ModelMultipleChoiceFilter(
         label="Material details",
         queryset=MaterialDetails.objects.all(),
@@ -170,6 +175,7 @@ class ItemFilter(django_filters.FilterSet):
             'edition_isnull',
             'edition_isempty',
             'edition_place',
+            'edition_year_tag',
             'sales_price',
             'material_details',
             'tag'
