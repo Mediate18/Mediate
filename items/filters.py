@@ -288,6 +288,7 @@ class ItemFilter(django_filters.FilterSet):
         if value:
             return queryset.filter(lot__catalogue__personcataloguerelation__in=
                                    PersonCatalogueRelation.objects.filter(role__name__iexact='owner', person__sex=value))
+        return queryset
 
 
 # ItemAuthor filter
