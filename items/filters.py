@@ -5,7 +5,7 @@ from django.forms import CheckboxInput
 from django_select2.forms import ModelSelect2MultipleWidget, Select2MultipleWidget, HeavySelect2MultipleWidget
 from tagme.models import Tag
 from .models import *
-from catalogues.models import Catalogue
+from catalogues.models import Catalogue, ParisianCategory
 from mediate.tools import filter_multiple_words
 from viapy.api import ViafAPI
 
@@ -58,6 +58,16 @@ class ItemFilter(django_filters.FilterSet):
     )
     catalogue_publication_year = django_filters.RangeFilter(label="Catalogue publication year", widget=RangeWidget(),
                                                             field_name='lot__catalogue__year_of_publication')
+    parisian_category = django_filters.ModelMultipleChoiceFilter(
+        label="Parisian category",
+        queryset=ParisianCategory.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=ParisianCategory,
+            search_fields=['name__icontains', 'description__icontains']
+        ),
+        method='parisian_category_filter'
+    )
     edition = django_filters.ModelMultipleChoiceFilter(
         queryset=Edition.objects.all(),
         widget=ModelSelect2MultipleWidget(
@@ -171,6 +181,7 @@ class ItemFilter(django_filters.FilterSet):
             'index_in_lot',
             'catalogue',
             'catalogue_publication_year',
+            'parisian_category',
             'edition',
             'edition_isnull',
             'edition_isempty',
@@ -211,6 +222,12 @@ class ItemFilter(django_filters.FilterSet):
     def item_type_filter(self, queryset, name, value):
         if value:
             return queryset.filter(itemitemtyperelation__type__name__in=value)
+        return queryset
+
+    def parisian_category_filter(self, queryset, name, value):
+        print("Value:", value)
+        if value:
+            return queryset.filter(lot__category__parisian_category__in=value)
         return queryset
 
     def edition_isnull_filter(self, queryset, name, value):
