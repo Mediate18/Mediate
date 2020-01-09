@@ -168,7 +168,7 @@ class Residence(models.Model):
         object_str = _("{} lived in {}").format(self.person, self.place)
         if self.start_year:
             object_str = object_str + _(" from {}").format(self.start_year)
-        if self.end_year_year:
+        if self.end_year:
             object_str = object_str + _(" until {}").format(self.end_year)
         return object_str
 
