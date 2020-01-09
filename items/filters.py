@@ -451,6 +451,16 @@ class EditionFilter(django_filters.FilterSet):
     )
     number_of_items = django_filters.Filter(label='Number of items', method='number_of_items_filter',
                                             widget=django_filters.widgets.RangeWidget())
+    language = django_filters.ModelMultipleChoiceFilter(
+        label='Language',
+        queryset=Language.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Language,
+            search_fields=['name__icontains', 'language_code_2char__iexact', 'language_code_3char__iexact']
+        ),
+        method='language_filter'
+    )
 
     class Meta:
         model = Edition
@@ -472,6 +482,12 @@ class EditionFilter(django_filters.FilterSet):
         if value:
             return queryset.filter(items__lot__catalogue__in=value)
         return queryset
+
+    def language_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(items__languages__language__in=value)
+        return queryset
+
 
 # Publisher filter
 class PublisherFilter(django_filters.FilterSet):
