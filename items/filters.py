@@ -5,7 +5,7 @@ from django.forms import CheckboxInput
 from django_select2.forms import ModelSelect2MultipleWidget, Select2MultipleWidget, HeavySelect2MultipleWidget
 from tagme.models import Tag
 from .models import *
-from persons.models import Country
+from persons.models import Country, Profession
 from catalogues.models import Catalogue, ParisianCategory, PersonCatalogueRelation
 from mediate.tools import filter_multiple_words
 from viapy.api import ViafAPI
@@ -182,6 +182,16 @@ class ItemFilter(django_filters.FilterSet):
         ),
         method='owner_country_of_residence_filter'
     )
+    owner_profession = django_filters.ModelMultipleChoiceFilter(
+        label="Owner profession",
+        queryset=Profession.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Profession,
+            search_fields=['name__icontains']
+        ),
+        method='owner_profession_filter'
+    )
     language = django_filters.ModelMultipleChoiceFilter(
         label='Language',
         queryset=Language.objects.all(),
@@ -323,6 +333,12 @@ class ItemFilter(django_filters.FilterSet):
         if value:
             return queryset.filter(lot__catalogue__personcataloguerelation__in=PersonCatalogueRelation.objects.filter(
                 role__name__iexact='owner', person__residence__place__country__in=value))
+        return queryset
+
+    def owner_profession_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(lot__catalogue__personcataloguerelation__in=PersonCatalogueRelation.objects.filter(
+                role__name__iexact='owner', person__personprofession__profession__in=value))
         return queryset
 
 
