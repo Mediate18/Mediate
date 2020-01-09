@@ -461,6 +461,16 @@ class EditionFilter(django_filters.FilterSet):
         ),
         method='language_filter'
     )
+    book_format = django_filters.ModelMultipleChoiceFilter(
+        label="Book format",
+        queryset=BookFormat.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=BookFormat,
+            search_fields=['name__icontains']
+        ),
+        method='book_format_filter'
+    )
 
     class Meta:
         model = Edition
@@ -486,6 +496,11 @@ class EditionFilter(django_filters.FilterSet):
     def language_filter(self, queryset, name, value):
         if value:
             return queryset.filter(items__languages__language__in=value)
+        return queryset
+
+    def book_format_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(items__book_format__in=value)
         return queryset
 
 
