@@ -23,7 +23,6 @@ class BookFormatFilter(django_filters.FilterSet):
 class ItemFilter(django_filters.FilterSet):
     short_title = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
     lot = django_filters.Filter(name='lot__lot_as_listed_in_catalogue', lookup_expr='icontains')
-    sales_price = django_filters.Filter(name='lot__sales_price', lookup_expr='icontains')
     collection = django_filters.Filter(name='collection__name', lookup_expr='icontains')
     number_of_volumes = django_filters.Filter(lookup_expr='icontains')
     book_format = django_filters.ModelMultipleChoiceFilter(
@@ -67,15 +66,6 @@ class ItemFilter(django_filters.FilterSet):
             search_fields=['name__icontains', 'description__icontains']
         ),
         method='parisian_category_filter'
-    )
-    edition = django_filters.ModelMultipleChoiceFilter(
-        queryset=Edition.objects.all(),
-        widget=ModelSelect2MultipleWidget(
-            attrs={'data-placeholder': "Select multiple"},
-            model=Edition,
-            search_fields=['place__name__icontains', 'year__icontains', 'url__icontains',
-                           'publisher__publisher__short_name__icontains']
-        )
     )
     edition_isnull = django_filters.BooleanFilter(
         label="No associated edition",
@@ -183,16 +173,13 @@ class ItemFilter(django_filters.FilterSet):
             'book_format',
             'non_book',
             'item_type',
-            'index_in_lot',
             'catalogue',
             'catalogue_publication_year',
             'parisian_category',
-            'edition',
             'edition_isnull',
             'edition_isempty',
             'edition_place',
             'edition_year_tag',
-            'sales_price',
             'material_details',
             'tag'
         ]
