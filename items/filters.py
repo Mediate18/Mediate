@@ -248,7 +248,6 @@ class ItemFilter(django_filters.FilterSet):
         return queryset
 
     def parisian_category_filter(self, queryset, name, value):
-        print("Value:", value)
         if value:
             return queryset.filter(lot__category__parisian_category__in=value)
         return queryset
