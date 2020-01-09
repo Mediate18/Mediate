@@ -172,6 +172,16 @@ class ItemFilter(django_filters.FilterSet):
         ),
         method='owner_country_of_death_filter'
     )
+    owner_country_of_residence = django_filters.ModelMultipleChoiceFilter(
+        label="Owner country of residence",
+        queryset=Country.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Country,
+            search_fields=['name__icontains']
+        ),
+        method='owner_country_of_residence_filter'
+    )
     language = django_filters.ModelMultipleChoiceFilter(
         label='Language',
         queryset=Language.objects.all(),
@@ -308,6 +318,12 @@ class ItemFilter(django_filters.FilterSet):
         if value:
             return queryset.filter(lot__catalogue__personcataloguerelation__in=PersonCatalogueRelation.objects.filter(
                 role__name__iexact='owner', person__city_of_death__country__in=value))
+        return queryset
+
+    def owner_country_of_residence_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(lot__catalogue__personcataloguerelation__in=PersonCatalogueRelation.objects.filter(
+                role__name__iexact='owner', person__residence__place__country__in=value))
         return queryset
 
 
