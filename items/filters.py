@@ -5,7 +5,7 @@ from django.forms import CheckboxInput
 from django_select2.forms import ModelSelect2MultipleWidget, Select2MultipleWidget, HeavySelect2MultipleWidget
 from tagme.models import Tag
 from .models import *
-from catalogues.models import Catalogue, ParisianCategory
+from catalogues.models import Catalogue, ParisianCategory, PersonCatalogueRelation
 from mediate.tools import filter_multiple_words
 from viapy.api import ViafAPI
 
@@ -156,6 +156,11 @@ class ItemFilter(django_filters.FilterSet):
             data_view='personroleautoresponse'
         )
     )
+    owner_gender = django_filters.ChoiceFilter(
+        label="Owner gender",
+        choices=Person.SEX_CHOICES,
+        method='owner_gender_filter'
+    )
     language = django_filters.ModelMultipleChoiceFilter(
         label='Language',
         queryset=Language.objects.all(),
@@ -279,6 +284,10 @@ class ItemFilter(django_filters.FilterSet):
             return queryset.filter(languages__language__in=value)
         return queryset
 
+    def owner_gender_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(lot__catalogue__personcataloguerelation__in=
+                                   PersonCatalogueRelation.objects.filter(role__name__iexact='owner', person__sex=value))
 
 
 # ItemAuthor filter
