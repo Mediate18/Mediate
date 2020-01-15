@@ -50,32 +50,16 @@ class Command(BaseCommand):
         db_connection.row_factory = dict_factory
         cursor = db_connection.cursor()
 
-        dummy_collection, created = catalogues.models.Collection.objects.get_or_create(name='Dummy collection')
-
         # Catalogues
-        catalogue_id_mapping = self.create_catalogues(dummy_collection, catalogue_ids, cursor)
-
-        # Minimal Lot ID per Catalogue
-        cursor.execute("SELECT catalogue_id, MIN(id) FROM `lot` GROUP BY catalogue_id")
-        minimal_lot_id_per_catalogue = dict([
-            (row['catalogue_id'], row['MIN(id)'])
-            for row in cursor.fetchall()
-        ])
-
-        # Lots
-        lot_id_mapping, lot_ids = self.create_lots(catalogue_id_mapping, catalogue_ids, cursor,
-                                                   minimal_lot_id_per_catalogue)
-
-        # Items
-        self.create_items(cursor, dummy_collection, lot_id_mapping, lot_ids)
+        catalogue_id_mapping = self.create_catalogues(catalogue_ids, cursor)
 
         # Close database connection
         cursor.close
         db_connection.close()
 
-    def create_items(self, cursor, dummy_collection, lot_id_mapping, lot_ids):
+    def create_items(self, lot, lot_spi_id, cursor):
         cursor.execute("SELECT `item`.*, `lot`.entry_text FROM `item` JOIN `lot` ON `item`.lot_id = `lot`.id "
-                           "WHERE `lot`.id IN({})".format(",".join([str(id) for id in lot_ids])))
+                           "WHERE `lot`.id = {}".format(lot_spi_id))
         resultSet = cursor.fetchall()
         for row in resultSet:
             places_of_publication = re.compile(r'\/').split(row['place_of_publication'])
@@ -119,8 +103,8 @@ class Command(BaseCommand):
                     book_format, created = items.models.BookFormat.objects.get_or_create(name=row['book_format'])
                 insert_fields = {
                     'short_title': short_title[:128],
-                    'lot_id': lot_id_mapping[row['lot_id']],
-                    'collection': dummy_collection,
+                    'lot': lot,
+                    'collection': lot.catalogue.collection,
                     'number_of_volumes': row['number_of_volumes'],
                     'book_format': book_format,
                     'index_in_lot': row['index_in_lot'],
@@ -145,28 +129,25 @@ class Command(BaseCommand):
                                                                                           material_details=material_details)
                 item_materialdetails_relations.save()
 
-    def create_lots(self, catalogue_id_mapping, catalogue_ids, cursor, minimal_lot_id_per_catalogue):
-        lot_id_mapping = {}
-        if catalogue_ids:
-            cursor.execute("SELECT * FROM lot WHERE catalogue_id IN({})".format(",".join(catalogue_ids)))
-        else:
-            cursor.execute("SELECT * FROM lot")
+    def create_lots(self, catalogue, catalogue_spi_id, cursor):
+        minimal_lot_id = cursor.execute("SELECT MIN(ID) FROM lot WHERE catalogue_id={}".format(catalogue_spi_id))\
+            .fetchall()[0]['MIN(ID)']
+
+        query = "SELECT * FROM lot WHERE `catalogue_id` = {}".format(catalogue_spi_id)
+        cursor.execute(query)
         resultSet = cursor.fetchall()
         lot_ids = []
         for row in resultSet:
             try:
                 lot_id = int(row['id'])
                 lot_ids.append(lot_id)
-                catalogue_id = int(row['catalogue_id'])
-                index_in_catalogue = lot_id - minimal_lot_id_per_catalogue[catalogue_id] + 1
+                index_in_catalogue = lot_id - minimal_lot_id + 1
             except:
                 index_in_catalogue = None
             try:
                 page_in_catalogue = int(row['page_in_catalogue'])
             except:
                 page_in_catalogue = None
-
-            catalogue_id = catalogue_id_mapping[row['catalogue_id']]
 
             bookseller_category = row['bookseller_category_books']
 
@@ -182,14 +163,14 @@ class Command(BaseCommand):
                 child = bookseller_category
 
             # Link to Category
-            parent_category, created = catalogues.models.Category.objects.get_or_create(catalogue_id=catalogue_id,
+            parent_category, created = catalogues.models.Category.objects.get_or_create(catalogue=catalogue,
                                               bookseller_category=parent) if parent else (None, None)
 
-            category, created = catalogues.models.Category.objects.get_or_create(catalogue_id=catalogue_id,
+            category, created = catalogues.models.Category.objects.get_or_create(catalogue=catalogue,
                                        bookseller_category=child, parent=parent_category)
 
             insert_fields = {
-                'catalogue_id': catalogue_id,
+                'catalogue': catalogue,
                 'category': category,
                 'number_in_catalogue': row['number_in_catalogue'],
                 'lot_as_listed_in_catalogue': row['entry_text'],
@@ -201,35 +182,33 @@ class Command(BaseCommand):
             try:
                 lot = catalogues.models.Lot(**insert_fields)
                 lot.save()
-                lot_id_mapping[row['id']] = lot.pk
+                self.create_items(lot, row['id'], cursor)
             except Exception as e:
                 print(insert_fields)
                 raise e
 
-        return lot_id_mapping, lot_ids
-
-    def create_catalogues(self, dummy_collection, catalogue_ids, cursor):
-        catalogue_id_mapping = {}
+    def create_catalogues(self, catalogue_ids, cursor):
         if catalogue_ids:
             query = "SELECT * FROM catalogue WHERE id IN({})".format(",".join(catalogue_ids))
         else:
             query = "SELECT * FROM catalogue"
         cursor.execute(query)
         resultSet = cursor.fetchall()
+
         for row in resultSet:
             insert_fields = {
                 'short_title': row['short_title'],
                 'full_title': row['full_title'],
                 'preface_and_paratexts': row['preface_and_paratexts'],
-                'collection': dummy_collection
             }
 
             try:
+                collection = catalogues.models.Collection(name=row['short_title'])
+                collection.save()
                 catalogue = catalogues.models.Catalogue(**insert_fields)
+                catalogue.collection = collection
                 catalogue.save()
-                catalogue_id_mapping[row['id']] = catalogue.pk
+                self.create_lots(catalogue, row['id'], cursor)
             except Exception as e:
                 print(insert_fields)
                 raise e
-
-        return catalogue_id_mapping
