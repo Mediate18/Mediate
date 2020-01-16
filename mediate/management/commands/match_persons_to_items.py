@@ -6,6 +6,7 @@ Match Persons to Items
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.db.models import Count, Subquery
 from catalogues.models import Catalogue
 from items.models import Item, PersonItemRelation
 
@@ -28,26 +29,44 @@ class Command(BaseCommand):
             with open(catalogue_ids_filename, 'r') as cat_ids_file:
                 catalogue_ids = [id.strip() for id in cat_ids_file.readlines()]
 
-        total_new = 0
+        print("#catalogue_ids:", len(catalogue_ids))
+        print("#catalogues:", Catalogue.objects.filter(short_title__in=catalogue_ids).count())
         for catalogue_id in catalogue_ids:
-            catalogue = Catalogue.objects.get(short_title=catalogue_id)
-            total_new += self.do_matching(catalogue)
+            try:
+                Catalogue.objects.get(short_title=catalogue_id)
+            except:
+                print("catalogue <{}> not found".format(catalogue_id))
 
-        print("total_new:", total_new)
+        self.do_matching(catalogue_ids)
 
-    def do_matching(self, catalogue):
-        items = Item.objects.filter(lot__catalogue=catalogue)
-        total_new = 0
-        for item in items:
-            # matched_items = Item.objects.exclude(lot__catalogue=catalogue).filter(short_title=item.short_title)
-            personitemrelations = PersonItemRelation.objects.filter(item__short_title=item.short_title)\
-                .exclude(item=item)
-            # for relation in personitemrelations:
-            #     PersonItemRelation(item=item, person=relation.person, role=relation.role).save()
-            number_of_new = personitemrelations.count()
-            if number_of_new > 0:
-                print("number_of_new", number_of_new)
-                total_new += number_of_new
+    def do_matching(self, catalogue_ids):
+        short_title_duplicates = Item.objects\
+            .values_list('short_title', flat=True)\
+            .annotate(short_title_cnt=Count('short_title'))\
+            .order_by()\
+            .filter(short_title_cnt__gt=1)
+        duplicates_with_personitemrelations = Item.objects\
+            .filter(short_title__in=Subquery(short_title_duplicates.values('short_title')))\
+            .annotate(personitemrelation_cnt=Count('personitemrelation'))\
+            .order_by()\
+            .filter(personitemrelation_cnt__gt=0)
 
-        return total_new
+        total = 0
+
+        for source_item in duplicates_with_personitemrelations:
+            personitemrelations_to_copy = PersonItemRelation.objects.filter(item=source_item)
+
+            relation_count = personitemrelations_to_copy.count()
+            # print("Count:", relation_count)
+            total += relation_count
+
+            # for target_item in Item.objects.filter(short_title=source_item.short_title,
+            #                                        lot__catalogue__short_title__in=catalogue_ids):
+                # for relation in personitemrelations_to_copy:
+                #     PersonItemRelation(item=target_item, person=relation.person, role=relation.role).save()
+
+        print("Total:", total)
+
+
+
 
