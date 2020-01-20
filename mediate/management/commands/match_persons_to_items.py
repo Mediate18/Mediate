@@ -4,6 +4,7 @@ Match Persons to Items
 """
 
 
+import re
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import Count, Subquery
@@ -39,31 +40,62 @@ class Command(BaseCommand):
 
         self.do_matching(catalogue_ids)
 
+    def normalize(self, string):
+        return re.sub(r' +', ' ', string['short_title'].replace(":", ".").replace(",", ".").lower())
+
+    # Yield successive n-sized
+    # chunks from l.
+    def divide_chunks(self, l, n):
+
+        # looping till length l
+        for i in range(0, len(l), n):
+            yield l[i:i + n]
+
+    def duplicates(self, lst):
+        seen = set()
+        duplicates = []
+        for t in lst:
+            if t[1] in seen:
+                duplicates.append(t[0])
+            else:
+                seen.add(t[1])
+
+        return duplicates
+
     def do_matching(self, catalogue_ids):
-        short_title_duplicates = Item.objects\
-            .values_list('short_title', flat=True)\
-            .annotate(short_title_cnt=Count('short_title'))\
-            .order_by()\
-            .filter(short_title_cnt__gt=1)
-        duplicates_with_personitemrelations = Item.objects\
-            .filter(short_title__in=Subquery(short_title_duplicates.values('short_title')))\
-            .annotate(personitemrelation_cnt=Count('personitemrelation'))\
-            .order_by()\
-            .filter(personitemrelation_cnt__gt=0)
+        # Determine duplicate short_titles
+        short_titles = [(item['uuid'], self.normalize(item))
+                        for item in Item.objects.values('short_title', 'uuid')]
+
+        print("#short_titles:", len(short_titles), short_titles[0])
+
+        short_title_duplicates = self.duplicates(short_titles)
+
+        print("#duplicates:", len(short_title_duplicates), len(set(short_title_duplicates)))
 
         total = 0
 
-        for source_item in duplicates_with_personitemrelations:
-            personitemrelations_to_copy = PersonItemRelation.objects.filter(item=source_item)
+        for duplicate_chunk in self.divide_chunks(short_title_duplicates, 1000):
 
-            relation_count = personitemrelations_to_copy.count()
-            # print("Count:", relation_count)
-            total += relation_count
+            duplicates_with_personitemrelations = Item.objects\
+                .filter(uuid__in=duplicate_chunk)\
+                .annotate(personitemrelation_cnt=Count('personitemrelation'))\
+                .order_by()\
+                .filter(personitemrelation_cnt__gt=0)
 
-            # for target_item in Item.objects.filter(short_title=source_item.short_title,
-            #                                        lot__catalogue__short_title__in=catalogue_ids):
-                # for relation in personitemrelations_to_copy:
-                #     PersonItemRelation(item=target_item, person=relation.person, role=relation.role).save()
+            print("#relations:", PersonItemRelation.objects.filter(item__uuid__in=duplicate_chunk).count())
+
+            for source_item in duplicates_with_personitemrelations:
+                personitemrelations_to_copy = PersonItemRelation.objects.filter(item=source_item)
+
+                relation_count = personitemrelations_to_copy.count()
+                # print("Count:", relation_count)
+                total += relation_count
+
+                # for target_item in Item.objects.filter(short_title=source_item.short_title,
+                #                                        lot__catalogue__short_title__in=catalogue_ids):
+                    # for relation in personitemrelations_to_copy:
+                    #     PersonItemRelation(item=target_item, person=relation.person, role=relation.role).save()
 
         print("Total:", total)
 
