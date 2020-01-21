@@ -75,7 +75,7 @@ class Command(BaseCommand):
             # print('date: ' + str(date))
 
             if places_of_publication and places_of_publication[0]:
-                place, created = persons.models.Place.objects.get_or_create(name=places_of_publication[0], cerl_id=None)
+                place, created = persons.models.Place.objects.get_or_create(name=places_of_publication[0])
             else:
                 place = None
             # print('place: ' + str(place))
