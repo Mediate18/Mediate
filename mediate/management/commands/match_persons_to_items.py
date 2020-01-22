@@ -8,7 +8,7 @@ import re
 from collections import defaultdict
 from django.core.management.base import BaseCommand
 from django.db import transaction
-from django.db.models import Count, Subquery
+from django.db.models import Count, Q
 from catalogues.models import Catalogue
 from items.models import Item, PersonItemRelation
 
@@ -69,7 +69,8 @@ class Command(BaseCommand):
         short_titles_with_relations = self.get_short_titles_with_relations()
         print("#short_titles_with_relations", len(short_titles_with_relations))
 
-        short_titles_target_items = self.get_short_titles_from_selected_catalogues(catalogue_ids)
+        filter = Q(lot__catalogue__short_title__in=catalogue_ids)
+        short_titles_target_items = self.get_short_titles_with_filter(filter)
         print("#short_titles_target_items", len(short_titles_target_items))
 
         # Find short_titles that are in both lists
@@ -99,15 +100,16 @@ class Command(BaseCommand):
 
         print("Grand total:", grand_total)
 
-    def get_short_titles_from_selected_catalogues(self, catalogue_ids):
-        """Get short_titles from items that are in a selection of catalogues"""
-        
+    def get_short_titles_with_filter(self, filter=None):
+        """Get short_titles from items and filter them"""
+
         items_from_selected_catalogues = Item.objects \
             .values_list('short_title', 'uuid') \
             .annotate(personitemrelation_cnt=Count('personitemrelation')) \
-            .filter(lot__catalogue__short_title__in=catalogue_ids) \
             .order_by() \
             .filter(personitemrelation_cnt=0)
+        if filter:
+            items_from_selected_catalogues = items_from_selected_catalogues.filter(filter) \
 
         short_titles_from_selected_catalogues = defaultdict(list)
         for short_title, uuid, cnt in items_from_selected_catalogues:
