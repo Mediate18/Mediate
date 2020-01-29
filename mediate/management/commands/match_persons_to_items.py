@@ -24,9 +24,11 @@ class Command(BaseCommand):
     @transaction.atomic
     def handle(self, *args, **kwargs):
         # Get the command line arguments
-        catalogue_ids_filename = kwargs['catalogue_ids_filename']
+        if 'catalogue_ids_filename' in kwargs:
+            catalogue_ids_filename = kwargs['catalogue_ids_filename']
 
         # Read catalogue IDs
+        catalogue_ids = []
         if catalogue_ids_filename:
             with open(catalogue_ids_filename, 'r') as cat_ids_file:
                 catalogue_ids = [id.strip() for id in cat_ids_file.readlines()]
@@ -63,13 +65,15 @@ class Command(BaseCommand):
 
         return duplicates
 
-    def do_matching(self, catalogue_ids):
+    def do_matching(self, catalogue_ids=None):
         """Matches normalized short_titles and copies the PersonItemRelations."""
 
         short_titles_with_relations = self.get_short_titles_with_relations()
         print("#short_titles_with_relations", len(short_titles_with_relations))
 
-        filter = Q(lot__catalogue__short_title__in=catalogue_ids)
+        filter = Q()
+        if catalogue_ids:
+            filter = Q(lot__catalogue__short_title__in=catalogue_ids)
         short_titles_target_items = self.get_short_titles_with_filter(filter)
         print("#short_titles_target_items", len(short_titles_target_items))
 
