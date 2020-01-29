@@ -155,6 +155,20 @@ class PersonCatalogueRelationModelForm(forms.ModelForm):
     class Meta:
         model = PersonCatalogueRelation
         fields = "__all__"
+        widgets = {
+            'person': ModelSelect2Widget(
+                model=Person,
+                search_fields=['short_name__icontains', 'surname__icontains', 'first_names__icontains']
+            ),
+            'catalogue': ModelSelect2Widget(
+                model=Catalogue,
+                search_fields=['short_title__icontains']
+            ),
+            'role': ModelSelect2Widget(
+                model=PersonCatalogueRelationRole,
+                search_fields=['name__icontains']
+            )
+        }
 
 
 class PersonCatalogueRelationRoleModelForm(forms.ModelForm):
