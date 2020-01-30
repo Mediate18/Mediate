@@ -58,5 +58,5 @@ class Command(BaseCommand):
                     item.lot.catalogue,
                     item.book_format,
                     item.edition,
-                    ", ".join([lang.language for lang in item.languages.all()])
+                    ", ".join([lang.language.name for lang in item.languages.all()])
                 ])
