@@ -129,10 +129,6 @@ class Lot(models.Model):
     index_in_catalogue = models.IntegerField(_("Index in catalogue"), null=True)
     category = models.ForeignKey('Category', on_delete=SET_NULL, null=True)
 
-    class Meta:
-        ordering = ['catalogue__year_of_publication', 'catalogue__short_title', 'index_in_catalogue',
-                    'lot_as_listed_in_catalogue']
-
     def __str__(self):
         return self.lot_as_listed_in_catalogue
 

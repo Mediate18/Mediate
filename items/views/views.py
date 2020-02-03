@@ -105,7 +105,8 @@ class ItemTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        items = Item.objects.all()
+        items = Item.objects.order_by('lot__catalogue__year_of_publication', 'lot__catalogue__short_title',
+                                      'lot__lot_as_listed_in_catalogue')
         lot_uuid = self.request.GET.get('lot__uuid')
         if lot_uuid:
             items = items.filter(lot__uuid=uuid.UUID(lot_uuid))
