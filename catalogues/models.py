@@ -89,7 +89,11 @@ class Catalogue(models.Model):
     def item_count(self):
         from items.models import Item
         return Item.objects.filter(lot__catalogue=self).count()
-    
+
+    @property
+    def sorted_lot_set(self):
+        return self.lot_set.order_by('index_in_catalogue')
+
 
 class CatalogueCatalogueTypeRelation(models.Model):
     """
