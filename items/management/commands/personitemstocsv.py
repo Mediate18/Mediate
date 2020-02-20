@@ -29,6 +29,9 @@ class Command(BaseCommand):
             items_writer = csv.writer(items_csv_file)
             items_writer.writerow(['ID', 'Short title', 'Catalogue', 'Book format', 'Edition', 'Language'])
             
+            persons_seen = set()
+            items_seen = set()
+
             relations = PersonItemRelation.objects.all()
             for relation in relations:
                 relations_writer.writerow([
@@ -39,24 +42,28 @@ class Command(BaseCommand):
                 ])
 
                 person = relation.person
-                persons_writer.writerow([
-                    str(person.uuid),
-                    person.short_name,
-                    person.surname,
-                    person.first_names,
-                    person.date_of_birth,
-                    person.date_of_death,
-                    person.sex,
-                    person.city_of_birth,
-                    person.city_of_death
-                ])
+                if str(person.uuid) not in persons_seen:
+                    persons_seen.add(str(person.uuid))
+                    persons_writer.writerow([
+                        str(person.uuid),
+                        person.short_name,
+                        person.surname,
+                        person.first_names,
+                        person.date_of_birth,
+                        person.date_of_death,
+                        person.sex,
+                        person.city_of_birth,
+                        person.city_of_death
+                    ])
 
                 item = relation.item
-                items_writer.writerow([
-                    str(item.uuid),
-                    item.short_title,
-                    item.lot.catalogue,
-                    item.book_format,
-                    item.edition,
-                    ", ".join([lang.language.name for lang in item.languages.all()])
-                ])
+                if str(item.uuid) not in items_seen:
+                    items_seen.add(str(item.uuid))
+                    items_writer.writerow([
+                        str(item.uuid),
+                        item.short_title,
+                        item.lot.catalogue,
+                        item.book_format,
+                        item.edition,
+                        ", ".join([lang.language.name for lang in item.languages.all()])
+                    ])
