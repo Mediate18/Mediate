@@ -141,7 +141,7 @@ class Lot(models.Model):
         if not self.category or self.catalogue == self.category.catalogue:
             super(Lot, self).save(*args, **kwargs)
         else:
-            raise Exception(_("Lot {}: the catalogue is not the as the category's catalogue").format(self))
+            raise Exception(_("Lot {}: the catalogue is not the same as the category's catalogue").format(self))
 
     def get_absolute_url(self):
         return reverse_lazy('lot_detail', args=[str(self.uuid)])
