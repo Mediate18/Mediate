@@ -79,7 +79,7 @@ class Command(BaseCommand):
                 non_cerl_str = "[non-CERL]"
                 place_name = places_of_publication[0]
                 places = persons.models.Place.objects\
-                    .filter(name__iregex=rf'{re.escape(place_name)}\s+{re.escape(non_cerl_str)}')
+                    .filter(name__iregex=re.escape(place_name) + r'\s+' + re.escape(non_cerl_str))
                 if places:
                     place = places[0]
                 else:
