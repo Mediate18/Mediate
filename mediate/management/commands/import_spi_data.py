@@ -75,7 +75,15 @@ class Command(BaseCommand):
             # print('date: ' + str(date))
 
             if places_of_publication and places_of_publication[0]:
-                place, created = persons.models.Place.objects.get_or_create(name=places_of_publication[0])
+                # Find a place marked with [non-CERL]
+                non_cerl_str = "[non-CERL]"
+                place_name = places_of_publication[0]
+                places = persons.models.Place.objects\
+                    .filter(name__iregex=rf'{re.escape(place_name)}\s+{re.escape(non_cerl_str)}')
+                if places:
+                    place = places[0]
+                else:
+                    place = persons.models.Place.objects.create(name="{} {}".format(place_name, non_cerl_str))
             else:
                 place = None
             # print('place: ' + str(place))
