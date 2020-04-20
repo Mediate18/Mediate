@@ -13,6 +13,10 @@ from items.models import Item, Edition
 from persons.models import Place
 
 
+class DryRunException(Exception):
+    pass
+
+
 class Command(BaseCommand):
     help = 'Imports text transcriptions'
 
@@ -21,13 +25,15 @@ class Command(BaseCommand):
         parser.add_argument('transcription', type=str, nargs='+', help='Text transcription file')
 
         # Optional
-        parser.add_argument('-d', '--dry_run', action='store_true', help='Do not save to database, but print the data.')
+        parser.add_argument('-d', '--dry_run', action='store_true', help='Do not save to database.')
+        parser.add_argument('-vv', '--verbose', action='store_true', help='Print the data.')
 
     @transaction.atomic
     def handle(self, *args, **kwargs):
         # Get the command line arguments
         transcription_files = kwargs['transcription']
         dry_run = kwargs["dry_run"]
+        verbose = kwargs["verbose"]
 
         markers = OrderedDict({
             "TITLE": "TIT@",
@@ -66,11 +72,9 @@ class Command(BaseCommand):
                 text = re.sub(r'(?<=\r)'+marker, field_marker+marker, text)
             return text
 
-        def save_or_print(obj, dry_run=False):
-            if dry_run:
+        def print_obj(obj):
+            if verbose:
                 print("{}: {}".format(obj.__class__.__name__, model_to_dict(obj)))
-            else:
-                obj.save()
 
         def fill_slots(fields):
             slots = {}
@@ -84,95 +88,110 @@ class Command(BaseCommand):
             # Take catalogue short_title from filename
             catalogue_short_title = os.path.splitext(os.path.basename(file))[0]
 
-            collection = Collection(name=catalogue_short_title)
-            save_or_print(collection, dry_run)
+            try:
+                with open(file, 'r', encoding='utf-8') as transcription_file:
+                    with transaction.atomic():
+                        collection = Collection(name=catalogue_short_title)
+                        print_obj(collection)
+                        collection.save()
 
-            with open(file, 'r', encoding='utf-8') as transcription:
-                transcription_with_field_markers = add_field_marker(transcription.read())
-                # print(transcription_with_field_markers)
-                records = [record.strip() for record in transcription_with_field_markers.split("<%%>")]
-                page = 0
-                index_in_catalogue = 1
-                catalogue = None
-                for record in records:
-                    # print(record)
-                    fields = fill_slots(record.split(field_marker))
-                    # print(fields)
-                    if "PAGE" in fields:
-                        page += 1
-                    elif "TITLE" in fields:
-                        title = fields["TITLE"]
-                        catalogue = Catalogue(short_title=catalogue_short_title, full_title=title,
-                                              collection=collection)
-                        save_or_print(catalogue, dry_run)
-                    elif "CATEGORY" in fields:
-                        # print(fields)
-                        category_books = fields["CATEGORY"]
-                        category = Category(catalogue=catalogue, bookseller_category=category_books)
-                        save_or_print(category, dry_run)
-                    elif "FULL_ITEM_DESC" in fields:
-                        full_item_desc_books = fields["FULL_ITEM_DESC"]
-                        page_in_catalogue = page if page else None
+                        transcription = transcription_file.read().replace(u'\ufeff', '')
+                        transcription_with_field_markers = add_field_marker(transcription)
+                        # print(transcription_with_field_markers)
+                        records = [record.strip() for record in transcription_with_field_markers.split("<%%>")]
+                        page = 0
+                        index_in_catalogue = 1
+                        catalogue = None
+                        category = None
+                        for record in records:
+                            # print(record)
+                            fields = fill_slots(record.split(field_marker))
+                            # print(fields)
+                            if "PAGE" in fields:
+                                page += 1
+                            elif "TITLE" in fields:
+                                title = fields["TITLE"]
+                                catalogue = Catalogue(short_title=catalogue_short_title, full_title=title,
+                                                      collection=collection)
+                                print_obj(catalogue)
+                                catalogue.save()
+                            elif "CATEGORY" in fields:
+                                # print(fields)
+                                category_books = fields["CATEGORY"]
+                                category = Category(catalogue=catalogue, bookseller_category=category_books)
+                                print_obj(category)
+                                category.save()
+                            elif "FULL_ITEM_DESC" in fields:
+                                full_item_desc_books = fields["FULL_ITEM_DESC"]
+                                page_in_catalogue = page if page else None
 
-                        # Lot
-                        # TODO use get_or_create instead of the following:
-                        lot = Lot(catalogue=catalogue,
-                                  number_in_catalogue=fields.get("ITEM_NUMBER", None),
-                                  page_in_catalogue=page_in_catalogue,
-                                  sales_price=fields.get("SALES_PRICE", None),
-                                  lot_as_listed_in_catalogue=full_item_desc_books,
-                                  index_in_catalogue=index_in_catalogue,
-                                  category=category)
-                        save_or_print(lot, dry_run)
-                        index_in_catalogue += 1
+                                # Lot
+                                lot, created = Lot.objects.get_or_create(catalogue=catalogue,
+                                          number_in_catalogue=fields.get("ITEM_NUMBER", '-1'),
+                                          page_in_catalogue=page_in_catalogue,
+                                          sales_price=fields.get("SALES_PRICE", ""),
+                                          lot_as_listed_in_catalogue=full_item_desc_books,
+                                          index_in_catalogue=index_in_catalogue,
+                                          category=category)
+                                print_obj(lot)
+                                lot.save()
+                                index_in_catalogue += 1
 
-                        # Place
-                        if "CITY" in fields:
-                            non_cerl_str = "[non-CERL]"
-                            place_name = fields.get("CITY")
-                            places = Place.objects.filter(name__iregex=re.escape(place_name) + r' +'
-                                                                       + re.escape(non_cerl_str))
-                            if places:
-                                place = places[0]
-                            else:
-                                place = Place.objects.create(name="{} {}".format(place_name, non_cerl_str))
-                        else:
-                            place = None
+                                # Place
+                                if "CITY" in fields:
+                                    non_cerl_str = "[non-CERL]"
+                                    place_name = fields.get("CITY")
+                                    places = Place.objects.filter(name__iregex=re.escape(place_name) + r' +'
+                                                                               + re.escape(non_cerl_str))
+                                    if places:
+                                        place = places[0]
+                                    else:
+                                        place = Place.objects.create(name="{} {}".format(place_name, non_cerl_str))
+                                else:
+                                    place = None
 
-                        # Edition
-                        if "YEAR" in fields:
-                            try:
-                                year = int(fields.get("YEAR"))
-                                year_tag = None
-                            except:
-                                year = None
-                                year_tag = fields.get("YEAR")
-                        else:
-                            year = None
-                            year_tag = None
+                                # Edition
+                                if "YEAR" in fields:
+                                    try:
+                                        year = int(fields.get("YEAR"))
+                                        year_tag = ""
+                                    except:
+                                        year = None
+                                        year_tag = fields.get("YEAR")
+                                else:
+                                    year = None
+                                    year_tag = ""
 
-                        edition = Edition(place=place, year=year, year_tag=year_tag)
-                        save_or_print(edition, dry_run)
+                                edition = Edition(place=place, year=year, year_tag=year_tag)
+                                print_obj(edition)
+                                edition.save()
 
-                        # Format
-                        if "FORMAT" in fields:
-                            # TODO use get_or_create instead of the following:
-                            book_format = BookFormat(name=fields.get("FORMAT"))
-                            save_or_print(book_format, dry_run)
-                        else:
-                            book_format = None
+                                # Format
+                                if "FORMAT" in fields:
+                                    book_format, created = BookFormat.objects.get_or_create(name=fields.get("FORMAT"))
+                                    print_obj(book_format)
+                                else:
+                                    book_format = None
 
-                        # Item
-                        item = Item(short_title=fields.get("FULL_ITEM_DESC")[:128],
-                                    lot=lot,
-                                    number_of_volumes=fields.get("VOLUME", None),
-                                    book_format=book_format,
-                                    index_in_lot=1,
-                                    edition=edition)
-                        save_or_print(item, dry_run)
+                                # Item
+                                item = Item(short_title=fields.get("FULL_ITEM_DESC")[:128],
+                                            lot=lot,
+                                            number_of_volumes=fields.get("VOLUME", None),
+                                            book_format=book_format,
+                                            index_in_lot=1,
+                                            edition=edition)
+                                print_obj(item)
+                                item.save()
 
-                    elif "PREFACE" in fields:
-                        catalogue.preface_and_paratexts = fields.get("PREFACE")
-                        save_or_print(catalogue, dry_run)
+                            elif "PREFACE" in fields:
+                                catalogue.preface_and_paratexts = fields.get("PREFACE")
+                                print_obj(catalogue)
+                                catalogue.save()
+
+                        # The following, including the try-except is meant to handle a dry run
+                        if dry_run:
+                            raise DryRunException()
+            except DryRunException:
+                print("Dry run finished without errors.")
 
 
