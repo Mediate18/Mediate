@@ -397,6 +397,18 @@ class ItemItemTypeForm(forms.ModelForm):
         }
 
 
+class ItemTagsForm(forms.ModelForm):
+    class Meta:
+        model = TaggedEntity
+        fields = ['tag']
+        widgets = {
+            'tag': ModelSelect2MultipleWidget(
+                model=Tag,
+                search_fields=['name__icontains']
+            )
+        }
+
+
 class PublisherForm(forms.ModelForm):
     class Meta:
         model = Publisher
