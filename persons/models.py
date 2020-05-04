@@ -104,6 +104,7 @@ class Person(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     short_name = models.CharField(_("Short name"), max_length=128, null=True)
     viaf_id = models.CharField(_("VIAF ID (https://viaf.org)"), max_length=128, null=True, blank=True)
+    publisher_cerl_id = models.CharField(_("Publisher CERL ID"), max_length=32, null=True, blank=True)
     surname = models.CharField(_("Surname"), max_length=128)
     first_names = models.CharField(_("First names"), max_length=512)
     date_of_birth = models.CharField(_("Date of birth"), max_length=64, blank=True, null=True)

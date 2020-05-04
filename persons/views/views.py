@@ -615,6 +615,7 @@ class PlaceCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         context['action'] = _("add")
         context['object_name'] = "place"
+        context['js_variables'] = json.dumps({'viaf_select_id': self.form_class.suggest_select_ids})
         return context
 
 
@@ -628,6 +629,7 @@ class PlaceUpdateView(UpdateView):
         context = super().get_context_data(**kwargs)
         context['action'] = _("update")
         context['object_name'] = "place"
+        context['js_variables'] = json.dumps({'viaf_select_id': self.form_class.suggest_select_ids})
         return context
 
 

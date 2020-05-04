@@ -40,6 +40,7 @@ class PersonTable(tables.Table):
             'date_of_death',
             'catalogues',
             'viaf_id',
+            'publisher_cerl_id',
             'notes',
             'bibliography',
             'relations',
@@ -93,6 +94,15 @@ class PersonTable(tables.Table):
         if value:
             return format_html('<a target="blank" href="{}">{}</a>'.format(
                 value, value
+            ))
+        else:
+            return format_html('-')
+
+    def render_publisher_cerl_id(self, value):
+        if value:
+            url = cerl_record_url + value
+            return format_html('<a target="blank" href="{}">{}</a>'.format(
+                url, value
             ))
         else:
             return format_html('-')

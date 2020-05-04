@@ -9,7 +9,7 @@ from .models import *
 
 
 class PersonModelForm(forms.ModelForm):
-    suggest_select_ids = ['viaf_id', 'city_of_birth', 'city_of_death']  # IDs of the suggest widgets
+    suggest_select_ids = ['viaf_id', 'publisher_cerl_id', 'city_of_birth', 'city_of_death']  # IDs of the suggest widgets
 
     class Meta:
         model = Person
@@ -17,6 +17,11 @@ class PersonModelForm(forms.ModelForm):
         widgets = {
             'viaf_id': ApiSelectWidget(
                 url=reverse_lazy('person_viaf_suggest'),
+                attrs={'data-html': True,
+                       'data-placeholder': "Search for a person"},
+            ),
+            'publisher_cerl_id': ApiSelectWidget(
+                url='cerl_suggest_person',
                 attrs={'data-html': True,
                        'data-placeholder': "Search for a person"},
             ),
@@ -175,6 +180,8 @@ class CountryModelForm(forms.ModelForm):
 
 
 class PlaceModelForm(forms.ModelForm):
+    suggest_select_ids = ['cerl_id']
+
     class Meta:
         model = Place
         fields = "__all__"
@@ -189,6 +196,9 @@ class PlaceModelForm(forms.ModelForm):
                 search_fields=['name__icontains']
             )
         }
+
+    class Media:
+        js = ('js/viaf_select.js',)
 
 
 class ProfessionModelForm(forms.ModelForm):
