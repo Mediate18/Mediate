@@ -20,7 +20,7 @@ class ApiSelectWidget(autocomplete.Select2):
         id = value
         url = value
         if value:
-            if url.startswith('cnl') or url.startswith('cni'):
+            if isinstance(url, str) and (url.startswith('cnl') or url.startswith('cni')):
                 choice = get_record(value)
             else:
                 choice = value
@@ -30,7 +30,7 @@ class ApiSelectWidget(autocomplete.Select2):
                 try:
                     obj = self.model.objects.get(pk=value)
                     value = str(obj)
-                    self.choices = [(obj.pk, choice)]
+                    self.choices = [(obj.pk, value)]
                     url = obj.get_absolute_url()
                 except ObjectDoesNotExist:
                     pass
