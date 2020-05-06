@@ -142,7 +142,7 @@ class Item(models.Model):
     def determine_non_book(self):
         original_non_book = self.non_book
         if ItemItemTypeRelation.objects.filter(item=self):
-            if ItemItemTypeRelation.objects.exclude(item=self, type__name__icontains='book'):
+            if ItemItemTypeRelation.objects.filter(item=self).exclude(type__name__icontains='book:'):
                 self.non_book = True
             else:
                 self.non_book = False
