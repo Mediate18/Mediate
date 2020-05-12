@@ -211,8 +211,13 @@ class Command(BaseCommand):
             }
 
             try:
-                collection = catalogues.models.Collection(name=row['short_title'])
-                collection.save()
+                # Only use a collection that is new or that does not have any catalogues linked to it.
+                collection, created = catalogues.models.Collection.objects.get_or_create(name=row['short_title'])
+                if created:
+                    collection.save()
+                elif collection.catalogue_set.count() != 0:
+                    raise Exception("Collection {} already exists and has catalogues linked to.".format(collection))
+
                 catalogue = catalogues.models.Catalogue(**insert_fields)
                 catalogue.collection = collection
                 catalogue.save()
