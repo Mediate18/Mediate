@@ -1,3 +1,15 @@
+"""Django command to count objects
+
+
+Example:
+
+    ./manage.py object_count catalogues__Collection catalogues__Catalogue catalogues__Category catalogues__Lot \
+    persons__Place persons__Person items__Edition items__Item items__Publisher items__BookFormat \
+    items__MaterialDetails items__ItemMaterialDetailsRelation
+
+
+"""
+
 from django.core.management.base import BaseCommand
 from django.apps import apps
 
