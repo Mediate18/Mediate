@@ -104,24 +104,29 @@ class Command(BaseCommand):
                         catalogue = None
                         category = None
                         for record in records:
+                            if verbose:
+                                print('---')  # Start of record
                             # print(record)
+
                             fields = fill_slots(record.split(field_marker))
                             # print(fields)
                             if "PAGE" in fields:
                                 page += 1
-                            elif "TITLE" in fields:
+                                if verbose:
+                                    print("Page", page)
+                            if "TITLE" in fields:
                                 title = fields["TITLE"]
                                 catalogue = Catalogue(short_title=catalogue_short_title, full_title=title,
                                                       collection=collection)
                                 print_obj(catalogue)
                                 catalogue.save()
-                            elif "CATEGORY" in fields:
+                            if "CATEGORY" in fields:
                                 # print(fields)
                                 category_books = fields["CATEGORY"]
                                 category = Category(catalogue=catalogue, bookseller_category=category_books)
                                 print_obj(category)
                                 category.save()
-                            elif "FULL_ITEM_DESC" in fields:
+                            if "FULL_ITEM_DESC" in fields:
                                 full_item_desc_books = fields["FULL_ITEM_DESC"]
                                 page_in_catalogue = page if page else None
 
@@ -183,8 +188,12 @@ class Command(BaseCommand):
                                 print_obj(item)
                                 item.save()
 
-                            elif "PREFACE" in fields:
-                                catalogue.preface_and_paratexts = fields.get("PREFACE")
+                            if "PREFACE" in fields:
+                                if not catalogue.preface_and_paratexts:
+                                    catalogue.preface_and_paratexts = fields.get("PREFACE")
+                                else:
+                                    catalogue.preface_and_paratexts = catalogue.preface_and_paratexts + " [...] " + \
+                                                                      fields.get("PREFACE")
                                 print_obj(catalogue)
                                 catalogue.save()
 
