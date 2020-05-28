@@ -94,11 +94,13 @@ class Person(models.Model):
     FEMALE = 'FEMALE'
     OTHER = 'OTHER'
     UNKNOWN = 'UNKNOWN'
+    CORPORATE = 'CORPRT'
     SEX_CHOICES = (
         (MALE, 'Male'),
         (FEMALE, 'Female'),
         (OTHER, 'Other'),
         (UNKNOWN, 'Unknown'),
+        (CORPORATE, 'Corporate')
     )
 
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
