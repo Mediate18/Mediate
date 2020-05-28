@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import ProtectedError
 from django.db.models.deletion import CASCADE, SET_NULL
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse_lazy
@@ -85,6 +86,23 @@ class Catalogue(models.Model):
 
     def get_absolute_url(self):
         return reverse_lazy('catalogue_detail', args=[str(self.uuid)])
+
+    def delete(self, *args, **kwargs):
+        # Gather edition IDs that are linked to this catalogue
+        from items.models import Edition  # To prevent an import error (probably circular imports)
+        editions = list(Edition.objects.filter(items__lot__catalogue=self).values_list('uuid', flat=True))
+
+        # Delete the catalogue
+        super().delete(*args, **kwargs)
+
+        # Delete the linked editions
+        for id in editions:
+            try:
+                edition = Edition.objects.get(uuid=id)
+                edition.delete()
+            except ProtectedError:
+                # No problem, this is suppost to happen due to the on_delete=PROTECT in the Item-Edition relation
+                pass
 
     def item_count(self):
         from items.models import Item

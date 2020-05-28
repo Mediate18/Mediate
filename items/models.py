@@ -152,9 +152,9 @@ class Item(models.Model):
         # Return whether non_book is changed
         return not original_non_book == self.non_book
 
-    def save(self):
+    def save(self, *args, **kwargs):
         self.determine_non_book()
-        super().save()
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse_lazy('item_detail', args=[str(self.uuid)])
