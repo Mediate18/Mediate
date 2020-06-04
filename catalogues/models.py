@@ -149,7 +149,7 @@ class Lot(models.Model):
     sales_price = models.CharField(_("Sales price"), max_length=128, blank=True)
     lot_as_listed_in_catalogue = models.TextField(_("Full lot description, exactly as in the catalogue"))
     index_in_catalogue = models.IntegerField(_("Index in catalogue"), null=True)
-    category = models.ForeignKey('Category', on_delete=SET_NULL, null=True)
+    category = models.ForeignKey('Category', on_delete=SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.lot_as_listed_in_catalogue
