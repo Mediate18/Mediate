@@ -133,7 +133,7 @@ class LotModelForm(forms.ModelForm):
         widgets = {
             'catalogue': ModelSelect2Widget(
                 model=Catalogue,
-                search_fields=['name__icontains']
+                search_fields=['short_title__icontains']
             ),
         }
 
