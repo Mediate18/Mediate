@@ -127,10 +127,6 @@ class Item(models.Model):
 
     tags = GenericRelation(TaggedEntity, related_query_name='items')
 
-    class Meta:
-        ordering = ['lot__catalogue__year_of_publication', 'lot__catalogue__short_title',
-                    'lot__lot_as_listed_in_catalogue']
-
     def __str__(self):
         return self.short_title
 
@@ -146,7 +142,7 @@ class Item(models.Model):
     def determine_non_book(self):
         original_non_book = self.non_book
         if ItemItemTypeRelation.objects.filter(item=self):
-            if ItemItemTypeRelation.objects.exclude(item=self, type__name__icontains='book'):
+            if ItemItemTypeRelation.objects.filter(item=self).exclude(type__name__icontains='book:'):
                 self.non_book = True
             else:
                 self.non_book = False
@@ -156,9 +152,9 @@ class Item(models.Model):
         # Return whether non_book is changed
         return not original_non_book == self.non_book
 
-    def save(self):
+    def save(self, *args, **kwargs):
         self.determine_non_book()
-        super().save()
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse_lazy('item_detail', args=[str(self.uuid)])

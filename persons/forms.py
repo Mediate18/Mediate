@@ -9,7 +9,7 @@ from .models import *
 
 
 class PersonModelForm(forms.ModelForm):
-    suggest_select_ids = ['viaf_id', 'city_of_birth', 'city_of_death']  # IDs of the suggest widgets
+    suggest_select_ids = ['viaf_id', 'publisher_cerl_id', 'city_of_birth', 'city_of_death']  # IDs of the suggest widgets
 
     class Meta:
         model = Person
@@ -17,6 +17,11 @@ class PersonModelForm(forms.ModelForm):
         widgets = {
             'viaf_id': ApiSelectWidget(
                 url=reverse_lazy('person_viaf_suggest'),
+                attrs={'data-html': True,
+                       'data-placeholder': "Search for a person"},
+            ),
+            'publisher_cerl_id': ApiSelectWidget(
+                url='cerl_suggest_person',
                 attrs={'data-html': True,
                        'data-placeholder': "Search for a person"},
             ),
@@ -122,7 +127,38 @@ AlternativePersonNameFormSet = inlineformset_factory(Person, AlternativePersonNa
 class PersonPersonRelationModelForm(forms.ModelForm):
     class Meta:
         model = PersonPersonRelation
-        fields = "__all__"
+        fields = (
+            'first_person',
+            'type',
+            'second_person',
+            'start_year',
+            'end_year'
+        )
+        widgets = {
+            'first_person': ModelSelect2Widget(
+                label="Person",
+                model=Person,
+                search_fields=['short_name__icontains']
+            ),
+            'second_person': ModelSelect2Widget(
+                label="Person",
+                model=Person,
+                search_fields=['short_name__icontains'],
+                attrs={'style': 'width: 200px;'}
+            ),
+            'type': ModelSelect2Widget(
+                model=PersonPersonRelationType,
+                search_fields=['name__icontains'],
+                attrs={'style': 'width: 150px;'}
+            )
+        }
+
+
+FirstPersonPersonRelationFormSet = inlineformset_factory(Person, PersonPersonRelation, fk_name='first_person',
+                                                         form=PersonPersonRelationModelForm, can_delete=True, extra=1)
+
+SecondPersonPersonRelationFormSet = inlineformset_factory(Person, PersonPersonRelation, fk_name='second_person',
+                                                         form=PersonPersonRelationModelForm, can_delete=True, extra=1)
 
 
 class PersonPersonRelationTypeModelForm(forms.ModelForm):
@@ -144,6 +180,8 @@ class CountryModelForm(forms.ModelForm):
 
 
 class PlaceModelForm(forms.ModelForm):
+    suggest_select_ids = ['cerl_id']
+
     class Meta:
         model = Place
         fields = "__all__"
@@ -158,6 +196,9 @@ class PlaceModelForm(forms.ModelForm):
                 search_fields=['name__icontains']
             )
         }
+
+    class Media:
+        js = ('js/viaf_select.js',)
 
 
 class ProfessionModelForm(forms.ModelForm):
@@ -189,7 +230,8 @@ class ResidenceModelForm(forms.ModelForm):
             ),
             'place': ModelSelect2Widget(
                 model=Place,
-                search_fields=['name__icontains']
+                search_fields=['name__icontains'],
+                attrs={'style': 'width: 300px'}
             )
         }
 

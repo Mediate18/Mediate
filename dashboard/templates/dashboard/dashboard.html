@@ -6,7 +6,7 @@
 <h1>{% trans "Dashboard" %}</h1>
 
 <div class="row">
-    <div class="col-xs-3">
+    <div class="col-md-3">
         <h3>{% trans "Persons" %}</h3>
         <table class="table">
             <tbody>
@@ -121,7 +121,7 @@
         </table>
 
     </div>
-    <div class="col-xs-3">
+    <div class="col-md-3">
         <h3>{% trans "Catalogues" %}</h3>
         <table class="table">
             <tbody>
@@ -280,7 +280,7 @@
             </tbody>
         </table>
     </div>
-    <div class="col-xs-3">
+    <div class="col-md-3">
         <h3>{% trans "Items" %}</h3>
         {% if request.user.is_superuser %}
         <div class="panel panel-default">
@@ -457,7 +457,7 @@
             </tbody>
         </table>
     </div>
-    <div class="col-xs-3">
+    <div class="col-md-3">
         <h3>{% trans "Works" %}</h3>
         <table class="table">
             <tbody>

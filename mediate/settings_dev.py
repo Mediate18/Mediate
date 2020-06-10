@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import os
 import socket
-from mediate.decouple import config
+from mediate.decouple import config, Csv
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -27,7 +27,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool)
 
-ALLOWED_HOSTS = [config('ALLOWED_HOSTS')]
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
 ADMINS = [
     ('Micha Hulsbosch', 'm.hulsbosch@let.ru.nl')
@@ -112,51 +112,61 @@ WSGI_APPLICATION = 'mediate.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST': config('DB_HOST'),
-        'USER': config('DB_USERNAME'),
+        'ENGINE': 'django.db.backends.sqlite3',
         'NAME': config('DB_NAME'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES',character_set_connection=utf8mb4,collation_connection=utf8_unicode_ci",
-            'charset': 'utf8mb4'
-        },
         'TEST': {
             'NAME': config('TEST_DB_NAME', None),
         }
     }
 }
 
+print(DATABASES['default']['NAME'])
+
 # Check the availability of Redis at startup
 # otherwise use a database cache
-socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#
+# REDIS_PORT = config('REDIS_PORT', 0, cast=int)
+#
+# try:
+#     socket.connect(('127.0.0.1', REDIS_PORT))
+#     socket.close()
+#     print("Starting with Redis cache (port: {})".format(REDIS_PORT))
+#     CACHES = {
+#         "default": {
+#             "BACKEND": "django_redis.cache.RedisCache",
+#             "LOCATION": "redis://127.0.0.1:{}/1".format(REDIS_PORT),
+#             "OPTIONS": {
+#                 "CLIENT_CLASS": "django_redis.client.DefaultClient"
+#             },
+#             "KEY_PREFIX": "mediate",
+#             "TIMEOUT": 60*60*24  # 24 hours
+#         }
+#     }
+# except ConnectionRefusedError:
+#     print("Starting with database cache")
+#     CACHES = {
+#         'default': {
+#             'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+#             'LOCATION': config('CACHE_LOCATION', default="mediate_cache"),
+#             'TIMEOUT': 60*60*24  # 24 hours
+#         }
+#     }
 
-REDIS_PORT = config('REDIS_PORT', cast=int)
-
-try:
-    socket.connect(('127.0.0.1', REDIS_PORT))
-    socket.close()
-    print("Starting with Redis cache (port: {})".format(REDIS_PORT))
-    CACHES = {
-        "default": {
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": "redis://127.0.0.1:{}/1".format(REDIS_PORT),
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient"
-            },
-            "KEY_PREFIX": "mediate",
-            "TIMEOUT": 60*60*24  # 24 hours
-        }
-    }
-except ConnectionRefusedError:
-    print("Starting with database cache")
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-            'LOCATION': config('CACHE_LOCATION', default="mediate_cache"),
-            'TIMEOUT': 60*60*24  # 24 hours
-        }
-    }
+# LOGGING = {
+#     'version': 1,
+#     'handlers': {
+#         'console': {
+#             'class': 'logging.StreamHandler',
+#         },
+#     },
+#     'loggers': {
+#         'django.db.backends': {
+#             'level': 'DEBUG',
+#             'handlers': ['console', ],
+#         },
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators

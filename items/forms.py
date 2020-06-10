@@ -22,6 +22,8 @@ class ItemModelForm(forms.ModelForm):
         self.add_tag_field()
         self.add_languages_field()
         self.add_publishers_field()
+        self.add_material_details_field()
+        self.add_itemtype_field()
 
     def add_tag_field(self):
         tag = forms.ModelMultipleChoiceField(
@@ -60,6 +62,30 @@ class ItemModelForm(forms.ModelForm):
             initial=Person.objects.filter(publisher__edition__items=self.instance)
         )
         self.fields['publishers'] = publishers
+        
+    def add_material_details_field(self):
+        material_details = forms.ModelMultipleChoiceField(
+            widget=ModelSelect2MultipleWidget(
+                model=MaterialDetails,
+                search_fields=['description']
+            ),
+            queryset=MaterialDetails.objects.all(),
+            required=False,
+            initial=MaterialDetails.objects.filter(items__item=self.instance)
+        )
+        self.fields['material_details'] = material_details
+
+    def add_itemtype_field(self):
+        itemtypes = forms.ModelMultipleChoiceField(
+            widget=ModelSelect2MultipleWidget(
+                model=ItemType,
+                search_fields=['name']
+            ),
+            queryset=ItemType.objects.all(),
+            required=False,
+            initial=ItemType.objects.filter(itemitemtyperelation__item=self.instance)
+        )
+        self.fields['item_type'] = itemtypes
 
     class Meta:
         model = Item
@@ -124,6 +150,36 @@ class ItemModelForm(forms.ModelForm):
         for person in new_persons:
             item = self.instance
             Publisher(edition=item.edition, publisher=person).save()
+            
+    def save_material_details(self):
+        material_details_in_form = self.cleaned_data['material_details']
+        existing_material_details = MaterialDetails.objects.filter(items__item=self.instance)
+
+        # Delete material details that were removed in the form
+        material_details_to_delete = existing_material_details\
+            .exclude(pk__in=material_details_in_form.values_list('pk', flat=True))
+        for material_details in material_details_to_delete:
+            ItemMaterialDetailsRelation.objects.get(item=self.instance, material_details=material_details).delete()
+
+        # Add material details that were added in the form
+        new_material_details = material_details_in_form\
+            .exclude(pk__in=existing_material_details.values_list('pk', flat=True))
+        for material_details in new_material_details:
+            ItemMaterialDetailsRelation(item=self.instance, material_details=material_details).save()
+
+    def save_itemtypes(self):
+        itemtypes_in_form = self.cleaned_data['item_type']
+        existing_itemtypes = ItemType.objects.filter(itemitemtyperelation__item=self.instance)
+
+        # Delete item types that were removed in the form
+        itemtypes_to_delete = existing_itemtypes.exclude(pk__in=itemtypes_in_form.values_list('pk', flat=True))
+        for itemtype in itemtypes_to_delete:
+            ItemItemTypeRelation.objects.get(item=self.instance, type=itemtype).delete()
+
+        # Add item types that were added in the form
+        new_itemtypes = itemtypes_in_form.exclude(pk__in=existing_itemtypes.values_list('pk', flat=True))
+        for itemtype in new_itemtypes:
+            ItemItemTypeRelation(item=self.instance, type=itemtype).save()
 
     def save(self, commit=True):
         self.instance = super(ItemModelForm, self).save(commit=commit)
@@ -131,6 +187,8 @@ class ItemModelForm(forms.ModelForm):
             self.save_tags()
             self.save_languages()
             self.save_publishers()
+            self.save_material_details()
+            self.save_itemtypes()
 
         return self.instance
 
@@ -334,6 +392,18 @@ class ItemItemTypeForm(forms.ModelForm):
         widgets = {
             'type': ModelSelect2MultipleWidget(
                 model=ItemType,
+                search_fields=['name__icontains']
+            )
+        }
+
+
+class ItemTagsForm(forms.ModelForm):
+    class Meta:
+        model = TaggedEntity
+        fields = ['tag']
+        widgets = {
+            'tag': ModelSelect2MultipleWidget(
+                model=Tag,
                 search_fields=['name__icontains']
             )
         }

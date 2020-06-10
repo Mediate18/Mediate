@@ -1,6 +1,7 @@
 import django_tables2 as tables
 from django_tables2.utils import A  # alias for Accessor
-from django.utils.html import format_html
+from django.utils.html import format_html, format_html_join
+from django.utils.safestring import mark_safe
 import itertools
 
 from .models import *
@@ -18,6 +19,11 @@ class PersonTable(tables.Table):
     catalogues = tables.Column(empty_values=())
     roles = tables.Column(empty_values=())
     viaf_id = tables.Column(empty_values=())
+    relations = tables.Column(
+        verbose_name=_("Relations"),
+        orderable=False,
+        empty_values=()
+    )
 
     class Meta:
         model = Person
@@ -34,8 +40,10 @@ class PersonTable(tables.Table):
             'date_of_death',
             'catalogues',
             'viaf_id',
+            'publisher_cerl_id',
             'notes',
             'bibliography',
+            'relations',
             'uuid'
         ]
 
@@ -89,6 +97,33 @@ class PersonTable(tables.Table):
             ))
         else:
             return format_html('-')
+
+    def render_publisher_cerl_id(self, value):
+        if value:
+            url = cerl_record_url + value
+            return format_html('<a target="blank" href="{}">{}</a>'.format(
+                url, value
+            ))
+        else:
+            return format_html('-')
+
+    def render_relations(self, record):
+        person = record
+        of_str = ' of'
+        relations = []
+        for relation in person.relations_when_first.all():
+            relation_of_str = '' if relation.type.name.endswith(of_str) else of_str
+            relation_str = format_html(_('{}{} <a href="{}">{}</a>'), str(relation.type).capitalize(), relation_of_str,
+                                     relation.second_person.get_absolute_url(), relation.second_person)
+            relations.append(relation_str)
+        for relation in person.relations_when_second.all():
+            type = str(relation.type)
+            type_without_of = type[:-len(of_str)] if type.endswith(of_str) else type
+            relation_str = format_html(_('{}: <a href="{}">{}</a>'), type_without_of.capitalize(),
+                                     relation.first_person.get_absolute_url(), relation.first_person)
+            relations.append(relation_str)
+        return format_html_join('\n', '{}<br/>', ((rel,) for rel in relations))
+
 
 
 # PersonRanking table

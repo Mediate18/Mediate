@@ -3,7 +3,7 @@ from django.utils.safestring import mark_safe
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.html import escape
 
-from apiconnectors.cerlapi import cerl_record_url
+from apiconnectors.cerlapi import cerl_record_url, get_record
 
 
 class ApiSelectWidget(autocomplete.Select2):
@@ -20,7 +20,12 @@ class ApiSelectWidget(autocomplete.Select2):
         id = value
         url = value
         if value:
-            self.choices = [(id, value)]
+            if isinstance(url, str) and (url.startswith('cnl') or url.startswith('cni')):
+                choice = get_record(value)
+            else:
+                choice = value
+
+            self.choices = [(id, choice)]
             if self.model:
                 try:
                     obj = self.model.objects.get(pk=value)
@@ -29,7 +34,7 @@ class ApiSelectWidget(autocomplete.Select2):
                     url = obj.get_absolute_url()
                 except ObjectDoesNotExist:
                     pass
-            if url.startswith('cnl'):
+            if url.startswith('cnl') or url.startswith('cni'):
                 url = cerl_record_url + url
         widget = super(ApiSelectWidget, self).render(name, id, attrs)
         return mark_safe(

@@ -105,7 +105,8 @@ class ItemTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        items = Item.objects.all()
+        items = Item.objects.order_by('lot__catalogue__year_of_publication', 'lot__catalogue__short_title',
+                                      'lot__index_in_catalogue', 'index_in_lot', 'lot__lot_as_listed_in_catalogue')
         lot_uuid = self.request.GET.get('lot__uuid')
         if lot_uuid:
             items = items.filter(lot__uuid=uuid.UUID(lot_uuid))
@@ -176,6 +177,12 @@ class ItemTableView(ListView):
                 'label': _("Add type"),
                 'url': reverse_lazy('add_type_to_items'),
                 'form': ItemItemTypeForm
+            },
+            {
+                'id': 'add_tags',
+                'label': _("Add tags"),
+                'url': reverse_lazy('add_tags_to_items'),
+                'form': ItemTagsForm
             }
         ]
 
@@ -990,7 +997,9 @@ class PersonItemRelationDeleteView(DeleteView):
     success_url = reverse_lazy('personitemrelations')
 
     def get_success_url(self):
-        return self.request.META['HTTP_REFERER']
+        if 'HTTP_REFERER' in self.request.META:
+            return self.request.META['HTTP_REFERER']
+        return self.success_url
 
 
 @moderate(action=ModerationAction.CREATE)
@@ -1197,6 +1206,34 @@ def add_type_to_items(request):
                         pass
         else:
             messages.add_message(request, messages.WARNING, _("No items and/or no types selected."))
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    else:
+        raise Http404
+
+
+def add_tags_to_items(request):
+    """
+    Add tags to a list of items
+    :param request:
+    :return:
+    """
+    if request.method == 'POST':
+        if 'entries' in request.POST and 'tag' in request.POST:
+            items = request.POST.getlist('entries')
+            tags = request.POST.getlist('tag')
+            for tag_id in tags:
+                tag = Tag.objects.get(id=tag_id)
+                for item_id in items:
+                    item = Item.objects.get(uuid=item_id)
+                    try:
+                        if tag.id not in item.tags.values_list('tag', flat=True):
+                            item.tags.create(tag=tag)
+                    except IntegrityError as ie:
+                        # Unique constraint failed; the ItemItemTypeRelation already exists
+                        print(ie)
+                        pass
+        else:
+            messages.add_message(request, messages.WARNING, _("No items and/or no tags selected."))
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
     else:
         raise Http404
@@ -1713,6 +1750,8 @@ class ItemAndEditionCreateView(CreateView):
         form['item'].save_tags()
         form['item'].save_languages()
         form['item'].save_publishers()
+        form['item'].save_material_details()
+        form['item'].save_itemtypes()
 
         messages.add_message(self.request, messages.SUCCESS, self.success_msg)
         return HttpResponseRedirect(self.success_url)

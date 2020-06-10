@@ -542,7 +542,8 @@ class LotTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return Lot.objects.all()
+        return Lot.objects.order_by('catalogue__year_of_publication', 'catalogue__short_title', 'index_in_catalogue',
+                                    'lot_as_listed_in_catalogue')
 
     def get_context_data(self, **kwargs):
         context = super(LotTableView, self).get_context_data(**kwargs)

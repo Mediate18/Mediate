@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import ProtectedError
 from django.db.models.deletion import CASCADE, SET_NULL
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse_lazy
@@ -86,10 +87,31 @@ class Catalogue(models.Model):
     def get_absolute_url(self):
         return reverse_lazy('catalogue_detail', args=[str(self.uuid)])
 
+    def delete(self, *args, **kwargs):
+        # Gather edition IDs that are linked to this catalogue
+        from items.models import Edition  # To prevent an import error (probably circular imports)
+        editions = list(Edition.objects.filter(items__lot__catalogue=self).values_list('uuid', flat=True))
+
+        # Delete the catalogue
+        super().delete(*args, **kwargs)
+
+        # Delete the linked editions
+        for id in editions:
+            try:
+                edition = Edition.objects.get(uuid=id)
+                edition.delete()
+            except ProtectedError:
+                # No problem, this is suppost to happen due to the on_delete=PROTECT in the Item-Edition relation
+                pass
+
     def item_count(self):
         from items.models import Item
         return Item.objects.filter(lot__catalogue=self).count()
-    
+
+    @property
+    def sorted_lot_set(self):
+        return self.lot_set.order_by('index_in_catalogue')
+
 
 class CatalogueCatalogueTypeRelation(models.Model):
     """
@@ -127,11 +149,7 @@ class Lot(models.Model):
     sales_price = models.CharField(_("Sales price"), max_length=128, blank=True)
     lot_as_listed_in_catalogue = models.TextField(_("Full lot description, exactly as in the catalogue"))
     index_in_catalogue = models.IntegerField(_("Index in catalogue"), null=True)
-    category = models.ForeignKey('Category', on_delete=SET_NULL, null=True)
-
-    class Meta:
-        ordering = ['catalogue__year_of_publication', 'catalogue__short_title', 'index_in_catalogue',
-                    'lot_as_listed_in_catalogue']
+    category = models.ForeignKey('Category', on_delete=SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.lot_as_listed_in_catalogue
@@ -141,7 +159,7 @@ class Lot(models.Model):
         if not self.category or self.catalogue == self.category.catalogue:
             super(Lot, self).save(*args, **kwargs)
         else:
-            raise Exception(_("Lot {}: the catalogue is not the as the category's catalogue").format(self))
+            raise Exception(_("Lot {}: the catalogue is not the same as the category's catalogue").format(self))
 
     def get_absolute_url(self):
         return reverse_lazy('lot_detail', args=[str(self.uuid)])

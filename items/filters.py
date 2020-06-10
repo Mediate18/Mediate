@@ -5,7 +5,8 @@ from django.forms import CheckboxInput
 from django_select2.forms import ModelSelect2MultipleWidget, Select2MultipleWidget, HeavySelect2MultipleWidget
 from tagme.models import Tag
 from .models import *
-from catalogues.models import Catalogue
+from persons.models import Country, Profession
+from catalogues.models import Catalogue, ParisianCategory, PersonCatalogueRelation
 from mediate.tools import filter_multiple_words
 from viapy.api import ViafAPI
 
@@ -23,8 +24,6 @@ class BookFormatFilter(django_filters.FilterSet):
 class ItemFilter(django_filters.FilterSet):
     short_title = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
     lot = django_filters.Filter(field_name='lot__lot_as_listed_in_catalogue', lookup_expr='icontains')
-    sales_price = django_filters.Filter(field_name='lot__sales_price', lookup_expr='icontains')
-    collection = django_filters.Filter(field_name='collection__name', lookup_expr='icontains')
     number_of_volumes = django_filters.Filter(lookup_expr='icontains')
     book_format = django_filters.ModelMultipleChoiceFilter(
         queryset=BookFormat.objects.all(),
@@ -34,6 +33,16 @@ class ItemFilter(django_filters.FilterSet):
         label="Include non-book items",
         widget=CheckboxInput,
         method='include_non_book_items_filter'
+    )
+    item_type = django_filters.ModelMultipleChoiceFilter(
+        label="Item Type",
+        queryset=ItemType.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=ItemType,
+            search_fields=['name__icontains']
+        ),
+        method='item_type_filter'
     )
     catalogue = django_filters.ModelMultipleChoiceFilter(
         label="Catalogue",
@@ -48,14 +57,15 @@ class ItemFilter(django_filters.FilterSet):
     )
     catalogue_publication_year = django_filters.RangeFilter(label="Catalogue publication year", widget=RangeWidget(),
                                                             field_name='lot__catalogue__year_of_publication')
-    edition = django_filters.ModelMultipleChoiceFilter(
-        queryset=Edition.objects.all(),
+    parisian_category = django_filters.ModelMultipleChoiceFilter(
+        label="Parisian category",
+        queryset=ParisianCategory.objects.all(),
         widget=ModelSelect2MultipleWidget(
             attrs={'data-placeholder': "Select multiple"},
-            model=Edition,
-            search_fields=['place__name__icontains', 'year__icontains', 'url__icontains',
-                           'publisher__publisher__short_name__icontains']
-        )
+            model=ParisianCategory,
+            search_fields=['name__icontains', 'description__icontains']
+        ),
+        method='parisian_category_filter'
     )
     edition_isnull = django_filters.BooleanFilter(
         label="No associated edition",
@@ -76,6 +86,11 @@ class ItemFilter(django_filters.FilterSet):
             search_fields=['name__icontains']
         ),
         method='edition_place_filter'
+    )
+    edition_year_tag = django_filters.Filter(
+        label="Date of publication tag",
+        field_name='edition__year_tag',
+        lookup_expr='icontains'
     )
     material_details = django_filters.ModelMultipleChoiceFilter(
         label="Material details",
@@ -131,6 +146,51 @@ class ItemFilter(django_filters.FilterSet):
             data_view='personroleautoresponse'
         )
     )
+    owner_gender = django_filters.ChoiceFilter(
+        label="Owner gender",
+        choices=Person.SEX_CHOICES,
+        method='owner_gender_filter'
+    )
+    owner_country_of_birth = django_filters.ModelMultipleChoiceFilter(
+        label="Owner country of birth",
+        queryset=Country.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Country,
+            search_fields=['name__icontains']
+        ),
+        method='owner_country_of_birth_filter'
+    )
+    owner_country_of_death = django_filters.ModelMultipleChoiceFilter(
+        label="Owner country of death",
+        queryset=Country.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Country,
+            search_fields=['name__icontains']
+        ),
+        method='owner_country_of_death_filter'
+    )
+    owner_country_of_residence = django_filters.ModelMultipleChoiceFilter(
+        label="Owner country of residence",
+        queryset=Country.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Country,
+            search_fields=['name__icontains']
+        ),
+        method='owner_country_of_residence_filter'
+    )
+    owner_profession = django_filters.ModelMultipleChoiceFilter(
+        label="Owner profession",
+        queryset=Profession.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Profession,
+            search_fields=['name__icontains']
+        ),
+        method='owner_profession_filter'
+    )
     language = django_filters.ModelMultipleChoiceFilter(
         label='Language',
         queryset=Language.objects.all(),
@@ -148,18 +208,17 @@ class ItemFilter(django_filters.FilterSet):
         fields = [
             'short_title',
             'lot',
-            'collection',
             'number_of_volumes',
             'book_format',
             'non_book',
-            'index_in_lot',
+            'item_type',
             'catalogue',
             'catalogue_publication_year',
-            'edition',
+            'parisian_category',
             'edition_isnull',
             'edition_isempty',
             'edition_place',
-            'sales_price',
+            'edition_year_tag',
             'material_details',
             'tag'
         ]
@@ -190,6 +249,16 @@ class ItemFilter(django_filters.FilterSet):
         if value:
             return queryset
         return queryset.exclude(non_book=True)
+
+    def item_type_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(itemitemtyperelation__type__name__in=value)
+        return queryset
+
+    def parisian_category_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(lot__category__parisian_category__in=value)
+        return queryset
 
     def edition_isnull_filter(self, queryset, name, value):
         if value:
@@ -240,6 +309,35 @@ class ItemFilter(django_filters.FilterSet):
             return queryset.filter(languages__language__in=value)
         return queryset
 
+    def owner_gender_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(lot__catalogue__personcataloguerelation__in=
+                                   PersonCatalogueRelation.objects.filter(role__name__iexact='owner', person__sex=value))
+        return queryset
+
+    def owner_country_of_birth_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(lot__catalogue__personcataloguerelation__in=PersonCatalogueRelation.objects.filter(
+                role__name__iexact='owner', person__city_of_birth__country__in=value))
+        return queryset
+
+    def owner_country_of_death_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(lot__catalogue__personcataloguerelation__in=PersonCatalogueRelation.objects.filter(
+                role__name__iexact='owner', person__city_of_death__country__in=value))
+        return queryset
+
+    def owner_country_of_residence_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(lot__catalogue__personcataloguerelation__in=PersonCatalogueRelation.objects.filter(
+                role__name__iexact='owner', person__residence__place__country__in=value))
+        return queryset
+
+    def owner_profession_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(lot__catalogue__personcataloguerelation__in=PersonCatalogueRelation.objects.filter(
+                role__name__iexact='owner', person__personprofession__profession__in=value))
+        return queryset
 
 
 # ItemAuthor filter
@@ -333,7 +431,10 @@ class EditionFilter(django_filters.FilterSet):
         queryset=Place.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
-    url = django_filters.Filter(lookup_expr='icontains')
+    url = django_filters.BooleanFilter(
+        label="Has URL",
+        method='has_url_filter'
+    )
     publisher = django_filters.ModelMultipleChoiceFilter(
         label='Publisher',
         queryset=Person.objects.all(),
@@ -353,10 +454,37 @@ class EditionFilter(django_filters.FilterSet):
     )
     number_of_items = django_filters.Filter(label='Number of items', method='number_of_items_filter',
                                             widget=django_filters.widgets.RangeWidget())
+    language = django_filters.ModelMultipleChoiceFilter(
+        label='Language',
+        queryset=Language.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Language,
+            search_fields=['name__icontains', 'language_code_2char__iexact', 'language_code_3char__iexact']
+        ),
+        method='language_filter'
+    )
+    book_format = django_filters.ModelMultipleChoiceFilter(
+        label="Book format",
+        queryset=BookFormat.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=BookFormat,
+            search_fields=['name__icontains']
+        ),
+        method='book_format_filter'
+    )
 
     class Meta:
         model = Edition
         exclude = ['uuid']
+
+    def has_url_filter(self, queryset, name, value):
+        print("value", value, str(value), type(value))
+        if value:
+            return queryset.exclude(url__exact="")
+        else:
+            return queryset.filter(url__exact="")
 
     def publisher_filter(self, queryset, name, value):
         if value:
@@ -374,6 +502,17 @@ class EditionFilter(django_filters.FilterSet):
         if value:
             return queryset.filter(items__lot__catalogue__in=value)
         return queryset
+
+    def language_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(items__languages__language__in=value)
+        return queryset
+
+    def book_format_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(items__book_format__in=value)
+        return queryset
+
 
 # Publisher filter
 class PublisherFilter(django_filters.FilterSet):

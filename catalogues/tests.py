@@ -53,6 +53,42 @@ class CatalogueTests(GenericCRUDTestMixin, TestCase):
         response = client.get(reverse_lazy(self.get_url_name('list')))
         self.assertEqual(response.status_code, 200)
 
+    def test_Deletion_of_Editions(self):
+        """
+        When a Catalogue is deleted, all linked Editions that are not also linked to another Catalogue
+        should be deleted
+        :return:
+        """
+
+        # Create two Catalogues
+        catalogue_data = self.get_add_form_data()
+        catalogue1, created = self.model.objects.get_or_create(**catalogue_data)
+        catalogue_data['short_title'] = 'short_title test2'
+        catalogue2, created = self.model.objects.get_or_create(**catalogue_data)
+
+        # Create two Lots
+        lot1 = Lot.objects.create(catalogue=catalogue1, number_in_catalogue=1, lot_as_listed_in_catalogue="lot1_text")
+        lot2 = Lot.objects.create(catalogue=catalogue2, number_in_catalogue=1, lot_as_listed_in_catalogue="lot2_text")
+
+        # Create two Edition
+        from items.models import Item, Edition
+        edition1 = Edition.objects.create(year=1111)
+        edition2 = Edition.objects.create(year=2222)
+
+        # Create three Items. The third makes Edition2 link to two different Catalogues
+        item1 = Item.objects.create(short_title="item1", lot=lot1, edition=edition1, index_in_lot=1)
+        item2 = Item.objects.create(short_title="item2", lot=lot2, edition=edition2, index_in_lot=1)
+        item3 = Item.objects.create(short_title="item3", lot=lot1, edition=edition2, index_in_lot=2)
+
+        # Deleting catalogue1 should result in deleting edition1, but not edition2
+        catalogue1.delete()
+
+        def object_exists_in_database(obj):
+            return obj.__class__.objects.filter(uuid=obj.pk).exists() if obj.pk else False
+
+        self.assertFalse(object_exists_in_database(edition1))
+        self.assertTrue(object_exists_in_database(edition2))
+
 
 class CollectionYearTests(GenericCRUDTestMixin, TestCase):
     model = CollectionYear
@@ -194,7 +230,7 @@ class PersonCollectionRelationTests(GenericCRUDTestMixin, TestCase):
 
     def get_change_form_data(self):
         person_data = {**PersonTests().get_add_form_data(), **PersonTests().get_change_form_data()}
-        person, created = Person.objects.get_or_create(person_data)
+        person, created = Person.objects.get_or_create(**person_data)
         return {
             'person': person
         }
@@ -230,16 +266,16 @@ class PersonCatalogueRelationTests(GenericCRUDTestMixin, TestCase):
         catalogue, created = Catalogue.objects.get_or_create(**CatalogueTests().get_add_form_data())
         role, created = PersonCatalogueRelationRole.objects.get_or_create(**PersonCatalogueRelationRoleTests().get_add_form_data())
         return {
-            'person': person,
-            'catalogue': catalogue,
-            'role': role
+            'person_id': person.pk,
+            'catalogue_id': catalogue.pk,
+            'role_id': role.pk
         }
 
     def get_change_form_data(self):
         person_data = {**PersonTests().get_add_form_data(), **PersonTests().get_change_form_data()}
-        person, created = Person.objects.get_or_create(person_data)
+        person, created = Person.objects.get_or_create(**person_data)
         return {
-            'person': person
+            'person_id': person.pk
         }
 
     def test_Detail(self):
@@ -328,6 +364,6 @@ class LotModelTests(TestCase):
 
         exception = exception_context_manager.exception
 
-        self.assertEqual(exception.args, ("Lot {}: the catalogue is not the as the category's catalogue"
+        self.assertEqual(exception.args, ("Lot {}: the catalogue is not the same as the category's catalogue"
                                          .format(dummy_lot),))
 

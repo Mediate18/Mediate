@@ -1,0 +1,137 @@
+{% extends extended_layout|default:"baselayout.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block extracss %}
+{{ form.media.css }}
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-xs-12">
+        <h1>{% trans action|title %} {% trans object_name %}</h1>
+    </div>
+    <div class="col-lg-6">
+        <form action="{{ request.path }}?next={{ next_url }}" method="post" enctype="multipart/form-data">
+            <table class="table">
+                {% csrf_token %}
+                    {% if form_as == 'p' %}
+                        {{ form.as_p }}
+                    {% else %}
+                        {{ form.as_table }}
+                    {% endif %}
+            </table>
+            
+            {% if alternativepersonnames %}
+                <hr/>
+                <h3>{% trans "Alternative names" %}</h3>
+
+                {% with formset=alternativepersonnames formset_name='alternativepersonnames' %}
+                    {% include "inline_formset_table.html" %}
+                {% endwith %}
+            {% endif %}
+
+            {% if residences %}
+                <hr/>
+                <h3>{% trans "Residences" %}</h3>
+                {% with formset=residences formset_name='residences' %}
+                    {% include "inline_formset_table.html" %}
+                {% endwith %}
+            {% endif %}
+
+            <hr/>
+            {% if firstpersonrelations or secondpersonrelations %}
+                <h3>{% blocktrans %} Person relations  {% endblocktrans %}</h3>
+            {% endif %}
+
+            {% if firstpersonrelations %}
+                <h5>{% blocktrans %} <i>{{ object }}</i> is the first person in the relation {% endblocktrans %}</h5>
+                {% with formset=firstpersonrelations formset_name='firstpersonrelations' %}
+                    {% include "inline_formset_table.html" %}
+                {% endwith %}
+            {% endif %}
+
+            {% if secondpersonrelations %}
+                <h5>{% blocktrans %} <i>{{ object }}</i> is the second person in the relation {% endblocktrans %}</h5>
+                {% with formset=secondpersonrelations formset_name='secondpersonrelations' %}
+                    {% include "inline_formset_table.html" %}
+                {% endwith %}
+            {% endif %}
+
+            <hr/>
+
+            <div>
+                <input type="submit" class="btn pull-right" value="{% trans 'Save' %}"/>
+                {% if next_url %}
+                    <a href="{{ next_url }}">{% trans 'Cancel' %}</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+    <div class="col-lg-6">
+        <div class="panel-group">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" href="#relateditemspanel">{% trans "Related items" %}
+                    <span class="glyphicon glyphicon-chevron-down"></span></a>
+                </h4>
+            </div>
+            <div id="relateditemspanel" class="panel-collapse collapse in">
+              <div class="panel-body">
+                  <table class="table">
+                      <thead>
+                        <tr>
+                            <th>{% trans "Item" %}</th>
+                            <th>{% trans "Role" %}</th>
+                            <th>{% trans "Notes" %}</th>
+                            <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for relation in object.personitemrelation_set.all %}
+                            <tr>
+                                <td><a href="{{ relation.item.get_absolute_url }}">{{ relation.item }}</a></td>
+                                <td>{{ relation.role }}</td>
+                                <td>{% if relation.notes %}{{ relation.notes|linebreaks }}{% else %}-{% endif %}</td>
+                                <td>
+                                    <a href="{{ relation.get_absolute_url }}" title="{% trans 'Change relation' %}">
+                                        <span class="glyphicon glyphicon-pencil"></span>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                      </tbody>
+                  </table>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    {% if js_variables %}
+        js_variables = {{ js_variables|safe }}
+    {% endif %}
+</script>
+{{ form.media.js }}
+<script>
+$(document).ready(function(){
+        $('.django-select2').djangoSelect2({placeholder: 'Select an option'});
+});
+</script>
+<script src="{% static 'js/make_inline_formset_dynamic.js' %}"></script>
+<script>
+$(document).ready(function(){
+    make_inline_formset_dynamic('alternativepersonnames', '{{ alternativepersonnames.prefix }}');
+    make_inline_formset_dynamic('residences', '{{ residences.prefix }}');
+    make_inline_formset_dynamic('firstpersonrelations', '{{ firstpersonrelations.prefix }}');
+    make_inline_formset_dynamic('secondpersonrelations', '{{ secondpersonrelations.prefix }}');
+});
+</script>
+{% endblock %}

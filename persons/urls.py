@@ -4,6 +4,7 @@ from django.conf.urls.static import static
 from django.views.generic import RedirectView
 from django.contrib.auth.decorators import login_required, permission_required
 from .views.views import *
+from apiconnectors.cerlapi import CerlSuggestPublisher
 
 urlpatterns = [
     path(r'', RedirectView.as_view(url='persons/')),
@@ -161,4 +162,5 @@ urlpatterns = [
     # Cerl API
     path(r'cerl_suggest', CerlSuggest.as_view(), name='cerl_suggest'),
     path(r'placeandcerl_suggest', PlaceAndCerlSuggest.as_view(), name='placeandcerl_suggest'),
+    path(r'cerl_suggest_person', CerlSuggestPublisher.as_view(), name='cerl_suggest_person'),
 ]

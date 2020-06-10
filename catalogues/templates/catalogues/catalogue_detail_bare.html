@@ -57,7 +57,7 @@
 </dl>
 <h2 class="text-center">{% trans "Lots" %}</h2>
 <table class="table table-hover">
-{% for lot in object.lot_set.all %}
+{% for lot in object.sorted_lot_set %}
             {% if lot.index_in_catalogue in first_lot_on_page_dict %}
     <tr>
         <td class="text-center" colspan="4">

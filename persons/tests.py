@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, Client
 from mediate.tools_testing import GenericCRUDTestMixin
 
 from .models import *
@@ -10,13 +10,13 @@ class PlaceTests(GenericCRUDTestMixin, TestCase):
     def get_add_form_data(self):
         return {
             'name': 'name test',
-            'cerl_id': '1234567890'
+            'cerl_id': 'cnl00016323'  # Nijmegen
         }
 
     def get_change_form_data(self):
         return {
             'name': 'name test2',
-            'cerl_id': '0987654321'
+            'cerl_id': 'cnl00015951'  # Utrecht
         }
 
 
@@ -68,6 +68,86 @@ class PersonTests(GenericCRUDTestMixin, TestCase):
             'city_of_birth_id': place.pk,
             'city_of_death_id': place.pk
         }
+
+    def test_Add(self):
+        """Tests the Create view"""
+        # Test permission
+        permission = self.get_permission_string('add')
+        self.assertTrue(self.user.has_perm(permission))
+
+        # Get the Add form
+        client = Client()
+        client.login(username=self.username, password=self.password)
+        response = client.get(reverse_lazy(self.get_url_name('add')))
+        self.assertEqual(response.status_code, 200)
+
+        # Post to the Add form
+        add_form_data = self.get_add_form_data().update({
+            # FormSet form data
+            "alternative_names-TOTAL_FORMS": 0,
+            "alternative_names-INITIAL_FORMS": 0,
+            "alternative_names-MIN_NUM_FORMS": 0,
+            "alternative_names-MAX_NUM_FORMS": 0,
+
+            "residence_set-TOTAL_FORMS": 0,
+            "residence_set-INITIAL_FORMS": 0,
+            "residence_set-MIN_NUM_FORMS": 0,
+            "residence_set-MAX_NUM_FORMS": 0,
+
+            "relations_when_first-TOTAL_FORMS": 0,
+            "relations_when_first-INITIAL_FORMS": 0,
+            "relations_when_first-MIN_NUM_FORMS": 0,
+            "relations_when_first-MAX_NUM_FORMS": 0,
+
+            "relations_when_second-TOTAL_FORMS": 0,
+            "relations_when_second-INITIAL_FORMS": 0,
+            "relations_when_second-MIN_NUM_FORMS": 0,
+            "relations_when_second-MAX_NUM_FORMS": 0,
+        })
+        response = client.post(reverse_lazy(self.get_url_name('add')),
+                               add_form_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+    def test_Change(self):
+        """Tests the Change view"""
+        # Test permission
+        permission = self.get_permission_string('change')
+        self.assertTrue(self.user.has_perm(permission))
+
+        # Get the Change form
+        obj, created = self.model.objects.get_or_create(**self.get_add_form_data())
+
+        client = Client()
+        client.login(username=self.username, password=self.password)
+        response = client.get(reverse_lazy(self.get_url_name('change'), args=[obj.uuid]))
+        self.assertEqual(response.status_code, 200)
+
+        # Post to the Change form
+        change_form_data = self.get_change_form_data().update({
+            # FormSet form data
+            "alternative_names-TOTAL_FORMS": 0,
+            "alternative_names-INITIAL_FORMS": 0,
+            "alternative_names-MIN_NUM_FORMS": 0,
+            "alternative_names-MAX_NUM_FORMS": 0,
+
+            "residence_set-TOTAL_FORMS": 0,
+            "residence_set-INITIAL_FORMS": 0,
+            "residence_set-MIN_NUM_FORMS": 0,
+            "residence_set-MAX_NUM_FORMS": 0,
+
+            "relations_when_first-TOTAL_FORMS": 0,
+            "relations_when_first-INITIAL_FORMS": 0,
+            "relations_when_first-MIN_NUM_FORMS": 0,
+            "relations_when_first-MAX_NUM_FORMS": 0,
+
+            "relations_when_second-TOTAL_FORMS": 0,
+            "relations_when_second-INITIAL_FORMS": 0,
+            "relations_when_second-MIN_NUM_FORMS": 0,
+            "relations_when_second-MAX_NUM_FORMS": 0,
+        })
+        response = client.post(reverse_lazy(self.get_url_name('change'), args=[obj.uuid]),
+                               change_form_data, follow=True)
+        self.assertEqual(response.status_code, 200)
 
 
 class ReligiousAffiliationTests(GenericCRUDTestMixin, TestCase):
@@ -189,7 +269,7 @@ class PersonPersonRelationTests(GenericCRUDTestMixin, TestCase):
         return {
             'first_person_id': first_person.pk,
             'second_person_id': second_person.pk,
-            'type': relation_type,
+            'type_id': relation_type.pk,
             'start_year': 1678,
             'end_year': 1765
         }

@@ -28,7 +28,6 @@ class ItemTable(tables.Table):
     people = tables.Column(empty_values=(), orderable=False)
     works = tables.Column(empty_values=(), verbose_name=_("Works"))
     lot = tables.Column(order_by='lot__lot_as_listed_in_catalogue', )
-    sales_price = tables.Column(empty_values=(), order_by='lot__sales_price')
     catalogue = tables.Column(empty_values=(), order_by='lot__catalogue__short_title')
     number_of_volumes = tables.Column(empty_values=(), verbose_name=_('Number of volumes'))
     material_details = tables.Column(empty_values=(), orderable=False)
@@ -41,6 +40,7 @@ class ItemTable(tables.Table):
          args=[A('pk')], orderable=False, empty_values=())
     languages = tables.Column(empty_values=(), verbose_name=_("Languages"), orderable=False)
     parisian_category = tables.Column(accessor='lot.category.parisian_category')
+    item_type = tables.Column(empty_values=(), orderable=False)
 
     class Meta:
         model = Item
@@ -51,7 +51,6 @@ class ItemTable(tables.Table):
             'works',
             'lot',
             'index_in_lot',
-            'sales_price',
             'catalogue',
             'number_of_volumes',
             'book_format',
@@ -59,6 +58,7 @@ class ItemTable(tables.Table):
             'edition',
             'languages',
             'parisian_category',
+            'item_type',
             'uuid',
             'manage_works',
             'manage_persons',
@@ -122,9 +122,6 @@ class ItemTable(tables.Table):
             str(record.lot.catalogue))
         )
 
-    def render_sales_price(self, record):
-        return record.lot.sales_price
-
     def render_number_of_volumes(self, record):
         return record.number_of_volumes or format_html("&mdash;")
 
@@ -133,6 +130,9 @@ class ItemTable(tables.Table):
 
     def render_languages(self, record):
         return ", ".join(Language.objects.filter(items__item=record).values_list('name', flat=True))
+
+    def render_item_type(self, record):
+        return ", ".join(ItemType.objects.filter(itemitemtyperelation__item=record).values_list('name', flat=True))
 
     # All value_XX methods are for the table export
     def value_lot(self, record):

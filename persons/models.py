@@ -4,7 +4,7 @@ from django_date_extensions.fields import ApproximateDateField
 from django.urls import reverse_lazy
 
 import requests
-from apiconnectors.cerlapi import cerl_record_url
+from apiconnectors.cerlapi import cerl_record_url_api
 
 import uuid
 
@@ -51,7 +51,7 @@ class Place(models.Model):
 
     def get_lat_long(self, overwrite=False):
         if self.cerl_id and (overwrite or (not self.latitude or not self.longitude)):
-            response = requests.get(cerl_record_url + self.cerl_id, headers={'accept': 'application/json'})
+            response = requests.get(cerl_record_url_api + self.cerl_id, headers={'accept': 'application/json'})
             cerl_record_json = response.json()
             try:
                 if overwrite or not self.latitude:
@@ -94,16 +94,19 @@ class Person(models.Model):
     FEMALE = 'FEMALE'
     OTHER = 'OTHER'
     UNKNOWN = 'UNKNOWN'
+    CORPORATE = 'CORPRT'
     SEX_CHOICES = (
         (MALE, 'Male'),
         (FEMALE, 'Female'),
         (OTHER, 'Other'),
         (UNKNOWN, 'Unknown'),
+        (CORPORATE, 'Corporate')
     )
 
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     short_name = models.CharField(_("Short name"), max_length=128, null=True)
     viaf_id = models.CharField(_("VIAF ID (https://viaf.org)"), max_length=128, null=True, blank=True)
+    publisher_cerl_id = models.CharField(_("Publisher CERL ID"), max_length=32, null=True, blank=True)
     surname = models.CharField(_("Surname"), max_length=128)
     first_names = models.CharField(_("First names"), max_length=512)
     date_of_birth = models.CharField(_("Date of birth"), max_length=64, blank=True, null=True)
@@ -112,7 +115,7 @@ class Person(models.Model):
     city_of_birth = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True, blank=True, related_name='persons_born')
     city_of_death = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True, blank=True, related_name='persons_died')
     notes = models.TextField(_("Notes"), null=True, blank=True)
-    bibliography = models.TextField(_("Bibiliography"), null=True, blank=True)
+    bibliography = models.TextField(_("Bibliography"), null=True, blank=True)
 
     class Meta:
         ordering = ['short_name']
@@ -168,7 +171,7 @@ class Residence(models.Model):
         object_str = _("{} lived in {}").format(self.person, self.place)
         if self.start_year:
             object_str = object_str + _(" from {}").format(self.start_year)
-        if self.end_year_year:
+        if self.end_year:
             object_str = object_str + _(" until {}").format(self.end_year)
         return object_str
 

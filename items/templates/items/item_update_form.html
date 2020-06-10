@@ -129,7 +129,7 @@
                             <tr>
                                 <td><a href="{{ relation.person.get_absolute_url }}">{{ relation.person }}</a></td>
                                 <td>{{ relation.role }}</td>
-                                <td>{% if relation.notes %}{{ relation.notes|linebreaks }}{% endif %}</td>
+                                <td>{% if relation.notes %}{{ relation.notes|linebreaks }}{% else %}-{% endif %}</td>
                                 <td>
                                     <a href="{{ relation.get_absolute_url }}" title="{% trans 'Change relation' %}">
                                         <span class="glyphicon glyphicon-pencil"></span>

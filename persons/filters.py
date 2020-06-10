@@ -36,10 +36,24 @@ class PersonFilter(django_filters.FilterSet):
         queryset=Place.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
+    country_of_birth = django_filters.ModelMultipleChoiceFilter(
+        label="Country of birth",
+        queryset=Country.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
+        field_name='city_of_birth__country',
+        lookup_expr='in'
+    )
     city_of_death = django_filters.ModelMultipleChoiceFilter(
         label=mark_safe(_("Place of death") + place_help.format(city_of_death_text)),
         queryset=Place.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
+    )
+    country_of_death = django_filters.ModelMultipleChoiceFilter(
+        label="Country of death",
+        queryset=Country.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
+        field_name='city_of_death__country',
+        lookup_expr='in'
     )
     profession = django_filters.ModelMultipleChoiceFilter(
         label="Profession",
@@ -80,6 +94,13 @@ class PersonFilter(django_filters.FilterSet):
         field_name='residence__place',
         lookup_expr='in'
     )
+    country_of_residence = django_filters.ModelMultipleChoiceFilter(
+        label="Country of residence",
+        queryset=Country.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
+        field_name='residence__place__country',
+        lookup_expr='in'
+    )
     related_to = django_filters.ModelMultipleChoiceFilter(
         label="Related to",
         queryset=Person.objects.all(),
@@ -100,8 +121,10 @@ class PersonFilter(django_filters.FilterSet):
             'surname',
             'sex',
             'city_of_birth',
+            'country_of_birth',
             'date_of_birth',
             'city_of_death',
+            'country_of_death',
             'date_of_death',
             'profession',
             'catalogue_roles',
@@ -110,6 +133,7 @@ class PersonFilter(django_filters.FilterSet):
             'publisher',
             'religious_affiliation',
             'city_of_residence',
+            'country_of_residence',
             'related_to',
             'nature_of_relation'
         ]
