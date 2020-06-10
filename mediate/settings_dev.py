@@ -124,49 +124,49 @@ print(DATABASES['default']['NAME'])
 
 # Check the availability of Redis at startup
 # otherwise use a database cache
-socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#
+# REDIS_PORT = config('REDIS_PORT', 0, cast=int)
+#
+# try:
+#     socket.connect(('127.0.0.1', REDIS_PORT))
+#     socket.close()
+#     print("Starting with Redis cache (port: {})".format(REDIS_PORT))
+#     CACHES = {
+#         "default": {
+#             "BACKEND": "django_redis.cache.RedisCache",
+#             "LOCATION": "redis://127.0.0.1:{}/1".format(REDIS_PORT),
+#             "OPTIONS": {
+#                 "CLIENT_CLASS": "django_redis.client.DefaultClient"
+#             },
+#             "KEY_PREFIX": "mediate",
+#             "TIMEOUT": 60*60*24  # 24 hours
+#         }
+#     }
+# except ConnectionRefusedError:
+#     print("Starting with database cache")
+#     CACHES = {
+#         'default': {
+#             'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+#             'LOCATION': config('CACHE_LOCATION', default="mediate_cache"),
+#             'TIMEOUT': 60*60*24  # 24 hours
+#         }
+#     }
 
-REDIS_PORT = config('REDIS_PORT', 0, cast=int)
-
-try:
-    socket.connect(('127.0.0.1', REDIS_PORT))
-    socket.close()
-    print("Starting with Redis cache (port: {})".format(REDIS_PORT))
-    CACHES = {
-        "default": {
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": "redis://127.0.0.1:{}/1".format(REDIS_PORT),
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient"
-            },
-            "KEY_PREFIX": "mediate",
-            "TIMEOUT": 60*60*24  # 24 hours
-        }
-    }
-except ConnectionRefusedError:
-    print("Starting with database cache")
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-            'LOCATION': config('CACHE_LOCATION', default="mediate_cache"),
-            'TIMEOUT': 60*60*24  # 24 hours
-        }
-    }
-
-LOGGING = {
-    'version': 1,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        'django.db.backends': {
-            'level': 'DEBUG',
-            'handlers': ['console', ],
-        },
-    }
-}
+# LOGGING = {
+#     'version': 1,
+#     'handlers': {
+#         'console': {
+#             'class': 'logging.StreamHandler',
+#         },
+#     },
+#     'loggers': {
+#         'django.db.backends': {
+#             'level': 'DEBUG',
+#             'handlers': ['console', ],
+#         },
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
