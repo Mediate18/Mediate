@@ -1,6 +1,9 @@
 from django import forms
 from django_select2.forms import Select2Widget, ModelSelect2Widget, ModelSelect2MultipleWidget
+from django.contrib.contenttypes.models import ContentType
 from .models import *
+
+from tagme.models import Tag
 
 
 class CatalogueModelForm(forms.ModelForm):
@@ -14,8 +17,10 @@ class CatalogueModelForm(forms.ModelForm):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.content_type = ContentType.objects.get_for_model(self.instance)
         self.add_types_field()
         self.add_related_places_field()
+        self.add_tag_field()
 
     def add_types_field(self):
         types = forms.ModelMultipleChoiceField(
@@ -46,10 +51,25 @@ class CatalogueModelForm(forms.ModelForm):
             )
             self.fields[self.get_catalogueplacerelationtype_id(type)] = places
 
+    def add_tag_field(self):
+        tag = forms.ModelMultipleChoiceField(
+            widget=ModelSelect2MultipleWidget(
+                    model=Tag,
+                    search_fields=['name__icontains'],
+                    # queryset=Tag.objects.filter(namespace='item')
+                ),
+            queryset=Tag.objects.all(),  # ... filter(namespace='item'),
+            required=False,
+            initial=Tag.objects.filter(taggedentity__object_id=self.instance.pk,
+                                       taggedentity__content_type=self.content_type)
+        )
+        self.fields['tag'] = tag
+
     def save(self, commit=True):
         if commit:
             self.save_types()
             self.save_relation_places()
+            self.save_tags()
         return super(CatalogueModelForm, self).save(commit=commit)
 
     def save_types(self):
@@ -88,6 +108,21 @@ class CatalogueModelForm(forms.ModelForm):
                 catalogue_place_relation = CataloguePlaceRelation(catalogue=self.instance,
                                                                      place=new_related_place, type=type)
                 catalogue_place_relation.save()
+
+    def save_tags(self):
+        tags_in_form = self.cleaned_data['tag']
+        existing_tags = Tag.objects.filter(taggedentity__object_id=self.instance.pk,
+                                           taggedentity__content_type=self.content_type)
+
+        # Delete tags that were removed in the form
+        tags_to_delete = existing_tags.exclude(pk__in=tags_in_form.values_list('pk', flat=True))
+        for tag in tags_to_delete:
+            TaggedEntity.objects.get(tag=tag, object_id=self.instance.pk, content_type=self.content_type).delete()
+
+        # Add tags that were added in the form
+        new_tags = tags_in_form.exclude(pk__in=existing_tags.values_list('pk', flat=True))
+        for tag in new_tags:
+            self.instance.tags.create(tag=tag)
 
 
 class CatalogueHeldByModelForm(forms.ModelForm):

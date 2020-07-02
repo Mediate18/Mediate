@@ -3,11 +3,13 @@ from django.db.models import ProtectedError
 from django.db.models.deletion import CASCADE, SET_NULL
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse_lazy
+from django.contrib.contenttypes.fields import GenericRelation
 
 import uuid
 
 from persons.models import Person, Place
 from transcriptions.models import Transcription
+from tagme.models import TaggedEntity
 from simplemoderation.tools import moderated
 
 
@@ -77,6 +79,8 @@ class Catalogue(models.Model):
     notes = models.TextField(_("Notes for the Mediate project"), null=True)
     bibliography = models.TextField(_("Bibliography"), null=True)
     collection = models.ForeignKey(Collection, on_delete=SET_NULL, null=True)
+
+    tags = GenericRelation(TaggedEntity, related_query_name='catalogues')
 
     class Meta:
         ordering = ['year_of_publication', 'short_title']
