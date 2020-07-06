@@ -221,6 +221,16 @@ class ItemFilter(django_filters.FilterSet):
         ),
         method='catalogue_city_of_publication_filter'
     )
+    catalogue_tag = django_filters.ModelMultipleChoiceFilter(
+        label="Catalogue tag",
+        queryset=Tag.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Tag,
+            search_fields=['namespace__icontains', 'name__icontains', 'value__icontains']
+        ),
+        method='catalogue_tag_filter'
+    )
 
     class Meta:
         model = Item
@@ -242,7 +252,8 @@ class ItemFilter(django_filters.FilterSet):
             'material_details',
             'tag',
             'catalogue_country_of_publication',
-            'catalogue_city_of_publication'
+            'catalogue_city_of_publication',
+            'catalogue_tag',
         ]
 
     def tag_filter(self, queryset, name, value):
@@ -363,12 +374,17 @@ class ItemFilter(django_filters.FilterSet):
 
     def catalogue_country_of_publication_filter(self, queryset, name, value):
         if value:
-            return queryset.filter(lot__catalogue__related_places__place__country__in=value)
+            return queryset.filter(lot__catalogue__related_places__place__country__in=value).distinct()
         return queryset
 
     def catalogue_city_of_publication_filter(self, queryset, name, value):
         if value:
-            return queryset.filter(lot__catalogue__related_places__place__in=value)
+            return queryset.filter(lot__catalogue__related_places__place__in=value).distinct()
+        return queryset
+
+    def catalogue_tag_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(lot__catalogue__tags__tag__in=value).distinct()
         return queryset
 
 
