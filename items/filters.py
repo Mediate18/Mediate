@@ -211,6 +211,16 @@ class ItemFilter(django_filters.FilterSet):
         ),
         method='catalogue_country_of_publication_filter'
     )
+    catalogue_city_of_publication = django_filters.ModelMultipleChoiceFilter(
+        label="Catalogue city of publication",
+        queryset=Place.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Place,
+            search_fields=['name__icontains']
+        ),
+        method='catalogue_city_of_publication_filter'
+    )
 
     class Meta:
         model = Item
@@ -231,7 +241,8 @@ class ItemFilter(django_filters.FilterSet):
             'edition_year_tag',
             'material_details',
             'tag',
-            'catalogue_country_of_publication'
+            'catalogue_country_of_publication',
+            'catalogue_city_of_publication'
         ]
 
     def tag_filter(self, queryset, name, value):
@@ -353,6 +364,11 @@ class ItemFilter(django_filters.FilterSet):
     def catalogue_country_of_publication_filter(self, queryset, name, value):
         if value:
             return queryset.filter(lot__catalogue__related_places__place__country__in=value)
+        return queryset
+
+    def catalogue_city_of_publication_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(lot__catalogue__related_places__place__in=value)
         return queryset
 
 
