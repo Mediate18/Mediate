@@ -632,7 +632,7 @@ def expand_lot_view(request, pk):
             prefix = form.cleaned_data.get('prefix', '')
             last_item_index = Item.objects.filter(lot=lot).aggregate(Max('index_in_lot')).get('index_in_lot__max')
             print("last_item_index", last_item_index)
-            for index in range(1, number + 1):
+            for index in range(2, number + 1):
                 edition = Edition.objects.create()
 
                 index_in_lot = last_item_index + index

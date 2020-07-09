@@ -326,6 +326,9 @@ class ItemDeleteView(DeleteView):
     model = Item
     success_url = reverse_lazy('items')
 
+    def get_success_url(self):
+        return self.request.META.get('HTTP_REFERER', self.success_url)
+
 
 # ItemAuthor views
 class ItemAuthorTableView(ListView):
