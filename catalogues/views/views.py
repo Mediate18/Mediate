@@ -4,7 +4,8 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 from django.db.models import Count, Min, Max
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
 
 from mediate.tools import put_layout_in_context, put_get_variable_in_context
 from mediate.views import GenericDetailView
@@ -16,7 +17,7 @@ from ..filters import *
 
 from ..models import *
 
-from items.models import Item
+from items.models import Item, Edition
 from mediate.tools import Truncate
 import json
 
@@ -618,6 +619,36 @@ def previous_lot_view(request, pk, index):
         return JsonResponse({
             'success': False
         })
+
+
+def expand_lot_view(request, pk):
+    lot = get_object_or_404(Lot, pk=pk)
+    next_url = reverse_lazy('catalogue_detail_bare', args=[str(lot.catalogue.uuid)])
+
+    if request.method == 'POST':
+        form = LotExpandForm(request.POST)
+        if form.is_valid():
+            number = int(form.cleaned_data.get('number', 0))
+            prefix = form.cleaned_data.get('prefix', '')
+            last_item_index = Item.objects.filter(lot=lot).aggregate(Max('index_in_lot')).get('index_in_lot__max')
+            print("last_item_index", last_item_index)
+            for index in range(1, number + 1):
+                edition = Edition.objects.create()
+
+                index_in_lot = last_item_index + index
+                short_title = "{} [{} of {}]".format(prefix, index, number)
+                item = Item.objects.create(short_title=short_title, lot=lot, index_in_lot=index_in_lot,
+                                           collection=lot.catalogue.collection, edition=edition)
+        return HttpResponseRedirect(next_url)
+    else:
+        context = {
+            'form': LotExpandForm(),
+            'extended_layout': 'barelayout.html',
+            'action': _("Expand"),
+            'object_name': "lot",
+            'next_url': next_url
+        }
+        return render(request, 'generic_form.html', context=context)
 
 
 # PersonCatalogueRelation views

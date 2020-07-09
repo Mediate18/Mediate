@@ -94,6 +94,9 @@
             <a href="{% url 'items' %}?lot__uuid={{ lot.pk }}" target="_blank">
                 <span class="glyphicon glyphicon-list" title="{% trans 'Items of this lot' %}"></span>
             </a>
+            <a href="{% url 'expand_lot' lot.pk %}">
+                <span class="glyphicon glyphicon-plus" title="{% trans 'Add items to this lot' %}"></span>
+            </a>
         </td>
     </tr>
 {% endfor %}

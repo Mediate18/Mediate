@@ -250,3 +250,8 @@ class CataloguePlaceRelationTypeModelForm(forms.ModelForm):
     class Meta:
         model = CataloguePlaceRelationType
         fields = "__all__"
+
+
+class LotExpandForm(forms.Form):
+    number = forms.IntegerField(label='Number')
+    prefix = forms.CharField(label='Prefix', max_length=100)
