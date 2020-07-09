@@ -626,6 +626,7 @@ def expand_lot_view(request, pk):
     next_url = reverse_lazy('catalogue_detail_bare', args=[str(lot.catalogue.uuid)])
 
     if request.method == 'POST':
+        next_url = '{}#lot__{}'.format(next_url, lot.uuid)
         form = LotExpandForm(request.POST)
         if form.is_valid():
             number = int(form.cleaned_data.get('number', 0))
@@ -640,15 +641,17 @@ def expand_lot_view(request, pk):
                 item = Item.objects.create(short_title=short_title, lot=lot, index_in_lot=index_in_lot,
                                            collection=lot.catalogue.collection, edition=edition)
         return HttpResponseRedirect(next_url)
-    else:
-        context = {
-            'form': LotExpandForm(),
-            'extended_layout': 'barelayout.html',
-            'action': _("Expand"),
-            'object_name': "lot",
-            'next_url': next_url
-        }
-        return render(request, 'generic_form.html', context=context)
+    elif request.method == 'GET':
+        next_url = request.GET.get('next', next_url)
+
+    context = {
+        'form': LotExpandForm(),
+        'extended_layout': 'barelayout.html',
+        'action': _("Expand"),
+        'object_name': "lot: {}".format(lot.lot_as_listed_in_catalogue),
+        'next_url': next_url
+    }
+    return render(request, 'generic_form.html', context=context)
 
 
 # PersonCatalogueRelation views
