@@ -636,7 +636,7 @@ def expand_lot_view(request, pk):
             for index in range(2, number + 1):
                 edition = Edition.objects.create()
 
-                index_in_lot = last_item_index + index
+                index_in_lot = last_item_index + index - 1
                 short_title = "{} [{} of {}]".format(prefix, index, number)
                 item = Item.objects.create(short_title=short_title, lot=lot, index_in_lot=index_in_lot,
                                            collection=lot.catalogue.collection, edition=edition)
