@@ -362,7 +362,7 @@ class PersonRankingFilter(django_filters.FilterSet):
                         qs = filter_.filter(qs, value)
 
             self._qs = qs.distinct()\
-                .annotate(item_count=Count('uuid'))\
+                .annotate(item_count=Count('personitemrelation__item', distinct=True))\
                 .annotate(catalogue_count=Count('personitemrelation__item__lot__catalogue', distinct=True))\
                 .order_by('-item_count')
 
