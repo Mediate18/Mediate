@@ -41,6 +41,7 @@ class ItemTable(tables.Table):
     languages = tables.Column(empty_values=(), verbose_name=_("Languages"), orderable=False)
     parisian_category = tables.Column(accessor='lot.category.parisian_category')
     item_type = tables.Column(empty_values=(), orderable=False)
+    tags = tables.Column(empty_values=(), orderable=False)
 
     class Meta:
         model = Item
@@ -59,6 +60,7 @@ class ItemTable(tables.Table):
             'languages',
             'parisian_category',
             'item_type',
+            'tags',
             'uuid',
             'manage_works',
             'manage_persons',
@@ -133,6 +135,9 @@ class ItemTable(tables.Table):
 
     def render_item_type(self, record):
         return ", ".join(ItemType.objects.filter(itemitemtyperelation__item=record).values_list('name', flat=True))
+
+    def render_tags(self, record):
+        return ", ".join([str(taggedentity.tag) for taggedentity in record.tags.all()])
 
     # All value_XX methods are for the table export
     def value_lot(self, record):
