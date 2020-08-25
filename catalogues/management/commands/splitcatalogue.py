@@ -23,7 +23,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         # Get the command line arguments
-        print(kwargs.get('catalogue_id', None))
         catalogue = Catalogue.objects.get(uuid=kwargs.get('catalogue_id', None))
         lot = Lot.objects.get(catalogue=catalogue, index_in_catalogue=kwargs.get('index_in_catalogue', None))
         new_catalogue_name = kwargs.get('new_catalogue_name', None)
@@ -33,6 +32,7 @@ class Command(BaseCommand):
         with transaction.atomic():
             new_collection = Collection.objects.create(name=new_catalogue_name)
             new_catalogue = Catalogue.objects.create(short_title=new_catalogue_name, collection=new_collection)
+            print("New catalogue URL:", new_catalogue.get_absolute_url())
             lots_to_move = Lot.objects.filter(catalogue=catalogue, index_in_catalogue__gte=lot.index_in_catalogue)
             categories_to_move = Category.objects.filter(lot__in=lots_to_move).distinct()
 
