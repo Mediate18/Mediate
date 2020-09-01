@@ -5,7 +5,7 @@ from django.forms import CheckboxInput
 from django_select2.forms import ModelSelect2MultipleWidget, Select2MultipleWidget, HeavySelect2MultipleWidget
 from tagme.models import Tag
 from .models import *
-from persons.models import Country, Profession
+from persons.models import Country, Profession, Religion
 from catalogues.models import Catalogue, ParisianCategory, PersonCatalogueRelation
 from mediate.tools import filter_multiple_words
 from viapy.api import ViafAPI
@@ -191,6 +191,16 @@ class ItemFilter(django_filters.FilterSet):
         ),
         method='owner_profession_filter'
     )
+    owner_religion = django_filters.ModelMultipleChoiceFilter(
+        label="Ovner religion",
+        queryset=Religion.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Religion,
+            search_fields=['name__icontains']
+        ),
+        method='owner_religion_filter'
+    )
     language = django_filters.ModelMultipleChoiceFilter(
         label='Language',
         queryset=Language.objects.all(),
@@ -370,6 +380,12 @@ class ItemFilter(django_filters.FilterSet):
         if value:
             return queryset.filter(lot__catalogue__personcataloguerelation__in=PersonCatalogueRelation.objects.filter(
                 role__name__iexact='owner', person__personprofession__profession__in=value))
+        return queryset
+
+    def owner_religion_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(lot__catalogue__personcataloguerelation__in=PersonCatalogueRelation.objects.filter(
+                role__name__iexact='owner', person__religiousaffiliation__religion__in=value))
         return queryset
 
     def catalogue_country_of_publication_filter(self, queryset, name, value):
