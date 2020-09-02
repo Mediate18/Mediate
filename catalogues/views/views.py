@@ -4,6 +4,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 from django.db.models import Count, Min, Max
+from django.db.models.functions import Substr, Length
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 
@@ -18,7 +19,6 @@ from ..filters import *
 from ..models import *
 
 from items.models import Item, Edition
-from mediate.tools import Truncate
 import json
 
 import django_tables2
@@ -54,7 +54,7 @@ class CatalogueTableView(ListView):
 
         item_count_per_decade = Item.objects\
             .filter(lot__catalogue__in=filter.qs, edition__year__lte=max_publication_year)\
-            .annotate(decade=Truncate('edition__year', -1))\
+            .annotate(decade=10 * Substr('edition__year', 1, Length('edition__year') - 1))\
             .values('decade')\
             .order_by('decade')\
             .annotate(count=Count('decade'))
