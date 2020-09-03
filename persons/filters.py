@@ -2,7 +2,7 @@ import django_filters
 from .models import *
 from viapy.api import ViafAPI
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import Q, IntegerField, Count
+from django.db.models import Q, IntegerField, Count, QuerySet
 from django.db.models.functions import Cast
 from django import forms
 from django_select2.forms import Select2MultipleWidget
@@ -226,7 +226,29 @@ class MultipleChoiceFilterQWithExtraLookups(QBasedFilter, django_filters.Multipl
     """
     Subclass of django_filters.MultipleChoiceFilter for the purpose of
     using Q objects within one filter instead of chaining filters.
-    Specific version for the catalogue_owner_sex in PersonRankingFilter.
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.extra_field_lookups = kwargs.pop('extra_field_lookups', {})
+        super().__init__(*args, **kwargs)
+
+    def filter(self, q, value):
+        """MultipleChoiceFilter filter method override for use of Q(...) """
+        if isinstance(value, Lookup):
+            lookup = six.text_type(value.lookup_type)
+            value = value.value
+        else:
+            lookup = self.lookup_expr
+        if not value:
+            return q
+        q &= Q(**{'%s__%s' % (self.field_name, lookup): value, **self.extra_field_lookups})
+        return q
+
+
+class ModelMultipleChoiceFilterQWithExtraLookups(QBasedFilter, django_filters.ModelMultipleChoiceFilter):
+    """
+    Subclass of django_filters.MultipleChoiceFilter for the purpose of
+    using Q objects within one filter instead of chaining filters.
     """
 
     def __init__(self, *args, **kwargs):
@@ -288,6 +310,15 @@ class PersonRankingFilter(django_filters.FilterSet):
         lookup_expr='in',
         extra_field_lookups={'personitemrelation__item__lot__catalogue__personcataloguerelation__role__name': 'owner'}
     )
+    catalogue_owner_religion = ModelMultipleChoiceFilterQWithExtraLookups(
+        label="Catalogue owner religion",
+        queryset=Religion.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
+        field_name=
+        'personitemrelation__item__lot__catalogue__personcataloguerelation__person__religiousaffiliation__religion',
+        lookup_expr='in',
+        extra_field_lookups={'personitemrelation__item__lot__catalogue__personcataloguerelation__role__name': 'owner'}
+    )
     country_of_birth = ModelMultipleChoiceFilterQ(
         label="Country of birth of Person related to Item",
         queryset=Country.objects.all(),
@@ -320,6 +351,7 @@ class PersonRankingFilter(django_filters.FilterSet):
             'sex',
             'catalogue_year',
             'catalogue_owner_sex',
+            'catalogue_owner_religion',
             'country_of_birth',
             'date_of_birth',
             'country_of_death',
@@ -358,7 +390,10 @@ class PersonRankingFilter(django_filters.FilterSet):
                 if not isinstance(filter_, QBasedFilter):
                     value = self.form.cleaned_data.get(name)
 
-                    if value is not None:  # valid & clean data
+                    if isinstance(value, QuerySet):
+                        if value.exists():
+                            qs = filter_.filter(qs, value)
+                    elif value is not None:  # valid & clean data
                         qs = filter_.filter(qs, value)
 
             self._qs = qs.distinct()\
