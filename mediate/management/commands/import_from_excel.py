@@ -39,8 +39,8 @@ class Command(BaseCommand):
                 lots_data.append(dict(zip(header, row_as_list)))
 
             # Handle each lot dict
+            index_in_catalogue = 1
             for lot_dict in lots_data:
-                index_in_catalogue = 1
 
                 # Collection and Catalogue
                 catalogue_short_title = os.path.splitext(os.path.basename(transcription_file))[0]
