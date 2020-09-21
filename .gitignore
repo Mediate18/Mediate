@@ -3,5 +3,5 @@
 /logs/
 /venv/
 /static_root/
-.env
+.env*
 /writable/
