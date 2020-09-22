@@ -114,7 +114,7 @@ class Catalogue(models.Model):
 
     @property
     def sorted_lot_set(self):
-        return self.lot_set.order_by('index_in_catalogue')
+        return self.lot_set.order_by('index_in_catalogue', 'number_in_catalogue')
 
 
 class CatalogueCatalogueTypeRelation(models.Model):
