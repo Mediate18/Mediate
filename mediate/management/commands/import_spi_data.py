@@ -91,17 +91,21 @@ class Command(BaseCommand):
             else:
                 place = None
             # print('place: ' + str(place))
-            person, created = persons.models.Person.objects.get_or_create(short_name=row['publisher'],
-                                     surname=row['publisher'],
-                                     first_names='',
-                                     sex='UNKNOWN')
+            if row['publisher']:
+                person, created = persons.models.Person.objects.get_or_create(short_name=row['publisher'],
+                                         surname=row['publisher'],
+                                         first_names='',
+                                         sex='UNKNOWN')
+            else:
+                person = None
             # print('person: ' + str(person) + " " + str(created))
             edition = items.models.Edition(year=date, place=place)
             edition.save()
             # print('edition: ' + str(edition))
-            publisher = items.models.Publisher(edition=edition, publisher=person)
-            publisher.save()
-            # print('publisher: ' + str(publisher))
+            if person:
+                publisher = items.models.Publisher(edition=edition, publisher=person)
+                publisher.save()
+                # print('publisher: ' + str(publisher))
 
             item_entries = re.compile(r'\s?\/\s?').split(row['entry_text'])
             if len(item_entries) >= row['index_in_lot']:
