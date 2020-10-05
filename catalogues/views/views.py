@@ -654,6 +654,52 @@ def expand_lot_view(request, pk):
     return render(request, 'generic_form.html', context=context)
 
 
+def add_lot_before(request, pk):
+    lot_after = get_object_or_404(Lot, pk=pk)
+    try:
+        lot_before = Lot.objects.filter(catalogue=lot_after.catalogue, index_in_catalogue__lt=lot_after.index_in_catalogue)\
+            .order_by('-index_in_catalogue').first()
+    except:
+        lot_before = None
+    next_url = reverse_lazy('catalogue_detail_bare', args=[str(lot_after.catalogue.uuid)])
+
+    if request.method == 'POST':
+        pass  #TODO
+    elif request.method == 'GET':
+        if 'category' in request.GET:
+            if lot_before:
+                category = lot_before.category
+            else:
+                category = None
+        else:
+            category = lot_after.category
+
+        if 'page' in request.GET:
+            if lot_before:
+                page = lot_before.page_in_catalogue
+            elif lot_after.page_in_catalogue > 1:
+                page = lot_after.page_in_catalogue - 1
+            else:
+                page = lot_after.page_in_catalogue
+        else:
+            page = lot_after.page_in_catalogue
+
+        index = lot_after.index_in_catalogue
+
+        form = AddLotBeforeForm(category, page, index)
+    else:
+        form = AddLotBeforeForm()
+
+    context = {
+        'form': form,
+        'extended_layout': 'barelayout.html',
+        'action': _("Expand"),
+        'next_url': next_url
+    }
+
+    return render(request, 'generic_form.html', context=context)
+
+
 # PersonCatalogueRelation views
 class PersonCatalogueRelationTableView(ListView):
     model = PersonCatalogueRelation

@@ -255,3 +255,17 @@ class CataloguePlaceRelationTypeModelForm(forms.ModelForm):
 class LotExpandForm(forms.Form):
     number = forms.IntegerField(label='Number')
     prefix = forms.CharField(label='Prefix', max_length=100)
+
+
+class AddLotBeforeForm(forms.ModelForm):
+    class Meta:
+        model = Lot
+        fields = ['number_in_catalogue', 'sales_price', 'lot_as_listed_in_catalogue', 'category', 'page_in_catalogue',
+                  'index_in_catalogue']
+
+    def __init__(self, category=None, page=None, index=None, **kwargs):
+        super().__init__(**kwargs)
+        self.fields['category'] = forms.ModelChoiceField(Category.objects.filter(catalogue=self.instance.catalogue),
+                                                         widget=forms.HiddenInput(), initial=category)
+        self.fields['page_in_catalogue'] = forms.IntegerField(widget=forms.HiddenInput(), initial=page)
+        self.fields['index_in_catalogue'] = forms.IntegerField(widget=forms.HiddenInput(), initial=index)
