@@ -592,12 +592,13 @@ class LotUpdateView(UpdateView):
     def get_success_url(self):
         return self.request.GET.get('next') or reverse_lazy('lots')
 
-    @put_get_variable_in_context([('next', 'next_url'),])
     @put_layout_in_context
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("update")
         context['object_name'] = "lot"
+        if 'next' in self.request.GET:
+            context['next_url'] = '{}#lot__{}'.format(self.request.GET['next'], self.get_object().uuid)
         return context
 
 
@@ -674,10 +675,9 @@ def add_lot_before(request, pk):
         lot_before = None
 
     next_url = reverse_lazy('catalogue_detail_bare', args=[str(lot_after.catalogue.uuid)])
+    next_url = '{}#lot__{}'.format(next_url, lot_after.uuid)
 
     if request.method == 'POST':
-        print("POST")
-        next_url = '{}#lot__{}'.format(next_url, lot_after.uuid)
         form = AddLotBeforeForm(request.POST)
         print(form)
         if form.is_valid():
