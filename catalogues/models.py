@@ -1,9 +1,10 @@
-from django.db import models
-from django.db.models import ProtectedError
+from django.db import models, transaction
+from django.db.models import ProtectedError, F
 from django.db.models.deletion import CASCADE, SET_NULL
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse_lazy
 from django.contrib.contenttypes.fields import GenericRelation
+
 
 import uuid
 
@@ -161,9 +162,14 @@ class Lot(models.Model):
     def save(self, *args, **kwargs):
         # Check whether the catalogue of the category is the same catalogue
         if not self.category or self.catalogue == self.category.catalogue:
-            super(Lot, self).save(*args, **kwargs)
+            with transaction.atomic():
+                # Add 1 to index_in_catalogue for all lots with index_in_catalogue greater than or equal to this index
+                Lot.objects.filter(catalogue=self.catalogue, index_in_catalogue__gte=self.index_in_catalogue)\
+                    .update(index_in_catalogue=F('index_in_catalogue') + 1)
+                super(Lot, self).save(*args, **kwargs)
         else:
             raise Exception(_("Lot {}: the catalogue is not the same as the category's catalogue").format(self))
+
 
     def get_absolute_url(self):
         return reverse_lazy('lot_detail', args=[str(self.uuid)])

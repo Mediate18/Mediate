@@ -655,16 +655,35 @@ def expand_lot_view(request, pk):
 
 
 def add_lot_before(request, pk):
+    """
+    Add a lot at a certain position in the list of lots of a catalogue.
+    The position is determined as *before* the lot with 'pk' as the id.
+    If the 'page' url parameter is set, it means the page before the page of the selected lot.
+    If the 'category' url parameter is set, it means the category before the category of the selected lot.
+    :param request: 
+    :param pk: 
+    :return: 
+    """
     lot_after = get_object_or_404(Lot, pk=pk)
+
+    # Determine whether there is a lot before the selected position
     try:
         lot_before = Lot.objects.filter(catalogue=lot_after.catalogue, index_in_catalogue__lt=lot_after.index_in_catalogue)\
             .order_by('-index_in_catalogue').first()
     except:
         lot_before = None
+
     next_url = reverse_lazy('catalogue_detail_bare', args=[str(lot_after.catalogue.uuid)])
 
     if request.method == 'POST':
-        pass  #TODO
+        print("POST")
+        next_url = '{}#lot__{}'.format(next_url, lot_after.uuid)
+        form = AddLotBeforeForm(request.POST)
+        print(form)
+        if form.is_valid():
+            print("form is valid", form)
+            form.save()
+            return HttpResponseRedirect(next_url)
     elif request.method == 'GET':
         if 'category' in request.GET:
             if lot_before:
@@ -686,14 +705,14 @@ def add_lot_before(request, pk):
 
         index = lot_after.index_in_catalogue
 
-        form = AddLotBeforeForm(category, page, index)
+        form = AddLotBeforeForm(category=category, page=page, index=index, catalogue=lot_after.catalogue)
     else:
         form = AddLotBeforeForm()
 
     context = {
         'form': form,
         'extended_layout': 'barelayout.html',
-        'action': _("Expand"),
+        'action': _("Add lot"),
         'next_url': next_url
     }
 
