@@ -410,6 +410,8 @@ h1 {
     .navbar-collapse {
         border-top: 1px solid transparent;
         box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+        max-width: 320px;
+        float: right;
     }
     .navbar-fixed-top {
 		top: 0;
@@ -419,8 +421,13 @@ h1 {
         display: none!important;
     }
     .navbar-nav {
-        float: none!important;
-		margin-top: 7.5px;
+        float: none !important;
+        margin-top: 7.5px;
+        max-width: 300px;
+	}
+
+	.navbar-right {
+	    margin-right: 0px;
 	}
 	.navbar-nav>li {
         float: none;
