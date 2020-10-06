@@ -60,12 +60,20 @@
 {% for lot in object.sorted_lot_set %}
             {% if lot.index_in_catalogue in first_lot_on_page_dict %}
     <tr>
-        <td colspan="4">
+        <td colspan="4" style="padding: 0px;">
             <!--before page {{ lot.page_in_catalogue }}, before lot index {{ lot.index_in_catalogue }}-->
             {% if lot.index_in_catalogue in first_lot_in_category_dict %}
-                <a href="{% url 'add_lot_before' lot.pk %}?page&category" title="Add lot here"><div style="height: 2px; background-color: grey"></div></a>
+                <a href="{% url 'add_lot_before' lot.pk %}?page&category" title="Add lot here">
+                <div style="padding-top: 5px; padding-bottom: 5px;">
+                    <div style="height: 1px; background-color: #ddd;"></div>
+                </div>
+            </a>
             {% else %}
-                <a href="{% url 'add_lot_before' lot.pk %}?page" title="Add lot here"><div style="height: 2px; background-color: grey"></div></a>
+                <a href="{% url 'add_lot_before' lot.pk %}?page" title="Add lot here">
+                <div style="padding-top: 5px; padding-bottom: 5px;">
+                    <div style="height: 1px; background-color: #ddd;"></div>
+                </div>
+            </a>
             {% endif %}
         </td>
     </tr>
@@ -77,9 +85,13 @@
             {% endif %}
             {% if lot.index_in_catalogue in first_lot_in_category_dict %}
     <tr>
-        <td colspan="4">
+        <td colspan="4" style="padding: 0px;">
             <!-- before category {{ lot.category.bookseller_category }}, before lot index {{ lot.index_in_catalogue }}-->
-            <a href="{% url 'add_lot_before' lot.pk %}?category" title="Add lot here"><div style="height: 2px; background-color: grey;"></div></a>
+            <a href="{% url 'add_lot_before' lot.pk %}?category" title="Add lot here">
+                <div style="padding-top: 5px; padding-bottom: 5px;">
+                    <div style="height: 1px; background-color: #ddd;"></div>
+                </div>
+            </a>
         </td>
     </tr>
     <tr>
@@ -90,9 +102,13 @@
     </tr>
             {% endif %}
     <tr>
-        <td colspan="4">
+        <td colspan="4" style="padding: 0px;">
             <!--before lot index {{ lot.index_in_catalogue }}-->
-            <a href="{% url 'add_lot_before' lot.pk %}" title="Add lot here"><div style="height: 2px; background-color: grey"></div></a>
+            <a href="{% url 'add_lot_before' lot.pk %}" title="Add lot here">
+                <div style="padding-top: 5px; padding-bottom: 5px;">
+                    <div style="height: 1px; background-color: #ddd;"></div>
+                </div>
+            </a>
         </td>
     </tr>
     <tr>
