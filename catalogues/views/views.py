@@ -719,6 +719,46 @@ def add_lot_before(request, pk):
     return render(request, 'generic_form.html', context=context)
 
 
+def add_lot_at_end(request, pk):
+    """
+    Add a lot at the end of a catalogue
+    :param request:
+    :param pk:
+    :return:
+    """
+    catalogue = get_object_or_404(Catalogue, pk=pk)
+    last_lot = Lot.objects.filter(catalogue=catalogue).order_by('-index_in_catalogue').first()
+
+    next_url = reverse_lazy('catalogue_detail_bare', args=[str(catalogue.uuid)])
+    if request.method == 'POST':
+        form = AddLotAtEndForm(request.POST)
+        print(form)
+        if form.is_valid():
+            print("form is valid", form)
+            form.save()
+            return HttpResponseRedirect(next_url)
+    elif request.method == 'GET':
+        print("GET")
+        category = last_lot.category
+
+        page = last_lot.page_in_catalogue
+        print("PAGE", page)
+
+        index = last_lot.index_in_catalogue + 1
+
+        form = AddLotAtEndForm(category=category, page=page, index=index, catalogue=catalogue)
+    else:
+        form = AddLotAtEndForm()
+
+    context = {
+        'form': form,
+        'extended_layout': 'barelayout.html',
+        'action': _("Add lot"),
+        'next_url': next_url
+    }
+
+    return render(request, 'generic_form.html', context=context)
+
 # PersonCatalogueRelation views
 class PersonCatalogueRelationTableView(ListView):
     model = PersonCatalogueRelation

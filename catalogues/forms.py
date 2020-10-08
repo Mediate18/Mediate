@@ -268,3 +268,17 @@ class AddLotBeforeForm(LotModelForm):
             self.fields['index_in_catalogue'] = forms.IntegerField(widget=forms.HiddenInput(), initial=index)
         if catalogue:
             self.fields['catalogue'] = forms.CharField(widget=forms.HiddenInput(), initial=catalogue.uuid)
+
+
+class AddLotAtEndForm(LotModelForm):
+    def __init__(self, *args, category=None, page=None, index=None, catalogue=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if category:
+            self.fields['category'] = forms.ModelChoiceField(Category.objects.filter(catalogue=catalogue),
+                                                             initial=category.uuid)
+        if page:
+            self.fields['page_in_catalogue'] = forms.IntegerField(initial=page)
+        if index:
+            self.fields['index_in_catalogue'] = forms.IntegerField(widget=forms.HiddenInput(), initial=index)
+        if catalogue:
+            self.fields['catalogue'] = forms.CharField(widget=forms.HiddenInput(), initial=catalogue.uuid)

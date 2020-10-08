@@ -139,5 +139,15 @@
         </td>
     </tr>
 {% endfor %}
+    <tr>
+        <td colspan="4" style="padding: 0px;">
+            <!--before lot index {{ lot.index_in_catalogue }}-->
+            <a href="{% url 'add_lot_at_end' object.pk %}" title="Add lot here">
+                <div style="padding-top: 5px; padding-bottom: 5px;">
+                    <div style="height: 1px; background-color: #ddd;"></div>
+                </div>
+            </a>
+        </td>
+    </tr>
 </table>
 {% endblock %}
