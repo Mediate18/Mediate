@@ -734,17 +734,13 @@ def add_lot_at_end(request, pk):
 
     if request.method == 'POST':
         form = AddLotAtEndForm(request.POST)
-        print(form)
         if form.is_valid():
-            print("form is valid", form)
             form.save()
             return HttpResponseRedirect(next_url)
     elif request.method == 'GET':
-        print("GET")
         category = last_lot.category
 
         page = last_lot.page_in_catalogue
-        print("PAGE", page)
 
         index = last_lot.index_in_catalogue + 1
 
