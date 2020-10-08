@@ -730,6 +730,8 @@ def add_lot_at_end(request, pk):
     last_lot = Lot.objects.filter(catalogue=catalogue).order_by('-index_in_catalogue').first()
 
     next_url = reverse_lazy('catalogue_detail_bare', args=[str(catalogue.uuid)])
+    next_url = '{}#lot__{}'.format(next_url, last_lot.uuid)
+
     if request.method == 'POST':
         form = AddLotAtEndForm(request.POST)
         print(form)
