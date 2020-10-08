@@ -679,10 +679,18 @@ def add_lot_before(request, pk):
 
     if request.method == 'POST':
         form = AddLotBeforeForm(request.POST)
-        print(form)
         if form.is_valid():
-            print("form is valid", form)
-            form.save()
+            new_lot = form.save()
+
+            # Create Item for this new Lot
+            empty_edition = Edition.objects.create()
+            Item.objects.create(
+                lot=new_lot,
+                edition=empty_edition,
+                short_title=new_lot.lot_as_listed_in_catalogue[:128],
+                index_in_lot=1
+            )
+
             return HttpResponseRedirect(next_url)
     elif request.method == 'GET':
         if 'category' in request.GET:
@@ -735,15 +743,22 @@ def add_lot_at_end(request, pk):
     if request.method == 'POST':
         form = AddLotAtEndForm(request.POST)
         if form.is_valid():
-            form.save()
+            new_lot = form.save()
+
+            # Create Item for this new Lot
+            empty_edition = Edition.objects.create()
+            Item.objects.create(
+                lot=new_lot,
+                edition=empty_edition,
+                short_title=new_lot.lot_as_listed_in_catalogue[:128],
+                index_in_lot=1
+            )
+
             return HttpResponseRedirect(next_url)
     elif request.method == 'GET':
         category = last_lot.category
-
         page = last_lot.page_in_catalogue
-
         index = last_lot.index_in_catalogue + 1
-
         form = AddLotAtEndForm(category=category, page=page, index=index, catalogue=catalogue)
     else:
         form = AddLotAtEndForm()
@@ -756,6 +771,7 @@ def add_lot_at_end(request, pk):
     }
 
     return render(request, 'generic_form.html', context=context)
+
 
 # PersonCatalogueRelation views
 class PersonCatalogueRelationTableView(ListView):
