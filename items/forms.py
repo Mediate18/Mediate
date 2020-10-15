@@ -409,6 +409,18 @@ class ItemTagsForm(forms.ModelForm):
         }
 
 
+class ItemWorksForm(forms.ModelForm):
+    class Meta:
+        model = ItemWorkRelation
+        fields = ['work']
+        widgets = {
+            'work': ModelSelect2MultipleWidget(
+                model=Work,
+                search_fields=['title__icontains']
+            )
+        }
+
+
 class PublisherForm(forms.ModelForm):
     class Meta:
         model = Publisher
