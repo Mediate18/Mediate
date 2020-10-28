@@ -87,6 +87,8 @@ class ItemFilter(django_filters.FilterSet):
         ),
         method='edition_place_filter'
     )
+    edition_year = django_filters.RangeFilter(label="Date of publication", widget=RangeWidget(),
+                                                            field_name='edition__year')
     edition_year_tag = django_filters.Filter(
         label="Date of publication tag",
         name='edition__year_tag',
@@ -258,6 +260,7 @@ class ItemFilter(django_filters.FilterSet):
             'edition_isnull',
             'edition_isempty',
             'edition_place',
+            'edition_year',
             'edition_year_tag',
             'material_details',
             'tag',
