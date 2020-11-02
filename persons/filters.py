@@ -14,6 +14,7 @@ from django_filters.constants import STRICTNESS
 from django_filters.filters import Lookup
 
 from mediate.tools import filter_multiple_words
+from mediate.filters import QBasedFilter
 from catalogues.models import PersonCatalogueRelationRole, Catalogue
 from items.models import PersonItemRelationRole
 
@@ -174,13 +175,6 @@ class PersonFilter(django_filters.FilterSet):
             second_person_query = Q(relations_when_second__type__in=value)
             return queryset.filter(first_person_query | second_person_query).distinct()
         return queryset
-
-
-class QBasedFilter:
-    """
-    Merely a super class for testing with isinstance.
-    """
-    pass
 
 
 class ModelMultipleChoiceFilterQ(QBasedFilter, django_filters.ModelMultipleChoiceFilter):

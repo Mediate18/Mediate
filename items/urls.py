@@ -243,6 +243,10 @@ urlpatterns = [
     path(r'editions/setpublisherforeditions', permission_required('items.add_publisher')(set_publisher_for_editions),
          name="set_publisher_for_editions"),
 
+    # EditionRanking urls
+    path(r'editions/rank', permission_required('global.view_all')(EditionRankingTableView.as_view()),
+         name='editions_ranking'),
+
     # Publisher urls
     path('publishers/', permission_required('global.view_all')(PublisherTableView.as_view()), name='publishers'),
     path(r'publishers/<uuid:pk>', permission_required('global.view_all')(PublisherDetailView.as_view()), name="publisher_detail"),

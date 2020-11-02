@@ -1423,6 +1423,30 @@ class EditionTableView(ListView):
         return context
 
 
+class EditionRankingTableView(ListView):
+    model = Edition
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return Edition.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(EditionRankingTableView, self).get_context_data(**kwargs)
+        filter = EditionRankingFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = EditionRankingTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name_plural'] = "Edition ranking"
+        context['add_url'] = reverse_lazy('add_edition')
+
+        return context
+
+
 class EditionDetailView(GenericDetailView):
     model = Edition
     object_fields = ['year', 'year_tag', 'terminus_post_quem', 'place', 'url']

@@ -2,6 +2,8 @@ import django_tables2 as tables
 from django_tables2.utils import A  # alias for Accessor
 from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
+import itertools
+
 from .models import *
 
 from mediate.columns import ActionColumn
@@ -487,6 +489,37 @@ class EditionTable(tables.Table):
         return format_html(
             '<input id="{}" class="checkbox" type="checkbox" name="checkbox"/>'.format(record.uuid)
         )
+
+
+
+# EditionRanking table
+class EditionRankingTable(EditionTable):
+    row_index = tables.Column(empty_values=(), orderable=False, verbose_name="")
+    item_count = tables.Column(empty_values=(), verbose_name=_("# items"))
+    catalogue_count = tables.Column(empty_values=(), verbose_name=_("# catalogues"))
+
+    class Meta:
+        model = Edition
+        attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'row_index',
+            'item_count',
+            'catalogue_count',
+            'items',
+            'year',
+            'year_tag',
+            'terminus_post_quem',
+            'place',
+            'url',
+            'publisher',
+            'uuid',
+            'checkbox'
+        ]
+
+    def render_row_index(self):
+        self.row_index = getattr(self, 'row_index', itertools.count(self.page.start_index()))
+        return next(self.row_index)
+
 
 
 # Publisher table

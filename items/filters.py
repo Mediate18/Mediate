@@ -1,6 +1,6 @@
 import django_filters
 from django_filters.widgets import RangeWidget
-from django.db.models import Count
+from django.db.models import Count, Q, QuerySet
 from django.forms import CheckboxInput
 from django_select2.forms import ModelSelect2MultipleWidget, Select2MultipleWidget, HeavySelect2MultipleWidget
 from tagme.models import Tag
@@ -8,7 +8,9 @@ from .models import *
 from persons.models import Country, Profession, Religion
 from catalogues.models import Catalogue, ParisianCategory, PersonCatalogueRelation
 from mediate.tools import filter_multiple_words
+from mediate.filters import QBasedFilter
 from viapy.api import ViafAPI
+import six
 
 from django.urls import reverse_lazy
 
@@ -590,6 +592,18 @@ class EditionFilter(django_filters.FilterSet):
         if value:
             return queryset.filter(items__book_format__in=value)
         return queryset
+
+
+class EditionRankingFilter(EditionFilter):
+    # Override method
+    @property
+    def qs(self):
+        qs = super().qs
+        self._qs = qs.distinct() \
+            .annotate(item_count=Count('items', distinct=True)) \
+            .annotate(catalogue_count=Count('items__lot__catalogue', distinct=True)) \
+            .order_by('-item_count')
+        return self._qs
 
 
 # Publisher filter
