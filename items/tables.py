@@ -119,10 +119,14 @@ class ItemTable(tables.Table):
 
 
     def render_catalogue(self, record):
-        return format_html('<a href="{}">{}</a>'.format(
-            reverse_lazy('catalogue_detail', args=[str(record.lot.catalogue.uuid)]),
-            str(record.lot.catalogue))
-        )
+        try:
+            return format_html('<a href="{}">{}</a>'.format(
+                reverse_lazy('catalogue_detail', args=[str(record.lot.catalogue.uuid)]),
+                str(record.lot.catalogue))
+            )
+        except AttributeError:
+            # Record has not lot or lot has no catalogue
+            return ''
 
     def render_number_of_volumes(self, record):
         return record.number_of_volumes or format_html("&mdash;")

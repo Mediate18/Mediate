@@ -67,6 +67,11 @@ class ItemFilter(django_filters.FilterSet):
         ),
         method='parisian_category_filter'
     )
+    lot_isnull = django_filters.BooleanFilter(
+        label="No associated lot",
+        widget=CheckboxInput(),
+        method='lot_isnull_filter'
+    )
     edition_isnull = django_filters.BooleanFilter(
         label="No associated edition",
         widget=CheckboxInput(),
@@ -257,6 +262,7 @@ class ItemFilter(django_filters.FilterSet):
             'catalogue',
             'catalogue_publication_year',
             'parisian_category',
+            'lot_isnull',
             'edition_isnull',
             'edition_isempty',
             'edition_place',
@@ -304,6 +310,11 @@ class ItemFilter(django_filters.FilterSet):
     def parisian_category_filter(self, queryset, name, value):
         if value:
             return queryset.filter(lot__category__parisian_category__in=value)
+        return queryset
+
+    def lot_isnull_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(lot__isnull=True)
         return queryset
 
     def edition_isnull_filter(self, queryset, name, value):
