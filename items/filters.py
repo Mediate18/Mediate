@@ -22,6 +22,16 @@ class BookFormatFilter(django_filters.FilterSet):
         exclude = ['uuid']
 
 
+def valid_person_role(slf, value):
+    try:
+        person_uuid, role_uuid = value.split('|')
+        uuid.UUID(person_uuid)
+        uuid.UUID(role_uuid)
+        return True
+    except ValueError:
+        return False
+
+
 # Item filter
 class ItemFilter(django_filters.FilterSet):
     short_title = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
@@ -155,6 +165,9 @@ class ItemFilter(django_filters.FilterSet):
             data_view='personroleautoresponse'
         )
     )
+    # Override the valid_value method
+    person_role.field_class.valid_value = valid_person_role
+
     owner_gender = django_filters.ChoiceFilter(
         label="Owner gender",
         choices=Person.SEX_CHOICES,
@@ -276,6 +289,23 @@ class ItemFilter(django_filters.FilterSet):
             'catalogue_city_of_publication',
             'catalogue_tag',
         ]
+
+    def __init__(self, data=None, *args, **kwargs):
+        self.pass_selected_choices_to_person_role_filter(data)
+        super().__init__(data, *args, **kwargs)
+
+    def pass_selected_choices_to_person_role_filter(self, data):
+        """Passes the selected choices are in field on the result page"""
+        if data is not None:
+            person_role_field = self.base_filters.get('person_role')
+            person_roles = data.getlist('person_role')
+            person_role_choices = []
+            for person_role in person_roles:
+                person_id, role_id = person_role.split('|')
+                person_name = Person.objects.get(uuid=person_id).short_name
+                role_name = PersonItemRelationRole.objects.get(uuid=role_id).name
+                person_role_choices.append((person_role,"{} - {}".format(person_name, role_name)))
+            person_role_field.extra['choices'] = person_role_choices
 
     def tag_filter(self, queryset, name, value):
         if value:
