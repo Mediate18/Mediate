@@ -236,6 +236,32 @@ class PlaceTable(tables.Table):
             'latitude',
             'uuid'
         ]
+        
+        
+# PlaceRanking table
+class PlaceRankingTable(PlaceTable):
+    row_index = tables.Column(empty_values=(), orderable=False, verbose_name="")
+    item_count = tables.Column(empty_values=(), verbose_name=_("# items"))
+    catalogue_count = tables.Column(empty_values=(), verbose_name=_("# catalogues"))
+
+    class Meta:
+        model = Place
+        attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'row_index',
+            'item_count',
+            'catalogue_count',
+            'name',
+            'cerl_id',
+            'country',
+            'longitude',
+            'latitude',
+            'uuid'
+        ]
+
+    def render_row_index(self):
+        self.row_index = getattr(self, 'row_index', itertools.count(self.page.start_index()))
+        return next(self.row_index)
 
 
 # Place links table

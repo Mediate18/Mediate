@@ -103,6 +103,10 @@ urlpatterns = [
          permission_required('persons.delete_place')(PlaceDeleteView.as_view()),
          name="delete_place"),
 
+    # PersonRanking urls
+    path(r'places/rank', permission_required('global.view_all')(PlaceRankingTableView.as_view()),
+         name='places_ranking'),
+
     path('placelinks', permission_required('global.view_all')(PlaceLinksTableView.as_view()), name='placelinks'),
 
     # Profession urls
