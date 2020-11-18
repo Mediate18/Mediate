@@ -474,6 +474,18 @@ class PlaceFilter(django_filters.FilterSet):
 
 
 class PlaceRankingFilter(PlaceFilter):
+    year = django_filters.RangeFilter(
+        label="Item publication year",
+        widget=RangeWidget(),
+        field_name='edition__year'
+    )
+
+    class Meta:
+        model = Place
+        fields = [
+            'name', 'cerl_id', 'country'
+        ]
+
     # Override method
     @property
     def qs(self):
@@ -483,6 +495,14 @@ class PlaceRankingFilter(PlaceFilter):
             .annotate(catalogue_count=Count('edition__items__lot__catalogue', distinct=True)) \
             .order_by('-item_count')
         return self._qs
+
+    def get_year_range(self):
+        if self.data:
+            year_0 = int(self.data['year_0']) if self.data['year_0'] else None
+            year_1 = int(self.data['year_1']) if self.data['year_1'] else None
+            return (year_0, year_1)
+        else:
+            return None
 
 
 # PlaceLinks filter

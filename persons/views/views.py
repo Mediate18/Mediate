@@ -649,7 +649,7 @@ class PlaceRankingTableView(ListView):
         context = super(PlaceRankingTableView, self).get_context_data(**kwargs)
         filter = PlaceRankingFilter(self.request.GET, queryset=self.get_queryset())
 
-        table = PlaceRankingTable(filter.qs)
+        table = PlaceRankingTable(filter.qs, filter=filter)
         django_tables2.RequestConfig(self.request, ).configure(table)
 
         context['filter'] = filter
