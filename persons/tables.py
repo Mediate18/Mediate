@@ -275,7 +275,6 @@ class PlaceRankingTable(PlaceTable):
         if self.year:
             year = self.year
             if year[0] and year[1]:
-                print(type(year), type(year[0]))
                 return Person.objects\
                     .filter(Q(residence__place=record, residence__start_year__gte=year[0], residence__end_year__lte=year[1])
                             | Q(city_of_birth=record, date_of_birth__gte=year[0], date_of_birth__lte=year[1])
@@ -295,9 +294,9 @@ class PlaceRankingTable(PlaceTable):
                     | Q(city_of_birth=record, date_of_birth__lte=year[1])
                     | Q(city_of_death=record, date_of_death__lte=year[1])) \
                     .distinct().count()
-            else:
-                return Person.objects.filter(Q(residence__place=record) | Q(city_of_birth=record) | Q(city_of_death=record))\
-                    .distinct().count()
+        else:
+            return Person.objects.filter(Q(residence__place=record) | Q(city_of_birth=record) | Q(city_of_death=record))\
+                .distinct().count()
 
 
 # Place links table
