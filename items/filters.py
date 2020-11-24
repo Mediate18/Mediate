@@ -22,14 +22,15 @@ class BookFormatFilter(django_filters.FilterSet):
         exclude = ['uuid']
 
 
-def valid_person_role(slf, value):
-    try:
-        person_uuid, role_uuid = value.split('|')
-        uuid.UUID(person_uuid)
-        uuid.UUID(role_uuid)
-        return True
-    except ValueError:
-        return False
+class PersonRoleMultipleChoiceField(django_filters.fields.MultipleChoiceField):
+    def valid_value(self, value):
+        try:
+            person_uuid, role_uuid = value.split('|')
+            uuid.UUID(person_uuid)
+            uuid.UUID(role_uuid)
+            return True
+        except ValueError:
+            return False
 
 
 # Item filter
@@ -165,8 +166,8 @@ class ItemFilter(django_filters.FilterSet):
             data_view='personroleautoresponse'
         )
     )
-    # Override the valid_value method
-    person_role.field_class.valid_value = valid_person_role
+    # Override the field_class (with valid_value method)
+    person_role.field_class= PersonRoleMultipleChoiceField
 
     owner_gender = django_filters.ChoiceFilter(
         label="Owner gender",
