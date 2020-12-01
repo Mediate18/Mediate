@@ -72,7 +72,13 @@
                 </li>
               {% endif %}
               {% if perms.persons.change_place or perms.global.view_all %}
-                <li class="{% if url_name == 'places' %}active{% endif %}"><a href="{% url 'places' %}">{% trans "Places" %}</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Places" %} <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'places' %}">{% trans "Search" %}</a></li>
+                        <li><a href="{% url 'places_ranking' %}">{% trans "Rank by item count" %}</a></li>
+                    </ul>
+                </li>
               {% endif %}
               {% if perms.persons.change_catalogue or perms.global.view_all %}
                 <li class="{% if url_name == 'catalogues' %}active{% endif %}"><a href="{% url 'catalogues' %}">{% trans "Catalogues" %}</a></li>
@@ -84,7 +90,13 @@
                 <li class="{% if url_name == 'items' %}active{% endif %}"><a href="{% url 'items' %}">{% trans "Items" %}</a></li>
               {% endif %}
               {% if perms.persons.change_edition or perms.global.view_all %}
-                <li class="{% if url_name == 'editions' %}active{% endif %}"><a href="{% url 'editions' %}">{% trans "Editions" %}</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Editions" %} <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'editions' %}">{% trans "Search" %}</a></li>
+                        <li><a href="{% url 'editions_ranking' %}">{% trans "Rank by item count" %}</a></li>
+                    </ul>
+                </li>
               {% endif %}
               {% if perms.persons.change_work or perms.global.view_all %}
                 <li class="{% if url_name == 'works' %}active{% endif %}"><a href="{% url 'works' %}">{% trans "Works" %}</a></li>

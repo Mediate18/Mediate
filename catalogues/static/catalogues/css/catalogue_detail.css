@@ -61,3 +61,13 @@ html, body {
     min-width: 200px !important;   /* NOTE: This won't be respected! Explicit size of left forces the size to be fixed */
     background: #eee;
 }
+
+.table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td,
+.table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+    border-top: 0px;
+}
+
+.lot-anchor {
+    position: absolute;
+    transform: translateY(-50vh);
+}

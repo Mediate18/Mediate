@@ -1,14 +1,16 @@
 import django_filters
 from django_filters.widgets import RangeWidget
-from django.db.models import Count
+from django.db.models import Count, Q, QuerySet
 from django.forms import CheckboxInput
 from django_select2.forms import ModelSelect2MultipleWidget, Select2MultipleWidget, HeavySelect2MultipleWidget
 from tagme.models import Tag
 from .models import *
-from persons.models import Country, Profession
+from persons.models import Country, Profession, Religion
 from catalogues.models import Catalogue, ParisianCategory, PersonCatalogueRelation
 from mediate.tools import filter_multiple_words
+from mediate.filters import QBasedFilter
 from viapy.api import ViafAPI
+import six
 
 from django.urls import reverse_lazy
 
@@ -18,6 +20,17 @@ class BookFormatFilter(django_filters.FilterSet):
     class Meta:
         model = BookFormat
         exclude = ['uuid']
+
+
+class PersonRoleMultipleChoiceField(django_filters.fields.MultipleChoiceField):
+    def valid_value(self, value):
+        try:
+            person_uuid, role_uuid = value.split('|')
+            uuid.UUID(person_uuid)
+            uuid.UUID(role_uuid)
+            return True
+        except ValueError:
+            return False
 
 
 # Item filter
@@ -67,6 +80,11 @@ class ItemFilter(django_filters.FilterSet):
         ),
         method='parisian_category_filter'
     )
+    lot_isnull = django_filters.BooleanFilter(
+        label="No associated lot",
+        widget=CheckboxInput(),
+        method='lot_isnull_filter'
+    )
     edition_isnull = django_filters.BooleanFilter(
         label="No associated edition",
         widget=CheckboxInput(),
@@ -87,6 +105,8 @@ class ItemFilter(django_filters.FilterSet):
         ),
         method='edition_place_filter'
     )
+    edition_year = django_filters.RangeFilter(label="Date of publication", widget=RangeWidget(),
+                                                            field_name='edition__year')
     edition_year_tag = django_filters.Filter(
         label="Date of publication tag",
         field_name='edition__year_tag',
@@ -146,6 +166,9 @@ class ItemFilter(django_filters.FilterSet):
             data_view='personroleautoresponse'
         )
     )
+    # Override the field_class (with valid_value method)
+    person_role.field_class= PersonRoleMultipleChoiceField
+
     owner_gender = django_filters.ChoiceFilter(
         label="Owner gender",
         choices=Person.SEX_CHOICES,
@@ -191,6 +214,16 @@ class ItemFilter(django_filters.FilterSet):
         ),
         method='owner_profession_filter'
     )
+    owner_religion = django_filters.ModelMultipleChoiceFilter(
+        label="Ovner religion",
+        queryset=Religion.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Religion,
+            search_fields=['name__icontains']
+        ),
+        method='owner_religion_filter'
+    )
     language = django_filters.ModelMultipleChoiceFilter(
         label='Language',
         queryset=Language.objects.all(),
@@ -200,6 +233,36 @@ class ItemFilter(django_filters.FilterSet):
             search_fields=['name__icontains', 'language_code_2char__iexact', 'language_code_3char__iexact']
         ),
         method='language_filter'
+    )
+    catalogue_country_of_publication = django_filters.ModelMultipleChoiceFilter(
+        label="Catalogue country of publication",
+        queryset=Country.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Country,
+            search_fields=['name__icontains']
+        ),
+        method='catalogue_country_of_publication_filter'
+    )
+    catalogue_city_of_publication = django_filters.ModelMultipleChoiceFilter(
+        label="Catalogue city of publication",
+        queryset=Place.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Place,
+            search_fields=['name__icontains']
+        ),
+        method='catalogue_city_of_publication_filter'
+    )
+    catalogue_tag = django_filters.ModelMultipleChoiceFilter(
+        label="Catalogue tag",
+        queryset=Tag.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Tag,
+            search_fields=['namespace__icontains', 'name__icontains', 'value__icontains']
+        ),
+        method='catalogue_tag_filter'
     )
 
     class Meta:
@@ -215,13 +278,35 @@ class ItemFilter(django_filters.FilterSet):
             'catalogue',
             'catalogue_publication_year',
             'parisian_category',
+            'lot_isnull',
             'edition_isnull',
             'edition_isempty',
             'edition_place',
+            'edition_year',
             'edition_year_tag',
             'material_details',
-            'tag'
+            'tag',
+            'catalogue_country_of_publication',
+            'catalogue_city_of_publication',
+            'catalogue_tag',
         ]
+
+    def __init__(self, data=None, *args, **kwargs):
+        self.pass_selected_choices_to_person_role_filter(data)
+        super().__init__(data, *args, **kwargs)
+
+    def pass_selected_choices_to_person_role_filter(self, data):
+        """Passes the selected choices are in field on the result page"""
+        if data is not None:
+            person_role_field = self.base_filters.get('person_role')
+            person_roles = data.getlist('person_role')
+            person_role_choices = []
+            for person_role in person_roles:
+                person_id, role_id = person_role.split('|')
+                person_name = Person.objects.get(uuid=person_id).short_name
+                role_name = PersonItemRelationRole.objects.get(uuid=role_id).name
+                person_role_choices.append((person_role,"{} - {}".format(person_name, role_name)))
+            person_role_field.extra['choices'] = person_role_choices
 
     def tag_filter(self, queryset, name, value):
         if value:
@@ -258,6 +343,11 @@ class ItemFilter(django_filters.FilterSet):
     def parisian_category_filter(self, queryset, name, value):
         if value:
             return queryset.filter(lot__category__parisian_category__in=value)
+        return queryset
+
+    def lot_isnull_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(lot__isnull=True)
         return queryset
 
     def edition_isnull_filter(self, queryset, name, value):
@@ -337,6 +427,27 @@ class ItemFilter(django_filters.FilterSet):
         if value:
             return queryset.filter(lot__catalogue__personcataloguerelation__in=PersonCatalogueRelation.objects.filter(
                 role__name__iexact='owner', person__personprofession__profession__in=value))
+        return queryset
+
+    def owner_religion_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(lot__catalogue__personcataloguerelation__in=PersonCatalogueRelation.objects.filter(
+                role__name__iexact='owner', person__religiousaffiliation__religion__in=value))
+        return queryset
+
+    def catalogue_country_of_publication_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(lot__catalogue__related_places__place__country__in=value).distinct()
+        return queryset
+
+    def catalogue_city_of_publication_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(lot__catalogue__related_places__place__in=value).distinct()
+        return queryset
+
+    def catalogue_tag_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(lot__catalogue__tags__tag__in=value).distinct()
         return queryset
 
 
@@ -512,6 +623,18 @@ class EditionFilter(django_filters.FilterSet):
         if value:
             return queryset.filter(items__book_format__in=value)
         return queryset
+
+
+class EditionRankingFilter(EditionFilter):
+    # Override method
+    @property
+    def qs(self):
+        qs = super().qs
+        self._qs = qs.distinct() \
+            .annotate(item_count=Count('items', distinct=True)) \
+            .annotate(catalogue_count=Count('items__lot__catalogue', distinct=True)) \
+            .order_by('-item_count')
+        return self._qs
 
 
 # Publisher filter

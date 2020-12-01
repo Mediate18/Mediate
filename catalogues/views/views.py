@@ -4,7 +4,9 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 from django.db.models import Count, Min, Max
-from django.http import JsonResponse
+from django.db.models.functions import Substr, Length
+from django.http import JsonResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
 
 from mediate.tools import put_layout_in_context, put_get_variable_in_context
 from mediate.views import GenericDetailView
@@ -16,8 +18,7 @@ from ..filters import *
 
 from ..models import *
 
-from items.models import Item
-from mediate.tools import Truncate
+from items.models import Item, Edition
 import json
 
 import django_tables2
@@ -53,7 +54,7 @@ class CatalogueTableView(ListView):
 
         item_count_per_decade = Item.objects\
             .filter(lot__catalogue__in=filter.qs, edition__year__lte=max_publication_year)\
-            .annotate(decade=Truncate('edition__year', -1))\
+            .annotate(decade=10 * Substr('edition__year', 1, Length('edition__year') - 1))\
             .values('decade')\
             .order_by('decade')\
             .annotate(count=Count('decade'))
@@ -591,12 +592,13 @@ class LotUpdateView(UpdateView):
     def get_success_url(self):
         return self.request.GET.get('next') or reverse_lazy('lots')
 
-    @put_get_variable_in_context([('next', 'next_url'),])
     @put_layout_in_context
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("update")
         context['object_name'] = "lot"
+        if 'next' in self.request.GET:
+            context['next_url'] = '{}#lot__{}'.format(self.request.GET['next'], self.get_object().uuid)
         return context
 
 
@@ -618,6 +620,157 @@ def previous_lot_view(request, pk, index):
         return JsonResponse({
             'success': False
         })
+
+
+def expand_lot_view(request, pk):
+    lot = get_object_or_404(Lot, pk=pk)
+    next_url = reverse_lazy('catalogue_detail_bare', args=[str(lot.catalogue.uuid)])
+
+    if request.method == 'POST':
+        next_url = '{}#lot__{}'.format(next_url, lot.uuid)
+        form = LotExpandForm(request.POST)
+        if form.is_valid():
+            number = int(form.cleaned_data.get('number', 0))
+            prefix = form.cleaned_data.get('prefix', '')
+            last_item_index = Item.objects.filter(lot=lot).aggregate(Max('index_in_lot')).get('index_in_lot__max')
+            print("last_item_index", last_item_index)
+            for index in range(2, number + 1):
+                edition = Edition.objects.create()
+
+                index_in_lot = last_item_index + index - 1
+                short_title = "{} [{} of {}]".format(prefix, index, number)
+                item = Item.objects.create(short_title=short_title, lot=lot, index_in_lot=index_in_lot,
+                                           collection=lot.catalogue.collection, edition=edition)
+        return HttpResponseRedirect(next_url)
+    elif request.method == 'GET':
+        next_url = request.GET.get('next', next_url)
+
+    context = {
+        'form': LotExpandForm(),
+        'extended_layout': 'barelayout.html',
+        'action': _("Expand"),
+        'object_name': "lot: {}".format(lot.lot_as_listed_in_catalogue),
+        'next_url': next_url
+    }
+    return render(request, 'generic_form.html', context=context)
+
+
+def add_lot_before(request, pk):
+    """
+    Add a lot at a certain position in the list of lots of a catalogue.
+    The position is determined as *before* the lot with 'pk' as the id.
+    If the 'page' url parameter is set, it means the page before the page of the selected lot.
+    If the 'category' url parameter is set, it means the category before the category of the selected lot.
+    :param request: 
+    :param pk: 
+    :return: 
+    """
+    lot_after = get_object_or_404(Lot, pk=pk)
+
+    # Determine whether there is a lot before the selected position
+    try:
+        lot_before = Lot.objects.filter(catalogue=lot_after.catalogue, index_in_catalogue__lt=lot_after.index_in_catalogue)\
+            .order_by('-index_in_catalogue').first()
+    except:
+        lot_before = None
+
+    next_url = reverse_lazy('catalogue_detail_bare', args=[str(lot_after.catalogue.uuid)])
+    next_url = '{}#lot__{}'.format(next_url, lot_after.uuid)
+
+    if request.method == 'POST':
+        form = AddLotBeforeForm(request.POST)
+        if form.is_valid():
+            new_lot = form.save()
+
+            # Create Item for this new Lot
+            empty_edition = Edition.objects.create()
+            Item.objects.create(
+                lot=new_lot,
+                edition=empty_edition,
+                short_title=new_lot.lot_as_listed_in_catalogue[:128],
+                index_in_lot=1
+            )
+
+            return HttpResponseRedirect(next_url)
+    elif request.method == 'GET':
+        if 'category' in request.GET:
+            if lot_before:
+                category = lot_before.category
+            else:
+                category = None
+        else:
+            category = lot_after.category
+
+        if 'page' in request.GET:
+            if lot_before:
+                page = lot_before.page_in_catalogue
+            elif lot_after.page_in_catalogue > 1:
+                page = lot_after.page_in_catalogue - 1
+            else:
+                page = lot_after.page_in_catalogue
+        else:
+            page = lot_after.page_in_catalogue
+
+        index = lot_after.index_in_catalogue
+
+        form = AddLotBeforeForm(category=category, page=page, index=index, catalogue=lot_after.catalogue)
+    else:
+        form = AddLotBeforeForm()
+
+    context = {
+        'form': form,
+        'extended_layout': 'barelayout.html',
+        'action': _("Add lot"),
+        'next_url': next_url
+    }
+
+    return render(request, 'generic_form.html', context=context)
+
+
+def add_lot_at_end(request, pk):
+    """
+    Add a lot at the end of a catalogue
+    :param request:
+    :param pk:
+    :return:
+    """
+    catalogue = get_object_or_404(Catalogue, pk=pk)
+    last_lot = Lot.objects.filter(catalogue=catalogue).order_by('-index_in_catalogue').first()
+
+    next_url = reverse_lazy('catalogue_detail_bare', args=[str(catalogue.uuid)])
+    next_url = '{}#lot__{}'.format(next_url, last_lot.uuid)
+
+    if request.method == 'POST':
+        form = AddLotAtEndForm(request.POST)
+        if form.is_valid():
+            new_lot = form.save()
+
+            # Create Item for this new Lot
+            empty_edition = Edition.objects.create()
+            Item.objects.create(
+                lot=new_lot,
+                edition=empty_edition,
+                short_title=new_lot.lot_as_listed_in_catalogue[:128],
+                index_in_lot=1
+            )
+
+            return HttpResponseRedirect(next_url)
+    elif request.method == 'GET':
+        category = last_lot.category
+        page = last_lot.page_in_catalogue
+        index = last_lot.index_in_catalogue + 1
+        form = AddLotAtEndForm(category=category, page=page, index=index, catalogue=catalogue)
+    else:
+        form = AddLotAtEndForm()
+
+    context = {
+        'form': form,
+        'extended_layout': 'barelayout.html',
+        'action': _("Add lot"),
+        'next_url': next_url
+    }
+
+    return render(request, 'generic_form.html', context=context)
 
 
 # PersonCatalogueRelation views

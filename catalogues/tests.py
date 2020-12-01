@@ -67,8 +67,10 @@ class CatalogueTests(GenericCRUDTestMixin, TestCase):
         catalogue2, created = self.model.objects.get_or_create(**catalogue_data)
 
         # Create two Lots
-        lot1 = Lot.objects.create(catalogue=catalogue1, number_in_catalogue=1, lot_as_listed_in_catalogue="lot1_text")
-        lot2 = Lot.objects.create(catalogue=catalogue2, number_in_catalogue=1, lot_as_listed_in_catalogue="lot2_text")
+        lot1 = Lot.objects.create(catalogue=catalogue1, number_in_catalogue=1, index_in_catalogue=1,
+                                  lot_as_listed_in_catalogue="lot1_text")
+        lot2 = Lot.objects.create(catalogue=catalogue2, number_in_catalogue=1, index_in_catalogue=1,
+                                  lot_as_listed_in_catalogue="lot2_text")
 
         # Create two Edition
         from items.models import Item, Edition

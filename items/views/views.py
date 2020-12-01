@@ -183,6 +183,12 @@ class ItemTableView(ListView):
                 'label': _("Add tags"),
                 'url': reverse_lazy('add_tags_to_items'),
                 'form': ItemTagsForm
+            },
+            {
+                'id': 'add_works',
+                'label': _("Add works"),
+                'url': reverse_lazy('add_works_to_items'),
+                'form': ItemWorksForm
             }
         ]
 
@@ -325,6 +331,9 @@ class ItemUpdateView(UpdateView):
 class ItemDeleteView(DeleteView):
     model = Item
     success_url = reverse_lazy('items')
+
+    def get_success_url(self):
+        return self.request.META.get('HTTP_REFERER', self.success_url)
 
 
 # ItemAuthor views
@@ -1239,6 +1248,32 @@ def add_tags_to_items(request):
         raise Http404
 
 
+def add_works_to_items(request):
+    """
+    Add works to a list of items
+    :param request: 
+    :return: 
+    """
+    if request.method == 'POST':
+        if 'entries' in request.POST and 'work' in request.POST:
+            items = request.POST.getlist('entries')
+            works = request.POST.getlist('work')
+            for work_id in works:
+                work = Work.objects.get(uuid=work_id)
+                for item_id in items:
+                    item = Item.objects.get(uuid=item_id)
+                    try:
+                        ItemWorkRelation.objects.create(item=item, work=work)
+                    except IntegrityError:
+                        # Unique constraint failed; the ItemItemTypeRelation already exists
+                        pass
+        else:
+            messages.add_message(request, messages.WARNING, _("No items and/or no works selected."))
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    else:
+        raise Http404
+
+
 def set_publication_place_for_editions(request):
     """
     Set the publication place for a list of editions
@@ -1386,6 +1421,30 @@ class EditionTableView(ListView):
                 'form': PublisherForm
             },
         ]
+
+        return context
+
+
+class EditionRankingTableView(ListView):
+    model = Edition
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return Edition.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(EditionRankingTableView, self).get_context_data(**kwargs)
+        filter = EditionRankingFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = EditionRankingTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name_plural'] = "Edition ranking"
+        context['add_url'] = reverse_lazy('add_edition')
 
         return context
 

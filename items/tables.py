@@ -2,6 +2,8 @@ import django_tables2 as tables
 from django_tables2.utils import A  # alias for Accessor
 from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
+import itertools
+
 from .models import *
 
 from mediate.columns import ActionColumn
@@ -41,6 +43,7 @@ class ItemTable(tables.Table):
     languages = tables.Column(empty_values=(), verbose_name=_("Languages"), orderable=False)
     parisian_category = tables.Column(accessor='lot.category.parisian_category')
     item_type = tables.Column(empty_values=(), orderable=False)
+    tags = tables.Column(empty_values=(), orderable=False)
 
     class Meta:
         model = Item
@@ -59,6 +62,7 @@ class ItemTable(tables.Table):
             'languages',
             'parisian_category',
             'item_type',
+            'tags',
             'uuid',
             'manage_works',
             'manage_persons',
@@ -117,10 +121,14 @@ class ItemTable(tables.Table):
 
 
     def render_catalogue(self, record):
-        return format_html('<a href="{}">{}</a>'.format(
-            reverse_lazy('catalogue_detail', args=[str(record.lot.catalogue.uuid)]),
-            str(record.lot.catalogue))
-        )
+        try:
+            return format_html('<a href="{}">{}</a>'.format(
+                reverse_lazy('catalogue_detail', args=[str(record.lot.catalogue.uuid)]),
+                str(record.lot.catalogue))
+            )
+        except AttributeError:
+            # Record has not lot or lot has no catalogue
+            return ''
 
     def render_number_of_volumes(self, record):
         return record.number_of_volumes or format_html("&mdash;")
@@ -133,6 +141,9 @@ class ItemTable(tables.Table):
 
     def render_item_type(self, record):
         return ", ".join(ItemType.objects.filter(itemitemtyperelation__item=record).values_list('name', flat=True))
+
+    def render_tags(self, record):
+        return ", ".join([str(taggedentity.tag) for taggedentity in record.tags.all()])
 
     # All value_XX methods are for the table export
     def value_lot(self, record):
@@ -478,6 +489,37 @@ class EditionTable(tables.Table):
         return format_html(
             '<input id="{}" class="checkbox" type="checkbox" name="checkbox"/>'.format(record.uuid)
         )
+
+
+
+# EditionRanking table
+class EditionRankingTable(EditionTable):
+    row_index = tables.Column(empty_values=(), orderable=False, verbose_name="")
+    item_count = tables.Column(empty_values=(), verbose_name=_("# items"))
+    catalogue_count = tables.Column(empty_values=(), verbose_name=_("# catalogues"))
+
+    class Meta:
+        model = Edition
+        attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'row_index',
+            'item_count',
+            'catalogue_count',
+            'items',
+            'year',
+            'year_tag',
+            'terminus_post_quem',
+            'place',
+            'url',
+            'publisher',
+            'uuid',
+            'checkbox'
+        ]
+
+    def render_row_index(self):
+        self.row_index = getattr(self, 'row_index', itertools.count(self.page.start_index()))
+        return next(self.row_index)
+
 
 
 # Publisher table

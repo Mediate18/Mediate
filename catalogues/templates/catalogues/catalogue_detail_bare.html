@@ -60,12 +60,40 @@
 {% for lot in object.sorted_lot_set %}
             {% if lot.index_in_catalogue in first_lot_on_page_dict %}
     <tr>
+        <td colspan="4" style="padding: 0px;">
+            <!--before page {{ lot.page_in_catalogue }}, before lot index {{ lot.index_in_catalogue }}-->
+            {% if lot.index_in_catalogue in first_lot_in_category_dict %}
+                <a href="{% url 'add_lot_before' lot.pk %}?page&category" title="Add lot here">
+                <div style="padding-top: 5px; padding-bottom: 5px;">
+                    <div style="height: 1px; background-color: #ddd;"></div>
+                </div>
+            </a>
+            {% else %}
+                <a href="{% url 'add_lot_before' lot.pk %}?page" title="Add lot here">
+                <div style="padding-top: 5px; padding-bottom: 5px;">
+                    <div style="height: 1px; background-color: #ddd;"></div>
+                </div>
+            </a>
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
         <td class="text-center" colspan="4">
                 <b>{% trans "Page" %} {{ lot.page_in_catalogue }}</b>
         </td>
     </tr>
             {% endif %}
             {% if lot.index_in_catalogue in first_lot_in_category_dict %}
+    <tr>
+        <td colspan="4" style="padding: 0px;">
+            <!-- before category {{ lot.category.bookseller_category }}, before lot index {{ lot.index_in_catalogue }}-->
+            <a href="{% url 'add_lot_before' lot.pk %}?category" title="Add lot here">
+                <div style="padding-top: 5px; padding-bottom: 5px;">
+                    <div style="height: 1px; background-color: #ddd;"></div>
+                </div>
+            </a>
+        </td>
+    </tr>
     <tr>
         <td class="text-center" colspan="4">
                 <br/>
@@ -74,10 +102,21 @@
     </tr>
             {% endif %}
     <tr>
+        <td colspan="4" style="padding: 0px;">
+            <!--before lot index {{ lot.index_in_catalogue }}-->
+            <a href="{% url 'add_lot_before' lot.pk %}" title="Add lot here">
+                <div style="padding-top: 5px; padding-bottom: 5px;">
+                    <div style="height: 1px; background-color: #ddd;"></div>
+                </div>
+            </a>
+        </td>
+    </tr>
+    <tr>
         <td>
             <b>{{ lot.number_in_catalogue }}</b>
         </td>
         <td>
+            <a class="lot-anchor" id="lot__{{ lot.uuid }}"></a>
             {{ lot }}
         </td>
         <td>
@@ -94,8 +133,21 @@
             <a href="{% url 'items' %}?lot__uuid={{ lot.pk }}" target="_blank">
                 <span class="glyphicon glyphicon-list" title="{% trans 'Items of this lot' %}"></span>
             </a>
+            <a href="{% url 'expand_lot' lot.pk %}?next={{ request.path }}%23lot__{{ lot.uuid }}">
+                <span class="glyphicon glyphicon-plus" title="{% trans 'Add items to this lot' %}"></span>
+            </a>
         </td>
     </tr>
 {% endfor %}
+    <tr>
+        <td colspan="4" style="padding: 0px;">
+            <!--before lot index {{ lot.index_in_catalogue }}-->
+            <a href="{% url 'add_lot_at_end' object.pk %}" title="Add lot here">
+                <div style="padding-top: 5px; padding-bottom: 5px;">
+                    <div style="height: 1px; background-color: #ddd;"></div>
+                </div>
+            </a>
+        </td>
+    </tr>
 </table>
 {% endblock %}

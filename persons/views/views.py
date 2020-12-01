@@ -641,6 +641,30 @@ class PlaceDeleteView(DeleteView):
     success_url = reverse_lazy('places')
 
 
+class PlaceRankingTableView(ListView):
+    model = Place
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return Place.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(PlaceRankingTableView, self).get_context_data(**kwargs)
+        filter = PlaceRankingFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = PlaceRankingTable(filter.qs, filter=filter)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name_plural'] = "place ranking"
+        context['add_url'] = reverse_lazy('add_place')
+
+        return context
+
+
 # Profession views
 class ProfessionTableView(ListView):
     model = Profession

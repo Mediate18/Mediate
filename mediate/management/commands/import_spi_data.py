@@ -28,12 +28,16 @@ class Command(BaseCommand):
         # Optional
         parser.add_argument('-c', '--catalogue_ids_filename', type=str,
                             help='Path to a list of catalogue IDs to process (one ID per line)')
+        parser.add_argument('-m', '--multiple_catalogues_per_collection',
+                            action='store_true',
+                            help='Allow for multiple catalogues per collection')
 
     @transaction.atomic
     def handle(self, *args, **kwargs):
         # Get the command line arguments
         database_path = kwargs['database_path']
         catalogue_ids_filename = kwargs['catalogue_ids_filename']
+        self.multiple_catalogues_per_collection = kwargs.get('multiple_catalogues_per_collection', False)
 
         # Read catalogue IDs
         if catalogue_ids_filename:
@@ -87,17 +91,21 @@ class Command(BaseCommand):
             else:
                 place = None
             # print('place: ' + str(place))
-            person, created = persons.models.Person.objects.get_or_create(short_name=row['publisher'],
-                                     surname=row['publisher'],
-                                     first_names='',
-                                     sex='UNKNOWN')
+            if row['publisher']:
+                person, created = persons.models.Person.objects.get_or_create(short_name=row['publisher'],
+                                         surname=row['publisher'],
+                                         first_names='',
+                                         sex='UNKNOWN')
+            else:
+                person = None
             # print('person: ' + str(person) + " " + str(created))
             edition = items.models.Edition(year=date, place=place)
             edition.save()
             # print('edition: ' + str(edition))
-            publisher = items.models.Publisher(edition=edition, publisher=person)
-            publisher.save()
-            # print('publisher: ' + str(publisher))
+            if person:
+                publisher = items.models.Publisher(edition=edition, publisher=person)
+                publisher.save()
+                # print('publisher: ' + str(publisher))
 
             item_entries = re.compile(r'\s?\/\s?').split(row['entry_text'])
             if len(item_entries) >= row['index_in_lot']:
@@ -215,8 +223,9 @@ class Command(BaseCommand):
                 collection, created = catalogues.models.Collection.objects.get_or_create(name=row['short_title'])
                 if created:
                     collection.save()
-                elif collection.catalogue_set.count() != 0:
-                    raise Exception("Collection {} already exists and has catalogues linked to.".format(collection))
+                else:
+                    if collection.catalogue_set.count() != 0 and not self.multiple_catalogues_per_collection:
+                        raise Exception("Collection {} already exists and has catalogues linked to.".format(collection))
 
                 catalogue = catalogues.models.Catalogue(**insert_fields)
                 catalogue.collection = collection

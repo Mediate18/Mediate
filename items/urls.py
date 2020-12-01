@@ -39,6 +39,8 @@ urlpatterns = [
          name='add_type_to_items'),
     path('items/add_tags_to_items', permission_required('items.change_item')(add_tags_to_items),
              name='add_tags_to_items'),
+    path('items/add_works_to_items', permission_required('items.change_itemworkrelation')(add_works_to_items),
+             name='add_works_to_items'),
 
     # Tagged Item urls
     path('taggeditems/', login_required(TaggedItemTableView.as_view()), name='taggeditems'),
@@ -240,6 +242,10 @@ urlpatterns = [
          name="set_publisher_for_items"),
     path(r'editions/setpublisherforeditions', permission_required('items.add_publisher')(set_publisher_for_editions),
          name="set_publisher_for_editions"),
+
+    # EditionRanking urls
+    path(r'editions/rank', permission_required('global.view_all')(EditionRankingTableView.as_view()),
+         name='editions_ranking'),
 
     # Publisher urls
     path('publishers/', permission_required('global.view_all')(PublisherTableView.as_view()), name='publishers'),

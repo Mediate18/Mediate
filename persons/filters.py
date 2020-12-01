@@ -2,7 +2,7 @@ import django_filters
 from .models import *
 from viapy.api import ViafAPI
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import Q, IntegerField, Count
+from django.db.models import Q, IntegerField, Count, QuerySet
 from django.db.models.functions import Cast
 from django import forms
 from django_select2.forms import Select2MultipleWidget
@@ -10,8 +10,10 @@ from django_filters.widgets import RangeWidget
 from django.utils.safestring import mark_safe
 
 import six
+from django_filters.filters import Lookup
 
 from mediate.tools import filter_multiple_words
+from mediate.filters import QBasedFilter
 from catalogues.models import PersonCatalogueRelationRole, Catalogue
 from items.models import PersonItemRelationRole
 
@@ -174,13 +176,6 @@ class PersonFilter(django_filters.FilterSet):
         return queryset
 
 
-class QBasedFilter:
-    """
-    Merely a super class for testing with isinstance.
-    """
-    pass
-
-
 class ModelMultipleChoiceFilterQ(QBasedFilter, django_filters.ModelMultipleChoiceFilter):
     """
     Subclass of django_filters.ModelMultipleChoiceFilter for the purpose of
@@ -221,7 +216,29 @@ class MultipleChoiceFilterQWithExtraLookups(QBasedFilter, django_filters.Multipl
     """
     Subclass of django_filters.MultipleChoiceFilter for the purpose of
     using Q objects within one filter instead of chaining filters.
-    Specific version for the catalogue_owner_sex in PersonRankingFilter.
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.extra_field_lookups = kwargs.pop('extra_field_lookups', {})
+        super().__init__(*args, **kwargs)
+
+    def filter(self, q, value):
+        """MultipleChoiceFilter filter method override for use of Q(...) """
+        if isinstance(value, Lookup):
+            lookup = six.text_type(value.lookup_type)
+            value = value.value
+        else:
+            lookup = self.lookup_expr
+        if not value:
+            return q
+        q &= Q(**{'%s__%s' % (self.field_name, lookup): value, **self.extra_field_lookups})
+        return q
+
+
+class ModelMultipleChoiceFilterQWithExtraLookups(QBasedFilter, django_filters.ModelMultipleChoiceFilter):
+    """
+    Subclass of django_filters.MultipleChoiceFilter for the purpose of
+    using Q objects within one filter instead of chaining filters.
     """
 
     def __init__(self, *args, **kwargs):
@@ -279,6 +296,15 @@ class PersonRankingFilter(django_filters.FilterSet):
         lookup_expr='in',
         extra_field_lookups={'personitemrelation__item__lot__catalogue__personcataloguerelation__role__name': 'owner'}
     )
+    catalogue_owner_religion = ModelMultipleChoiceFilterQWithExtraLookups(
+        label="Catalogue owner religion",
+        queryset=Religion.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
+        field_name=
+        'personitemrelation__item__lot__catalogue__personcataloguerelation__person__religiousaffiliation__religion',
+        lookup_expr='in',
+        extra_field_lookups={'personitemrelation__item__lot__catalogue__personcataloguerelation__role__name': 'owner'}
+    )
     country_of_birth = ModelMultipleChoiceFilterQ(
         label="Country of birth of Person related to Item",
         queryset=Country.objects.all(),
@@ -311,6 +337,7 @@ class PersonRankingFilter(django_filters.FilterSet):
             'sex',
             'catalogue_year',
             'catalogue_owner_sex',
+            'catalogue_owner_religion',
             'country_of_birth',
             'date_of_birth',
             'country_of_death',
@@ -342,12 +369,15 @@ class PersonRankingFilter(django_filters.FilterSet):
                 if not isinstance(filter_, QBasedFilter):
                     value = self.form.cleaned_data.get(name)
 
-                    if value is not None:  # valid & clean data
+                    if isinstance(value, QuerySet):
+                        if value.exists():
+                            qs = filter_.filter(qs, value)
+                    elif value is not None:  # valid & clean data
                         qs = filter_.filter(qs, value)
 
-            self._qs = qs.distinct() \
-                .annotate(item_count=Count('uuid')) \
-                .annotate(catalogue_count=Count('personitemrelation__item__lot__catalogue', distinct=True)) \
+            self._qs = qs.distinct()\
+                .annotate(item_count=Count('personitemrelation__item', distinct=True))\
+                .annotate(catalogue_count=Count('personitemrelation__item__lot__catalogue', distinct=True))\
                 .order_by('-item_count')
 
         return self._qs
@@ -426,6 +456,38 @@ class PlaceFilter(django_filters.FilterSet):
 
     def multiple_words_filter(self, queryset, name, value):
         return filter_multiple_words(self.filters[name].lookup_expr, queryset, name, value)
+
+
+class PlaceRankingFilter(PlaceFilter):
+    year = django_filters.RangeFilter(
+        label="Item publication year",
+        widget=RangeWidget(),
+        field_name='edition__year'
+    )
+
+    class Meta:
+        model = Place
+        fields = [
+            'name', 'cerl_id', 'country'
+        ]
+
+    # Override method
+    @property
+    def qs(self):
+        qs = super().qs
+        self._qs = qs.distinct() \
+            .annotate(item_count=Count('edition__items', distinct=True)) \
+            .annotate(catalogue_count=Count('edition__items__lot__catalogue', distinct=True)) \
+            .order_by('-item_count')
+        return self._qs
+
+    def get_year_range(self):
+        if self.data:
+            year_0 = int(self.data['year_0']) if self.data['year_0'] else None
+            year_1 = int(self.data['year_1']) if self.data['year_1'] else None
+            return (year_0, year_1)
+        else:
+            return None
 
 
 # PlaceLinks filter

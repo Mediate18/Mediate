@@ -126,6 +126,9 @@ urlpatterns = [
     path(r'lots/delete/<uuid:pk>',
        permission_required('catalogues.delete_lot')(LotDeleteView.as_view()),
        name="delete_lot"),
+    path(r'lots/expand/<uuid:pk>', permission_required('items.add_item')(expand_lot_view), name="expand_lot"),
+    path(r'lots/add_before/<uuid:pk>', permission_required('catalogues.add_lot')(add_lot_before), name="add_lot_before"),
+    path(r'lots/add_at_end/<uuid:pk>', permission_required('catalogues.add_lot')(add_lot_at_end), name="add_lot_at_end"),
 
 
     # PersonCatalogueRelation urls
