@@ -573,6 +573,29 @@ class WorkTable(tables.Table):
             return format_html('-')
 
 
+# WorkRanking table
+class WorkRankingTable(WorkTable):
+    row_index = tables.Column(empty_values=(), orderable=False, verbose_name="")
+    item_count = tables.Column(empty_values=(), verbose_name=_("# items"))
+    catalogue_count = tables.Column(empty_values=(), verbose_name=_("# catalogues"))
+
+    class Meta:
+        model = Work
+        attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'row_index',
+            'item_count',
+            'catalogue_count',
+            'title',
+            'viaf_id',
+            'uuid'
+        ]
+
+    def render_row_index(self):
+        self.row_index = getattr(self, 'row_index', itertools.count(self.page.start_index()))
+        return next(self.row_index)
+
+
 # WorkAuthor table
 class WorkAuthorTable(tables.Table):
     uuid = ActionColumn('workauthor_detail', 'change_workauthor', 'delete_workauthor', orderable=False)

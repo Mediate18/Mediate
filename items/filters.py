@@ -676,6 +676,19 @@ class WorkFilter(django_filters.FilterSet):
         return filter_multiple_words(self.filters[name].lookup_expr, queryset, name, value)
 
 
+# Work Ranking filter
+class WorkRankingFilter(WorkFilter):
+    # Override method
+    @property
+    def qs(self):
+        qs = super().qs
+        self._qs = qs.distinct() \
+            .annotate(item_count=Count('items__item', distinct=True)) \
+            .annotate(catalogue_count=Count('items__item__lot__catalogue', distinct=True)) \
+            .order_by('-item_count')
+        return self._qs
+
+
 # WorkAuthor filter
 class WorkAuthorFilter(django_filters.FilterSet):
     class Meta:

@@ -1625,6 +1625,31 @@ class WorkTableView(ListView):
         return context
 
 
+class WorkRankingTableView(ListView):
+    model = Work
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return Work.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(WorkRankingTableView, self).get_context_data(**kwargs)
+        filter = WorkRankingFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = WorkRankingTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name'] = "work"
+        context['add_url'] = reverse_lazy('add_work')
+
+        return context
+
+
+
 class WorkDetailView(GenericDetailView):
     model = Work
     object_fields = ['title', 'viaf_id']

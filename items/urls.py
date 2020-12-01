@@ -280,6 +280,10 @@ urlpatterns = [
        name="change_work"),
     path(r'works/delete/<uuid:pk>', permission_required('items.delete_work')(WorkDeleteView.as_view()),
        name="delete_work"),
+    
+    # WorkRanking urls
+    path(r'works/rank', permission_required('global.view_all')(WorkRankingTableView.as_view()),
+         name='works_ranking'),
 
     # WorkAuthor urls
     path('workauthors/', permission_required('global.view_all')(WorkAuthorTableView.as_view()), name='workauthors'),

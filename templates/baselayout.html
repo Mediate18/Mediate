@@ -99,7 +99,13 @@
                 </li>
               {% endif %}
               {% if perms.persons.change_work or perms.global.view_all %}
-                <li class="{% if url_name == 'works' %}active{% endif %}"><a href="{% url 'works' %}">{% trans "Works" %}</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Works" %} <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'works' %}">{% trans "Search" %}</a></li>
+                        <li><a href="{% url 'works_ranking' %}">{% trans "Rank by item count" %}</a></li>
+                    </ul>
+                </li>
               {% endif %}
             {% endwith %}
           </ul>
