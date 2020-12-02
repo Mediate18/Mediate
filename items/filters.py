@@ -695,9 +695,6 @@ class WorkFilter(django_filters.FilterSet):
     # Override method
     @property
     def qs(self):
-        # Annotate before filter
-        self.queryset = self.queryset.annotate(item_count=Count('items__item', distinct=True))
-
         qs = super().qs
         self._qs = qs.distinct()
         return self._qs
@@ -721,6 +718,7 @@ class WorkFilter(django_filters.FilterSet):
     def item_count_filter(self, queryset, name, value):
         # value is a slice object
         if value.start or value.stop:
+            queryset = queryset.annotate(item_count=Count('items__item', distinct=True))
             if value.start:
                 queryset = queryset.filter(item_count__gte=value.start)
             if value.stop:
@@ -733,14 +731,11 @@ class WorkRankingFilter(WorkFilter):
     # Override method
     @property
     def qs(self):
-        # Annotate before filter
-        self.queryset = self.queryset.annotate(item_count=Count('items__item', distinct=True)) \
-            .annotate(catalogue_count=Count('items__item__lot__catalogue', distinct=True))
-
         qs = super().qs
-        self._qs = qs.distinct().order_by('-item_count')
-
-        print(self._qs.query)
+        self._qs = qs.distinct() \
+            .annotate(item_count=Count('items__item', distinct=True)) \
+            .annotate(catalogue_count=Count('items__item__lot__catalogue', distinct=True)) \
+            .order_by('-item_count')
         return self._qs
 
 
