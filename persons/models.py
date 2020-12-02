@@ -79,6 +79,9 @@ class Religion(models.Model):
     name = models.CharField(_("Religion name"), max_length=128)
     description = models.TextField(_("Religion description"))
 
+    class Meta:
+        ordering = ['name']
+
     def __str__(self):
         return self.name
 

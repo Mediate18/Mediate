@@ -661,19 +661,71 @@ class SubjectFilter(django_filters.FilterSet):
 # Work filter
 class WorkFilter(django_filters.FilterSet):
     title = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
-    viaf_id = django_filters.Filter(method='viaf_id_filter')
+    catalogue_publication_year = django_filters.RangeFilter(label="Catalogue publication year", widget=RangeWidget(),
+                                                            field_name='items__item__lot__catalogue__year_of_publication')
+    catalogue_country = django_filters.ModelMultipleChoiceFilter(
+        label="Catalogue country",
+        queryset=Country.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
+        field_name='items__item__lot__catalogue__related_places__place__country',
+        lookup_expr='in'
+    )
+    catalogue_owner_gender = django_filters.MultipleChoiceFilter(
+        label="Catalogue owner gender",
+        choices=Person.SEX_CHOICES,
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
+        method='catalogue_owner_gender_filter'
+    )
+    catalogue_owner_religion = django_filters.ModelMultipleChoiceFilter(
+        label="Catalogue owner religion",
+        queryset=Religion.objects.all().order_by('name'),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
+        method='catalogue_owner_religion_filter'
+    )
+    item_count = django_filters.RangeFilter(
+        label="Item count",
+        widget=RangeWidget(),
+        method='item_count_filter'
+    )
 
     class Meta:
         model = Work
-        exclude = ['uuid']
+        exclude = ['viaf_id', 'uuid']
 
-    def viaf_id_filter(self, queryset, name, value):
-        if value:
-            return queryset.filter(viaf_id=ViafAPI.uri_base+"/"+value)
-        return queryset
+    # Override method
+    @property
+    def qs(self):
+        # Annotate before filter
+        self.queryset = self.queryset.annotate(item_count=Count('items__item', distinct=True))
+
+        qs = super().qs
+        self._qs = qs.distinct()
+        return self._qs
 
     def multiple_words_filter(self, queryset, name, value):
         return filter_multiple_words(self.filters[name].lookup_expr, queryset, name, value)
+
+    def catalogue_owner_gender_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(items__item__lot__catalogue__personcataloguerelation__in=
+                                   PersonCatalogueRelation.objects.filter(role__name__iexact='owner',
+                                                                          person__sex__in=value))
+        return queryset
+
+    def catalogue_owner_religion_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(items__item__lot__catalogue__personcataloguerelation__role__name='owner',
+                items__item__lot__catalogue__personcataloguerelation__person__religiousaffiliation__religion__in=value)
+        return queryset
+
+    def item_count_filter(self, queryset, name, value):
+        # value is a slice object
+        if value.start or value.stop:
+            if value.start:
+                queryset = queryset.filter(item_count__gte=value.start)
+            if value.stop:
+                queryset = queryset.filter(item_count__lte=value.stop)
+        return queryset
 
 
 # Work Ranking filter
@@ -681,11 +733,14 @@ class WorkRankingFilter(WorkFilter):
     # Override method
     @property
     def qs(self):
+        # Annotate before filter
+        self.queryset = self.queryset.annotate(item_count=Count('items__item', distinct=True)) \
+            .annotate(catalogue_count=Count('items__item__lot__catalogue', distinct=True))
+
         qs = super().qs
-        self._qs = qs.distinct() \
-            .annotate(item_count=Count('items__item', distinct=True)) \
-            .annotate(catalogue_count=Count('items__item__lot__catalogue', distinct=True)) \
-            .order_by('-item_count')
+        self._qs = qs.distinct().order_by('-item_count')
+
+        print(self._qs.query)
         return self._qs
 
 
