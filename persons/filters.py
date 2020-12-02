@@ -498,8 +498,8 @@ class PlaceRankingFilter(PlaceFilter):
 
     def get_year_range(self):
         if self.data:
-            year_0 = int(self.data['year_0']) if self.data['year_0'] else None
-            year_1 = int(self.data['year_1']) if self.data['year_1'] else None
+            year_0 = int(self.data['year_0']) if 'year_0' in self.data and self.data['year_0'] else None
+            year_1 = int(self.data['year_1']) if 'year_1' in self.data and self.data['year_1'] else None
             return (year_0, year_1)
         else:
             return None
