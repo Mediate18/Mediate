@@ -453,14 +453,14 @@ class EditionTable(tables.Table):
     place = tables.RelatedLinkColumn()
     url = tables.Column(linkify=lambda record: record.url)
     publisher = tables.Column(verbose_name=_("Publisher"), empty_values=())
+    year_of_publication = tables.Column(empty_values=(), verbose_name=_("Year of publication"))
 
     class Meta:
         model = Edition
         attrs = {'class': 'table table-sortable'}
         sequence = [
             'items',
-            'year_start',
-            'year_end',
+            'year_of_publication',
             'year_tag',
             'terminus_post_quem',
             'place',
@@ -469,6 +469,7 @@ class EditionTable(tables.Table):
             'uuid',
             'checkbox'
         ]
+        exclude = ['year_start', 'year_end']
 
     def render_items(self, record):
         items = Item.objects.filter(edition=record).distinct()
@@ -490,7 +491,12 @@ class EditionTable(tables.Table):
         return format_html(
             '<input id="{}" class="checkbox" type="checkbox" name="checkbox"/>'.format(record.uuid)
         )
-
+    
+    def render_year_of_publication(self, record):
+        year_range_str = "{}".format(record.year_start) if record.year_start else "?"
+        year_range_str += " - {}".format(record.year_end) if record.year_end else ""
+        year_range_str = "—" if year_range_str == "?" else year_range_str
+        return year_range_str
 
 
 # EditionRanking table
@@ -507,8 +513,7 @@ class EditionRankingTable(EditionTable):
             'item_count',
             'catalogue_count',
             'items',
-            'year_start',
-            'year_end',
+            'year_of_publication',
             'year_tag',
             'terminus_post_quem',
             'place',
@@ -517,11 +522,11 @@ class EditionRankingTable(EditionTable):
             'uuid',
             'checkbox'
         ]
+        exclude = ['year_start', 'year_end']
 
     def render_row_index(self):
         self.row_index = getattr(self, 'row_index', itertools.count(self.page.start_index()))
         return next(self.row_index)
-
 
 
 # Publisher table
