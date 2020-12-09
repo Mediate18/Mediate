@@ -275,7 +275,8 @@ class Edition(models.Model):
     The edition information for an item
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    year = models.IntegerField(_("Year of publication"), null=True, blank=True)
+    year_start = models.IntegerField(_("Year of publication - start"), null=True, blank=True)
+    year_end = models.IntegerField(_("Year of publication - end"), null=True, blank=True)
     year_tag = models.CharField(_("Year of publication tag"), max_length=128, blank=True)
     terminus_post_quem = models.BooleanField(_("Terminus post quem"), default=False)
     place = models.ForeignKey(Place, on_delete=models.PROTECT, null=True, blank=True)
@@ -289,10 +290,18 @@ class Edition(models.Model):
                       if publisher.publisher.short_name]
         if publishers:
             str_elements += publishers
-        if self.year:
-            str_elements.append("{}".format(self.year))
+        year_range_str = "{}".format(self.year_start) if self.year_start else "?"
+        year_range_str += " - {}".format(self.year_end) if self.year_end else ""
+        str_elements.append(year_range_str)
         published_str = ", ".join(str_elements)if str_elements else _("Empty edition").format()
         return published_str
+
+    def clean(self):
+        if self.year_start is None and self.year_end is not None:
+            raise ValidationError(
+                _('Year of publication - start may not be empty if Year of publication - end is non-empty MODEL'),
+                code='model__empty_year_start_non_emtpy_year_end',
+            )
 
     def get_absolute_url(self):
         return reverse_lazy('edition_detail', args=[str(self.uuid)])

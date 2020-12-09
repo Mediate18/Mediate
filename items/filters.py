@@ -536,7 +536,11 @@ class PersonItemRelationRoleFilter(django_filters.FilterSet):
 # Edition filter
 class EditionFilter(django_filters.FilterSet):
     items = django_filters.Filter(name='items__short_title', lookup_expr='icontains')
-    year = django_filters.RangeFilter(widget=RangeWidget())
+    year = django_filters.RangeFilter(
+        label="Year of publication",
+        widget=RangeWidget(),
+        method='year_filter'
+    )
     year_tag = django_filters.Filter(lookup_expr='icontains')
     place = django_filters.ModelMultipleChoiceFilter(
         queryset=Place.objects.all(),
@@ -588,7 +592,24 @@ class EditionFilter(django_filters.FilterSet):
 
     class Meta:
         model = Edition
-        exclude = ['uuid']
+        exclude = ['uuid', 'year_start', 'year_end']
+
+    def year_filter(self, queryset, name, value):
+        if value:
+            if value.start and not value.stop:
+                q = Q(year_start__gte=value.start) | Q(year_end__gte=value.start)
+            elif value.stop and not value.start:
+                q = Q(year_start__lte=value.stop)
+            else:  # value.start and value.end
+                # Either year_start  within value range
+                # or     year_end    within value range
+                # or     value range inside range of year_start to year_end
+                q = (Q(year_start__gte=value.start) & Q(year_start__lte=value.stop)) \
+                    | (Q(year_end__gte=value.start) & Q(year_end__lte=value.stop)) \
+                    | (Q(year_start__lte=value.start) & Q(year_end__gte=value.stop))
+
+            return queryset.filter(q)
+        return queryset
 
     def has_url_filter(self, queryset, name, value):
         print("value", value, str(value), type(value))

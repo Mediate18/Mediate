@@ -459,7 +459,8 @@ class EditionTable(tables.Table):
         attrs = {'class': 'table table-sortable'}
         sequence = [
             'items',
-            'year',
+            'year_start',
+            'year_end',
             'year_tag',
             'terminus_post_quem',
             'place',
@@ -506,7 +507,8 @@ class EditionRankingTable(EditionTable):
             'item_count',
             'catalogue_count',
             'items',
-            'year',
+            'year_start',
+            'year_end',
             'year_tag',
             'terminus_post_quem',
             'place',
