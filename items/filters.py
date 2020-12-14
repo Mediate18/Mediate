@@ -106,7 +106,7 @@ class ItemFilter(django_filters.FilterSet):
         method='edition_place_filter'
     )
     edition_year = django_filters.RangeFilter(label="Date of publication", widget=RangeWidget(),
-                                                            field_name='edition__year')
+                                              field_name='edition__year', method='year_filter')
     edition_year_tag = django_filters.Filter(
         label="Date of publication tag",
         name='edition__year_tag',
@@ -364,6 +364,23 @@ class ItemFilter(django_filters.FilterSet):
     def edition_place_filter(self, queryset, name, value):
         if value:
             return queryset.filter(edition__place__in=value)
+        return queryset
+
+    def year_filter(self, queryset, name, value):
+        if value:
+            if value.start and not value.stop:
+                q = Q(edition__year_start__gte=value.start) | Q(edition__year_end__gte=value.start)
+            elif value.stop and not value.start:
+                q = Q(edition__year_start__lte=value.stop)
+            else:  # value.start and value.end
+                # Either year_start  within value range
+                # or     year_end    within value range
+                # or     value range inside range of year_start to year_end
+                q = (Q(edition__year_start__gte=value.start) & Q(edition__year_start__lte=value.stop)) \
+                    | (Q(edition__year_end__gte=value.start) & Q(edition__year_end__lte=value.stop)) \
+                    | (Q(edition__year_start__lte=value.start) & Q(edition__year_end__gte=value.stop))
+
+            return queryset.filter(q)
         return queryset
 
     def catalogue_filter(self, queryset, name, value):
