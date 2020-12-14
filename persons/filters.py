@@ -216,6 +216,35 @@ class RangeFilterQ(QBasedFilter, django_filters.RangeFilter):
         return q
 
 
+class RangeRangeFilterQ(QBasedFilter, django_filters.RangeFilter):
+    """
+    Subclass of django_filters.RangeFilter for the purpose of
+    using Q objects within one filter instead of chaining filters.
+
+    Both the field and the filter are a range.
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.field_names = kwargs.pop('field_names', {})
+        super().__init__(*args, **kwargs)
+
+    def filter(self, q, value):
+        """RangeFilter filter method override for use of Q(...) """
+        if value:
+            if value.start and not value.stop:
+                q &= Q(**{'{}__gte'.format(self.field_names[0]): value.start}) \
+                    | Q(**{'{}__gte'.format(self.field_names[1]): value.start})
+            elif value.stop and not value.start:
+                q &= Q(**{'{}__gte'.format(self.field_names[0]): value.stop}) \
+                    | Q(**{'{}__gte'.format(self.field_names[1]): value.stop})
+            else:  # value.start and value.end
+                q &= Q(**{'{}__range'.format(self.field_names[0]): (value.start, value.stop)}) \
+                     | Q(**{'{}__range'.format(self.field_names[1]): (value.start, value.stop)}) \
+                     | (Q(**{'{}__lte'.format(self.field_names[0]): value.start}) & \
+                        Q(**{'{}__gte'.format(self.field_names[1]): value.stop}))
+        return q
+
+
 class MultipleChoiceFilterQWithExtraLookups(QBasedFilter, django_filters.MultipleChoiceFilter):
     """
     Subclass of django_filters.MultipleChoiceFilter for the purpose of
@@ -271,10 +300,10 @@ class PersonRankingFilter(django_filters.FilterSet):
         lookup_expr='in',
         required=True
     )
-    edition_year = RangeFilterQ(
+    edition_year = RangeRangeFilterQ(
         label="Item publication year",
         widget=RangeWidget(),
-        field_name='personitemrelation__item__edition__year',
+        field_names=('personitemrelation__item__edition__year_start', 'personitemrelation__item__edition__year_end'),
         lookup_expr='range',
     )
     catalogue_publication_country = ModelMultipleChoiceFilterQ(
