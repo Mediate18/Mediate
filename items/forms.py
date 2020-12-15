@@ -421,6 +421,18 @@ class ItemWorksForm(forms.ModelForm):
         }
 
 
+class ItemMaterialDetailsForm(forms.ModelForm):
+    class Meta:
+        model = ItemMaterialDetailsRelation
+        fields = ['material_details']
+        widgets = {
+            'material_details': ModelSelect2MultipleWidget(
+                model=MaterialDetails,
+                search_fields=['description__icontains']    
+            )
+        }
+
+
 class PublisherForm(forms.ModelForm):
     class Meta:
         model = Publisher

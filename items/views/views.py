@@ -189,7 +189,13 @@ class ItemTableView(ListView):
                 'label': _("Add works"),
                 'url': reverse_lazy('add_works_to_items'),
                 'form': ItemWorksForm
-            }
+            },
+            {
+                'id': 'add_materialdetails',
+                'label': _("Add material details"),
+                'url': reverse_lazy('add_materialdetails_to_items'),
+                'form': ItemMaterialDetailsForm
+            },
         ]
 
         context['per_page_choices'] = [25, 50, 100, 500, 1000]
@@ -1267,6 +1273,32 @@ def add_works_to_items(request):
                         pass
         else:
             messages.add_message(request, messages.WARNING, _("No items and/or no works selected."))
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    else:
+        raise Http404
+
+
+def add_materialdetails_to_items(request):
+    """
+    Add Material_details to a list of items
+    :param request:
+    :return:
+    """
+    if request.method == 'POST':
+        if 'entries' in request.POST and 'material_details' in request.POST:
+            items = request.POST.getlist('entries')
+            material_details_objects = request.POST.getlist('material_details')
+            for material_details_id in material_details_objects:
+                material_details = MaterialDetails.objects.get(uuid=material_details_id)
+                for item_id in items:
+                    item = Item.objects.get(uuid=item_id)
+                    try:
+                        ItemMaterialDetailsRelation.objects.create(item=item, material_details=material_details)
+                    except IntegrityError:
+                        # Unique constraint failed; the ItemItemTypeRelation already exists
+                        pass
+        else:
+            messages.add_message(request, messages.WARNING, _("No items and/or no material details selected."))
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
     else:
         raise Http404
