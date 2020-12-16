@@ -280,6 +280,10 @@ th {
     text-align: left;
 }
 
+form th {
+    width: 25%;
+}
+
 h1 {
     text-align: center;
 }
