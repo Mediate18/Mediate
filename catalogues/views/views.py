@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
-from django.db.models import Count, Min, Max
+from django.db.models import Count, Min, Max, Q
 from django.db.models.functions import Substr, Length
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -52,8 +52,11 @@ class CatalogueTableView(ListView):
             max_publication_year = 0
         context['max_publication_year'] = max_publication_year
 
+        # If the filter form is empty, do not filter for catalogue subset
+        catalogue_q = Q(lot__catalogue__in=filter.qs) if filter.non_empty_filters() else Q()
+
         item_count_per_decade = Item.objects\
-            .filter(lot__catalogue__in=filter.qs, edition__year_start__lte=max_publication_year)\
+            .filter(catalogue_q, edition__year_start__lte=max_publication_year)\
             .annotate(decade=10 * Substr('edition__year_start', 1, Length('edition__year_start') - 1))\
             .values('decade')\
             .order_by('decade')\
@@ -63,11 +66,11 @@ class CatalogueTableView(ListView):
         }
         context['extra_data'] = json.dumps(extra_data)
 
-        item_count_total = Item.objects.filter(lot__catalogue__in=filter.qs).count()
+        item_count_total = Item.objects.filter(catalogue_q).count()
         context['item_count_total'] = item_count_total
-        item_count_without_year = Item.objects.filter(lot__catalogue__in=filter.qs, edition__year_start__isnull=True).count()
+        item_count_without_year = Item.objects.filter(catalogue_q, edition__year_start__isnull=True).count()
         context['item_count_without_year'] = item_count_without_year
-        item_count_in_plot = Item.objects.filter(lot__catalogue__in=filter.qs, edition__year_start__lte=max_publication_year).count()
+        item_count_in_plot = Item.objects.filter(catalogue_q, edition__year_start__lte=max_publication_year).count()
         context['item_count_in_plot'] = item_count_in_plot
         context['item_percentage_in_plot'] = int(100 * item_count_in_plot / item_count_total) if item_count_total != 0 else 0
 

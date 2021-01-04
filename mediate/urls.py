@@ -23,6 +23,8 @@ from django.conf.urls import url, include
 from django.views.generic import RedirectView
 from rest_framework import routers
 
+import debug_toolbar
+
 from .views import protected_media
 
 import items.urls
@@ -111,5 +113,7 @@ urlpatterns = [
     url(r'^select2/', include('django_select2.urls')),
     url(r'^viaf/', include(('viapy.urls', 'viapy'), namespace='viaf'), name='viaf'),
     url(r'protected_media/(?P<filename>.*)$', protected_media, name='protected_media'),
+
+    path('__debug__/', include(debug_toolbar.urls)),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) \
               + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

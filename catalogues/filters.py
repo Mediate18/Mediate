@@ -1,6 +1,9 @@
 import django_filters
 from django.db.models import Count
 from django_select2.forms import Select2MultipleWidget
+
+import six
+
 from .models import *
 from mediate.tools import filter_multiple_words
 from persons.models import Profession, Religion, Place, Country
@@ -70,6 +73,14 @@ class CatalogueFilter(django_filters.FilterSet):
             'terminus_post_quem',
             'number_of_items',
             'number_of_lots'
+        ]
+
+    def non_empty_filters(self):
+        return [
+            (filter_.name, self.form.cleaned_data.get(name))
+            for name, filter_ in six.iteritems(self.filters)
+            if self.form.cleaned_data.get(name)
+               and self.form.cleaned_data.get(name) !=  [None, None]  # in case filter_ is a RangeFilter
         ]
 
     def multiple_words_filter(self, queryset, name, value):

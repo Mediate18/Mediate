@@ -1,5 +1,6 @@
 from django.db import models
 from django.dispatch import receiver
+from django.db.models import Subquery
 from django.db.models.deletion import CASCADE, SET_NULL
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
@@ -127,6 +128,13 @@ class Item(models.Model):
 
     tags = GenericRelation(TaggedEntity, related_query_name='items')
 
+    # Redundant fields for speedup of queries
+    catalogue_year_of_publication = models.IntegerField(_("Catalogue - Year of publication"), null=True, db_index=True,)
+    catalogue_short_title = models.CharField(_("Catalogue - Short title"), max_length=128, null=True, db_index=True)
+    lot_index_in_catalogue = models.IntegerField(_("Lot - Index in catalogue"), null=True, db_index=True)
+    lot_lot_as_listed_in_catalogue = models.TextField(_("Lot - Full lot description, exactly as in the catalogue"),
+                                                      null=True, db_index=True)
+
     def __str__(self):
         return self.short_title
 
@@ -169,6 +177,32 @@ class Item(models.Model):
     def get_other_items_in_lot(self):
         return Item.objects.prefetch_related('edition')\
             .filter(lot=self.lot).exclude(index_in_lot=self.index_in_lot).order_by('index_in_lot')
+
+    def copy_catalogue_values(self, catalogue):
+        """
+        Copies data from the related catalogue to the item for speeding up queries
+        :param catalogue:
+        :return:
+        """
+        Item.objects.filter(lot__catalogue=catalogue).update(
+            catalogue_year_of_publication = Subquery(Catalogue.objects.filter(lot__uuid=OuterRef('lot_id'))
+                                                     .values('year_of_publication')[:1]),
+            catalogue_short_title=Subquery(Catalogue.objects.filter(lot__uuid=OuterRef('lot_id'))
+                                           .values('short_title')[:1])
+        )
+
+    def copy_lot_values(self, lot):
+        """
+        Copies data from the related lot to the item for speeding up queries
+        :param lot:
+        :return:
+        """
+        Item.objects.filter(lot=lot).update(
+            lot_index_in_catalogue = Subquery(Lot.objects.filter(uuid=OuterRef('lot_id'))
+                                              .values('index_in_catalogue')[:1]),
+            lot_lot_as_listed_in_catalogue = Subquery(Lot.objects.filter(uuid=OuterRef('lot_id'))
+                                                      .values('lot_as_listed_in_catalogue')[:1])
+        )
 
 
 class ItemType(models.Model):
@@ -275,7 +309,7 @@ class Edition(models.Model):
     The edition information for an item
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    year_start = models.IntegerField(_("Year of publication - start"), null=True, blank=True)
+    year_start = models.IntegerField(_("Year of publication - start"), null=True, blank=True, db_index=True)
     year_end = models.IntegerField(_("Year of publication - end"), null=True, blank=True)
     year_tag = models.CharField(_("Year of publication tag"), max_length=128, blank=True)
     terminus_post_quem = models.BooleanField(_("Terminus post quem"), default=False)

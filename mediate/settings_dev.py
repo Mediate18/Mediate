@@ -29,6 +29,11 @@ DEBUG = config('DEBUG', cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
+
+
 ADMINS = [
     ('Micha Hulsbosch', 'm.hulsbosch@let.ru.nl')
 ]
@@ -50,6 +55,8 @@ INSTALLED_APPS = [
     'django_filters',
     'django_tables2',
     'django_select2',
+    'django_extensions',
+    'debug_toolbar',
     'dal',
     'dal_select2',
     'viapy',
@@ -73,6 +80,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
