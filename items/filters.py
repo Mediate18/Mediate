@@ -710,6 +710,13 @@ class WorkFilter(QBasedFilterset):
         field_name='items__item__lot__catalogue__related_places__place__country',
         lookup_expr='in'
     )
+    catalogue_city = ModelMultipleChoiceFilterQ(
+        label="Catalogue city",
+        queryset=Place.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
+        field_name='items__item__lot__catalogue__related_places__place',
+        lookup_expr='in'
+    )
     catalogue_owner_gender = MultipleChoiceFilterQWithExtraLookups(
         label="Catalogue owner gender",
         choices=Person.SEX_CHOICES,
