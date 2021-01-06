@@ -8,7 +8,8 @@ from .models import *
 from persons.models import Country, Profession, Religion
 from catalogues.models import Catalogue, ParisianCategory, PersonCatalogueRelation
 from mediate.tools import filter_multiple_words
-from mediate.filters import QBasedFilter
+from mediate.filters import QBasedFilterset, RangeFilterQ, MultipleChoiceFilterQWithExtraLookups, \
+    ModelMultipleChoiceFilterQ
 from viapy.api import ViafAPI
 import six
 
@@ -697,24 +698,25 @@ class SubjectFilter(django_filters.FilterSet):
 
 
 # Work filter
-class WorkFilter(django_filters.FilterSet):
+class WorkFilter(QBasedFilterset):
     title = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
-    catalogue_publication_year = django_filters.RangeFilter(label="Catalogue publication year", widget=RangeWidget(),
-                                                            field_name='items__item__lot__catalogue__year_of_publication')
-    catalogue_country = django_filters.ModelMultipleChoiceFilter(
+    catalogue_publication_year = RangeFilterQ(label="Catalogue publication year", widget=RangeWidget(),
+                                                        field_name='items__item__lot__catalogue__year_of_publication',
+                                                        lookup_expr='range')
+    catalogue_country = ModelMultipleChoiceFilterQ(
         label="Catalogue country",
         queryset=Country.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
         field_name='items__item__lot__catalogue__related_places__place__country',
         lookup_expr='in'
     )
-    catalogue_owner_gender = django_filters.MultipleChoiceFilter(
+    catalogue_owner_gender = MultipleChoiceFilterQWithExtraLookups(
         label="Catalogue owner gender",
         choices=Person.SEX_CHOICES,
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
         method='catalogue_owner_gender_filter'
     )
-    catalogue_owner_religion = django_filters.ModelMultipleChoiceFilter(
+    catalogue_owner_religion = ModelMultipleChoiceFilterQ(
         label="Catalogue owner religion",
         queryset=Religion.objects.all().order_by('name'),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
@@ -740,18 +742,18 @@ class WorkFilter(django_filters.FilterSet):
     def multiple_words_filter(self, queryset, name, value):
         return filter_multiple_words(self.filters[name].lookup_expr, queryset, name, value)
 
-    def catalogue_owner_gender_filter(self, queryset, name, value):
+    def catalogue_owner_gender_filter(self, q, name, value):
         if value:
-            return queryset.filter(items__item__lot__catalogue__personcataloguerelation__in=
+            q &= Q(items__item__lot__catalogue__personcataloguerelation__in=
                                    PersonCatalogueRelation.objects.filter(role__name__iexact='owner',
                                                                           person__sex__in=value))
-        return queryset
+        return q
 
-    def catalogue_owner_religion_filter(self, queryset, name, value):
+    def catalogue_owner_religion_filter(self, q, name, value):
         if value:
-            return queryset.filter(items__item__lot__catalogue__personcataloguerelation__role__name='owner',
+            q &= Q(items__item__lot__catalogue__personcataloguerelation__role__name='owner',
                 items__item__lot__catalogue__personcataloguerelation__person__religiousaffiliation__religion__in=value)
-        return queryset
+        return q
 
     def item_count_filter(self, queryset, name, value):
         # value is a slice object
