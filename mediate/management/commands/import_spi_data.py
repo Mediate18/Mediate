@@ -99,7 +99,7 @@ class Command(BaseCommand):
             else:
                 person = None
             # print('person: ' + str(person) + " " + str(created))
-            edition = items.models.Edition(year=date, place=place)
+            edition = items.models.Edition(year_start=date, place=place)
             edition.save()
             # print('edition: ' + str(edition))
             if person:
