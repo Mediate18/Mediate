@@ -52,7 +52,7 @@ def view_totals(request):
     languages = Language.objects.annotate(item_cnt=Count('items', filter=Q(items__item__non_book=False)))\
         .filter(item_cnt__gt=0).count()
 
-    item_person_relations = PersonItemRelation.objects.filter(item__non_book=False).distinct().count()
+    item_person_relations = PersonItemRelation.objects.filter(item__non_book=False).values('item').distinct().count()
     item_work_relations = ItemWorkRelation.objects.filter(item__non_book=False).distinct().count()
     items_with_date = Item.objects.filter(edition__year_start__isnull=False, non_book=False).distinct().count()
     items_with_place_of_publication = Item.objects.filter(edition__place__isnull=False, non_book=False)\
