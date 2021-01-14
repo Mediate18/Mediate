@@ -43,7 +43,7 @@ def view_totals(request):
     female_persons = Person.objects.filter(sex=Person.FEMALE).count()
     countries = Country.objects.count()
     cities = Place.objects.count()
-    languages = Language.objects.count()
+    languages = Language.objects.annotate(item_cnt=Count('items')).filter(item_cnt__gt=0).count()
 
 
     context = {
