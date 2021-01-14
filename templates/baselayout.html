@@ -87,20 +87,8 @@
               {% if perms.persons.change_catalogue or perms.global.view_all %}
                 <li class="{% if url_name == 'catalogues' %}active{% endif %}"><a href="{% url 'catalogues' %}">{% trans "Catalogues" %}</a></li>
               {% endif %}
-              {% if perms.persons.change_category or perms.global.view_all %}
-                <li class="{% if url_name == 'categories' %}active{% endif %}"><a href="{% url 'categories' %}">{% trans "Categories" %}</a></li>
-              {% endif %}
               {% if perms.persons.change_item or perms.global.view_all %}
                 <li class="{% if url_name == 'items' %}active{% endif %}"><a href="{% url 'items' %}">{% trans "Items" %}</a></li>
-              {% endif %}
-              {% if perms.persons.change_edition or perms.global.view_all %}
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Editions" %} <span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="{% url 'editions' %}">{% trans "Search" %}</a></li>
-                        <li><a href="{% url 'editions_ranking' %}">{% trans "Rank by item count" %}</a></li>
-                    </ul>
-                </li>
               {% endif %}
               {% if perms.persons.change_work or perms.global.view_all %}
                 <li class="dropdown">
