@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.db.models import Count
 
-from items.models import Item, Edition, Work, Language
+from items.models import Item, Edition, Work, Language, PersonItemRelation, ItemWorkRelation
 from catalogues.models import Lot, Catalogue
 from persons.models import Place, Person, Country
 
@@ -45,6 +45,7 @@ def view_totals(request):
     cities = Place.objects.count()
     languages = Language.objects.annotate(item_cnt=Count('items')).filter(item_cnt__gt=0).count()
 
+    item_person_relations = PersonItemRelation.objects.count()
 
     context = {
         'catalogues': catalogues,
@@ -57,6 +58,10 @@ def view_totals(request):
         'countries': countries,
         'cities': cities,
         'languages': languages,
+
+        'item_person_relations': item_person_relations,
+        'percentage_item_person_relations': round(100 * item_person_relations/book_items),
+
     }
 
     return render(request, 'dashboard/totals.html', context)

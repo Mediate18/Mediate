@@ -104,6 +104,20 @@
                 </tr>
                 {% endif %}
 
+                {% if item_person_relations %}
+                <tr>
+                    <td>
+                        {{ item_person_relations }}
+                    </td>
+                    <td>
+                        Item-Person relations
+                        {% if percentage_item_person_relations %}
+                            ({{percentage_item_person_relations}}% of total number of book Items)
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+
             </tbody>
         </table>
 
