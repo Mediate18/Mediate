@@ -41,8 +41,14 @@ def view_totals(request):
     works = Work.objects.count()
     persons = Person.objects.count()
     female_persons = Person.objects.filter(sex=Person.FEMALE).count()
-    countries = Country.objects.count()
-    cities = Place.objects.count()
+
+    cities_of_publication = list(Place.objects.filter(edition__isnull=False).distinct().values_list('uuid', flat=True))
+    cities_of_birth = list(Place.objects.filter(persons_born__isnull=False).distinct().values_list('uuid', flat=True))
+    cities_of_death = list(Place.objects.filter(persons_born__isnull=False).distinct().values_list('uuid', flat=True))
+    cities_list = list(set(cities_of_publication+cities_of_birth+cities_of_death))
+    cities = len(cities_list)
+    countries = Country.objects.filter(place__in=cities_list).distinct().count()
+
     languages = Language.objects.annotate(item_cnt=Count('items')).filter(item_cnt__gt=0).count()
 
     item_person_relations = PersonItemRelation.objects.count()
