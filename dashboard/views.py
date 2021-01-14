@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from django.db.models import Count
 
-from items.models import Item, Edition
-from catalogues.models import Lot
+from items.models import Item, Edition, Work, Language
+from catalogues.models import Lot, Catalogue
+from persons.models import Place, Person, Country
 
 def view_dashboard(request):
     if request.user.is_superuser:
@@ -26,3 +27,36 @@ def view_dashboard(request):
     else:
         context = {}
     return render(request, 'dashboard/dashboard.html', context)
+
+
+def view_totals(request):
+    """
+    Create a view with counts for a selection of models
+    :param request:
+    :return:
+    """
+    catalogues = Catalogue.objects.count()
+    book_items = Item.objects.filter(non_book=False).count()
+    non_book_items = Item.objects.filter(non_book=True).count()
+    works = Work.objects.count()
+    persons = Person.objects.count()
+    female_persons = Person.objects.filter(sex=Person.FEMALE).count()
+    countries = Country.objects.count()
+    cities = Place.objects.count()
+    languages = Language.objects.count()
+
+
+    context = {
+        'catalogues': catalogues,
+        'book_items': book_items,
+        'non_book_items': non_book_items,
+        'percentage_non_book_items': round(100 * non_book_items/book_items, 1),
+        'works': works,
+        'persons': persons,
+        'female_persons': female_persons,
+        'countries': countries,
+        'cities': cities,
+        'languages': languages,
+    }
+
+    return render(request, 'dashboard/totals.html', context)

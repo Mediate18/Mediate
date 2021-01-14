@@ -1,0 +1,113 @@
+{% extends "baselayout.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<h1>{% trans "Totals" %}</h1>
+
+<div class="row">
+    <div class="col-md-4 col-md-offset-4">
+        <table class="table">
+            <tbody>
+
+                {% if catalogues %}
+                <tr>
+                    <td>
+                        {{ catalogues }}
+                    </td>
+                    <td>
+                        <a href="{% url 'catalogues' %}">Catalogues</a>
+                    </td>
+                </tr>
+                {% endif %}
+
+                {% if book_items %}
+                <tr>
+                    <td>
+                        {{ book_items }}
+                    </td>
+                    <td>
+                        Book <a href="{% url 'items' %}">items</a>
+                    </td>
+                </tr>
+                {% endif %}
+
+                {% if non_book_items %}
+                <tr>
+                    <td>
+                        {{ non_book_items }}
+                    </td>
+                    <td>
+                        Non book <a href="{% url 'items' %}">items</a>
+                        {% if percentage_non_book_items %}
+                            ({{ percentage_non_book_items }}% of total)
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+
+                {% if works %}
+                <tr>
+                    <td>
+                        {{ works }}
+                    </td>
+                    <td>
+                        <a href="{% url 'works' %}">Works</a>
+                    </td>
+                </tr>
+                {% endif %}
+
+                {% if persons %}
+                <tr>
+                    <td>
+                        {{ persons }}
+                    </td>
+                    <td>
+                        <a href="{% url 'persons' %}">Persons</a>
+                        {% if female_persons %}
+                        (including {{ female_persons }} <a href="{% url 'persons' %}?sex=FEMALE">female</a>)
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+
+                {% if countries %}
+                <tr>
+                    <td>
+                        {{ countries }}
+                    </td>
+                    <td>
+                        <a href="{% url 'countries' %}">Countries</a>
+                    </td>
+                </tr>
+                {% endif %}
+
+                {% if cities %}
+                <tr>
+                    <td>
+                        {{ cities }}
+                    </td>
+                    <td>
+                        <a href="{% url 'places' %}">Cities</a> (places of birth, death, and publication)
+                    </td>
+                </tr>
+                {% endif %}
+
+                {% if languages %}
+                <tr>
+                    <td>
+                        {{ languages }}
+                    </td>
+                    <td>
+                        <a href="{% url 'languages' %}">Languages</a>
+                    </td>
+                </tr>
+                {% endif %}
+
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+{% endblock %}
