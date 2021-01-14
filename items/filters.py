@@ -527,6 +527,15 @@ class LanguageFilter(django_filters.FilterSet):
         model = Language
         exclude = ['uuid']
 
+    # Override method
+    @property
+    def qs(self):
+        qs = super().qs
+        self._qs = qs.distinct() \
+            .annotate(item_count=Count('items__item', filter=Q(items__item__non_book=False), distinct=True)) \
+            .order_by('-item_count')
+        return self._qs
+
 
 # MaterialDetails filter
 class MaterialDetailsFilter(django_filters.FilterSet):

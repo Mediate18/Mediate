@@ -386,6 +386,8 @@ class ItemWorkRelationTable(tables.Table):
 
 # Language table
 class LanguageTable(tables.Table):
+    row_index = tables.Column(empty_values=(), orderable=False, verbose_name="")
+    item_count = tables.Column(empty_values=(), verbose_name=_("# items"))
     uuid = ActionColumn('language_detail', 'change_language', 'delete_language',
                         orderable=False)
 
@@ -393,12 +395,24 @@ class LanguageTable(tables.Table):
         model = Language
         attrs = {'class': 'table table-sortable'}
         sequence = [
+            'row_index',
+            'item_count',
             'name',
             'language_code_2char',
             'language_code_3char',
             'description',
             'uuid'
         ]
+
+    def render_row_index(self):
+        self.row_index = getattr(self, 'row_index', itertools.count(self.page.start_index()))
+        return next(self.row_index)
+
+    def render_item_count(self, record):
+        return format_html(
+            '<a href="{}?language={}">{}</a>'.format(reverse_lazy('items'), record.uuid, record.item_count)
+        )
+
 
 
 # MaterialDetails table
