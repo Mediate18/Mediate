@@ -1481,7 +1481,7 @@ class EditionRankingTableView(ListView):
 
 class EditionDetailView(GenericDetailView):
     model = Edition
-    object_fields = ['year', 'year_tag', 'terminus_post_quem', 'place', 'url']
+    object_fields = ['year_start', 'year_end', 'year_tag', 'terminus_post_quem', 'place', 'url']
 
 
 class EditionCreateView(CreateView):
