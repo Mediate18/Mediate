@@ -88,7 +88,7 @@
                         {{ cities }}
                     </td>
                     <td>
-                        <a href="{% url 'places' %}">Cities</a> (places of birth, death, and publication)
+                        <a href="{% url 'places_ranking' %}">Cities</a> (places of birth, death, and publication)
                     </td>
                 </tr>
                 {% endif %}
@@ -154,7 +154,7 @@
                         {{ items_with_place_of_publication }}
                     </td>
                     <td>
-                        Items with place of publication
+                        Items with <a href="{% url 'itemsmap' %}    ">place of publication</a>
                         {% if percentage_items_with_place_of_publication %}
                             ({{percentage_items_with_place_of_publication}}% of total number of book Items)
                         {% endif %}
@@ -168,7 +168,7 @@
                         {{ persons_with_place_of_birth }}
                     </td>
                     <td>
-                        Persons with place of birth
+                        Persons with <a href="{% url 'placesofbirth' %}">place of birth</a>
                         {% if percentage_persons_with_place_of_birth %}
                             ({{percentage_persons_with_place_of_birth}}% of total number of persons)
                         {% endif %}
@@ -182,7 +182,7 @@
                         {{ persons_with_place_of_death }}
                     </td>
                     <td>
-                        Persons with place of death
+                        Persons with <a href="{% url 'placesofdeath' %}">place of death</a>
                         {% if percentage_persons_with_place_of_death %}
                             ({{percentage_persons_with_place_of_death}}% of total number of persons)
                         {% endif %}
