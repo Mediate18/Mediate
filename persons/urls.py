@@ -90,6 +90,10 @@ urlpatterns = [
          permission_required('persons.delete_country')(CountryDeleteView.as_view()),
          name="delete_country"),
 
+    # CountryRanking urls
+    path(r'countries/rank', permission_required('global.view_all')(CountryRankingTableView.as_view()),
+         name='countries_ranking'),
+
     # Place urls
     path('places/', permission_required('global.view_all')(PlaceTableView.as_view()), name='places'),
     path(r'places/<uuid:pk>', permission_required('global.view_all')(PlaceDetailView.as_view()),
@@ -103,7 +107,7 @@ urlpatterns = [
          permission_required('persons.delete_place')(PlaceDeleteView.as_view()),
          name="delete_place"),
 
-    # PersonRanking urls
+    # PlaceRanking urls
     path(r'places/rank', permission_required('global.view_all')(PlaceRankingTableView.as_view()),
          name='places_ranking'),
 

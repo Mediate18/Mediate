@@ -221,6 +221,28 @@ class CountryTable(tables.Table):
         ]
 
 
+# Country table
+class CountryRankingTable(CountryTable):
+    row_index = tables.Column(empty_values=(), orderable=False, verbose_name="")
+    item_count = tables.Column(empty_values=(), verbose_name=_("# items"))
+    catalogue_count = tables.Column(empty_values=(), verbose_name=_("# catalogues"))
+
+    class Meta:
+        model = Country
+        attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'row_index',
+            'item_count',
+            'catalogue_count',
+            'name',
+            'uuid'
+        ]
+
+    def render_row_index(self):
+        self.row_index = getattr(self, 'row_index', itertools.count(self.page.start_index()))
+        return next(self.row_index)
+
+
 # Place table
 class PlaceTable(tables.Table):
     uuid = ActionColumn('place_detail', 'change_place', 'delete_place',

@@ -336,6 +336,19 @@ class CountryFilter(django_filters.FilterSet):
         return filter_multiple_words(self.filters[name].lookup_expr, queryset, name, value)
 
 
+# Country filter
+class CountryRankingFilter(CountryFilter):
+    # Override method
+    @property
+    def qs(self):
+        qs = super().qs
+        self._qs = qs.distinct() \
+            .annotate(item_count=Count('place__edition__items', distinct=True)) \
+            .annotate(catalogue_count=Count('place__edition__items__lot__catalogue', distinct=True)) \
+            .order_by('-item_count')
+        return self._qs
+
+
 # Place filter
 class PlaceFilter(django_filters.FilterSet):
     name = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
