@@ -225,6 +225,17 @@ class ItemFilter(django_filters.FilterSet):
         ),
         method='owner_religion_filter'
     )
+    publisher = django_filters.ModelMultipleChoiceFilter(
+        label="Publisher",
+        queryset=Person.objects.filter(publisher__isnull=False).distinct(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Person,
+            queryset=Person.objects.filter(publisher__isnull=False).distinct(),
+            search_fields=['short_name__icontains', 'surname__icontains', 'first_names__icontains']
+        ),
+        field_name='edition__publisher__publisher'
+    )
     language = django_filters.ModelMultipleChoiceFilter(
         label='Language',
         queryset=Language.objects.all(),
