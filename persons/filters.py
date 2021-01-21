@@ -4,7 +4,7 @@ from viapy.api import ViafAPI
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q, IntegerField, Count
 from django.db.models.functions import Cast
-from django_select2.forms import Select2MultipleWidget
+from django_select2.forms import Select2MultipleWidget, ModelSelect2MultipleWidget
 from django_filters.widgets import RangeWidget
 from django.utils.safestring import mark_safe
 
@@ -365,11 +365,22 @@ class PlaceFilter(django_filters.FilterSet):
         return filter_multiple_words(self.filters[name].lookup_expr, queryset, name, value)
 
 
-class PlaceRankingFilter(PlaceFilter):
-    year = django_filters.RangeFilter(
+class PlaceRankingFilter(QBasedFilterset, PlaceFilter):
+    year = RangeFilterQ(
         label="Item publication year",
         widget=RangeWidget(),
-        field_name='edition__year'
+        field_name='edition__year_start'
+    )
+    catalogue = ModelMultipleChoiceFilterQ(
+        label="Catalogue",
+        queryset=Catalogue.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Catalogue,
+            search_fields=['short_title__icontains']
+        ),
+        field_name='edition__items__lot__catalogue',
+        lookup_expr='in'
     )
 
     class Meta:
@@ -393,6 +404,12 @@ class PlaceRankingFilter(PlaceFilter):
             year_0 = int(self.data['year_0']) if 'year_0' in self.data and self.data['year_0'] else None
             year_1 = int(self.data['year_1']) if 'year_1' in self.data and self.data['year_1'] else None
             return (year_0, year_1)
+        else:
+            return None
+
+    def get_catalogues(self):
+        if self.data:
+            return self.data.getlist('catalogue')
         else:
             return None
 
