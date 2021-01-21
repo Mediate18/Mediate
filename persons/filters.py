@@ -16,6 +16,7 @@ from mediate.filters import QBasedFilter, RangeFilterQ, RangeRangeFilterQ, Multi
     ModelMultipleChoiceFilterQ, ModelMultipleChoiceFilterQWithExtraLookups, QBasedFilterset
 from catalogues.models import PersonCatalogueRelationRole, Catalogue
 from items.models import PersonItemRelationRole
+from tagme.models import Tag
 
 
 # Person filter
@@ -382,6 +383,37 @@ class PlaceRankingFilter(QBasedFilterset, PlaceFilter):
         field_name='edition__items__lot__catalogue',
         lookup_expr='in'
     )
+    catalogue_publication_year = RangeFilterQ(
+        label="Catalogue publication year",
+        widget=RangeWidget(),
+        field_name='edition__items__lot__catalogue__year_of_publication'
+    )
+    catalogue_country_of_publication = ModelMultipleChoiceFilterQ(
+        label="Catalogue country of publication",
+        queryset=Country.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Country,
+            search_fields=['name__icontains']
+        ),
+        method='catalogue_country_of_publication_filter'
+    )
+    catalogue_tag = ModelMultipleChoiceFilterQ(
+        label="Catalogue tag",
+        queryset=Tag.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Tag,
+            search_fields=['namespace__icontains', 'name__icontains', 'value__icontains']
+        ),
+        method='catalogue_tag_filter'
+    )
+    catalogue_owner_religion = ModelMultipleChoiceFilterQ(
+        label="Catalogue owner religion",
+        queryset=Religion.objects.all().order_by('name'),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
+        method='catalogue_owner_religion_filter'
+    )
 
     class Meta:
         model = Place
@@ -398,6 +430,23 @@ class PlaceRankingFilter(QBasedFilterset, PlaceFilter):
             .annotate(catalogue_count=Count('edition__items__lot__catalogue', distinct=True)) \
             .order_by('-item_count')
         return self._qs
+
+    def catalogue_country_of_publication_filter(self, q, name, value):
+        if value:
+            q &= Q(edition__items__lot__catalogue__related_places__type__name='publication',
+                   edition__items__lot__catalogue__related_places__place__country__in=value)
+        return q
+
+    def catalogue_tag_filter(self, q, name, value):
+        if value:
+            q &= Q(edition__items__lot__catalogue__tags__tag__in=value)
+        return q
+
+    def catalogue_owner_religion_filter(self, q, name, value):
+        if value:
+            q &= Q(edition__items__lot__catalogue__personcataloguerelation__role__name='owner',
+              edition__items__lot__catalogue__personcataloguerelation__person__religiousaffiliation__religion__in=value)
+        return q
 
     def get_year_range(self):
         if self.data:

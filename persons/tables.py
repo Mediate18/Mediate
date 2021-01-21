@@ -296,7 +296,6 @@ class PlaceRankingTable(PlaceTable):
 
     def render_person_count(self, record):
         catalogues_query = Q(personitemrelation__item__lot__catalogue__in=self.catalogues) if self.catalogues else Q()
-        print(catalogues_query)
         if self.year:
             year = self.year
             if year[0] and year[1]:
