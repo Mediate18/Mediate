@@ -484,6 +484,15 @@
                     </td>
                 </tr>
                 {% endif %}
+
+
+                {% if perms.items.change_item %}
+                <tr>
+                    <td>
+                        <a href="{% url 'tags_ranking' %}">Item tags</a>
+                    </td>
+                </tr>
+                {% endif %}
             </tbody>
         </table>
     </div>
