@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 import itertools
 
 from .models import *
+from tagme.models import Tag
 
 from mediate.columns import ActionColumn
 
@@ -295,6 +296,26 @@ class TaggedItemTable(tables.Table):
 
     def value_number_of_volumes(self, record):
         return record.number_of_volumes or ""
+
+
+# Item Tag ranking table
+class ItemTagRankingTable(tables.Table):
+    row_index = tables.Column(empty_values=(), orderable=False, verbose_name="")
+    item_count = tables.Column(empty_values=(), verbose_name=_("# items"))
+
+    class Meta:
+        model = Tag
+        attrs = {'class': 'table table-sortable'}
+        fields = [
+            'row_index',
+            'item_count',
+            'name',
+            'value',
+        ]
+
+    def render_row_index(self):
+        self.row_index = getattr(self, 'row_index', itertools.count(self.page.start_index()))
+        return next(self.row_index)
 
 
 # ItemAuthor table

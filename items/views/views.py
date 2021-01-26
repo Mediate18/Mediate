@@ -276,6 +276,28 @@ class TaggedItemTableView(ListView):
         return context
 
 
+class ItemTagRankingTableView(ListView):
+    model = Tag
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return Tag.objects.filter(namespace__iexact='item')
+
+    def get_context_data(self, **kwargs):
+        context = super(ItemTagRankingTableView, self).get_context_data(**kwargs)
+        filter = ItemTagRankingFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = ItemTagRankingTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+        context['object_name'] = "tag"
+
+        return context
+
+
+
 class ItemLocationMapView(ListView):
     model = Item
     template_name = 'generic_location_map.html'

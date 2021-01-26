@@ -34,6 +34,86 @@ class PersonRoleMultipleChoiceField(django_filters.fields.MultipleChoiceField):
             return False
 
 
+class ItemTagRankingFilter(QBasedFilterset):
+    name = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
+    value = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
+    catalogue = ModelMultipleChoiceFilterQ(
+        label="Catalogue",
+        queryset=Catalogue.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Catalogue,
+            search_fields=['short_title__icontains']
+        ),
+        field_name='taggedentity__items__lot__catalogue',
+        lookup_expr='in'
+    )
+    catalogue_publication_year = RangeFilterQ(
+        label="Catalogue publication year",
+        widget=RangeWidget(),
+        field_name='taggedentity__items__lot__catalogue__year_of_publication'
+    )
+    catalogue_country_of_publication = ModelMultipleChoiceFilterQ(
+        label="Catalogue country of publication",
+        queryset=Country.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Country,
+            search_fields=['name__icontains']
+        ),
+        method='catalogue_country_of_publication_filter'
+    )
+    catalogue_tag = ModelMultipleChoiceFilterQ(
+        label="Catalogue tag",
+        queryset=Tag.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Tag,
+            search_fields=['namespace__icontains', 'name__icontains', 'value__icontains']
+        ),
+        method='catalogue_tag_filter'
+    )
+    catalogue_owner_religion = ModelMultipleChoiceFilterQ(
+        label="Catalogue owner religion",
+        queryset=Religion.objects.all().order_by('name'),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
+        method='catalogue_owner_religion_filter'
+    )
+
+    class Meta:
+        model = Tag
+        exclude = ['namespace', 'uuid']
+
+    # Override method
+    @property
+    def qs(self):
+        qs = super().qs
+        self._qs = qs.distinct() \
+            .annotate(item_count=Count('taggedentity__items', filter=Q(taggedentity__items__non_book=False), distinct=True)) \
+            .order_by('-item_count')
+        return self._qs
+
+    def multiple_words_filter(self, queryset, name, value):
+        return filter_multiple_words(self.filters[name].lookup_expr, queryset, name, value, wildcards=True)
+
+    def catalogue_country_of_publication_filter(self, q, name, value):
+        if value:
+            q &= Q(taggedentity__items__lot__catalogue__related_places__type__name='publication',
+                   taggedentity__items__lot__catalogue__related_places__place__country__in=value)
+        return q
+
+    def catalogue_tag_filter(self, q, name, value):
+        if value:
+            q &= Q(taggedentity__items__lot__catalogue__tags__tag__in=value)
+        return q
+
+    def catalogue_owner_religion_filter(self, q, name, value):
+        if value:
+            q &= Q(taggedentity__items__lot__catalogue__personcataloguerelation__role__name='owner',
+              taggedentity__items__lot__catalogue__personcataloguerelation__person__religiousaffiliation__religion__in=value)
+        return q
+
+
 # Item filter
 class ItemFilter(django_filters.FilterSet):
     short_title = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')

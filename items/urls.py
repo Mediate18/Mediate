@@ -48,6 +48,10 @@ urlpatterns = [
     # Tagged Item urls
     path('taggeditems/', login_required(TaggedItemTableView.as_view()), name='taggeditems'),
 
+    # EditionRanking urls
+    path(r'tags/rank', permission_required('global.view_all')(ItemTagRankingTableView.as_view()),
+         name='tags_ranking'),
+
     # ItemAuthor urls
     path('itemauthors/', permission_required('global.view_all')(ItemAuthorTableView.as_view()), name='itemauthors'),
     path(r'itemauthors/<uuid:pk>', permission_required('global.view_all')(ItemAuthorDetailView.as_view()),
