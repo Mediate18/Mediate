@@ -619,7 +619,8 @@ class WorkTable(tables.Table):
 class WorkRankingTable(WorkTable):
     row_index = tables.Column(empty_values=(), orderable=False, verbose_name="")
     item_count = tables.Column(empty_values=(), verbose_name=_("# items"))
-    catalogue_count = tables.Column(empty_values=(), verbose_name=_("# catalogues"))
+    catalogue_count = tables.Column(empty_values=(), verbose_name=_("# catalogues"),
+                                    order_by=("catalogue_count", "item_count"))
 
     class Meta:
         model = Work
