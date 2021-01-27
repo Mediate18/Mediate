@@ -29,6 +29,7 @@ from ..forms import *
 from ..filters import *
 from ..tables import *
 
+from catalogues.models import Category
 from persons.forms import PersonModelForm
 from mediate.views import GenericDetailView
 from simplemoderation.models import Moderation, ModerationAction
@@ -195,6 +196,12 @@ class ItemTableView(ListView):
                 'label': _("Add material details"),
                 'url': reverse_lazy('add_materialdetails_to_items'),
                 'form': ItemMaterialDetailsForm
+            },
+            {
+                'id': 'add_parisiancategories',
+                'label': _("Add Parisian categories"),
+                'url': reverse_lazy('add_parisiancategories_to_items'),
+                'form': ItemParisianCategoriesForm
             },
         ]
 
@@ -1324,6 +1331,26 @@ def add_materialdetails_to_items(request):
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
     else:
         raise Http404
+
+
+def add_parisian_category_to_items(request):
+    """
+    Add ParisianCategories to a list of items
+    :param request:
+    :return:
+    """
+    if request.method == 'POST':
+        if 'entries' in request.POST and 'parisian_category' in request.POST:
+            items = request.POST.getlist('entries')
+            parisian_category_id = request.POST.get('parisian_category')
+            categories = Category.objects.filter(lot__item__uuid__in=items)
+            categories.update(parisian_category_id=parisian_category_id)
+        else:
+            messages.add_message(request, messages.WARNING, _("No items and/or no Parisian categories selected."))
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    else:
+        raise Http404
+
 
 
 def set_publication_place_for_editions(request):
