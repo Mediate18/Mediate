@@ -9,7 +9,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 import uuid
 
 from persons.models import Place, Person
-from catalogues.models import Collection, Lot
+from catalogues.models import Collection, Lot, ParisianCategory
 from tagme.models import TaggedEntity
 
 from simplemoderation.tools import moderated
@@ -124,6 +124,7 @@ class Item(models.Model):
     index_in_lot = models.IntegerField(_("Index in the lot"))
     edition = models.ForeignKey('Edition', on_delete=models.PROTECT, related_name="items")  # See also the delete method
     non_book = models.BooleanField(default=False, editable=False)
+    parisian_category = models.ForeignKey(ParisianCategory, on_delete=SET_NULL, null=True, blank=True)
 
     tags = GenericRelation(TaggedEntity, related_query_name='items')
 
