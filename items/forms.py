@@ -436,7 +436,7 @@ class ItemMaterialDetailsForm(forms.ModelForm):
 
 class ItemParisianCategoriesForm(forms.ModelForm):
     class Meta:
-        model = Category
+        model = Item
         fields = ['parisian_category']
         widgets = {
             'parisian_category': ModelSelect2Widget(

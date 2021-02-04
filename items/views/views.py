@@ -1341,10 +1341,10 @@ def add_parisian_category_to_items(request):
     """
     if request.method == 'POST':
         if 'entries' in request.POST and 'parisian_category' in request.POST:
-            items = request.POST.getlist('entries')
+            item_ids = request.POST.getlist('entries')
+            items = Item.objects.filter(uuid__in=item_ids)
             parisian_category_id = request.POST.get('parisian_category')
-            categories = Category.objects.filter(lot__item__uuid__in=items)
-            categories.update(parisian_category_id=parisian_category_id)
+            items.update(parisian_category_id=parisian_category_id)
         else:
             messages.add_message(request, messages.WARNING, _("No items and/or no Parisian categories selected."))
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
