@@ -8,7 +8,8 @@ from .models import *
 from persons.models import Country, Profession, Religion
 from catalogues.models import Catalogue, ParisianCategory, PersonCatalogueRelation
 from mediate.tools import filter_multiple_words
-from mediate.filters import QBasedFilter
+from mediate.filters import QBasedFilterset, RangeFilterQ, MultipleChoiceFilterQWithExtraLookups, \
+    ModelMultipleChoiceFilterQ
 from viapy.api import ViafAPI
 import six
 
@@ -31,6 +32,86 @@ class PersonRoleMultipleChoiceField(django_filters.fields.MultipleChoiceField):
             return True
         except ValueError:
             return False
+
+
+class ItemTagRankingFilter(QBasedFilterset):
+    name = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
+    value = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
+    catalogue = ModelMultipleChoiceFilterQ(
+        label="Catalogue",
+        queryset=Catalogue.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Catalogue,
+            search_fields=['short_title__icontains']
+        ),
+        field_name='taggedentity__items__lot__catalogue',
+        lookup_expr='in'
+    )
+    catalogue_publication_year = RangeFilterQ(
+        label="Catalogue publication year",
+        widget=RangeWidget(),
+        field_name='taggedentity__items__lot__catalogue__year_of_publication'
+    )
+    catalogue_country_of_publication = ModelMultipleChoiceFilterQ(
+        label="Catalogue country of publication",
+        queryset=Country.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Country,
+            search_fields=['name__icontains']
+        ),
+        method='catalogue_country_of_publication_filter'
+    )
+    catalogue_tag = ModelMultipleChoiceFilterQ(
+        label="Catalogue tag",
+        queryset=Tag.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Tag,
+            search_fields=['namespace__icontains', 'name__icontains', 'value__icontains']
+        ),
+        method='catalogue_tag_filter'
+    )
+    catalogue_owner_religion = ModelMultipleChoiceFilterQ(
+        label="Catalogue owner religion",
+        queryset=Religion.objects.all().order_by('name'),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
+        method='catalogue_owner_religion_filter'
+    )
+
+    class Meta:
+        model = Tag
+        exclude = ['namespace', 'uuid']
+
+    # Override method
+    @property
+    def qs(self):
+        qs = super().qs
+        self._qs = qs.distinct() \
+            .annotate(item_count=Count('taggedentity__items', filter=Q(taggedentity__items__non_book=False), distinct=True)) \
+            .order_by('-item_count')
+        return self._qs
+
+    def multiple_words_filter(self, queryset, name, value):
+        return filter_multiple_words(self.filters[name].lookup_expr, queryset, name, value, wildcards=True)
+
+    def catalogue_country_of_publication_filter(self, q, name, value):
+        if value:
+            q &= Q(taggedentity__items__lot__catalogue__related_places__type__name='publication',
+                   taggedentity__items__lot__catalogue__related_places__place__country__in=value)
+        return q
+
+    def catalogue_tag_filter(self, q, name, value):
+        if value:
+            q &= Q(taggedentity__items__lot__catalogue__tags__tag__in=value)
+        return q
+
+    def catalogue_owner_religion_filter(self, q, name, value):
+        if value:
+            q &= Q(taggedentity__items__lot__catalogue__personcataloguerelation__role__name='owner',
+              taggedentity__items__lot__catalogue__personcataloguerelation__person__religiousaffiliation__religion__in=value)
+        return q
 
 
 # Item filter
@@ -106,7 +187,7 @@ class ItemFilter(django_filters.FilterSet):
         method='edition_place_filter'
     )
     edition_year = django_filters.RangeFilter(label="Date of publication", widget=RangeWidget(),
-                                                            field_name='edition__year')
+                                              field_name='edition__year', method='year_filter')
     edition_year_tag = django_filters.Filter(
         label="Date of publication tag",
         field_name='edition__year_tag',
@@ -223,6 +304,17 @@ class ItemFilter(django_filters.FilterSet):
             search_fields=['name__icontains']
         ),
         method='owner_religion_filter'
+    )
+    publisher = django_filters.ModelMultipleChoiceFilter(
+        label="Publisher",
+        queryset=Person.objects.filter(publisher__isnull=False).distinct(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Person,
+            queryset=Person.objects.filter(publisher__isnull=False).distinct(),
+            search_fields=['short_name__icontains', 'surname__icontains', 'first_names__icontains']
+        ),
+        field_name='edition__publisher__publisher'
     )
     language = django_filters.ModelMultipleChoiceFilter(
         label='Language',
@@ -366,6 +458,23 @@ class ItemFilter(django_filters.FilterSet):
             return queryset.filter(edition__place__in=value)
         return queryset
 
+    def year_filter(self, queryset, name, value):
+        if value:
+            if value.start and not value.stop:
+                q = Q(edition__year_start__gte=value.start) | Q(edition__year_end__gte=value.start)
+            elif value.stop and not value.start:
+                q = Q(edition__year_start__lte=value.stop)
+            else:  # value.start and value.end
+                # Either year_start  within value range
+                # or     year_end    within value range
+                # or     value range inside range of year_start to year_end
+                q = (Q(edition__year_start__gte=value.start) & Q(edition__year_start__lte=value.stop)) \
+                    | (Q(edition__year_end__gte=value.start) & Q(edition__year_end__lte=value.stop)) \
+                    | (Q(edition__year_start__lte=value.start) & Q(edition__year_end__gte=value.stop))
+
+            return queryset.filter(q)
+        return queryset
+
     def catalogue_filter(self, queryset, name, value):
         if value:
             return queryset.filter(lot__catalogue__in=value)
@@ -504,10 +613,79 @@ class ItemWorkRelationFilter(django_filters.FilterSet):
 
 
 # Language filter
-class LanguageFilter(django_filters.FilterSet):
+class LanguageFilter(QBasedFilterset):
+    catalogue = ModelMultipleChoiceFilterQ(
+        label="Catalogue",
+        queryset=Catalogue.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Catalogue,
+            search_fields=['short_title__icontains']
+        ),
+        field_name='items__item__lot__catalogue',
+        lookup_expr='in'
+    )
+    catalogue_publication_year = RangeFilterQ(
+        label="Catalogue publication year",
+        widget=RangeWidget(),
+        field_name='items__item__lot__catalogue__year_of_publication'
+    )
+    catalogue_country_of_publication = ModelMultipleChoiceFilterQ(
+        label="Catalogue country of publication",
+        queryset=Country.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Country,
+            search_fields=['name__icontains']
+        ),
+        method='catalogue_country_of_publication_filter'
+    )
+    catalogue_tag = ModelMultipleChoiceFilterQ(
+        label="Catalogue tag",
+        queryset=Tag.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Tag,
+            search_fields=['namespace__icontains', 'name__icontains', 'value__icontains']
+        ),
+        method='catalogue_tag_filter'
+    )
+    catalogue_owner_religion = ModelMultipleChoiceFilterQ(
+        label="Catalogue owner religion",
+        queryset=Religion.objects.all().order_by('name'),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
+        method='catalogue_owner_religion_filter'
+    )
+
     class Meta:
         model = Language
         exclude = ['uuid']
+
+    # Override method
+    @property
+    def qs(self):
+        qs = super().qs
+        self._qs = qs.distinct() \
+            .annotate(item_count=Count('items__item', filter=Q(items__item__non_book=False), distinct=True)) \
+            .order_by('-item_count')
+        return self._qs
+
+    def catalogue_country_of_publication_filter(self, q, name, value):
+        if value:
+            q &= Q(items__item__lot__catalogue__related_places__type__name='publication',
+                   items__item__lot__catalogue__related_places__place__country__in=value)
+        return q
+
+    def catalogue_tag_filter(self, q, name, value):
+        if value:
+            q &= Q(items__item__lot__catalogue__tags__tag__in=value)
+        return q
+
+    def catalogue_owner_religion_filter(self, q, name, value):
+        if value:
+            q &= Q(items__item__lot__catalogue__personcataloguerelation__role__name='owner',
+              items__item__lot__catalogue__personcataloguerelation__person__religiousaffiliation__religion__in=value)
+        return q
 
 
 # MaterialDetails filter
@@ -536,7 +714,11 @@ class PersonItemRelationRoleFilter(django_filters.FilterSet):
 # Edition filter
 class EditionFilter(django_filters.FilterSet):
     items = django_filters.Filter(field_name='items__short_title', lookup_expr='icontains')
-    year = django_filters.RangeFilter(widget=RangeWidget())
+    year = django_filters.RangeFilter(
+        label="Year of publication",
+        widget=RangeWidget(),
+        method='year_filter'
+    )
     year_tag = django_filters.Filter(lookup_expr='icontains')
     place = django_filters.ModelMultipleChoiceFilter(
         queryset=Place.objects.all(),
@@ -588,7 +770,24 @@ class EditionFilter(django_filters.FilterSet):
 
     class Meta:
         model = Edition
-        exclude = ['uuid']
+        exclude = ['uuid', 'year_start', 'year_end']
+
+    def year_filter(self, queryset, name, value):
+        if value:
+            if value.start and not value.stop:
+                q = Q(year_start__gte=value.start) | Q(year_end__gte=value.start)
+            elif value.stop and not value.start:
+                q = Q(year_start__lte=value.stop)
+            else:  # value.start and value.end
+                # Either year_start  within value range
+                # or     year_end    within value range
+                # or     value range inside range of year_start to year_end
+                q = (Q(year_start__gte=value.start) & Q(year_start__lte=value.stop)) \
+                    | (Q(year_end__gte=value.start) & Q(year_end__lte=value.stop)) \
+                    | (Q(year_start__lte=value.start) & Q(year_end__gte=value.stop))
+
+            return queryset.filter(q)
+        return queryset
 
     def has_url_filter(self, queryset, name, value):
         print("value", value, str(value), type(value))
@@ -659,21 +858,92 @@ class SubjectFilter(django_filters.FilterSet):
 
 
 # Work filter
-class WorkFilter(django_filters.FilterSet):
+class WorkFilter(QBasedFilterset):
     title = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
-    viaf_id = django_filters.Filter(method='viaf_id_filter')
+    catalogue_publication_year = RangeFilterQ(label="Catalogue publication year", widget=RangeWidget(),
+                                                        field_name='items__item__lot__catalogue__year_of_publication',
+                                                        lookup_expr='range')
+    catalogue_country = ModelMultipleChoiceFilterQ(
+        label="Catalogue country",
+        queryset=Country.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
+        field_name='items__item__lot__catalogue__related_places__place__country',
+        lookup_expr='in'
+    )
+    catalogue_city = ModelMultipleChoiceFilterQ(
+        label="Catalogue city",
+        queryset=Place.objects.all(),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
+        field_name='items__item__lot__catalogue__related_places__place',
+        lookup_expr='in'
+    )
+    catalogue_owner_gender = MultipleChoiceFilterQWithExtraLookups(
+        label="Catalogue owner gender",
+        choices=Person.SEX_CHOICES,
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
+        method='catalogue_owner_gender_filter'
+    )
+    catalogue_owner_religion = ModelMultipleChoiceFilterQ(
+        label="Catalogue owner religion",
+        queryset=Religion.objects.all().order_by('name'),
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
+        method='catalogue_owner_religion_filter'
+    )
+    item_count = django_filters.RangeFilter(
+        label="Item count",
+        widget=RangeWidget(),
+        method='item_count_filter'
+    )
 
     class Meta:
         model = Work
-        exclude = ['uuid']
+        exclude = ['viaf_id', 'uuid']
 
-    def viaf_id_filter(self, queryset, name, value):
-        if value:
-            return queryset.filter(viaf_id=ViafAPI.uri_base+"/"+value)
-        return queryset
+    # Override method
+    @property
+    def qs(self):
+        qs = super().qs
+        self._qs = qs.distinct()
+        return self._qs
 
     def multiple_words_filter(self, queryset, name, value):
         return filter_multiple_words(self.filters[name].lookup_expr, queryset, name, value)
+
+    def catalogue_owner_gender_filter(self, q, name, value):
+        if value:
+            q &= Q(items__item__lot__catalogue__personcataloguerelation__in=
+                                   PersonCatalogueRelation.objects.filter(role__name__iexact='owner',
+                                                                          person__sex__in=value))
+        return q
+
+    def catalogue_owner_religion_filter(self, q, name, value):
+        if value:
+            q &= Q(items__item__lot__catalogue__personcataloguerelation__role__name='owner',
+                items__item__lot__catalogue__personcataloguerelation__person__religiousaffiliation__religion__in=value)
+        return q
+
+    def item_count_filter(self, queryset, name, value):
+        # value is a slice object
+        if value.start or value.stop:
+            queryset = queryset.annotate(item_count=Count('items__item', distinct=True))
+            if value.start:
+                queryset = queryset.filter(item_count__gte=value.start)
+            if value.stop:
+                queryset = queryset.filter(item_count__lte=value.stop)
+        return queryset
+
+
+# Work Ranking filter
+class WorkRankingFilter(WorkFilter):
+    # Override method
+    @property
+    def qs(self):
+        qs = super().qs
+        self._qs = qs.distinct() \
+            .annotate(item_count=Count('items__item', distinct=True)) \
+            .annotate(catalogue_count=Count('items__item__lot__catalogue', distinct=True)) \
+            .order_by('-item_count')
+        return self._qs
 
 
 # WorkAuthor filter

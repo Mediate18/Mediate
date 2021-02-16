@@ -29,7 +29,7 @@ import items.urls
 import catalogues.urls
 import persons.urls
 import transcriptions.urls
-from dashboard.views import view_dashboard
+from dashboard.views import view_dashboard, view_totals
 
 from catalogues.views.api_views import *
 from items.views.api_views import *
@@ -105,6 +105,7 @@ urlpatterns = [
     path(r'persons/', include(persons.urls)),
     path(r'transcriptions/', include(transcriptions.urls)),
     path(r'dashboard/', login_required(view_dashboard), name='dashboard'),
+    path(r'totals/', view_totals, name='totals'),
     path(r'moderation/', include('simplemoderation.urls')),
     url(r'^api/', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),

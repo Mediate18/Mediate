@@ -471,7 +471,7 @@
                 {% if perms.items.change_edition %}
                 <tr>
                     <td>
-                        <a href="{% url 'editions' %}">Editions</a>
+                        <a href="{% url 'editions' %}">Editions</a> - <a href="{% url 'editions_ranking' %}">{% trans "rank by item count" %}</a>
                     </td>
                 </tr>
                 {% endif %}
@@ -481,6 +481,15 @@
                 <tr>
                     <td>
                         <a href="{% url 'publishers' %}">Publishers</a>
+                    </td>
+                </tr>
+                {% endif %}
+
+
+                {% if perms.items.change_item %}
+                <tr>
+                    <td>
+                        <a href="{% url 'tags_ranking' %}">Item tags</a>
                     </td>
                 </tr>
                 {% endif %}

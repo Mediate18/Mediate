@@ -10,12 +10,18 @@
 {% if extra_data %}
 
 <h3>Number of items per decade</h3>
-<span>{% trans "Total number of items:" %} {{ item_count_total }}</span> |
-<span>{% trans "Items without a date:" %} {{ item_count_without_year }}</span> |
-<span>{% trans "Number of items in the plot:" %} {{ item_count_in_plot }} ({{ item_percentage_in_plot }}% of total number of items)</span>
-<span class="glyphicon glyphicon-info-sign" title="{% blocktrans %}Only items with a publication year lower or equal to the maximum publication year of all catalogues ({{ max_publication_year }}) are used. {% endblocktrans %}"></span>
+<div>
+    <span>{% trans "Total number of items:" %} {{ item_count_total }}</span> |
+    <span>{% trans "Items without a date:" %} {{ item_count_without_year }}</span> |
+    <span>{% trans "Number of items in the plot:" %} {{ item_count_in_plot }} ({{ item_percentage_in_plot }}% of total number of items)</span>
+    <span class="glyphicon glyphicon-info-sign" title="{% blocktrans %}Only items with a publication year lower or equal to the maximum publication year of all catalogues ({{ max_publication_year }}) are used. {% endblocktrans %}"></span>
+</div>
 <div class="item_count_per_decade">
     <div id="item_count_per_decade__chart"></div>
+</div>
+<div class="pull-right">
+    <span class="glyphicon glyphicon-exclamation-sign"></span>
+    <span><small>Please note that when the publication date is a date range, only the start of the range is shown in this diagram.</small></span>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.13/c3.js"></script>

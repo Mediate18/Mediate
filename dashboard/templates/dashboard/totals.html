@@ -1,0 +1,213 @@
+{% extends "baselayout.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<h1>{% trans "Totals" %}</h1>
+
+<div class="row">
+    <div class="col-md-4 col-md-offset-4">
+        <table class="table">
+            <tbody>
+
+                {% if catalogues %}
+                <tr>
+                    <td>
+                        {{ catalogues }}
+                    </td>
+                    <td>
+                        <a href="{% url 'catalogues' %}">Catalogues</a>
+                    </td>
+                </tr>
+                {% endif %}
+
+                {% if book_items %}
+                <tr>
+                    <td>
+                        {{ book_items }}
+                    </td>
+                    <td>
+                        Book <a href="{% url 'items' %}">items</a>
+                    </td>
+                </tr>
+                {% endif %}
+
+                {% if non_book_items %}
+                <tr>
+                    <td>
+                        {{ non_book_items }}
+                    </td>
+                    <td>
+                        Non book <a href="{% url 'items' %}">items</a>
+                        {% if percentage_non_book_items %}
+                            ({{ percentage_non_book_items }}% of total)
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+
+                {% if works %}
+                <tr>
+                    <td>
+                        {{ works }}
+                    </td>
+                    <td>
+                        <a href="{% url 'works' %}">Works</a>
+                    </td>
+                </tr>
+                {% endif %}
+
+                {% if persons %}
+                <tr>
+                    <td>
+                        {{ persons }}
+                    </td>
+                    <td>
+                        <a href="{% url 'persons' %}">Persons</a>
+                        {% if female_persons %}
+                        (including {{ female_persons }} <a href="{% url 'persons' %}?sex=FEMALE">female</a>)
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+
+                {% if countries %}
+                <tr>
+                    <td>
+                        {{ countries }}
+                    </td>
+                    <td>
+                        <a href="{% url 'countries_ranking' %}">Countries</a>
+                    </td>
+                </tr>
+                {% endif %}
+
+                {% if cities %}
+                <tr>
+                    <td>
+                        {{ cities }}
+                    </td>
+                    <td>
+                        <a href="{% url 'places_ranking' %}">Cities</a> (places of birth, death, and publication)
+                    </td>
+                </tr>
+                {% endif %}
+
+                {% if languages %}
+                <tr>
+                    <td>
+                        {{ languages }}
+                    </td>
+                    <td>
+                        <a href="{% url 'languages' %}">Languages</a>
+                    </td>
+                </tr>
+                {% endif %}
+
+                <tr><td></td><td></td></tr>
+
+                {% if item_person_relations %}
+                <tr>
+                    <td>
+                        {{ item_person_relations }}
+                    </td>
+                    <td>
+                        Item-Person relations
+                        {% if percentage_item_person_relations %}
+                            ({{percentage_item_person_relations}}% of total number of book Items)
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+
+                {% if item_work_relations %}
+                <tr>
+                    <td>
+                        {{ item_work_relations }}
+                    </td>
+                    <td>
+                        Item-Work relations
+                        {% if percentage_item_work_relations %}
+                            ({{percentage_item_work_relations}}% of total number of book Items)
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+
+                {% if items_with_date %}
+                <tr>
+                    <td>
+                        {{ items_with_date }}
+                    </td>
+                    <td>
+                        Items with date
+                        {% if percentage_items_with_date %}
+                            ({{percentage_items_with_date}}% of total number of book Items)
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+
+                {% if items_with_place_of_publication %}
+                <tr>
+                    <td>
+                        {{ items_with_place_of_publication }}
+                    </td>
+                    <td>
+                        Items with <a href="{% url 'itemsmap' %}    ">place of publication</a>
+                        {% if percentage_items_with_place_of_publication %}
+                            ({{percentage_items_with_place_of_publication}}% of total number of book Items)
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+
+                {% if persons_with_place_of_birth %}
+                <tr>
+                    <td>
+                        {{ persons_with_place_of_birth }}
+                    </td>
+                    <td>
+                        Persons with <a href="{% url 'placesofbirth' %}">place of birth</a>
+                        {% if percentage_persons_with_place_of_birth %}
+                            ({{percentage_persons_with_place_of_birth}}% of total number of persons)
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+
+                {% if persons_with_place_of_death %}
+                <tr>
+                    <td>
+                        {{ persons_with_place_of_death }}
+                    </td>
+                    <td>
+                        Persons with <a href="{% url 'placesofdeath' %}">place of death</a>
+                        {% if percentage_persons_with_place_of_death %}
+                            ({{percentage_persons_with_place_of_death}}% of total number of persons)
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+
+                {% if books_with_language %}
+                <tr>
+                    <td>
+                        {{ books_with_language }}
+                    </td>
+                    <td>
+                        Books with language
+                        {% if percentage_books_with_language %}
+                            ({{percentage_books_with_language}}% of total number of books)
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+{% endblock %}

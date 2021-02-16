@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 import itertools
 
 from .models import *
+from tagme.models import Tag
 
 from mediate.columns import ActionColumn
 
@@ -41,7 +42,6 @@ class ItemTable(tables.Table):
          text=format_html('<span class="glyphicon glyphicon-list" data-toggle="tooltip" data-original-title="Manage people"></span>'),
          args=[A('pk')], orderable=False, empty_values=())
     languages = tables.Column(empty_values=(), verbose_name=_("Languages"), orderable=False)
-    parisian_category = tables.Column(accessor='lot.category.parisian_category')
     item_type = tables.Column(empty_values=(), orderable=False)
     tags = tables.Column(empty_values=(), orderable=False)
 
@@ -297,6 +297,26 @@ class TaggedItemTable(tables.Table):
         return record.number_of_volumes or ""
 
 
+# Item Tag ranking table
+class ItemTagRankingTable(tables.Table):
+    row_index = tables.Column(empty_values=(), orderable=False, verbose_name="")
+    item_count = tables.Column(empty_values=(), verbose_name=_("# items"))
+
+    class Meta:
+        model = Tag
+        attrs = {'class': 'table table-sortable'}
+        fields = [
+            'row_index',
+            'item_count',
+            'name',
+            'value',
+        ]
+
+    def render_row_index(self):
+        self.row_index = getattr(self, 'row_index', itertools.count(self.page.start_index()))
+        return next(self.row_index)
+
+
 # ItemAuthor table
 class ItemAuthorTable(tables.Table):
     uuid = ActionColumn('itemauthor_detail', 'change_itemauthor', 'delete_itemauthor', orderable=False)
@@ -386,6 +406,8 @@ class ItemWorkRelationTable(tables.Table):
 
 # Language table
 class LanguageTable(tables.Table):
+    row_index = tables.Column(empty_values=(), orderable=False, verbose_name="")
+    item_count = tables.Column(empty_values=(), verbose_name=_("# items"))
     uuid = ActionColumn('language_detail', 'change_language', 'delete_language',
                         orderable=False)
 
@@ -393,12 +415,24 @@ class LanguageTable(tables.Table):
         model = Language
         attrs = {'class': 'table table-sortable'}
         sequence = [
+            'row_index',
+            'item_count',
             'name',
             'language_code_2char',
             'language_code_3char',
             'description',
             'uuid'
         ]
+
+    def render_row_index(self):
+        self.row_index = getattr(self, 'row_index', itertools.count(self.page.start_index()))
+        return next(self.row_index)
+
+    def render_item_count(self, record):
+        return format_html(
+            '<a href="{}?language={}">{}</a>'.format(reverse_lazy('items'), record.uuid, record.item_count)
+        )
+
 
 
 # MaterialDetails table
@@ -453,13 +487,14 @@ class EditionTable(tables.Table):
     place = tables.RelatedLinkColumn()
     url = tables.Column(linkify=lambda record: record.url)
     publisher = tables.Column(verbose_name=_("Publisher"), empty_values=())
+    year_of_publication = tables.Column(empty_values=(), verbose_name=_("Year of publication"))
 
     class Meta:
         model = Edition
         attrs = {'class': 'table table-sortable'}
         sequence = [
             'items',
-            'year',
+            'year_of_publication',
             'year_tag',
             'terminus_post_quem',
             'place',
@@ -468,6 +503,7 @@ class EditionTable(tables.Table):
             'uuid',
             'checkbox'
         ]
+        exclude = ['year_start', 'year_end']
 
     def render_items(self, record):
         items = Item.objects.filter(edition=record).distinct()
@@ -489,7 +525,12 @@ class EditionTable(tables.Table):
         return format_html(
             '<input id="{}" class="checkbox" type="checkbox" name="checkbox"/>'.format(record.uuid)
         )
-
+    
+    def render_year_of_publication(self, record):
+        year_range_str = "{}".format(record.year_start) if record.year_start else "?"
+        year_range_str += " - {}".format(record.year_end) if record.year_end else ""
+        year_range_str = "—" if year_range_str == "?" else year_range_str
+        return year_range_str
 
 
 # EditionRanking table
@@ -506,7 +547,7 @@ class EditionRankingTable(EditionTable):
             'item_count',
             'catalogue_count',
             'items',
-            'year',
+            'year_of_publication',
             'year_tag',
             'terminus_post_quem',
             'place',
@@ -515,11 +556,11 @@ class EditionRankingTable(EditionTable):
             'uuid',
             'checkbox'
         ]
+        exclude = ['year_start', 'year_end']
 
     def render_row_index(self):
         self.row_index = getattr(self, 'row_index', itertools.count(self.page.start_index()))
         return next(self.row_index)
-
 
 
 # Publisher table
@@ -571,6 +612,30 @@ class WorkTable(tables.Table):
             ))
         else:
             return format_html('-')
+
+
+# WorkRanking table
+class WorkRankingTable(WorkTable):
+    row_index = tables.Column(empty_values=(), orderable=False, verbose_name="")
+    item_count = tables.Column(empty_values=(), verbose_name=_("# items"))
+    catalogue_count = tables.Column(empty_values=(), verbose_name=_("# catalogues"),
+                                    order_by=("catalogue_count", "item_count"))
+
+    class Meta:
+        model = Work
+        attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'row_index',
+            'item_count',
+            'catalogue_count',
+            'title',
+            'viaf_id',
+            'uuid'
+        ]
+
+    def render_row_index(self):
+        self.row_index = getattr(self, 'row_index', itertools.count(self.page.start_index()))
+        return next(self.row_index)
 
 
 # WorkAuthor table

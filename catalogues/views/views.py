@@ -53,8 +53,8 @@ class CatalogueTableView(ListView):
         context['max_publication_year'] = max_publication_year
 
         item_count_per_decade = Item.objects\
-            .filter(lot__catalogue__in=filter.qs, edition__year__lte=max_publication_year)\
-            .annotate(decade=10 * Substr('edition__year', 1, Length('edition__year') - 1))\
+            .filter(lot__catalogue__in=filter.qs, edition__year_start__lte=max_publication_year)\
+            .annotate(decade=10 * Substr('edition__year_start', 1, Length('edition__year_start') - 1))\
             .values('decade')\
             .order_by('decade')\
             .annotate(count=Count('decade'))
@@ -65,9 +65,9 @@ class CatalogueTableView(ListView):
 
         item_count_total = Item.objects.filter(lot__catalogue__in=filter.qs).count()
         context['item_count_total'] = item_count_total
-        item_count_without_year = Item.objects.filter(lot__catalogue__in=filter.qs, edition__year__isnull=True).count()
+        item_count_without_year = Item.objects.filter(lot__catalogue__in=filter.qs, edition__year_start__isnull=True).count()
         context['item_count_without_year'] = item_count_without_year
-        item_count_in_plot = Item.objects.filter(lot__catalogue__in=filter.qs, edition__year__lte=max_publication_year).count()
+        item_count_in_plot = Item.objects.filter(lot__catalogue__in=filter.qs, edition__year_start__lte=max_publication_year).count()
         context['item_count_in_plot'] = item_count_in_plot
         context['item_percentage_in_plot'] = int(100 * item_count_in_plot / item_count_total) if item_count_total != 0 else 0
 

@@ -257,7 +257,7 @@ class ParisianCategory(models.Model):
         verbose_name_plural = "parisian categories"
 
     def __str__(self):
-        return "{} ({})".format(self.name, self.description)
+        return "{} ({})".format(self.name, self.description) if self.description else self.name
 
 
 class Category(models.Model):

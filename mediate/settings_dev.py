@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'django_select2',
     'dal',
     'dal_select2',
+    'django_extensions',
     'viapy',
     'dbbackup',
     'maintenance_mode',

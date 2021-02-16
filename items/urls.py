@@ -41,9 +41,19 @@ urlpatterns = [
              name='add_tags_to_items'),
     path('items/add_works_to_items', permission_required('items.change_itemworkrelation')(add_works_to_items),
              name='add_works_to_items'),
+    path('items/add_materialdetails_to_items',
+         permission_required('items.change_itemmaterialdetailsrelation')(add_materialdetails_to_items),
+         name='add_materialdetails_to_items'),
+    path('items/add_parisiancategories_to_items',
+         permission_required('catalogues.change_category')(add_parisian_category_to_items),
+         name='add_parisiancategories_to_items'),
 
     # Tagged Item urls
     path('taggeditems/', login_required(TaggedItemTableView.as_view()), name='taggeditems'),
+
+    # EditionRanking urls
+    path(r'tags/rank', permission_required('global.view_all')(ItemTagRankingTableView.as_view()),
+         name='tags_ranking'),
 
     # ItemAuthor urls
     path('itemauthors/', permission_required('global.view_all')(ItemAuthorTableView.as_view()), name='itemauthors'),
@@ -280,6 +290,10 @@ urlpatterns = [
        name="change_work"),
     path(r'works/delete/<uuid:pk>', permission_required('items.delete_work')(WorkDeleteView.as_view()),
        name="delete_work"),
+    
+    # WorkRanking urls
+    path(r'works/rank', permission_required('global.view_all')(WorkRankingTableView.as_view()),
+         name='works_ranking'),
 
     # WorkAuthor urls
     path('workauthors/', permission_required('global.view_all')(WorkAuthorTableView.as_view()), name='workauthors'),

@@ -29,6 +29,7 @@ from ..forms import *
 from ..filters import *
 from ..tables import *
 
+from catalogues.models import Category
 from persons.forms import PersonModelForm
 from mediate.views import GenericDetailView
 from simplemoderation.models import Moderation, ModerationAction
@@ -189,7 +190,19 @@ class ItemTableView(ListView):
                 'label': _("Add works"),
                 'url': reverse_lazy('add_works_to_items'),
                 'form': ItemWorksForm
-            }
+            },
+            {
+                'id': 'add_materialdetails',
+                'label': _("Add material details"),
+                'url': reverse_lazy('add_materialdetails_to_items'),
+                'form': ItemMaterialDetailsForm
+            },
+            {
+                'id': 'add_parisiancategories',
+                'label': _("Add Parisian categories"),
+                'url': reverse_lazy('add_parisiancategories_to_items'),
+                'form': ItemParisianCategoriesForm
+            },
         ]
 
         context['per_page_choices'] = [25, 50, 100, 500, 1000]
@@ -268,6 +281,28 @@ class TaggedItemTableView(ListView):
         }
 
         return context
+
+
+class ItemTagRankingTableView(ListView):
+    model = Tag
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return Tag.objects.filter(namespace__iexact='item')
+
+    def get_context_data(self, **kwargs):
+        context = super(ItemTagRankingTableView, self).get_context_data(**kwargs)
+        filter = ItemTagRankingFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = ItemTagRankingTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+        context['object_name'] = "tag"
+
+        return context
+
 
 
 class ItemLocationMapView(ListView):
@@ -1274,6 +1309,52 @@ def add_works_to_items(request):
         raise Http404
 
 
+def add_materialdetails_to_items(request):
+    """
+    Add Material_details to a list of items
+    :param request:
+    :return:
+    """
+    if request.method == 'POST':
+        if 'entries' in request.POST and 'material_details' in request.POST:
+            items = request.POST.getlist('entries')
+            material_details_objects = request.POST.getlist('material_details')
+            for material_details_id in material_details_objects:
+                material_details = MaterialDetails.objects.get(uuid=material_details_id)
+                for item_id in items:
+                    item = Item.objects.get(uuid=item_id)
+                    try:
+                        ItemMaterialDetailsRelation.objects.create(item=item, material_details=material_details)
+                    except IntegrityError:
+                        # Unique constraint failed; the ItemItemTypeRelation already exists
+                        pass
+        else:
+            messages.add_message(request, messages.WARNING, _("No items and/or no material details selected."))
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    else:
+        raise Http404
+
+
+def add_parisian_category_to_items(request):
+    """
+    Add ParisianCategories to a list of items
+    :param request:
+    :return:
+    """
+    if request.method == 'POST':
+        if 'entries' in request.POST and 'parisian_category' in request.POST:
+            item_ids = request.POST.getlist('entries')
+            items = Item.objects.filter(uuid__in=item_ids)
+            parisian_category_id = request.POST.get('parisian_category')
+            items.update(parisian_category_id=parisian_category_id)
+        else:
+            messages.add_message(request, messages.WARNING, _("No items and/or no Parisian categories selected."))
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    else:
+        raise Http404
+
+
+
 def set_publication_place_for_editions(request):
     """
     Set the publication place for a list of editions
@@ -1451,7 +1532,7 @@ class EditionRankingTableView(ListView):
 
 class EditionDetailView(GenericDetailView):
     model = Edition
-    object_fields = ['year', 'year_tag', 'terminus_post_quem', 'place', 'url']
+    object_fields = ['year_start', 'year_end', 'year_tag', 'terminus_post_quem', 'place', 'url']
 
 
 class EditionCreateView(CreateView):
@@ -1625,6 +1706,31 @@ class WorkTableView(ListView):
         context['add_url'] = reverse_lazy('add_work')
 
         return context
+
+
+class WorkRankingTableView(ListView):
+    model = Work
+    template_name = 'generic_list.html'
+
+    def get_queryset(self):
+        return Work.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(WorkRankingTableView, self).get_context_data(**kwargs)
+        filter = WorkRankingFilter(self.request.GET, queryset=self.get_queryset())
+
+        table = WorkRankingTable(filter.qs)
+        django_tables2.RequestConfig(self.request, ).configure(table)
+
+        context['filter'] = filter
+        context['table'] = table
+
+        context['action'] = _("add")
+        context['object_name'] = "work"
+        context['add_url'] = reverse_lazy('add_work')
+
+        return context
+
 
 
 class WorkDetailView(GenericDetailView):

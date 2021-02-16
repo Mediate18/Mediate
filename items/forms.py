@@ -4,6 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from django_select2.forms import Select2Widget, ModelSelect2Widget, ModelSelect2MultipleWidget
 from apiconnectors.widgets import ApiSelectWidget
 from .models import *
+from catalogues.models import Category, ParisianCategory
 
 from tagme.models import Tag
 from betterforms.multiform import MultiModelForm
@@ -417,6 +418,30 @@ class ItemWorksForm(forms.ModelForm):
             'work': ModelSelect2MultipleWidget(
                 model=Work,
                 search_fields=['title__icontains']
+            )
+        }
+
+
+class ItemMaterialDetailsForm(forms.ModelForm):
+    class Meta:
+        model = ItemMaterialDetailsRelation
+        fields = ['material_details']
+        widgets = {
+            'material_details': ModelSelect2MultipleWidget(
+                model=MaterialDetails,
+                search_fields=['description__icontains']    
+            )
+        }
+
+
+class ItemParisianCategoriesForm(forms.ModelForm):
+    class Meta:
+        model = Item
+        fields = ['parisian_category']
+        widgets = {
+            'parisian_category': ModelSelect2Widget(
+                model=ParisianCategory,
+                search_fields=['name__icontains', 'description__icontains']
             )
         }
 

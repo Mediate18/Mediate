@@ -54,8 +54,10 @@ class GenericDetailView(DetailView):
         context['object_name'] = self.model.__name__
 
         if hasattr(self, 'object_fields'):
-            context['object_dict'] = dict([(field.replace('_', ' '), getattr(obj, field))
-                                           for field in self.object_fields])
+            context['object_dict'] = dict([
+                (field.replace('_', ' '), getattr(obj, field) if getattr(obj, field) is not None else '-')
+                for field in self.object_fields
+            ])
 
         context['edit_url'] = reverse_lazy('change_' + self.model.__name__.lower(), args=[obj.pk])
         return context

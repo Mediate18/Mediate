@@ -221,6 +221,28 @@ class CountryTable(tables.Table):
         ]
 
 
+# Country table
+class CountryRankingTable(CountryTable):
+    row_index = tables.Column(empty_values=(), orderable=False, verbose_name="")
+    item_count = tables.Column(empty_values=(), verbose_name=_("# items"))
+    catalogue_count = tables.Column(empty_values=(), verbose_name=_("# catalogues"))
+
+    class Meta:
+        model = Country
+        attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'row_index',
+            'item_count',
+            'catalogue_count',
+            'name',
+            'uuid'
+        ]
+
+    def render_row_index(self):
+        self.row_index = getattr(self, 'row_index', itertools.count(self.page.start_index()))
+        return next(self.row_index)
+
+
 # Place table
 class PlaceTable(tables.Table):
     uuid = ActionColumn('place_detail', 'change_place', 'delete_place',
@@ -266,12 +288,14 @@ class PlaceRankingTable(PlaceTable):
         filter = kwargs.pop('filter', None)
         super().__init__(*args, **kwargs)
         self.year = filter.get_year_range()
+        self.catalogues = filter.get_catalogues()
 
     def render_row_index(self):
         self.row_index = getattr(self, 'row_index', itertools.count(self.page.start_index()))
         return next(self.row_index)
 
     def render_person_count(self, record):
+        catalogues_query = Q(personitemrelation__item__lot__catalogue__in=self.catalogues) if self.catalogues else Q()
         if self.year:
             year = self.year
             if year[0] and year[1]:
@@ -279,23 +303,24 @@ class PlaceRankingTable(PlaceTable):
                     .filter(Q(residence__place=record, residence__start_year__gte=year[0], residence__end_year__lte=year[1])
                             | Q(city_of_birth=record, date_of_birth__gte=year[0], date_of_birth__lte=year[1])
                             | Q(city_of_death=record, date_of_death__gte=year[0], date_of_death__lte=year[1])) \
-                    .distinct().count()
+                    .filter(catalogues_query).distinct().count()
             elif year[0]:
                 return Person.objects \
-                    .filter(
-                    Q(residence__place=record, residence__start_year__gte=year[0])
-                    | Q(city_of_birth=record, date_of_birth__gte=year[0])
-                    | Q(city_of_death=record, date_of_death__gte=year[0])) \
-                    .distinct().count()
+                    .filter(Q(residence__place=record, residence__start_year__gte=year[0])
+                            | Q(city_of_birth=record, date_of_birth__gte=year[0])
+                            | Q(city_of_death=record, date_of_death__gte=year[0])) \
+                    .filter(catalogues_query).distinct().count()
             elif year[1]:
                 return Person.objects \
                     .filter(
                     Q(residence__place=record, residence__end_year__lte=year[1])
                     | Q(city_of_birth=record, date_of_birth__lte=year[1])
                     | Q(city_of_death=record, date_of_death__lte=year[1])) \
-                    .distinct().count()
-        else:
-            return Person.objects.filter(Q(residence__place=record) | Q(city_of_birth=record) | Q(city_of_death=record))\
+                    .filter(catalogues_query).distinct().count()
+
+        # Default
+        return Person.objects.filter(Q(residence__place=record) | Q(city_of_birth=record) | Q(city_of_death=record))\
+                .filter(catalogues_query) \
                 .distinct().count()
 
 
