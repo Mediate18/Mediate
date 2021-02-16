@@ -305,7 +305,7 @@ class EditionTests(GenericCRUDTestMixin, TestCase):
     def get_add_form_data(self):
         place, created = Place.objects.get_or_create(name="name test")
         return {
-            'year': 1678,
+            'year_start': 1678,
             'year_tag': 'year_tag test',
             'terminus_post_quem': False,
             'place_id': place.pk,

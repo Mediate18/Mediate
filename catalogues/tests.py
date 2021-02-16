@@ -74,8 +74,8 @@ class CatalogueTests(GenericCRUDTestMixin, TestCase):
 
         # Create two Edition
         from items.models import Item, Edition
-        edition1 = Edition.objects.create(year=1111)
-        edition2 = Edition.objects.create(year=2222)
+        edition1 = Edition.objects.create(year_start=1111)
+        edition2 = Edition.objects.create(year_start=2222)
 
         # Create three Items. The third makes Edition2 link to two different Catalogues
         item1 = Item.objects.create(short_title="item1", lot=lot1, edition=edition1, index_in_lot=1)
