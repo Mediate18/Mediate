@@ -8,9 +8,6 @@ from django_select2.forms import Select2MultipleWidget, ModelSelect2MultipleWidg
 from django_filters.widgets import RangeWidget
 from django.utils.safestring import mark_safe
 
-import six
-from django_filters.filters import Lookup
-
 from mediate.tools import filter_multiple_words
 from mediate.filters import QBasedFilter, RangeFilterQ, RangeRangeFilterQ, MultipleChoiceFilterQWithExtraLookups, \
     ModelMultipleChoiceFilterQ, ModelMultipleChoiceFilterQWithExtraLookups, QBasedFilterset
