@@ -1551,7 +1551,7 @@ class EditionCreateView(CreateView):
 class EditionUpdateView(View):
     def get(self, request, **kwargs):
         obj = get_object_or_404(Edition, pk=kwargs['pk'])
-        if obj.items.count() is not 1:
+        if obj.items.count() != 1:
             messages.add_message(request, messages.WARNING,
                              _("Edition ({}) does not have exactly one item.".format(obj)))
             return HttpResponseRedirect(self.request.META['HTTP_REFERER'])

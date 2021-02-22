@@ -34,7 +34,7 @@ class GenericCRUDTestMixin:
         if hasattr(self, 'url_names'):
             if verb in self.url_names:
                 return self.url_names[verb]
-        if verb is 'list':
+        if verb == 'list':
             return self.model.__name__.lower() + 's'
         if postfix:
             return self.model.__name__.lower() + '_' + verb
