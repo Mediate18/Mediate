@@ -97,11 +97,6 @@ class Catalogue(models.Model):
         from items.models import Edition  # To prevent an import error (probably circular imports)
         editions = list(Edition.objects.filter(items__lot__catalogue=self).values_list('uuid', flat=True))
 
-        # TODO this is a workaround for the following error that popped up when upgrading from Django 2.1 to 2.2:
-        #      django.db.utils.IntegrityError: FOREIGN KEY constraint failed
-        # Delete all Lots of this Catalogue
-        Lot.objects.filter(catalogue=self).delete()
-
         # Delete the catalogue
         super().delete(*args, **kwargs)
 
