@@ -16,7 +16,7 @@ django-simple-history==2.7.2
 django-tables2==2.2.1
 -e git+https://github.com/Mediate18/django-tagging.git@a566fe44661d01d714846fafd4e626ad071a4bcb#egg=django_tagging
 django-test-without-migrations==0.6
-djangorestframework==3.9.1
+djangorestframework==3.11.2
 mysqlclient==2.0.3
 python-decouple==3.1
 sqlparse==0.3.0
