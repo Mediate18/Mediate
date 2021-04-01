@@ -167,7 +167,7 @@ class Command(BaseCommand):
                                     year = None
                                     year_tag = ""
 
-                                edition = Edition(place=place, year=year, year_tag=year_tag)
+                                edition = Edition(place=place, year_start=year, year_tag=year_tag)
                                 print_obj(edition)
                                 edition.save()
 
