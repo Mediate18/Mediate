@@ -175,7 +175,7 @@ class CollectionFilter(django_filters.FilterSet):
 
     class Meta:
         model = Collection
-        fields = ['name']
+        fields = ['name', 'dataset']
 
 
 # CollectionYear filter

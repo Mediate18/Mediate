@@ -143,6 +143,7 @@ class CollectionTable(tables.Table):
         attrs = {'class': 'table table-sortable'}
         sequence = [
             'name',
+            'dataset',
             'uuid'
         ]
 

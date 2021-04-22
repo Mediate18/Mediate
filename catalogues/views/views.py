@@ -382,7 +382,7 @@ class CollectionTableView(ListView):
 
 class CollectionDetailView(GenericDetailView):
     model = Collection
-    object_fields = ['name']
+    object_fields = ['name', 'dataset']
 
 
 class CollectionCreateView(CreateView):
