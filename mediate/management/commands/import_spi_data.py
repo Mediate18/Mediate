@@ -31,6 +31,8 @@ class Command(BaseCommand):
         parser.add_argument('-m', '--multiple_catalogues_per_collection',
                             action='store_true',
                             help='Allow for multiple catalogues per collection')
+        parser.add_argument('-d', '--dataset_name', type=str,
+                            help='Name of the dataset the collection/catalogue must put into')
 
     @transaction.atomic
     def handle(self, *args, **kwargs):
@@ -38,6 +40,7 @@ class Command(BaseCommand):
         database_path = kwargs['database_path']
         catalogue_ids_filename = kwargs['catalogue_ids_filename']
         self.multiple_catalogues_per_collection = kwargs.get('multiple_catalogues_per_collection', False)
+        self.dataset_name = kwargs.get('dataset_name', "Dump")
 
         # Read catalogue IDs
         if catalogue_ids_filename:
@@ -222,6 +225,7 @@ class Command(BaseCommand):
                 # Only use a collection that is new or that does not have any catalogues linked to it.
                 collection, created = catalogues.models.Collection.objects.get_or_create(name=row['short_title'])
                 if created:
+                    collection.dataset = catalogues.models.Dataset.objects.get(name=self.dataset_name)
                     collection.save()
                 else:
                     if collection.catalogue_set.count() != 0 and not self.multiple_catalogues_per_collection:
