@@ -14,12 +14,25 @@ from tagme.models import TaggedEntity
 from simplemoderation.tools import moderated
 
 
+class Dataset(models.Model):
+    """
+    The dataset a collection belongs to
+    """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(_("Name"), max_length=128, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
+
 class Collection(models.Model):
     """
     The collection a catalogue belongs to
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("Name"), max_length=128, unique=True)
+    dataset = models.ForeignKey(Dataset, on_delete=models.PROTECT)
 
     def __str__(self):
         return self.name
