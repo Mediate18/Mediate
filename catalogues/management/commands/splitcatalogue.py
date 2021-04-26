@@ -51,7 +51,8 @@ class Command(BaseCommand):
             return
 
         with transaction.atomic():
-            new_collection = Collection.objects.create(name=new_catalogue_name)
+            new_collection = Collection.objects.create(name=new_catalogue_name,
+                                                       dataset=catalogue.collection.dataset)
             new_catalogue = Catalogue.objects.create(short_title=new_catalogue_name, collection=new_collection)
             print("New catalogue URL:", new_catalogue.get_absolute_url())
             lots_to_move = Lot.objects.filter(catalogue=catalogue, index_in_catalogue__gte=lot.index_in_catalogue)\
