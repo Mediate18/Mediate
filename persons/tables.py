@@ -9,6 +9,7 @@ from .models import *
 from mediate.columns import ActionColumn
 from catalogues.models import PersonCatalogueRelation, Catalogue, CataloguePlaceRelation
 from items.models import PersonItemRelation, Edition
+from apiconnectors.cerlapi import cerl_record_url
 from django.utils.translation import ugettext_lazy as _
 
 from collections import defaultdict
