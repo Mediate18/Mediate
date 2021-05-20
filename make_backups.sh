@@ -62,7 +62,12 @@ DBBACKUP_FILE=${FILENAME_PREFIX}_backup.sql
 echo -e "\n--- Backing up the database ---" | tee -a $BACKUP_LOG
 cd $WORKING_DIR &&
 . $VIRTUALENV_DIR/bin/activate &&
-python manage.py dbbackup --noinput -O $BACKUP_DIR/$DBBACKUP_FILE 2>&1 | tee -a $BACKUP_LOG
+
+# MH: As of may 20, 2021 the next line give the error "Error: 'Access denied; you need (at least one of) the PROCESS privilege(s) for this operation' when trying to dump tablespaces\nmysqldump: Got errno 28 on write"
+#python manage.py dbbackup --noinput -O $BACKUP_DIR/$DBBACKUP_FILE 2>&1 | tee -a $BACKUP_LOG
+
+DB_PASSWORD=$(grep DB_PASSWORD .env | perl -pe 's/.*?=//')
+mysqldump mediatedb_test --quick --host=mysql-mediatedb.science.ru.nl --user=mediatedb_admin --password=$DB_PASSWORD --no-tablespaces > $BACKUP_DIR/$DBBACKUP_FILE 2> >(tee -a $BACKUP_LOG)
 gzip $BACKUP_DIR/$DBBACKUP_FILE
 
 # Backup media file
