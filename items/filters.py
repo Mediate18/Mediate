@@ -356,6 +356,14 @@ class ItemFilter(django_filters.FilterSet):
         ),
         method='catalogue_tag_filter'
     )
+    works = django_filters.ModelMultipleChoiceFilter(
+        queryset=Work.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Work,
+            search_fields=['title__icontains', 'viaf_id__icontains']
+        ),
+    )
 
     class Meta:
         model = Item
