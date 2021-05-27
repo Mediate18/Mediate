@@ -81,6 +81,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'maintenance_mode.middleware.MaintenanceModeMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
+    'mediate.middleware.DatasetMiddleware',
 ]
 
 ROOT_URLCONF = 'mediate.urls'
@@ -258,3 +259,5 @@ AVAILABLE_LAYOUTS = [
 MAINTENANCE_MODE = config('MAINTENANCE_MODE', False, cast=bool)
 
 TEST_WITHOUT_MIGRATIONS_COMMAND = 'django_nose.management.commands.test.Command'
+
+DATASET_NAME_FOR_ANONYMOUSUSER = "Sandbox"
