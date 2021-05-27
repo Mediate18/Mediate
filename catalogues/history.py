@@ -2,6 +2,7 @@ from simple_history import register
 from .models import *
 
 
+register(Dataset)
 register(Collection)
 register(CollectionYear)
 register(CatalogueType)

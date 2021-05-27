@@ -1,6 +1,7 @@
 from django.contrib import admin
 from simple_history.admin import SimpleHistoryAdmin
 from .models import *
+from guardian.admin import GuardedModelAdmin
 
 
 @admin.register(Catalogue)
@@ -30,4 +31,9 @@ class PersonCollectionRelationAdmin(SimpleHistoryAdmin):
 
 @admin.register(Collection)
 class CollectionAdmin(SimpleHistoryAdmin):
+    pass
+
+
+@admin.register(Dataset)
+class DatasetAdmin(GuardedModelAdmin, SimpleHistoryAdmin):
     pass
