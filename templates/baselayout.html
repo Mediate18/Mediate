@@ -14,6 +14,8 @@
 {% load static %}
 {% load staticfiles %}
 
+{% load json_dict %}
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -39,6 +41,11 @@
             </div>
 		</div>
         {% endif %}
+        <div>
+            <div class="navbar-brand">
+            <span class="label label-info">Dataset: {{ request.session.dataset|json_lookup:"name" }}</span>
+            </div>
+		</div>
         {% if user.is_superuser %}
         <div>
             <div class="navbar-brand">

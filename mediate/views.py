@@ -2,10 +2,22 @@ from django.contrib.auth.decorators import permission_required
 from django.utils.translation import ugettext_lazy as _
 import os
 import mimetypes
+import json
 from django.conf import settings
 from django.http import Http404, HttpResponse
 from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
+from django.shortcuts import render, redirect
+from django.contrib.auth.signals import user_logged_in
+
+from mediate.forms import SelectDatasetForm
+
+# When a user logs in, he/she should choose a Dataset.
+# To make this happen, set dataset in session to None after login.
+def login_handler(sender, user, request, **kwargs):
+    request.session['dataset'] = None
+
+user_logged_in.connect(login_handler)
 
 
 @permission_required('global.view_all')
@@ -61,3 +73,21 @@ class GenericDetailView(DetailView):
 
         context['edit_url'] = reverse_lazy('change_' + self.model.__name__.lower(), args=[obj.pk])
         return context
+
+
+def select_dataset(request):
+    """
+    Select a Dataset for the current session
+    :param request:
+    :return:
+    """
+    if request.method == 'POST':
+        form = SelectDatasetForm(request.POST)
+        if form.is_valid():
+            request.session['dataset'] = json.dumps({'uuid': str(form.cleaned_data['dataset'].uuid),
+                                                     'name': form.cleaned_data['dataset'].name})
+            return redirect('dashboard')
+    else:
+        form = SelectDatasetForm()
+
+    return render(request, 'generic_form.html', {'form': form})

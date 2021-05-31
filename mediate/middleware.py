@@ -1,5 +1,11 @@
 from django.conf import settings
+from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from catalogues.models import Dataset
+from mediate.forms import SelectDatasetForm
+from catalogues.models import Dataset
+
+import json
 
 class DatasetMiddleware:
     """
@@ -14,17 +20,18 @@ class DatasetMiddleware:
         dataset = request.session.get('dataset', None)
         if not dataset:
             if request.user.is_authenticated:
-                # Show Dataset select page
-                pass
+                if request.path == reverse_lazy('select_dataset'):
+                    # Don't change anything to the request - response cycle
+                    response = self.get_response(request)
+                    return response
+                if request.path != reverse_lazy('logout') and not request.is_ajax():
+                    # Show Dataset select page
+                    return redirect(reverse_lazy('select_dataset'))
             else:
                 # Set default dataset for AnonymousUser
                 default_dataset = Dataset.objects.get(name=settings.DATASET_NAME_FOR_ANONYMOUSUSER)
-                request.session['dataset'] = str(default_dataset.uuid)
+                request.session['dataset'] = json.dumps({'uuid': str(default_dataset.uuid),
+                                                         'name': default_dataset.name})
 
         response = self.get_response(request)
-
-        # Code to be executed for each request/response after
-        # the view is called.
-        print('Dataset:', request.session.get('dataset', None))
-
         return response
