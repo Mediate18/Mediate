@@ -7,6 +7,7 @@ from django.db.models import Count, Min, Max
 from django.db.models.functions import Substr, Length
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.core.exceptions import PermissionDenied
 
 from mediate.tools import put_layout_in_context, put_get_variable_in_context
 from mediate.views import GenericDetailView
@@ -17,11 +18,16 @@ from ..tables import *
 from ..filters import *
 
 from ..models import *
+from catalogues.tools import get_dataset_for_user
 
 from items.models import Item, Edition
 import json
 
 import django_tables2
+
+
+def get_catalogues_for_user(request):
+    return Catalogue.objects.filter(collection__dataset=get_dataset_for_user(request))
 
 
 # Catalogue views
@@ -30,7 +36,7 @@ class CatalogueTableView(ListView):
     template_name = 'catalogue_list.html'
 
     def get_queryset(self):
-        return Catalogue.objects.all().distinct()
+        return get_catalogues_for_user(self.request).distinct()
 
     def get_context_data(self, **kwargs):
         context = super(CatalogueTableView, self).get_context_data(**kwargs)
@@ -47,7 +53,7 @@ class CatalogueTableView(ListView):
         context['add_url'] = reverse_lazy('add_catalogue')
 
         # Extra data, used for e.g. charts
-        max_publication_year = Catalogue.objects.aggregate(Max('lot__catalogue__year_of_publication'))['lot__catalogue__year_of_publication__max']
+        max_publication_year = get_catalogues_for_user(self.request).aggregate(Max('lot__catalogue__year_of_publication'))['lot__catalogue__year_of_publication__max']
         if not max_publication_year:
             max_publication_year = 0
         context['max_publication_year'] = max_publication_year
@@ -83,7 +89,7 @@ class CatalogueLocationMapView(ListView):
     template_name = 'generic_location_map.html'
 
     def get_queryset(self):
-        catalogues = Catalogue.objects.filter(related_places__place__latitude__isnull=False,
+        catalogues = get_catalogues_for_user(self.request).filter(related_places__place__latitude__isnull=False,
                                          related_places__place__longitude__isnull=False)
         return catalogues
 
@@ -106,6 +112,12 @@ class CatalogueLocationMapView(ListView):
 
 class CatalogueDetailView(DetailView):
     model = Catalogue
+
+    def get(self, request, *args, **kwargs):
+        # Check whether the user has permission to view this catalogue
+        if not self.request.user.has_perm('catalogues.view_dataset', self.get_object().collection.dataset):
+            raise PermissionDenied
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         self.object = self.get_object()
@@ -157,6 +169,12 @@ class CatalogueUpdateView(UpdateView):
     template_name = 'generic_form.html'
     form_class = CatalogueModelForm
 
+    def get(self, request, *args, **kwargs):
+        # Check whether the user has permission to view this catalogue
+        if not self.request.user.has_perm('catalogues.change_dataset', self.get_object().collection.dataset):
+            raise PermissionDenied
+        return super().get(request, *args, **kwargs)
+
     def get_success_url(self):
         return self.request.GET.get('next') or reverse_lazy('catalogues')
 
@@ -173,6 +191,12 @@ class CatalogueUpdateView(UpdateView):
 class CatalogueDeleteView(DeleteView):
     model = Catalogue
     success_url = reverse_lazy('catalogues')
+
+    def get(self, request, *args, **kwargs):
+        # Check whether the user has permission to view this catalogue
+        if not self.request.user.has_perm('catalogues.change_dataset', self.get_object().collection.dataset):
+            raise PermissionDenied
+        return super().get(request, *args, **kwargs)
 
 
 # CatalogueHeldBy views
