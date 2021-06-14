@@ -37,15 +37,17 @@
         {% if APPLICATION_INSTANCE_TYPE %}
         <div>
             <div class="navbar-brand">
-            <span class="label label-warning">{{ APPLICATION_INSTANCE_TYPE }}</span>
+              <span class="label label-warning">{{ APPLICATION_INSTANCE_TYPE }}</span>
             </div>
 		</div>
         {% endif %}
-        <div>
-            <div class="navbar-brand">
-            <span class="label label-info">Dataset: {{ request.session.dataset|json_lookup:"name" }}</span>
+        <a href="{% url 'select_dataset'%}">
+            <div>
+                <div class="navbar-brand">
+                    <span class="label label-info">Dataset: {{ request.session.dataset|json_lookup:"name" }}</span>
+                </div>
             </div>
-		</div>
+        </a>
         {% if user.is_superuser %}
         <div>
             <div class="navbar-brand">
