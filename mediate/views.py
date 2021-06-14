@@ -9,8 +9,11 @@ from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 from django.shortcuts import render, redirect
 from django.contrib.auth.signals import user_logged_in
+from django.core.exceptions import ObjectDoesNotExist
 
 from mediate.forms import SelectDatasetForm
+from catalogues.models import Dataset
+from catalogues.tools import get_dataset_for_anonymoususer
 
 # When a user logs in, he/she should choose a Dataset.
 # To make this happen, set dataset in session to None after login.
@@ -82,12 +85,20 @@ def select_dataset(request):
     :return:
     """
     if request.method == 'POST':
-        form = SelectDatasetForm(request.POST)
+        form = SelectDatasetForm(request.POST, user=request.user)
         if form.is_valid():
-            request.session['dataset'] = json.dumps({'uuid': str(form.cleaned_data['dataset'].uuid),
-                                                     'name': form.cleaned_data['dataset'].name})
+            uuid = str(form.cleaned_data['dataset'].uuid)
+            try:
+                dataset = Dataset.objects.get(uuid=str(form.cleaned_data['dataset'].uuid))
+            except ObjectDoesNotExist:
+                dataset = get_dataset_for_anonymoususer()
+            if dataset and request.user.has_perm('catalogues.change_dataset', dataset):
+                request.session['dataset'] = json.dumps({'uuid': str(form.cleaned_data['dataset'].uuid),
+                                                         'name': form.cleaned_data['dataset'].name})
+            else:
+                request.session['dataset'] = None
             return redirect('dashboard')
     else:
-        form = SelectDatasetForm()
+        form = SelectDatasetForm(user=request.user)
 
     return render(request, 'generic_form.html', {'form': form})

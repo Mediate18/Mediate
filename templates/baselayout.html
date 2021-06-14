@@ -14,7 +14,7 @@
 {% load static %}
 {% load staticfiles %}
 
-{% load json_dict %}
+{% load dataset %}
 
 <html lang="en">
 <head>
@@ -45,7 +45,7 @@
             <a href="{% url 'select_dataset'%}">
                 <div>
                     <div class="navbar-brand">
-                        <span class="label label-info">Dataset: {{ request.session.dataset|json_lookup:"name" }}</span>
+                        <span class="label label-info">Dataset: {{ request|get_dataset_name }}</span>
                     </div>
                 </div>
             </a>

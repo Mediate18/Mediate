@@ -81,7 +81,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'maintenance_mode.middleware.MaintenanceModeMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
-    'mediate.middleware.DatasetMiddleware',
 ]
 
 ROOT_URLCONF = 'mediate.urls'
