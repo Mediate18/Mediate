@@ -41,13 +41,15 @@
             </div>
 		</div>
         {% endif %}
-        <a href="{% url 'select_dataset'%}">
-            <div>
-                <div class="navbar-brand">
-                    <span class="label label-info">Dataset: {{ request.session.dataset|json_lookup:"name" }}</span>
+        {% if user.is_authenticated %}
+            <a href="{% url 'select_dataset'%}">
+                <div>
+                    <div class="navbar-brand">
+                        <span class="label label-info">Dataset: {{ request.session.dataset|json_lookup:"name" }}</span>
+                    </div>
                 </div>
-            </div>
-        </a>
+            </a>
+        {% endif %}
         {% if user.is_superuser %}
         <div>
             <div class="navbar-brand">
