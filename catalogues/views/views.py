@@ -9,6 +9,8 @@ from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.core.exceptions import PermissionDenied
 
+from guardian.mixins import PermissionRequiredMixin
+
 from mediate.tools import put_layout_in_context, put_get_variable_in_context
 from mediate.views import GenericDetailView
 from simplemoderation.tools import moderate
@@ -110,14 +112,15 @@ class CatalogueLocationMapView(ListView):
         return context
 
 
-class CatalogueDetailView(DetailView):
+class CatalogueDetailView(PermissionRequiredMixin, DetailView):
     model = Catalogue
 
-    def get(self, request, *args, **kwargs):
-        # Check whether the user has permission to view this catalogue
-        if not self.request.user.has_perm('catalogues.view_dataset', self.get_object().collection.dataset):
-            raise PermissionDenied
-        return super().get(request, *args, **kwargs)
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.view_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().collection.dataset
+    # End permission check
 
     def get_context_data(self, **kwargs):
         self.object = self.get_object()
@@ -169,10 +172,17 @@ class CatalogueCreateView(CreateView):
 
 
 @moderate()
-class CatalogueUpdateView(UpdateView):
+class CatalogueUpdateView(PermissionRequiredMixin, UpdateView):
     model = Catalogue
     template_name = 'generic_form.html'
     form_class = CatalogueModelForm
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.change_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().collection.dataset
+    # End permission check
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -198,9 +208,16 @@ class CatalogueUpdateView(UpdateView):
 
 
 @moderate()
-class CatalogueDeleteView(DeleteView):
+class CatalogueDeleteView(PermissionRequiredMixin, DeleteView):
     model = Catalogue
     success_url = reverse_lazy('catalogues')
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.change_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().collection.dataset
+    # End permission check
 
     def get(self, request, *args, **kwargs):
         # Check whether the user has permission to view this catalogue
