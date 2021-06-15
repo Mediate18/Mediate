@@ -156,6 +156,11 @@ class CatalogueCreateView(CreateView):
     form_class = CatalogueModelForm
     success_url = reverse_lazy('catalogues')
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['dataset'] = get_dataset_for_user(self.request)
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("add")
@@ -168,6 +173,11 @@ class CatalogueUpdateView(UpdateView):
     model = Catalogue
     template_name = 'generic_form.html'
     form_class = CatalogueModelForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['dataset'] = get_dataset_for_user(self.request)
+        return kwargs
 
     def get(self, request, *args, **kwargs):
         # Check whether the user has permission to view this catalogue

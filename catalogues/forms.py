@@ -11,12 +11,26 @@ class CatalogueModelForm(forms.ModelForm):
         model = Catalogue
         fields = "__all__"
         widgets = {
-            'collection': Select2Widget,
+            'collection': ModelSelect2Widget(
+                queryset=Collection.objects.all(),
+                search_fields=['name__icontains'],
+            ),
             'transcription': Select2Widget,
         }
 
     def __init__(self, **kwargs):
+        self.dataset = kwargs.pop('dataset', None)
         super().__init__(**kwargs)
+
+        if self.dataset:
+            self.fields['collection'] = forms.ModelChoiceField(
+                queryset=Collection.objects.filter(dataset=self.dataset),
+                widget=ModelSelect2Widget(
+                    queryset=Collection.objects.filter(dataset=self.dataset),
+                    search_fields=['name__icontains'],
+                ),
+            )
+
         self.content_type = ContentType.objects.get_for_model(self.instance)
         self.add_types_field()
         self.add_related_places_field()
