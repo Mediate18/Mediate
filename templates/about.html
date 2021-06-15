@@ -1,0 +1,49 @@
+{% extends "baselayout.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+
+<div class="row flex-row">
+    <div class="col-md-6 col-md-offset-3">
+        <div class="flex-col">
+
+          <h1>About this database</h1>
+
+          <p>
+            Welcome to the MEDIATE database. In this database, you will find data that has been extracted and enriched
+            from a corpus of several hundred catalogues of private libraries sold (mostly at auction) in the Dutch
+            Republic, France, British Isles and Italy between 1665 and 1830. In the main Sandbox dataset, this adds up
+            to a total of 600 individual collections, which together list over half a million individual books.
+          </p>
+
+          <p>
+            This is a dynamic database, which is continually being updated and expanded. That means that records may
+            contain errors, and data may change over time as it is further enriched and cleaned up. Our aim has not
+            been to provide perfect transcriptions of every word in the catalogues, but to render the data extracted
+            from the catalogues statistically manipulable. Since most catalogue transcriptions have been produced using
+            OCR (optical character recognition) software, with some manual post-correction, a number of common OCR
+            mistakes remain: long ‘s’ transcribed as ‘f’, ‘e’ transcribed as ‘c’, ‘a’ as ‘o’, ‘i’ as ‘t’, ‘l’ as ‘1’,
+            etc.
+          </p>
+
+          <h3>How to cite this database</h3>
+
+          <p>
+            If referring to data from this database, please use the following citation form:
+          </p>
+
+          <p>
+            Alicia C. Montoya, Micha Hulsbosch, Helwi Blom, Evelien Chayes, Anna de Wilde, Rindert Jagersma,
+            Juliette Reboul, and Joanna Rozendaal, <i>MEDIATE</i> database, 2022 – (ongoing),
+            https://test.mediate-database.cls.ru.nl/ [date accessed].
+          </p>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+{% endblock %}
