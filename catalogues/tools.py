@@ -6,7 +6,7 @@ import json
 from catalogues.models import Dataset
 
 
-def get_dataset_for_user(request):
+def get_datasets_for_session(request):
     """
     Gets the dataset for the current user:
     if a dataset is set in the session and the user has permission to change, return that dataset;

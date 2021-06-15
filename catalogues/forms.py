@@ -19,14 +19,14 @@ class CatalogueModelForm(forms.ModelForm):
         }
 
     def __init__(self, **kwargs):
-        self.dataset = kwargs.pop('dataset', None)
+        self.datasets = kwargs.pop('datasets', None)
         super().__init__(**kwargs)
 
         if self.dataset:
             self.fields['collection'] = forms.ModelChoiceField(
-                queryset=Collection.objects.filter(dataset=self.dataset),
+                queryset=Collection.objects.filter(dataset__in=self.datasets),
                 widget=ModelSelect2Widget(
-                    queryset=Collection.objects.filter(dataset=self.dataset),
+                    queryset=Collection.objects.filter(dataset__in=self.datasets),
                     search_fields=['name__icontains'],
                 ),
             )

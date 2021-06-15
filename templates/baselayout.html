@@ -46,7 +46,7 @@
                 <div>
                     <div class="navbar-brand">
                         <span class="label label-info">
-                            {% with request|get_dataset_name as datasets %}
+                            {% with request|get_datasets as datasets %}
                                 {% if datasets|length > 1 %}
                                     Datasets:
                                 {% else %}

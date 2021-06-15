@@ -20,7 +20,7 @@ from ..tables import *
 from ..filters import *
 
 from ..models import *
-from catalogues.tools import get_dataset_for_user
+from catalogues.tools import get_datasets_for_session
 
 from items.models import Item, Edition
 import json
@@ -29,7 +29,7 @@ import django_tables2
 
 
 def get_catalogues_for_user(request):
-    return Catalogue.objects.filter(collection__dataset=get_dataset_for_user(request))
+    return Catalogue.objects.filter(collection__dataset__in=get_datasets_for_session(request))
 
 
 # Catalogue views
@@ -161,7 +161,7 @@ class CatalogueCreateView(CreateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['dataset'] = get_dataset_for_user(self.request)
+        kwargs['datasets'] = get_datasets_for_session(self.request)
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -186,7 +186,7 @@ class CatalogueUpdateView(PermissionRequiredMixin, UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['dataset'] = get_dataset_for_user(self.request)
+        kwargs['datasets'] = get_datasets_for_session(self.request)
         return kwargs
 
     def get(self, request, *args, **kwargs):
