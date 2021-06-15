@@ -15,11 +15,14 @@ def get_dataset_for_user(request):
     :return: dataset
     """
     user = request.user
-    dataset = request.session.get('dataset', None)
-    if dataset and user.has_perm('catalogues.change_dataset', Dataset.objects.get(uuid=json.loads(dataset)['uuid'])):
-        return Dataset.objects.get(uuid=json.loads(dataset)['uuid'])
+    datasets_session = request.session.get('datasets', [])
+    datasets_retrieved = Dataset.objects.filter(uuid__in=[dataset['uuid'] for dataset in datasets_session])
+    datasets_permitted = [dataset for dataset in datasets_retrieved
+                          if user.has_perm('catalogues.change_dataset', dataset)]
+    if datasets_permitted:
+        return datasets_permitted
 
-    return get_dataset_for_anonymoususer()
+    return [get_dataset_for_anonymoususer()]
 
 
 def get_dataset_for_anonymoususer():

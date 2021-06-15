@@ -42,10 +42,26 @@
 		</div>
         {% endif %}
         {% if user.is_authenticated %}
-            <a href="{% url 'select_dataset'%}">
+            <a href="{% url 'select_dataset'%}" title="{% trans 'Select dataset' %}">
                 <div>
                     <div class="navbar-brand">
-                        <span class="label label-info">Dataset: {{ request|get_dataset_name }}</span>
+                        <span class="label label-info">
+                            {% with request|get_dataset_name as datasets %}
+                                {% if datasets|length > 1 %}
+                                    Datasets:
+                                {% else %}
+                                    Dataset:
+                                {% endif %}
+                                {% if datasets|length <= 0 %}
+                                    -
+                                {% else %}
+                                    {% for dataset in datasets %}
+                                        {{ dataset.name }}
+                                        {% if not forloop.last %} | {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            {% endwith %}
+                        </span>
                     </div>
                 </div>
             </a>

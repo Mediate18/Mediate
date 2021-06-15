@@ -6,8 +6,4 @@ register = Library()
 
 @register.filter
 def get_dataset_name(request):
-    dataset = get_dataset_for_user(request)
-    if dataset:
-        return dataset.name
-    else:
-        return "NO DATASET SELECTED"
+    return get_dataset_for_user(request)

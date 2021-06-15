@@ -85,20 +85,16 @@ def select_dataset(request):
     :return:
     """
     if request.method == 'POST':
-        form = SelectDatasetForm(request.POST, user=request.user)
+        form = SelectDatasetForm(request.POST, request=request)
         if form.is_valid():
-            uuid = str(form.cleaned_data['dataset'].uuid)
-            try:
-                dataset = Dataset.objects.get(uuid=str(form.cleaned_data['dataset'].uuid))
-            except ObjectDoesNotExist:
-                dataset = get_dataset_for_anonymoususer()
-            if dataset and request.user.has_perm('catalogues.change_dataset', dataset):
-                request.session['dataset'] = json.dumps({'uuid': str(form.cleaned_data['dataset'].uuid),
-                                                         'name': form.cleaned_data['dataset'].name})
-            else:
-                request.session['dataset'] = None
+            datasets = form.cleaned_data['datasets']
+
+            request.session['datasets'] = [
+                {'uuid': str(dataset.uuid), 'name': dataset.name}
+                for dataset in datasets if request.user.has_perm('catalogues.change_dataset', dataset)
+            ]
             return redirect('dashboard')
     else:
-        form = SelectDatasetForm(user=request.user)
+        form = SelectDatasetForm(request=request)
 
     return render(request, 'generic_form.html', {'form': form})
