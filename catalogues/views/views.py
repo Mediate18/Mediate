@@ -232,7 +232,7 @@ class CatalogueHeldByTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return CatalogueHeldBy.objects.all()
+        return CatalogueHeldBy.objects.filter(catalogue__collection__dataset__in=get_datasets_for_session(self.request))
 
     def get_context_data(self, **kwargs):
         context = super(CatalogueHeldByTableView, self).get_context_data(**kwargs)
@@ -251,8 +251,16 @@ class CatalogueHeldByTableView(ListView):
         return context
 
 
-class CatalogueHeldByDetailView(DetailView):
+class CatalogueHeldByDetailView(PermissionRequiredMixin, DetailView):
     model = CatalogueHeldBy
+    template_name = 'generic_detail.html'
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.view_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().catalogue.collection.dataset
+    # End permission check
 
 
 class CatalogueHeldByCreateView(CreateView):
