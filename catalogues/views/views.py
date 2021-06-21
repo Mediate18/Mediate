@@ -28,7 +28,7 @@ import json
 import django_tables2
 
 
-def get_catalogues_for_user(request):
+def get_catalogues_for_session(request):
     return Catalogue.objects.filter(collection__dataset__in=get_datasets_for_session(request))
 
 
@@ -38,7 +38,7 @@ class CatalogueTableView(ListView):
     template_name = 'catalogue_list.html'
 
     def get_queryset(self):
-        return get_catalogues_for_user(self.request).distinct()
+        return get_catalogues_for_session(self.request).distinct()
 
     def get_context_data(self, **kwargs):
         context = super(CatalogueTableView, self).get_context_data(**kwargs)
@@ -55,7 +55,7 @@ class CatalogueTableView(ListView):
         context['add_url'] = reverse_lazy('add_catalogue')
 
         # Extra data, used for e.g. charts
-        max_publication_year = get_catalogues_for_user(self.request).aggregate(Max('lot__catalogue__year_of_publication'))['lot__catalogue__year_of_publication__max']
+        max_publication_year = get_catalogues_for_session(self.request).aggregate(Max('lot__catalogue__year_of_publication'))['lot__catalogue__year_of_publication__max']
         if not max_publication_year:
             max_publication_year = 0
         context['max_publication_year'] = max_publication_year
@@ -91,8 +91,8 @@ class CatalogueLocationMapView(ListView):
     template_name = 'generic_location_map.html'
 
     def get_queryset(self):
-        catalogues = get_catalogues_for_user(self.request).filter(related_places__place__latitude__isnull=False,
-                                         related_places__place__longitude__isnull=False)
+        catalogues = get_catalogues_for_session(self.request).filter(related_places__place__latitude__isnull=False,
+                                                                     related_places__place__longitude__isnull=False)
         return catalogues
 
     def get_context_data(self, **kwargs):
