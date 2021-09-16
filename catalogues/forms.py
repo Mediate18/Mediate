@@ -2,6 +2,7 @@ from django import forms
 from django_select2.forms import Select2Widget, ModelSelect2Widget, ModelSelect2MultipleWidget
 from django.contrib.contenttypes.models import ContentType
 from .models import *
+from catalogues.tools import get_datasets_for_session
 
 from tagme.models import Tag
 
@@ -155,6 +156,19 @@ class CatalogueCatalogueTypeRelationModelForm(forms.ModelForm):
     class Meta:
         model = CatalogueCatalogueTypeRelation
         fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        self.catalogues = kwargs.pop('catalogues', None)
+        super().__init__(*args, **kwargs)
+
+        if self.catalogues:
+            self.fields['catalogue'] = forms.ModelChoiceField(
+                queryset=self.catalogues,
+                widget=ModelSelect2Widget(
+                    queryset=self.catalogues,
+                    search_fields=['short_title__icontains'],
+                ),
+            )
 
 
 class CollectionModelForm(forms.ModelForm):

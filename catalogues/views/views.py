@@ -360,7 +360,8 @@ class CatalogueCatalogueTypeRelationTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return CatalogueCatalogueTypeRelation.objects.all()
+        return CatalogueCatalogueTypeRelation.objects\
+            .filter(catalogue__collection__dataset__in=get_datasets_for_session(self.request))
 
     def get_context_data(self, **kwargs):
         context = super(CatalogueCatalogueTypeRelationTableView, self).get_context_data(**kwargs)
@@ -379,8 +380,16 @@ class CatalogueCatalogueTypeRelationTableView(ListView):
         return context
 
 
-class CatalogueCatalogueTypeRelationDetailView(DetailView):
+class CatalogueCatalogueTypeRelationDetailView(PermissionRequiredMixin, DetailView):
     model = CatalogueCatalogueTypeRelation
+    template_name = 'generic_detail.html'
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.view_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().catalogue.collection.dataset
+    # End permission check
 
 
 class CatalogueCatalogueTypeRelationCreateView(CreateView):
@@ -389,6 +398,11 @@ class CatalogueCatalogueTypeRelationCreateView(CreateView):
     form_class = CatalogueCatalogueTypeRelationModelForm
     success_url = reverse_lazy('cataloguecataloguetyperelations')
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['catalogues'] = get_catalogues_for_session(self.request)
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("add")
@@ -396,11 +410,23 @@ class CatalogueCatalogueTypeRelationCreateView(CreateView):
         return context
 
 
-class CatalogueCatalogueTypeRelationUpdateView(UpdateView):
+class CatalogueCatalogueTypeRelationUpdateView(PermissionRequiredMixin, UpdateView):
     model = CatalogueCatalogueTypeRelation
     template_name = 'generic_form.html'
     form_class = CatalogueCatalogueTypeRelationModelForm
     success_url = reverse_lazy('cataloguecataloguetyperelations')
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.change_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().catalogue.collection.dataset
+    # End permission check
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['catalogues'] = get_catalogues_for_session(self.request)
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -409,9 +435,16 @@ class CatalogueCatalogueTypeRelationUpdateView(UpdateView):
         return context
 
 
-class CatalogueCatalogueTypeRelationDeleteView(DeleteView):
+class CatalogueCatalogueTypeRelationDeleteView(PermissionRequiredMixin, DeleteView):
     model = CatalogueCatalogueTypeRelation
     success_url = reverse_lazy('cataloguecataloguetyperelations')
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.change_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().catalogue.collection.dataset
+    # End permission check
 
 
 # Collection views
