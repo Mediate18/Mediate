@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404, render
 from django.core.exceptions import PermissionDenied
 
 from guardian.mixins import PermissionRequiredMixin
+from guardian.shortcuts import get_objects_for_user
 
 from mediate.tools import put_layout_in_context, put_get_variable_in_context
 from mediate.views import GenericDetailView
@@ -20,7 +21,7 @@ from ..tables import *
 from ..filters import *
 
 from ..models import *
-from catalogues.tools import get_datasets_for_session
+from catalogues.tools import get_datasets_for_session, get_dataset_for_anonymoususer
 
 from items.models import Item, Edition
 import json
@@ -453,7 +454,7 @@ class CollectionTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return Collection.objects.all()
+        return Collection.objects.filter(dataset__in=get_datasets_for_session(self.request))
 
     def get_context_data(self, **kwargs):
         context = super(CollectionTableView, self).get_context_data(**kwargs)
@@ -472,9 +473,17 @@ class CollectionTableView(ListView):
         return context
 
 
-class CollectionDetailView(GenericDetailView):
+class CollectionDetailView(PermissionRequiredMixin, GenericDetailView):
     model = Collection
     object_fields = ['name', 'dataset']
+    template_name = 'generic_detail.html'
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.view_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().dataset
+    # End permission check
 
 
 class CollectionCreateView(CreateView):
@@ -483,6 +492,12 @@ class CollectionCreateView(CreateView):
     form_class = CollectionModelForm
     success_url = reverse_lazy('collections')
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['datasets'] = get_objects_for_user(self.request.user, 'catalogues.change_dataset') \
+                             or get_dataset_for_anonymoususer()
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("add")
@@ -490,11 +505,24 @@ class CollectionCreateView(CreateView):
         return context
 
 
-class CollectionUpdateView(UpdateView):
+class CollectionUpdateView(PermissionRequiredMixin, UpdateView):
     model = Collection
     template_name = 'generic_form.html'
     form_class = CollectionModelForm
     success_url = reverse_lazy('collections')
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.change_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().dataset
+    # End permission check
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['datasets'] = get_objects_for_user(self.request.user, 'catalogues.change_dataset') \
+                             or get_dataset_for_anonymoususer()
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -503,9 +531,16 @@ class CollectionUpdateView(UpdateView):
         return context
 
 
-class CollectionDeleteView(DeleteView):
+class CollectionDeleteView(PermissionRequiredMixin, DeleteView):
     model = Collection
     success_url = reverse_lazy('collections')
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.view_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().dataset
+    # End permission check
 
 
 # CollectionYear views

@@ -176,6 +176,19 @@ class CollectionModelForm(forms.ModelForm):
         model = Collection
         fields = "__all__"
 
+    def __init__(self, *args, **kwargs):
+        self.datasets = kwargs.pop('datasets', None)
+        super().__init__(*args, **kwargs)
+
+        if self.datasets:
+            self.fields['dataset'] = forms.ModelChoiceField(
+                queryset=self.datasets,
+                widget=ModelSelect2Widget(
+                    queryset=self.datasets,
+                    search_fields=['name__icontains']
+                )
+            )
+
 
 class CollectionYearModelForm(forms.ModelForm):
     class Meta:

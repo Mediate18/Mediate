@@ -22,13 +22,11 @@ def get_datasets_for_session(request):
     if datasets_permitted:
         return datasets_permitted
 
-    return [get_dataset_for_anonymoususer()]
+    return list(get_dataset_for_anonymoususer())
 
 
 def get_dataset_for_anonymoususer():
     try:
-        return Dataset.objects.get(name=settings.DATASET_NAME_FOR_ANONYMOUSUSER)
+        return Dataset.objects.filter(name=settings.DATASET_NAME_FOR_ANONYMOUSUSER)
     except KeyError:
-        return None
-    except ObjectDoesNotExist:
-        return None
+        return Dataset.objects.none()
