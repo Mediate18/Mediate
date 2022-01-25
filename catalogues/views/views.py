@@ -7,7 +7,7 @@ from django.db.models import Count, Min, Max
 from django.db.models.functions import Substr, Length
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 
 from guardian.mixins import PermissionRequiredMixin
 from guardian.shortcuts import get_objects_for_user
@@ -770,12 +770,14 @@ class LotDeleteView(PermissionRequiredMixin, DeleteView):
 def previous_lot_view(request, pk, index):
     try:
         lot = Lot.objects.get(catalogue__uuid=pk, index_in_catalogue=index)
+        if not request.user.has_perm('catalogues.view_dataset', lot.catalogue.collection.dataset):
+            raise PermissionDenied()
         return JsonResponse({
             'success': True,
             'lot_as_listed_in_catalogue': lot.lot_as_listed_in_catalogue,
             'index_in_catalogue': lot.index_in_catalogue
         })
-    except:
+    except ObjectDoesNotExist:
         return JsonResponse({
             'success': False
         })
@@ -783,6 +785,8 @@ def previous_lot_view(request, pk, index):
 
 def expand_lot_view(request, pk):
     lot = get_object_or_404(Lot, pk=pk)
+    if not request.user.has_perm('catalogues.view_dataset', lot.catalogue.collection.dataset):
+        raise PermissionDenied()
     next_url = reverse_lazy('catalogue_detail_bare', args=[str(lot.catalogue.uuid)])
 
     if request.method == 'POST':
@@ -825,6 +829,8 @@ def add_lot_before(request, pk):
     :return: 
     """
     lot_after = get_object_or_404(Lot, pk=pk)
+    if not request.user.has_perm('catalogues.view_dataset', lot_after.catalogue.collection.dataset):
+        raise PermissionDenied()
 
     # Determine whether there is a lot before the selected position
     try:
@@ -894,6 +900,8 @@ def add_lot_at_end(request, pk):
     :return:
     """
     catalogue = get_object_or_404(Catalogue, pk=pk)
+    if request.user.has_perm('catalogues.view_dataset', catalogue.collection.dataset):
+        raise PermissionDenied()
     last_lot = Lot.objects.filter(catalogue=catalogue).order_by('-index_in_catalogue').first()
 
     next_url = reverse_lazy('catalogue_detail_bare', args=[str(catalogue.uuid)])
