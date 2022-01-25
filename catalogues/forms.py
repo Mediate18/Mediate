@@ -207,17 +207,26 @@ class LotModelForm(forms.ModelForm):
         model = Lot
         fields = "__all__"
         widgets = {
-            'catalogue': ModelSelect2Widget(
-                model=Catalogue,
-                search_fields=['short_title__icontains'],
-                dependent_fields={'category': 'category'}
-            ),
             'category': ModelSelect2Widget(
                 model=Category,
                 search_fields=['bookseller_category__icontains'],
                 dependent_fields={'catalogue': 'catalogue'}
             )
         }
+
+    def __init__(self, *args, **kwargs):
+        self.catalogues = kwargs.pop('catalogues', None)
+        super().__init__(*args, **kwargs)
+
+        if self.catalogues:
+            self.fields['catalogue'] = forms.ModelChoiceField(
+                queryset=self.catalogues,
+                widget=ModelSelect2Widget(
+                    queryset=self.catalogues,
+                    search_fields=['short_title__icontains'],
+                    dependent_fields={'category': 'category'}
+                ),
+            )
 
 
 class PersonCatalogueRelationModelForm(forms.ModelForm):

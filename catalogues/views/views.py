@@ -670,7 +670,8 @@ class LotTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return Lot.objects.order_by('catalogue__year_of_publication', 'catalogue__short_title', 'index_in_catalogue',
+        return Lot.objects.filter(catalogue__collection__dataset__in=get_datasets_for_session(self.request))\
+            .order_by('catalogue__year_of_publication', 'catalogue__short_title', 'index_in_catalogue',
                                     'lot_as_listed_in_catalogue')
 
     def get_context_data(self, **kwargs):
@@ -690,10 +691,17 @@ class LotTableView(ListView):
         return context
 
 
-class LotDetailView(GenericDetailView):
+class LotDetailView(PermissionRequiredMixin, GenericDetailView):
     model = Lot
     object_fields = ['catalogue', 'number_in_catalogue', 'page_in_catalogue', 'sales_price',
                      'lot_as_listed_in_catalogue', 'index_in_catalogue', 'category']
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.view_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().catalogue.collection.dataset
+    # End permission check
 
 
 @moderate()
@@ -703,6 +711,11 @@ class LotCreateView(CreateView):
     form_class = LotModelForm
     success_url = reverse_lazy('lots')
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['catalogues'] = get_catalogues_for_session(self.request)
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("add")
@@ -711,10 +724,22 @@ class LotCreateView(CreateView):
 
 
 @moderate()
-class LotUpdateView(UpdateView):
+class LotUpdateView(PermissionRequiredMixin, UpdateView):
     model = Lot
     template_name = 'generic_form.html'
     form_class = LotModelForm
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.change_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().catalogue.collection.dataset
+    # End permission check
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['catalogues'] = get_catalogues_for_session(self.request)
+        return kwargs
 
     def get_success_url(self):
         return self.request.GET.get('next') or reverse_lazy('lots')
@@ -730,9 +755,16 @@ class LotUpdateView(UpdateView):
 
 
 @moderate()
-class LotDeleteView(DeleteView):
+class LotDeleteView(PermissionRequiredMixin, DeleteView):
     model = Lot
     success_url = reverse_lazy('lots')
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.change_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().catalogue.collection.dataset
+    # End permission check
 
 
 def previous_lot_view(request, pk, index):
