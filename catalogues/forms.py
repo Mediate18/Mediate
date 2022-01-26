@@ -238,15 +238,24 @@ class PersonCatalogueRelationModelForm(forms.ModelForm):
                 model=Person,
                 search_fields=['short_name__icontains', 'surname__icontains', 'first_names__icontains']
             ),
-            'catalogue': ModelSelect2Widget(
-                model=Catalogue,
-                search_fields=['short_title__icontains']
-            ),
             'role': ModelSelect2Widget(
                 model=PersonCatalogueRelationRole,
                 search_fields=['name__icontains']
             )
         }
+
+    def __init__(self, *args, **kwargs):
+        self.catalogues = kwargs.pop('catalogues', None)
+        super().__init__(*args, **kwargs)
+
+        if self.catalogues:
+            self.fields['catalogue'] = forms.ModelChoiceField(
+                queryset=self.catalogues,
+                widget=ModelSelect2Widget(
+                    queryset=self.catalogues,
+                    search_fields=['short_title__icontains'],
+                ),
+            )
 
 
 class PersonCatalogueRelationRoleModelForm(forms.ModelForm):
