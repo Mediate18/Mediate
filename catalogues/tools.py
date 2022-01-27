@@ -6,7 +6,7 @@ import json
 from catalogues.models import Dataset
 
 
-def get_datasets_for_session(request):
+def get_datasets_for_session(request, extra_dataset=None):
     """
     Gets the dataset for the current user:
     if a dataset is set in the session and the user has permission to change, return that dataset;
@@ -20,7 +20,7 @@ def get_datasets_for_session(request):
     datasets_permitted = [dataset for dataset in datasets_retrieved
                           if user.has_perm('catalogues.change_dataset', dataset)]
     if datasets_permitted:
-        return datasets_permitted
+        return datasets_permitted + [extra_dataset] if extra_dataset else datasets_permitted
 
     return list(get_dataset_for_anonymoususer())
 

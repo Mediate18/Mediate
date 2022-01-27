@@ -23,7 +23,7 @@ class CatalogueModelForm(forms.ModelForm):
         self.datasets = kwargs.pop('datasets', None)
         super().__init__(**kwargs)
 
-        if self.dataset:
+        if self.datasets:
             self.fields['collection'] = forms.ModelChoiceField(
                 queryset=Collection.objects.filter(dataset__in=self.datasets),
                 widget=ModelSelect2Widget(

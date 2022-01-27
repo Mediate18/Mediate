@@ -191,7 +191,17 @@ class CatalogueUpdateView(PermissionRequiredMixin, UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['datasets'] = get_datasets_for_session(self.request)
+        catalogue = self.get_object()
+        kwargs['datasets'] = get_datasets_for_session(
+            self.request,
+            catalogue.collection.dataset
+        )
+        if catalogue.collection.dataset not in get_datasets_for_session(self.request):
+            messages.warning(self.request,
+                             format_html(_("The dataset this Catalogue belongs to, <i>{}</i>, is "
+                                           "currently not selected."),
+                                         catalogue.collection.dataset))
+
         return kwargs
 
     def get(self, request, *args, **kwargs):
