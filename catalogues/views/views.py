@@ -1,9 +1,10 @@
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
+from django.utils.html import format_html
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
-from django.db.models import Count, Min, Max
+from django.db.models import Count, Min, Max, Q
 from django.db.models.functions import Substr, Length
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -29,8 +30,11 @@ import json
 import django_tables2
 
 
-def get_catalogues_for_session(request):
-    return Catalogue.objects.filter(collection__dataset__in=get_datasets_for_session(request))
+def get_catalogues_for_session(request, extra_catalogue=None):
+    return Catalogue.objects.filter(
+        Q(collection__dataset__in=get_datasets_for_session(request))
+        | Q(pk=extra_catalogue.pk if extra_catalogue else None)
+    )
 
 
 # Catalogue views
@@ -1008,11 +1012,21 @@ class PersonCatalogueRelationUpdateView(PermissionRequiredMixin, UpdateView):
 
     def get_permission_object(self):
         return self.get_object().catalogue.collection.dataset
+
     # End permission check
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['catalogues'] = get_catalogues_for_session(self.request)
+        personcataloguerelation = self.get_object()
+        kwargs['catalogues'] = get_catalogues_for_session(
+            self.request,
+            personcataloguerelation.catalogue
+        )
+        if personcataloguerelation.catalogue.collection.dataset not in get_datasets_for_session(self.request):
+            messages.warning(self.request,
+                             format_html(_("The dataset this PersonCatalogueRelation belongs to, <i>{}</i>, is "
+                                           "currently not selected."),
+                                         personcataloguerelation.catalogue.collection.dataset))
         return kwargs
 
     def get_context_data(self, **kwargs):
