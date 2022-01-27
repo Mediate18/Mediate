@@ -430,7 +430,17 @@ class CatalogueCatalogueTypeRelationUpdateView(PermissionRequiredMixin, UpdateVi
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['catalogues'] = get_catalogues_for_session(self.request)
+        relation = self.get_object()
+        kwargs['catalogues'] = get_catalogues_for_session(
+            self.request,
+            relation.catalogue
+        )
+        if relation.catalogue.collection.dataset not in get_datasets_for_session(self.request):
+            messages.warning(self.request,
+                             format_html(_("The dataset this CatalogueCatalogueTypeRelation belongs to, <i>{}</i>, is "
+                                           "currently not selected."),
+                                         relation.catalogue.collection.dataset))
+
         return kwargs
 
     def get_context_data(self, **kwargs):
