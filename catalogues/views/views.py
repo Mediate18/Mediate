@@ -742,7 +742,16 @@ class LotUpdateView(PermissionRequiredMixin, UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['catalogues'] = get_catalogues_for_session(self.request)
+        lot = self.get_object()
+        kwargs['catalogues'] = get_catalogues_for_session(
+            self.request,
+            lot.catalogue
+        )
+        if lot.catalogue.collection.dataset not in get_datasets_for_session(self.request):
+            messages.warning(self.request,
+                             format_html(_("The dataset this Lot belongs to, <i>{}</i>, is "
+                                           "currently not selected."),
+                                         lot.catalogue.collection.dataset))
         return kwargs
 
     def get_success_url(self):
