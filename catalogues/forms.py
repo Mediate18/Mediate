@@ -268,6 +268,25 @@ class PersonCollectionRelationModelForm(forms.ModelForm):
     class Meta:
         model = PersonCollectionRelation
         fields = "__all__"
+        widgets = {
+            'person': ModelSelect2Widget(
+                model=Person,
+                search_fields=['short_name__icontains', 'surname__icontains', 'first_names__icontains']
+            ),
+        }
+
+    def __init__(self, **kwargs):
+        self.collections = kwargs.pop('collections', None)
+        super().__init__(**kwargs)
+
+        if self.collections:
+            self.fields['collection'] = forms.ModelChoiceField(
+                queryset=self.collections,
+                widget=ModelSelect2Widget(
+                    queryset=self.collections,
+                    search_fields=['name__icontains'],
+                ),
+            )
 
 
 class CataloguePlaceRelationModelForm(forms.ModelForm):
