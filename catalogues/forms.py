@@ -325,6 +325,38 @@ class CategoryModelForm(forms.ModelForm):
         labels = {
             'parent': "Parent category"
         }
+        widgets = {
+            'parisian_category': ModelSelect2Widget(
+                model=ParisianCategory,
+                search_fields=['name__icontains', 'description__icontains']
+            )
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.catalogues = kwargs.pop('catalogues', None)
+        self.categories = kwargs.pop('categories', None)
+        super().__init__(*args, **kwargs)
+
+        if self.catalogues:
+            self.fields['catalogue'] = forms.ModelChoiceField(
+                queryset=self.catalogues,
+                widget=ModelSelect2Widget(
+                    queryset=self.catalogues,
+                    search_fields=['short_title__icontains'],
+                    dependent_fields={'parent': 'category'}
+                ),
+            )
+
+        if self.categories:
+            self.fields['parent'] = forms.ModelChoiceField(
+                queryset=self.categories,
+                widget=ModelSelect2Widget(
+                    attrs={'data-placeholder': "First select a catalogue"},
+                    queryset=self.categories,
+                    search_fields=['bookseller_category__icontains'],
+                    dependent_fields={'catalogue': 'catalogue'}
+                ),
+            )
 
 
 class ParisianCategoryModelForm(forms.ModelForm):

@@ -288,7 +288,8 @@ class Category(models.Model):
         verbose_name_plural = "categories"
 
     def __str__(self):
-        return self.bookseller_category
+        return self.bookseller_category if self.bookseller_category \
+            else "Empty heading (Catalogue: {}, Parisian category: {})".format(self.catalogue, self.parisian_category if self.parisian_category else '-')
 
     def get_absolute_url(self):
         return reverse_lazy('category_detail', args=[str(self.uuid)])

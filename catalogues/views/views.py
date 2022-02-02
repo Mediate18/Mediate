@@ -1347,7 +1347,7 @@ class CategoryTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return Category.objects.all()
+        return Category.objects.filter(catalogue__collection__dataset__in=get_datasets_for_session(self.request))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1366,9 +1366,17 @@ class CategoryTableView(ListView):
         return context
 
 
-class CategoryDetailView(GenericDetailView):
+class CategoryDetailView(PermissionRequiredMixin, GenericDetailView):
     model = Category
     object_fields = ['catalogue', 'parent', 'bookseller_category', 'parisian_category']
+    template_name = 'generic_detail.html'
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.view_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().catalogue.collection.dataset
+    # End permission check
 
 
 class CategoryCreateView(CreateView):
@@ -1377,6 +1385,12 @@ class CategoryCreateView(CreateView):
     form_class = CategoryModelForm
     success_url = reverse_lazy('categories')
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['catalogues'] = get_catalogues_for_session(self.request)
+        kwargs['categories'] = Category.objects.filter(catalogue__collection__dataset__in=get_datasets_for_session(self.request))
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("add")
@@ -1384,11 +1398,36 @@ class CategoryCreateView(CreateView):
         return context
     
     
-class CategoryUpdateView(UpdateView):
+class CategoryUpdateView(PermissionRequiredMixin, UpdateView):
     model = Category
     template_name = 'generic_form.html'
     form_class = CategoryModelForm
     success_url = reverse_lazy('categories')
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.change_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().catalogue.collection.dataset
+    # End permission check
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        category = self.get_object()
+        kwargs['catalogues'] = get_catalogues_for_session(
+            self.request,
+            category.catalogue
+        )
+        kwargs['categories'] = Category.objects.filter(
+            Q(catalogue__collection__dataset__in=get_datasets_for_session(self.request))
+            | Q(pk=category.pk)
+        )
+        if category.catalogue.collection.dataset not in get_datasets_for_session(self.request):
+            messages.warning(self.request,
+                             format_html(_("The dataset this Category belongs to, <i>{}</i>, is "
+                                           "currently not selected."),
+                                         category.catalogue.collection.dataset))
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1397,9 +1436,16 @@ class CategoryUpdateView(UpdateView):
         return context
 
 
-class CategoryDeleteView(DeleteView):
+class CategoryDeleteView(PermissionRequiredMixin, DeleteView):
     model = Category
     success_url = reverse_lazy('categories')
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.change_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().catalogue.collection.dataset
+    # End permission check
 
 
 # ParisianCategory views
