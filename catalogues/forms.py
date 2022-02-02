@@ -294,10 +294,6 @@ class CataloguePlaceRelationModelForm(forms.ModelForm):
         model = CataloguePlaceRelation
         fields = "__all__"
         widgets = {
-            'catalogue': ModelSelect2Widget(
-                model=Catalogue,
-                search_fields=['short_title__icontains']
-            ),
             'place': ModelSelect2Widget(
                 model=Place,
                 search_fields=['name__icontains']
@@ -307,6 +303,19 @@ class CataloguePlaceRelationModelForm(forms.ModelForm):
                 search_fields=['name__icontains']
             )
         }
+
+    def __init__(self, *args, **kwargs):
+        self.catalogues = kwargs.pop('catalogues', None)
+        super().__init__(*args, **kwargs)
+
+        if self.catalogues:
+            self.fields['catalogue'] = forms.ModelChoiceField(
+                queryset=self.catalogues,
+                widget=ModelSelect2Widget(
+                    queryset=self.catalogues,
+                    search_fields=['short_title__icontains'],
+                ),
+            )
 
 
 class CategoryModelForm(forms.ModelForm):

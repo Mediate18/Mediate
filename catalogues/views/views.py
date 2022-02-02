@@ -1243,6 +1243,10 @@ class CataloguePlaceRelationTableView(ListView):
     model = CataloguePlaceRelation
     template_name = 'generic_list.html'
 
+    def get_queryset(self):
+        return CataloguePlaceRelation.objects\
+            .filter(catalogue__collection__dataset__in=get_datasets_for_session(self.request))
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         filter = CataloguePlaceRelationFilter(self.request.GET, queryset=self.get_queryset())
@@ -1264,12 +1268,24 @@ class CataloguePlaceRelationDetailView(DetailView):
     model = CataloguePlaceRelation
     template_name = 'generic_detail.html'
 
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.view_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().catalogue.collection.dataset
+    # End permission check
+
 
 class CataloguePlaceRelationCreateView(CreateView):
     model = CataloguePlaceRelation
     template_name = 'generic_form.html'
     form_class = CataloguePlaceRelationModelForm
     success_url = reverse_lazy('catalogueplacerelations')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['catalogues'] = get_catalogues_for_session(self.request)
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1284,6 +1300,28 @@ class CataloguePlaceRelationUpdateView(UpdateView):
     form_class = CataloguePlaceRelationModelForm
     success_url = reverse_lazy('catalogueplacerelations')
 
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.change_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().catalogue.collection.dataset
+    # End permission check
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        relation = self.get_object()
+        kwargs['catalogues'] = get_catalogues_for_session(
+            self.request,
+            relation.catalogue
+        )
+        if relation.catalogue.collection.dataset not in get_datasets_for_session(self.request):
+            messages.warning(self.request,
+                             format_html(_("The dataset this CataloguePlaceRelation belongs to, <i>{}</i>, is "
+                                           "currently not selected."),
+                                         relation.catalogue.collection.dataset))
+
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("update")
@@ -1294,6 +1332,13 @@ class CataloguePlaceRelationUpdateView(UpdateView):
 class CataloguePlaceRelationDeleteView(DeleteView):
     model = CataloguePlaceRelation
     success_url = reverse_lazy('catalogueplacerelations')
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.change_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().catalogue.collection.dataset
+    # End permission check
 
 
 # Category views
