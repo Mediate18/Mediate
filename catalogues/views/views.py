@@ -1264,7 +1264,7 @@ class CataloguePlaceRelationTableView(ListView):
         return context
 
 
-class CataloguePlaceRelationDetailView(DetailView):
+class CataloguePlaceRelationDetailView(PermissionRequiredMixin, DetailView):
     model = CataloguePlaceRelation
     template_name = 'generic_detail.html'
 
@@ -1294,7 +1294,7 @@ class CataloguePlaceRelationCreateView(CreateView):
         return context
 
 
-class CataloguePlaceRelationUpdateView(UpdateView):
+class CataloguePlaceRelationUpdateView(PermissionRequiredMixin, UpdateView):
     model = CataloguePlaceRelation
     template_name = 'generic_form.html'
     form_class = CataloguePlaceRelationModelForm
@@ -1329,7 +1329,7 @@ class CataloguePlaceRelationUpdateView(UpdateView):
         return context
 
 
-class CataloguePlaceRelationDeleteView(DeleteView):
+class CataloguePlaceRelationDeleteView(PermissionRequiredMixin, DeleteView):
     model = CataloguePlaceRelation
     success_url = reverse_lazy('catalogueplacerelations')
 
