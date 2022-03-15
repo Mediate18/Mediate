@@ -17,6 +17,7 @@ from django.db.models import Q
 
 import django_tables2
 from guardian.shortcuts import get_objects_for_user
+from guardian.mixins import PermissionRequiredMixin
 from django_select2.views import AutoResponseView
 
 from dal import autocomplete
@@ -32,6 +33,8 @@ from ..tables import *
 from catalogues.models import Category
 from persons.forms import PersonModelForm
 from mediate.views import GenericDetailView
+from catalogues.views.views import get_catalogues_for_session
+from catalogues.tools import get_datasets_for_session
 from simplemoderation.models import Moderation, ModerationAction
 
 from simplemoderation.tools import moderate
@@ -106,7 +109,9 @@ class ItemTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        items = Item.objects.order_by('lot__catalogue__year_of_publication', 'lot__catalogue__short_title',
+        items = Item.objects \
+            .filter(lot__catalogue_id__in=get_catalogues_for_session(self.request)) \
+            .order_by('lot__catalogue__year_of_publication', 'lot__catalogue__short_title',
                                       'lot__index_in_catalogue', 'index_in_lot', 'lot__lot_as_listed_in_catalogue')
         lot_uuid = self.request.GET.get('lot__uuid')
         if lot_uuid:
@@ -221,9 +226,11 @@ class PersonAndRoleAutocompleteView(AutoResponseView):
         person_query = Q(person__short_name__icontains=term)
         role_query = Q(role__name__icontains=term)
 
-        person_item_relations = PersonItemRelation.objects.filter(person_query | role_query)\
-                                    .values('person', 'person__short_name', 'role', 'role__name')\
-                                    .distinct().order_by('person__short_name')[begin:end]
+        person_item_relations = PersonItemRelation.objects\
+                .filter(item__lot__catalogue__collection__dataset__in=get_datasets_for_session(request)) \
+                .filter(person_query | role_query)\
+                .values('person', 'person__short_name', 'role', 'role__name')\
+                .distinct().order_by('person__short_name')[begin:end]
 
         more = True
         if len(person_item_relations) != self.page_size:
@@ -248,7 +255,9 @@ class TaggedItemTableView(ListView):
 
     def get_queryset(self):
         tags = get_objects_for_user(self.request.user, 'tagme.view_entities_with_this_tag')
-        return Item.objects.filter(tags__tag__in=tags)
+        return Item.objects\
+            .filter(lot__catalogue_id__in=get_catalogues_for_session(self.request))\
+            .filter(tags__tag__in=tags)
 
     def get(self, request, *args, **kwargs):
         # Handle the _export query
@@ -310,7 +319,9 @@ class ItemLocationMapView(ListView):
     template_name = 'generic_location_map.html'
 
     def get_queryset(self):
-        items = Item.objects.filter(edition__place__latitude__isnull=False, edition__place__longitude__isnull=False)
+        items = Item.objects\
+            .filter(lot__catalogue_id__in=get_catalogues_for_session(self.request))\
+            .filter(edition__place__latitude__isnull=False, edition__place__longitude__isnull=False)
         return items
 
     def get_context_data(self, **kwargs):
@@ -331,9 +342,16 @@ class ItemLocationMapView(ListView):
         return context
 
 
-class ItemDetailView(DetailView):
+class ItemDetailView(PermissionRequiredMixin, DetailView):
     model = Item
     template_name = 'items/item_detail.html'
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.view_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().lot.catalogue.collection.dataset
+    # End permission check
 
 
 class ItemCreateView(CreateView):
@@ -341,6 +359,12 @@ class ItemCreateView(CreateView):
     template_name = 'generic_form.html'
     form_class = ItemModelForm
     success_url = reverse_lazy('items')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['collections'] = Collection.objects.filter(dataset__in=get_datasets_for_session(self.request))
+        kwargs['lots'] = Lot.objects.filter(catalogue__in=get_catalogues_for_session(self.request))
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -350,11 +374,24 @@ class ItemCreateView(CreateView):
 
 
 @moderate(action=ModerationAction.UPDATE)
-class ItemUpdateView(UpdateView):
+class ItemUpdateView(PermissionRequiredMixin, UpdateView):
     model = Item
     template_name = 'generic_form.html'
     form_class = ItemModelForm
     success_url = reverse_lazy('items')
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.change_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().lot.catalogue.collection.dataset
+    # End permission check
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['collections'] = Collection.objects.filter(dataset__in=get_datasets_for_session(self.request))
+        kwargs['lots'] = Lot.objects.filter(catalogue__in=get_catalogues_for_session(self.request))
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -363,9 +400,16 @@ class ItemUpdateView(UpdateView):
         return context
 
 
-class ItemDeleteView(DeleteView):
+class ItemDeleteView(PermissionRequiredMixin, DeleteView):
     model = Item
     success_url = reverse_lazy('items')
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.change_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().lot.catalogue.collection.dataset
+    # End permission check
 
     def get_success_url(self):
         return self.request.META.get('HTTP_REFERER', self.success_url)
@@ -1896,6 +1940,12 @@ class ItemAndEditionCreateView(CreateView):
     success_url = reverse_lazy('items')
     success_msg = _("Added an item and a edition.")
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['collections'] = Collection.objects.filter(dataset__in=get_datasets_for_session(self.request))
+        kwargs['lots'] = Lot.objects.filter(catalogue__in=get_catalogues_for_session(self.request))
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("add")
@@ -1922,10 +1972,17 @@ class ItemAndEditionCreateView(CreateView):
         return HttpResponseRedirect(self.success_url)
 
 
-class ItemAndEditionUpdateView(ItemAndEditionCreateView):
+class ItemAndEditionUpdateView(PermissionRequiredMixin, ItemAndEditionCreateView):
     model = Item
     template_name = 'items/item_update_form.html'
     success_msg = _("Changed an item and a edition.")
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.change_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().lot.catalogue.collection.dataset
+    # End permission check
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1939,4 +1996,6 @@ class ItemAndEditionUpdateView(ItemAndEditionCreateView):
             'item': self.object,
             'edition': self.object.edition,
         })
+        kwargs['collections'] = Collection.objects.filter(dataset__in=get_datasets_for_session(self.request))
+        kwargs['lots'] = Lot.objects.filter(catalogue__in=get_catalogues_for_session(self.request))
         return kwargs

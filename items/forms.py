@@ -17,7 +17,29 @@ class BookFormatModelForm(forms.ModelForm):
 
 
 class ItemModelForm(forms.ModelForm):
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
+        self.collections = kwargs.pop('collections', None)
+        self.lots = kwargs.pop('lots', None)
+        super().__init__(*args, **kwargs)
+
+        if self.collections:
+            self.fields['collection'] = forms.ModelChoiceField(
+                queryset=self.collections,
+                widget=ModelSelect2Widget(
+                    queryset=self.collections,
+                    search_fields=['name__icontains'],
+                ),
+            )
+
+        if self.lots:
+            self.fields['lot'] = forms.ModelChoiceField(
+                queryset=self.lots,
+                widget=ModelSelect2Widget(
+                    queryset=self.lots,
+                    search_fields=['lot_as_listed_in_catalogue__icontains'],
+                ),
+            )
+        
         super().__init__(**kwargs)
         self.content_type = ContentType.objects.get_for_model(self.instance)
         self.add_tag_field()
@@ -543,11 +565,6 @@ class ItemModelForm2(ItemModelForm):
         model = Item
         exclude = ['edition']
         widgets = {
-            'collection': Select2Widget,
-            'lot': ModelSelect2Widget(
-                model=Lot,
-                search_fields=['lot_as_listed_in_catalogue__icontains']
-            ),
             'book_format': Select2Widget,
             'binding_material_details': Select2Widget,
             'language': Select2Widget,
@@ -560,3 +577,29 @@ class ItemAndEditionForm(MultiModelForm):
         ('item', ItemModelForm2),
         ('edition', EditionModelForm)
     ])
+
+    def __init__(self, *args, **kwargs):
+        self.collections = kwargs.pop('collections', None)
+        self.lots = kwargs.pop('lots', None)
+        super().__init__(*args, **kwargs)
+
+        fields = self.fields
+        d = self.__dict__
+
+        if self.collections:
+            self.forms['item'].fields['collection'] = forms.ModelChoiceField(
+                queryset=self.collections,
+                widget=ModelSelect2Widget(
+                    queryset=self.collections,
+                    search_fields=['name__icontains'],
+                ),
+            )
+
+        if self.lots:
+            self.forms['item'].fields['lot'] = forms.ModelChoiceField(
+                queryset=self.lots,
+                widget=ModelSelect2Widget(
+                    queryset=self.lots,
+                    search_fields=['lot_as_listed_in_catalogue__icontains'],
+                ),
+            )
