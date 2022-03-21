@@ -513,7 +513,7 @@ class ItemItemTypeRelationTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return ItemItemTypeRelation.objects.all()
+        return ItemItemTypeRelation.objects.filter(item__lot__catalogue__in=get_catalogues_for_session(self.request))
 
     def get_context_data(self, **kwargs):
         context = super(ItemItemTypeRelationTableView, self).get_context_data(**kwargs)
@@ -532,8 +532,16 @@ class ItemItemTypeRelationTableView(ListView):
         return context
 
 
-class ItemItemTypeRelationDetailView(DetailView):
+class ItemItemTypeRelationDetailView(PermissionRequiredMixin, DetailView):
     model = ItemItemTypeRelation
+    template_name = 'generic_detail.html'
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.view_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().item.lot.catalogue.collection.dataset
+    # End permission check
 
 
 class ItemItemTypeRelationCreateView(CreateView):
@@ -542,6 +550,11 @@ class ItemItemTypeRelationCreateView(CreateView):
     form_class = ItemItemTypeRelationModelForm
     success_url = reverse_lazy('itemitemtyperelations')
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['items'] = Item.objects.filter(lot__catalogue__in=get_catalogues_for_session(self.request))
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("add")
@@ -549,11 +562,23 @@ class ItemItemTypeRelationCreateView(CreateView):
         return context
 
 
-class ItemItemTypeRelationUpdateView(UpdateView):
+class ItemItemTypeRelationUpdateView(PermissionRequiredMixin, UpdateView):
     model = ItemItemTypeRelation
     template_name = 'generic_form.html'
     form_class = ItemItemTypeRelationModelForm
     success_url = reverse_lazy('itemitemtyperelations')
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.change_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().item.lot.catalogue.collection.dataset
+    # End permission check
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['items'] = Item.objects.filter(lot__catalogue__in=get_catalogues_for_session(self.request))
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -562,9 +587,16 @@ class ItemItemTypeRelationUpdateView(UpdateView):
         return context
 
 
-class ItemItemTypeRelationDeleteView(DeleteView):
+class ItemItemTypeRelationDeleteView(PermissionRequiredMixin, DeleteView):
     model = ItemItemTypeRelation
     success_url = reverse_lazy('itemitemtyperelations')
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.change_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().item.lot.catalogue.collection.dataset
+    # End permission check
 
 
 # ItemLanguageRelation views
