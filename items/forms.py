@@ -243,8 +243,6 @@ class ItemAuthorModelForm(forms.ModelForm):
         self.items = kwargs.pop('items', None)
         super().__init__(*args, **kwargs)
 
-        print(self.items.query)
-
         if self.items is not None:
             self.fields['item'] = forms.ModelChoiceField(
                 queryset=self.items,
