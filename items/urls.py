@@ -48,6 +48,8 @@ urlpatterns = [
          permission_required('catalogues.change_category')(add_parisian_category_to_items),
          name='add_parisiancategories_to_items'),
 
+    path('items/item_suggest', permission_required('global.view_all')(ItemSuggest.as_view()), name='item_suggest'),
+
     # Tagged Item urls
     path('taggeditems/', login_required(TaggedItemTableView.as_view()), name='taggeditems'),
 

@@ -5,9 +5,11 @@ from django_select2.forms import Select2Widget, ModelSelect2Widget, ModelSelect2
 from apiconnectors.widgets import ApiSelectWidget
 from .models import *
 from catalogues.models import Category, ParisianCategory
+from catalogues.views.views import get_catalogues_for_session
 
 from tagme.models import Tag
 from betterforms.multiform import MultiModelForm
+from dal import autocomplete
 
 
 class BookFormatModelForm(forms.ModelForm):
@@ -216,16 +218,41 @@ class ItemModelForm(forms.ModelForm):
         return self.instance
 
 
+class ItemSuggest(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = Item.objects.filter(lot__catalogue__in=get_catalogues_for_session(self.request))
+
+        if self.q:
+            qs = qs.filter(short_title__icontains=self.q)
+
+        return qs
+
+
 class ItemAuthorModelForm(forms.ModelForm):
     class Meta:
         model = ItemAuthor
         fields = "__all__"
         widgets = {
-            'item': ModelSelect2Widget(
-                model=Item,
-                search_fields=['short_title__icontains']
-            ),
+            'author': ModelSelect2Widget(
+                queryset=Person.objects.all(),
+                search_fields=['short_name__icontains', 'surname__icontains', 'first_names__icontains']
+            )
         }
+
+    def __init__(self, *args, **kwargs):
+        self.items = kwargs.pop('items', None)
+        super().__init__(*args, **kwargs)
+
+        print(self.items.query)
+
+        if self.items is not None:
+            self.fields['item'] = forms.ModelChoiceField(
+                queryset=self.items,
+                widget=autocomplete.ModelSelect2(
+                    url='item_suggest',
+                    attrs={'data-placeholder': "Search for an item", 'data-minimum-input-length': 3},
+                )
+            )
 
 
 class ItemItemTypeRelationModelForm(forms.ModelForm):
