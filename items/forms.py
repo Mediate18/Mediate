@@ -307,12 +307,19 @@ class ItemMaterialDetailsRelationModelForm(forms.ModelForm):
     class Meta:
         model = ItemMaterialDetailsRelation
         fields = "__all__"
-        widgets = {
-            'item': ModelSelect2Widget(
-                model=Item,
-                search_fields=['short_title__icontains']
-            ),
-        }
+
+    def __init__(self, *args, **kwargs):
+        self.items = kwargs.pop('items', None)
+        super().__init__(*args, **kwargs)
+
+        if self.items is not None:
+            self.fields['item'] = forms.ModelChoiceField(
+                queryset=self.items,
+                widget=autocomplete.ModelSelect2(
+                    url='item_suggest',
+                    attrs={'data-placeholder': "Search for an item", 'data-minimum-input-length': 3},
+                )
+            )
 
 
 class ItemTypeModelForm(forms.ModelForm):
