@@ -605,7 +605,7 @@ class ItemLanguageRelationTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return ItemLanguageRelation.objects.all()
+        return ItemLanguageRelation.objects.filter(item__lot__catalogue__in=get_catalogues_for_session(self.request))
 
     def get_context_data(self, **kwargs):
         context = super(ItemLanguageRelationTableView, self).get_context_data(**kwargs)
@@ -624,8 +624,16 @@ class ItemLanguageRelationTableView(ListView):
         return context
 
 
-class ItemLanguageRelationDetailView(DetailView):
+class ItemLanguageRelationDetailView(PermissionRequiredMixin, DetailView):
     model = ItemLanguageRelation
+    template_name = 'generic_detail.html'
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.view_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().item.lot.catalogue.collection.dataset
+    # End permission check
 
 
 class ItemLanguageRelationCreateView(CreateView):
@@ -634,6 +642,11 @@ class ItemLanguageRelationCreateView(CreateView):
     form_class = ItemLanguageRelationModelForm
     success_url = reverse_lazy('itemlanguagerelations')
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['items'] = Item.objects.filter(lot__catalogue__in=get_catalogues_for_session(self.request))
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("add")
@@ -641,11 +654,23 @@ class ItemLanguageRelationCreateView(CreateView):
         return context
 
 
-class ItemLanguageRelationUpdateView(UpdateView):
+class ItemLanguageRelationUpdateView(PermissionRequiredMixin, UpdateView):
     model = ItemLanguageRelation
     template_name = 'generic_form.html'
     form_class = ItemLanguageRelationModelForm
     success_url = reverse_lazy('itemlanguagerelations')
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.change_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().item.lot.catalogue.collection.dataset
+    # End permission check
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['items'] = Item.objects.filter(lot__catalogue__in=get_catalogues_for_session(self.request))
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -654,9 +679,16 @@ class ItemLanguageRelationUpdateView(UpdateView):
         return context
 
 
-class ItemLanguageRelationDeleteView(DeleteView):
+class ItemLanguageRelationDeleteView(PermissionRequiredMixin, DeleteView):
     model = ItemLanguageRelation
     success_url = reverse_lazy('itemlanguagerelations')
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.change_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().item.lot.catalogue.collection.dataset
+    # End permission check
 
 
 # ItemMaterialDetailsRelation views
