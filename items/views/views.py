@@ -1007,13 +1007,20 @@ class WorkVIAFSuggest(autocomplete.Select2ListView):
         return JsonResponse({'results': viaf_result})
 
 
-class ItemWorkRelationAddView(UpdateView):
+class ItemWorkRelationAddView(PermissionRequiredMixin, UpdateView):
     """
     A view to add works to an item through ItemWorkRelations
     """
     model = Item
     template_name = 'items/manage_itemworkrelations_form.html'
     form_class = ItemWorkRelationAddForm
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.change_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().lot.catalogue.collection.dataset
+    # End permission check
 
     def get_success_url(self):
         return self.request.META['HTTP_REFERER']
