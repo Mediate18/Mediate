@@ -1292,13 +1292,20 @@ class PersonItemRelationDeleteView(PermissionRequiredMixin, DeleteView):
 
 
 @moderate(action=ModerationAction.CREATE)
-class PersonItemRelationAddView(SingleObjectMixin, FormView):
+class PersonItemRelationAddView(PermissionRequiredMixin, SingleObjectMixin, FormView):
     """
     A view to add persons to an item through PersonItemRelations
     """
     model = Item
     template_name = 'items/manage_personitemrelations_form.html'
     form_class = PersonItemRelationAddForm
+
+    # Object permission check by Django Guardian
+    permission_required = 'catalogues.change_dataset'
+
+    def get_permission_object(self):
+        return self.get_object().lot.catalogue.collection.dataset
+    # End permission check
 
     def get_success_url(self):
         return self.request.META['HTTP_REFERER']
