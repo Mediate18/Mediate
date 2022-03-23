@@ -16,7 +16,7 @@ from django.db import transaction
 from django.db.models import Q
 
 import django_tables2
-from guardian.shortcuts import get_objects_for_user
+from guardian.shortcuts import get_objects_for_user, get_perms
 from guardian.mixins import PermissionRequiredMixin
 from django_select2.views import AutoResponseView
 
@@ -1355,7 +1355,8 @@ def add_person_to_items(request):
             for item_id in items:
                 item = Item.objects.get(uuid=item_id)
                 form_set = PersonItemRelationAddFormSet(data=request.POST)
-                if form_set.is_valid():
+                if form_set.is_valid() and 'change_dataset' in \
+                        get_perms(request.user, item.lot.catalogue.collection.dataset):
                     for form in form_set:
                         if form.is_valid() and form.has_changed():
                             try:
@@ -1389,11 +1390,16 @@ def set_publication_place_for_items(request):
             if publicationplaceform.is_valid():
                 for item_id in items:
                     item = Item.objects.get(uuid=item_id)
-                    if not item.edition:
-                        item.edition = Edition()
-                        item.save()
-                    item.edition.place = publicationplaceform.cleaned_data['place']
-                    item.edition.save()
+                    if 'change_dataset' in get_perms(request.user, item.lot.catalogue.collection.dataset):
+                        if not item.edition:
+                            item.edition = Edition()
+                            item.save()
+                        item.edition.place = publicationplaceform.cleaned_data['place']
+                        item.edition.save()
+                    else:
+                        messages.add_message(request, messages.ERROR,
+                                             _("Item {} could not be used for setting a place of publication"
+                                               " because you are not allowed to change the dataset.".format(item)))
             else:
                 messages.add_message(request, messages.WARNING, _("The Place form was invalid."))
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
@@ -1414,8 +1420,13 @@ def set_bookformat_for_items(request):
             if itemformatform.is_valid():
                 for item_id in items:
                     item = Item.objects.get(uuid=item_id)
-                    item.book_format = itemformatform.cleaned_data['book_format']
-                    item.save()
+                    if 'change_dataset' in get_perms(request.user, item.lot.catalogue.collection.dataset):
+                        item.book_format = itemformatform.cleaned_data['book_format']
+                        item.save()
+                    else:
+                        messages.add_message(request, messages.ERROR,
+                                             _("Item {} could not be used for setting a book format"
+                                               " because you are not allowed to change the dataset.".format(item)))
             else:
                 messages.add_message(request, messages.WARNING, _("The Book Format form was invalid."))
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
@@ -1436,15 +1447,20 @@ def set_publisher_for_items(request):
             if publisherform.is_valid():
                 for item_id in items:
                     item = Item.objects.get(uuid=item_id)
-                    if not item.edition:
-                        item.edition = Edition()
-                        item.save()
-                    try:
-                        publisher = Publisher(edition=item.edition, publisher=publisherform.cleaned_data['publisher'])
-                        publisher.save()
-                    except IntegrityError:
-                        # Unique constraint failed; the Publisher already exists
-                        pass
+                    if 'change_dataset' in get_perms(request.user, item.lot.catalogue.collection.dataset):
+                        if not item.edition:
+                            item.edition = Edition()
+                            item.save()
+                        try:
+                            publisher = Publisher(edition=item.edition, publisher=publisherform.cleaned_data['publisher'])
+                            publisher.save()
+                        except IntegrityError:
+                            # Unique constraint failed; the Publisher already exists
+                            pass
+                    else:
+                        messages.add_message(request, messages.ERROR,
+                                             _("Item {} could not be used for setting a publisher"
+                                               " because you are not allowed to change the dataset.".format(item)))
             else:
                 messages.add_message(request, messages.WARNING, _("The Publisher form was invalid."))
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
@@ -1466,13 +1482,18 @@ def add_language_to_items(request):
                 language = Language.objects.get(uuid=language_id)
                 for item_id in items:
                     item = Item.objects.get(uuid=item_id)
-                    try:
-                        itemlanguagerelation = ItemLanguageRelation(item=item,
-                                                                    language=language)
-                        itemlanguagerelation.save()
-                    except IntegrityError:
-                        # Unique constraint failed; the ItemLanguageRelation already exists
-                        pass
+                    if 'change_dataset' in get_perms(request.user, item.lot.catalogue.collection.dataset):
+                        try:
+                            itemlanguagerelation = ItemLanguageRelation(item=item,
+                                                                        language=language)
+                            itemlanguagerelation.save()
+                        except IntegrityError:
+                            # Unique constraint failed; the ItemLanguageRelation already exists
+                            pass
+                    else:
+                        messages.add_message(request, messages.ERROR,
+                                             _("Item {} could not be used for adding a language"
+                                               " because you are not allowed to change the dataset.".format(item)))
         else:
             messages.add_message(request, messages.WARNING, _("No items and/or no language selected."))
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
@@ -1494,12 +1515,17 @@ def add_type_to_items(request):
                 itemtype = ItemType.objects.get(uuid=type_id)
                 for item_id in items:
                     item = Item.objects.get(uuid=item_id)
-                    try:
-                        itemitemtyperelation = ItemItemTypeRelation(item=item, type=itemtype)
-                        itemitemtyperelation.save()
-                    except IntegrityError:
-                        # Unique constraint failed; the ItemItemTypeRelation already exists
-                        pass
+                    if 'change_dataset' in get_perms(request.user, item.lot.catalogue.collection.dataset):
+                        try:
+                            itemitemtyperelation = ItemItemTypeRelation(item=item, type=itemtype)
+                            itemitemtyperelation.save()
+                        except IntegrityError:
+                            # Unique constraint failed; the ItemItemTypeRelation already exists
+                            pass
+                    else:
+                        messages.add_message(request, messages.ERROR,
+                                             _("Item {} could not be used for adding a type"
+                                               " because you are not allowed to change the dataset.".format(item)))
         else:
             messages.add_message(request, messages.WARNING, _("No items and/or no types selected."))
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
@@ -1521,13 +1547,18 @@ def add_tags_to_items(request):
                 tag = Tag.objects.get(id=tag_id)
                 for item_id in items:
                     item = Item.objects.get(uuid=item_id)
-                    try:
-                        if tag.id not in item.tags.values_list('tag', flat=True):
-                            item.tags.create(tag=tag)
-                    except IntegrityError as ie:
-                        # Unique constraint failed; the ItemItemTypeRelation already exists
-                        print(ie)
-                        pass
+                    if 'change_dataset' in get_perms(request.user, item.lot.catalogue.collection.dataset):
+                        try:
+                            if tag.id not in item.tags.values_list('tag', flat=True):
+                                item.tags.create(tag=tag)
+                        except IntegrityError as ie:
+                            # Unique constraint failed; the ItemItemTypeRelation already exists
+                            print(ie)
+                            pass
+                    else:
+                        messages.add_message(request, messages.ERROR,
+                                             _("Item {} could not be used for adding a tag"
+                                               " because you are not allowed to change the dataset.".format(item)))
         else:
             messages.add_message(request, messages.WARNING, _("No items and/or no tags selected."))
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
@@ -1549,11 +1580,16 @@ def add_works_to_items(request):
                 work = Work.objects.get(uuid=work_id)
                 for item_id in items:
                     item = Item.objects.get(uuid=item_id)
-                    try:
-                        ItemWorkRelation.objects.create(item=item, work=work)
-                    except IntegrityError:
-                        # Unique constraint failed; the ItemItemTypeRelation already exists
-                        pass
+                    if 'change_dataset' in get_perms(request.user, item.lot.catalogue.collection.dataset):
+                        try:
+                            ItemWorkRelation.objects.create(item=item, work=work)
+                        except IntegrityError:
+                            # Unique constraint failed; the ItemItemTypeRelation already exists
+                            pass
+                    else:
+                        messages.add_message(request, messages.ERROR,
+                                             _("Item {} could not be used for adding a work"
+                                               " because you are not allowed to change the dataset.".format(item)))
         else:
             messages.add_message(request, messages.WARNING, _("No items and/or no works selected."))
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
@@ -1575,11 +1611,16 @@ def add_materialdetails_to_items(request):
                 material_details = MaterialDetails.objects.get(uuid=material_details_id)
                 for item_id in items:
                     item = Item.objects.get(uuid=item_id)
-                    try:
-                        ItemMaterialDetailsRelation.objects.create(item=item, material_details=material_details)
-                    except IntegrityError:
-                        # Unique constraint failed; the ItemItemTypeRelation already exists
-                        pass
+                    if 'change_dataset' in get_perms(request.user, item.lot.catalogue.collection.dataset):
+                        try:
+                            ItemMaterialDetailsRelation.objects.create(item=item, material_details=material_details)
+                        except IntegrityError:
+                            # Unique constraint failed; the ItemItemTypeRelation already exists
+                            pass
+                    else:
+                        messages.add_message(request, messages.ERROR,
+                                             _("Item {} could not be used for adding material details"
+                                               " because you are not allowed to change the dataset.".format(item)))
         else:
             messages.add_message(request, messages.WARNING, _("No items and/or no material details selected."))
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
@@ -1596,7 +1637,11 @@ def add_parisian_category_to_items(request):
     if request.method == 'POST':
         if 'entries' in request.POST and 'parisian_category' in request.POST:
             item_ids = request.POST.getlist('entries')
-            items = Item.objects.filter(uuid__in=item_ids)
+            items = Item.objects.filter(uuid__in=item_ids, lot__catalogue__in=get_catalogues_for_session(request))
+            if len(item_ids) != items.count():
+                messages.add_message(request, messages.ERROR,
+                                     _("Some items could not be used for adding a parisian category"
+                                       " because you are not allowed to change the dataset."))
             parisian_category_id = request.POST.get('parisian_category')
             items.update(parisian_category_id=parisian_category_id)
         else:
