@@ -386,21 +386,30 @@ class MaterialDetailsModelForm(forms.ModelForm):
 class PersonItemRelationModelForm(forms.ModelForm):
     class Meta:
         model = PersonItemRelation
-        fields = "__all__"
+        fields = ['item', 'person', 'role', 'notes']
         widgets = {
             'person': ModelSelect2Widget(
                 model=Person,
                 search_fields=['short_name__icontains']
-            ),
-            'item': ModelSelect2Widget(
-                model=Item,
-                search_fields=['short_title__icontains']
             ),
             'role': ModelSelect2Widget(
                 model=PersonItemRelationRole,
                 search_fields=['name__icontains']
             )
         }
+
+    def __init__(self, *args, **kwargs):
+        self.items = kwargs.pop('items', None)
+        super().__init__(*args, **kwargs)
+
+        if self.items is not None:
+            self.fields['item'] = forms.ModelChoiceField(
+                queryset=self.items,
+                widget=autocomplete.ModelSelect2(
+                    url='item_suggest',
+                    attrs={'data-placeholder': "Search for an item", 'data-minimum-input-length': 3},
+                )
+            )
 
 
 class AddAnotherWidget(ModelSelect2Widget):
