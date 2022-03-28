@@ -44,9 +44,10 @@ def view_totals(request):
     :param request:
     :return:
     """
-    catalogues = Catalogue.objects.count()
-    book_items = Item.objects.filter(non_book=False).count()
-    non_book_items = Item.objects.filter(non_book=True).count()
+    catalogues = list(get_catalogues_for_session(request))
+    catalogues_count = get_catalogues_for_session(request).count()
+    book_items = Item.objects.filter(lot__catalogue__in=catalogues, non_book=False).count()
+    non_book_items = Item.objects.filter(lot__catalogue__in=catalogues, non_book=True).count()
     works = Work.objects.count()
     persons = Person.objects.count()
     female_persons = Person.objects.filter(sex=Person.FEMALE).count()
@@ -58,22 +59,28 @@ def view_totals(request):
     cities = len(cities_list)
     countries = Country.objects.filter(place__in=cities_list).distinct().count()
 
-    languages = Language.objects.annotate(item_cnt=Count('items', filter=Q(items__item__non_book=False)))\
+    languages = Language.objects\
+        .annotate(item_cnt=Count('items', filter=Q(items__item__lot__catalogue__in=catalogues,
+                                                   items__item__non_book=False)))\
         .filter(item_cnt__gt=0).count()
 
-    item_person_relations = PersonItemRelation.objects.filter(item__non_book=False).values('item').distinct().count()
-    item_work_relations = ItemWorkRelation.objects.filter(item__non_book=False).distinct().count()
-    items_with_date = Item.objects.filter(edition__year_start__isnull=False, non_book=False).distinct().count()
-    items_with_place_of_publication = Item.objects.filter(edition__place__isnull=False, non_book=False)\
-        .distinct().count()
+    item_person_relations = PersonItemRelation.objects.filter(item__lot__catalogue__in=catalogues,
+                                                              item__non_book=False).values('item').distinct().count()
+    item_work_relations = ItemWorkRelation.objects.filter(item__lot__catalogue__in=catalogues,
+                                                          item__non_book=False).distinct().count()
+    items_with_date = Item.objects.filter(lot__catalogue__in=catalogues, edition__year_start__isnull=False,
+                                          non_book=False).distinct().count()
+    items_with_place_of_publication = Item.objects.filter(lot__catalogue__in=catalogues, edition__place__isnull=False,
+                                                          non_book=False).distinct().count()
     
     persons_with_place_of_birth = Person.objects.filter(city_of_birth__isnull=False).distinct().count()
     persons_with_place_of_death = Person.objects.filter(city_of_death__isnull=False).distinct().count()
 
-    books_with_language = Item.objects.filter(languages__isnull=False, non_book=False).distinct().count()
+    books_with_language = Item.objects.filter(lot__catalogue__in=catalogues, languages__isnull=False, non_book=False)\
+        .distinct().count()
 
     context = {
-        'catalogues': catalogues,
+        'catalogues': catalogues_count,
         'book_items': book_items,
         'non_book_items': non_book_items,
         'percentage_non_book_items': round(100 * non_book_items/book_items, 1),
