@@ -301,7 +301,7 @@ class ItemTagRankingTableView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ItemTagRankingTableView, self).get_context_data(**kwargs)
-        filter = ItemTagRankingFilter(self.request.GET, queryset=self.get_queryset())
+        filter = ItemTagRankingFilter(self.request.GET, queryset=self.get_queryset(), request=self.request)
 
         table = ItemTagRankingTable(filter.qs)
         django_tables2.RequestConfig(self.request, ).configure(table)

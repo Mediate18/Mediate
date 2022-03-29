@@ -7,6 +7,7 @@ from tagme.models import Tag
 from .models import *
 from persons.models import Country, Profession, Religion
 from catalogues.models import Catalogue, ParisianCategory, PersonCatalogueRelation
+from catalogues.views.views import get_catalogues_for_session
 from mediate.tools import filter_multiple_words
 from mediate.filters import QBasedFilterset, RangeFilterQ, MultipleChoiceFilterQWithExtraLookups, \
     ModelMultipleChoiceFilterQ
@@ -84,12 +85,22 @@ class ItemTagRankingFilter(QBasedFilterset):
         model = Tag
         exclude = ['namespace', 'uuid']
 
+    def __init__(self, *args, **kwargs):
+        request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
+        self.request = request
+        print("Filter", self.request)
+
     # Override method
     @property
     def qs(self):
         qs = super().qs
         self._qs = qs.distinct() \
-            .annotate(item_count=Count('taggedentity__items', filter=Q(taggedentity__items__non_book=False), distinct=True)) \
+            .annotate(item_count=Count('taggedentity__items',
+                                       filter=Q(taggedentity__items__non_book=False,
+                                                taggedentity__items__lot__catalogue__in=
+                                                get_catalogues_for_session(self.request)),
+                                       distinct=True)) \
             .order_by('-item_count')
         return self._qs
 
