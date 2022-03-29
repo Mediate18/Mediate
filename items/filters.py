@@ -836,13 +836,22 @@ class EditionFilter(django_filters.FilterSet):
 
 
 class EditionRankingFilter(EditionFilter):
+    def __init__(self, *args, **kwargs):
+        request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
+        self.request = request
+        print("Filter", self.request)
+
     # Override method
     @property
     def qs(self):
         qs = super().qs
         self._qs = qs.distinct() \
             .annotate(item_count=Count('items', distinct=True)) \
-            .annotate(catalogue_count=Count('items__lot__catalogue', distinct=True)) \
+            .annotate(catalogue_count=Count('items__lot__catalogue',
+                                            filter=Q(items__lot__catalogue__in=
+                                                get_catalogues_for_session(self.request)),
+                                            distinct=True)) \
             .order_by('-item_count')
         return self._qs
 

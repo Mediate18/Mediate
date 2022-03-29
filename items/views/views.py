@@ -1812,7 +1812,7 @@ class EditionRankingTableView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(EditionRankingTableView, self).get_context_data(**kwargs)
-        filter = EditionRankingFilter(self.request.GET, queryset=self.get_queryset())
+        filter = EditionRankingFilter(self.request.GET, queryset=self.get_queryset(), request=self.request)
 
         table = EditionRankingTable(filter.qs)
         django_tables2.RequestConfig(self.request, ).configure(table)
