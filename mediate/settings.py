@@ -260,3 +260,15 @@ MAINTENANCE_MODE = config('MAINTENANCE_MODE', False, cast=bool)
 TEST_WITHOUT_MIGRATIONS_COMMAND = 'django_nose.management.commands.test.Command'
 
 DATASET_NAME_FOR_ANONYMOUSUSER = "Sandbox"
+
+# Determine whether to use Silk (https://github.com/jazzband/django-silk)
+SILK = config('SILK', False, cast=bool)
+if SILK:
+    try:
+        import silk
+        INSTALLED_APPS.append('silk')
+        MIDDLEWARE.insert(MIDDLEWARE.index('django.contrib.auth.middleware.AuthenticationMiddleware') + 1,
+                          'silk.middleware.SilkyMiddleware')
+    except ImportError:
+        SILK = False
+

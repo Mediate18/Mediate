@@ -116,3 +116,6 @@ urlpatterns = [
     url(r'protected_media/(?P<filename>.*)$', protected_media, name='protected_media'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) \
               + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.SILK:
+    urlpatterns += [path('silk/', include('silk.urls', namespace='silk'))]
