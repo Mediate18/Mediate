@@ -89,7 +89,6 @@ class ItemTagRankingFilter(QBasedFilterset):
         request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
         self.request = request
-        print("Filter", self.request)
 
     # Override method
     @property
@@ -955,13 +954,24 @@ class WorkFilter(QBasedFilterset):
 
 # Work Ranking filter
 class WorkRankingFilter(WorkFilter):
+    def __init__(self, *args, **kwargs):
+        request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
+        self.request = request
+
     # Override method
     @property
     def qs(self):
         qs = super().qs
         self._qs = qs.distinct() \
-            .annotate(item_count=Count('items__item', distinct=True)) \
-            .annotate(catalogue_count=Count('items__item__lot__catalogue', distinct=True)) \
+            .annotate(item_count=Count('items__item',
+                                       filter=Q(items__item__lot__catalogue__in=
+                                                get_catalogues_for_session(self.request)),
+                                       distinct=True)) \
+            .annotate(catalogue_count=Count('items__item__lot__catalogue',
+                                            filter=Q(items__item__lot__catalogue__in=
+                                                     get_catalogues_for_session(self.request)),
+                                            distinct=True)) \
             .order_by('-item_count')
         return self._qs
 

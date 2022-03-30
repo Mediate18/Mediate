@@ -2014,7 +2014,7 @@ class WorkRankingTableView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(WorkRankingTableView, self).get_context_data(**kwargs)
-        filter = WorkRankingFilter(self.request.GET, queryset=self.get_queryset())
+        filter = WorkRankingFilter(self.request.GET, queryset=self.get_queryset(), request=self.request)
 
         table = WorkRankingTable(filter.qs)
         django_tables2.RequestConfig(self.request, ).configure(table)
