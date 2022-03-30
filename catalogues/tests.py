@@ -11,6 +11,9 @@ from transcriptions.models import *
 
 
 class DatasetTests(GenericCRUDTestMixin, TestCase):
+    """
+    This is more or less a dummy test class since Dataset does not have any CRUD view (yet).
+    """
     model = Dataset
 
     def get_add_form_data(self):
@@ -23,6 +26,26 @@ class DatasetTests(GenericCRUDTestMixin, TestCase):
             'name': 'name_test2'
         }
 
+    def test_List(self):
+        # No Dataset list/table view exists
+        pass
+
+    def test_Detail(self):
+        # No Dataset detail view exists
+        pass
+
+    def test_Delete(self):
+        # No Dataset delete view exists
+        pass
+
+    def test_Add(self):
+        # No Dataset add view exists
+        pass
+
+    def test_Change(self):
+        # No Dataset change view exists
+        pass
+
 
 class CollectionTests(GenericCRUDTestMixin, TestCase):
     model = Collection
@@ -31,7 +54,7 @@ class CollectionTests(GenericCRUDTestMixin, TestCase):
         dataset, created = Dataset.objects.get_or_create(**DatasetTests().get_add_form_data())
         return {
             'name': 'name_test',
-            'dataset': dataset
+            'dataset_id': dataset.pk
         }
 
     def get_change_form_data(self):
@@ -48,13 +71,13 @@ class CatalogueTests(GenericCRUDTestMixin, TestCase):
         transcription, created = Transcription.objects.get_or_create(source_material=source_material, curator="curator test")
         collection, created = Collection.objects.get_or_create(**CollectionTests().get_add_form_data())
         return {
-            'transcription': transcription,
+            'transcription_id': transcription.pk,
             'short_title': 'short_title test1',
             'full_title': 'full_title test',
             'preface_and_paratexts': 'preface_and_paratexts test',
             'year_of_publication': 1666,
             'bibliography': 'bibliography test',
-            'collection': collection
+            'collection_id': collection.pk
         }
 
     def get_change_form_data(self):
@@ -171,16 +194,16 @@ class CatalogueCatalogueTypeRelationTests(GenericCRUDTestMixin, TestCase):
         catalogue, created = Catalogue.objects.get_or_create(**CatalogueTests().get_add_form_data())
         catalogue_type, created = CatalogueType.objects.get_or_create(**CatalogueTypeTests().get_add_form_data())
         return {
-            'catalogue': catalogue,
-            'type': catalogue_type
+            'catalogue_id': catalogue.pk,
+            'type_id': catalogue_type.pk
         }
 
     def get_change_form_data(self):
         catalogue_change, created = Catalogue.objects.get_or_create(**CatalogueTests().get_change_form_data())
         catalogue_type_change, created = CatalogueType.objects.get_or_create(**CatalogueTypeTests().get_change_form_data())
         return {
-            'catalogue': catalogue_change,
-            'type': catalogue_type_change
+            'catalogue_id': catalogue_change.pk,
+            'type_id': catalogue_type_change.pk
         }
 
     def test_Detail(self):
@@ -242,15 +265,15 @@ class PersonCollectionRelationTests(GenericCRUDTestMixin, TestCase):
         person, created = Person.objects.get_or_create(**PersonTests().get_add_form_data())
         collection, created = Collection.objects.get_or_create(**CollectionTests().get_add_form_data())
         return {
-            'person': person,
-            'collection': collection
+            'person_id': person.pk,
+            'collection_id': collection.pk
         }
 
     def get_change_form_data(self):
         person_data = {**PersonTests().get_add_form_data(), **PersonTests().get_change_form_data()}
         person, created = Person.objects.get_or_create(**person_data)
         return {
-            'person': person
+            'person_id': person.pk
         }
 
     def test_Detail(self):
@@ -332,10 +355,10 @@ class CategoryTests(GenericCRUDTestMixin, TestCase):
                                                          bookseller_category='bookseller_category test2')
         parisian_category, create = ParisianCategory.objects.get_or_create(**ParisianCategoryTests().get_add_form_data())
         return {
-            'catalogue': catalogue,
-            'parent': parent,
+            'catalogue_id': catalogue.pk,
+            'parent_id': parent.pk,
             'bookseller_category': 'bookseller_category test',
-            'parisian_category': parisian_category
+            'parisian_category_id': parisian_category.pk
         }
 
     def get_change_form_data(self):

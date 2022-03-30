@@ -3,6 +3,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.test import Client
 from django.urls import reverse_lazy
 
+from guardian.shortcuts import assign_perm
+
+from catalogues.models import Dataset
+
 
 class GenericCRUDTestMixin:
     """
@@ -24,6 +28,12 @@ class GenericCRUDTestMixin:
         # Make the user member of the group dataset managers
         sandbox_group = Group.objects.get(name='sandbox')
         sandbox_group.user_set.add(self.user)
+
+        # Add permission to change the test dataset
+        dataset, created = Dataset.objects.get_or_create(name='name_test')
+        assign_perm('catalogue.change_dataset', self.user, dataset)
+        assign_perm('catalogue.view_dataset', self.user, dataset)
+
 
     def get_permission_string(self, verb):
         content_type = ContentType.objects.get_for_model(self.model)
