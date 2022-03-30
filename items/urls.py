@@ -53,7 +53,7 @@ urlpatterns = [
     # Tagged Item urls
     path('taggeditems/', login_required(TaggedItemTableView.as_view()), name='taggeditems'),
 
-    # EditionRanking urls
+    # TagRanking urls
     path(r'tags/rank', permission_required('global.view_all')(ItemTagRankingTableView.as_view()),
          name='tags_ranking'),
 
