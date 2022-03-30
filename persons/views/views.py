@@ -130,6 +130,10 @@ class PersonRankingTableView(ListView):
         context['object_name_plural'] = "person ranking"
         context['add_url'] = reverse_lazy('add_person')
 
+        if 'item_roles' not in self.request.GET:
+            messages.add_message(self.request, messages.WARNING,
+                                 _("Please select a item role in the filter below."))
+
         return context
 
 
