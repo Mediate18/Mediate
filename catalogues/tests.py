@@ -10,12 +10,28 @@ from transcriptions.models import *
 # View tests #
 
 
-class CollectionTests(GenericCRUDTestMixin, TestCase):
-    model = Collection
+class DatasetTests(GenericCRUDTestMixin, TestCase):
+    model = Dataset
 
     def get_add_form_data(self):
         return {
             'name': 'name_test'
+        }
+
+    def get_change_form_data(self):
+        return {
+            'name': 'name_test2'
+        }
+
+
+class CollectionTests(GenericCRUDTestMixin, TestCase):
+    model = Collection
+
+    def get_add_form_data(self):
+        dataset, created = Dataset.objects.get_or_create(**DatasetTests().get_add_form_data())
+        return {
+            'name': 'name_test',
+            'dataset': dataset
         }
 
     def get_change_form_data(self):
