@@ -9,7 +9,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.forms.models import model_to_dict
 from catalogues.models import Collection, Catalogue, Lot, Category
-from items.models import Item, Edition
+from items.models import Item, Edition, BookFormat
 from persons.models import Place
 
 

@@ -366,6 +366,15 @@ class ItemFilter(django_filters.FilterSet):
         ),
         method='catalogue_tag_filter'
     )
+    works = django_filters.ModelMultipleChoiceFilter(
+        queryset=Work.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Work,
+            search_fields=['title__icontains', 'viaf_id__icontains']
+        ),
+        method='works_filter'
+    )
 
     class Meta:
         model = Item
@@ -567,6 +576,11 @@ class ItemFilter(django_filters.FilterSet):
     def catalogue_tag_filter(self, queryset, name, value):
         if value:
             return queryset.filter(lot__catalogue__tags__tag__in=value).distinct()
+        return queryset
+
+    def works_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(works__work__in=value).distinct()
         return queryset
 
 

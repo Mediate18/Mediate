@@ -20,7 +20,7 @@ from django.conf.urls.static import static
 from django.contrib.auth.decorators import login_required
 
 from django.conf.urls import url, include
-from django.views.generic import RedirectView
+from django.views.generic import RedirectView, TemplateView
 from rest_framework import routers
 
 from .views import protected_media
@@ -99,6 +99,7 @@ router.register(r'documentscan', DocumentScanViewSet)
 
 urlpatterns = [
     path(r'', RedirectView.as_view(url='dashboard/'), name='home'),
+    path('about/', TemplateView.as_view(template_name="about.html"), name='about'),
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path(r'items/', include(items.urls)),
