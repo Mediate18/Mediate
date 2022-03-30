@@ -353,8 +353,14 @@ class CountryRankingFilter(CountryFilter):
     def qs(self):
         qs = super().qs
         self._qs = qs.distinct() \
-            .annotate(item_count=Count('place__edition__items', distinct=True)) \
-            .annotate(catalogue_count=Count('place__edition__items__lot__catalogue', distinct=True)) \
+            .annotate(item_count=Count('place__edition__items',
+                                       filter=Q(place__edition__items__lot__catalogue__in=
+                                         get_catalogues_for_session(self.request)),
+                                       distinct=True)) \
+            .annotate(catalogue_count=Count('place__edition__items__lot__catalogue',
+                                       filter=Q(place__edition__items__lot__catalogue__in=
+                                         get_catalogues_for_session(self.request)),
+                                       distinct=True)) \
             .order_by('-item_count')
         return self._qs
 
