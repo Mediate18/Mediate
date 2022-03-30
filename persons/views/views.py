@@ -115,7 +115,7 @@ class PersonRankingTableView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(PersonRankingTableView, self).get_context_data(**kwargs)
-        filter = PersonRankingFilter(self.request.GET, queryset=self.get_queryset())
+        filter = PersonRankingFilter(self.request.GET, queryset=self.get_queryset(), request=self.request)
 
         if not filter.form.is_valid():
             filter._qs = filter.queryset.none()

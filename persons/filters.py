@@ -12,6 +12,7 @@ from mediate.tools import filter_multiple_words
 from mediate.filters import QBasedFilter, RangeFilterQ, RangeRangeFilterQ, MultipleChoiceFilterQWithExtraLookups, \
     ModelMultipleChoiceFilterQ, ModelMultipleChoiceFilterQWithExtraLookups, QBasedFilterset
 from catalogues.models import PersonCatalogueRelationRole, Catalogue
+from catalogues.views.views import get_catalogues_for_session
 from items.models import PersonItemRelationRole
 from tagme.models import Tag
 
@@ -264,13 +265,24 @@ class PersonRankingFilter(QBasedFilterset):
             'date_of_death'
         ]
 
+    def __init__(self, *args, **kwargs):
+        request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
+        self.request = request
+
     # Override method
     @property
     def qs(self):
         qs = super().qs
         self._qs = qs.distinct() \
-            .annotate(item_count=Count('personitemrelation__item', distinct=True)) \
-            .annotate(catalogue_count=Count('personitemrelation__item__lot__catalogue', distinct=True)) \
+            .annotate(item_count=Count('personitemrelation__item',
+                                       filter=Q(personitemrelation__item__lot__catalogue__in=
+                                         get_catalogues_for_session(self.request)),
+                                       distinct=True)) \
+            .annotate(catalogue_count=Count('personitemrelation__item__lot__catalogue',
+                                       filter=Q(personitemrelation__item__lot__catalogue__in=
+                                         get_catalogues_for_session(self.request)),
+                                        distinct=True)) \
             .order_by('-item_count')
         return self._qs
 
