@@ -31,7 +31,7 @@ class PersonCollectionRelationAdmin(SimpleHistoryAdmin):
 
 @admin.register(Collection)
 class CollectionAdmin(SimpleHistoryAdmin):
-    pass
+    search_fields = ['name']
 
 
 @admin.register(Dataset)
