@@ -7,7 +7,7 @@ from django.apps import apps
 from django.db.models import F
 from django.db import transaction
 
-from catalogues.models import Collection, Catalogue, Lot, Category
+from catalogues.models import Collection_TMP, Catalogue, Lot, Category
 
 
 def range_string_to_list(range_string):
@@ -51,9 +51,9 @@ class Command(BaseCommand):
             return
 
         with transaction.atomic():
-            new_collection = Collection.objects.create(name=new_catalogue_name,
-                                                       dataset=catalogue.collection.dataset)
-            new_catalogue = Catalogue.objects.create(short_title=new_catalogue_name, collection=new_collection)
+            new_collection_tmp = Collection_TMP.objects.create(name=new_catalogue_name,
+                                                       dataset=catalogue.collection_tmp.dataset)
+            new_catalogue = Catalogue.objects.create(short_title=new_catalogue_name, collection_tmp=new_collection_tmp)
             print("New catalogue URL:", new_catalogue.get_absolute_url())
             lots_to_move = Lot.objects.filter(catalogue=catalogue, index_in_catalogue__gte=lot.index_in_catalogue)\
                             .exclude(index_in_catalogue__in=exclude_indexes)

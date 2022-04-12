@@ -169,25 +169,25 @@ class CatalogueCatalogueTypeRelationFilter(django_filters.FilterSet):
         exclude = ['uuid']
 
 
-# Collection filter
-class CollectionFilter(django_filters.FilterSet):
+# Collection_TMP filter
+class Collection_TMPFilter(django_filters.FilterSet):
     name = django_filters.Filter(lookup_expr='icontains')
 
     class Meta:
-        model = Collection
+        model = Collection_TMP
         fields = ['name', 'dataset']
 
 
-# CollectionYear filter
-class CollectionYearFilter(django_filters.FilterSet):
+# Collection_TMPYear filter
+class Collection_TMPYearFilter(django_filters.FilterSet):
     year = django_filters.RangeFilter(widget=django_filters.widgets.RangeWidget())
-    collection = django_filters.ModelMultipleChoiceFilter(
-        queryset=Collection.objects.all(),
+    collection_tmp = django_filters.ModelMultipleChoiceFilter(
+        queryset=Collection_TMP.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
 
     class Meta:
-        model = CollectionYear
+        model = Collection_TMPYear
         exclude = ['uuid']
 
 
@@ -254,19 +254,19 @@ class PersonCatalogueRelationRoleFilter(django_filters.FilterSet):
         exclude = ['uuid']
 
 
-# PersonCollectionRelation filter
-class PersonCollectionRelationFilter(django_filters.FilterSet):
+# PersonCollection_TMPRelation filter
+class PersonCollection_TMPRelationFilter(django_filters.FilterSet):
     person = django_filters.ModelMultipleChoiceFilter(
         queryset=Person.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
-    collection = django_filters.ModelMultipleChoiceFilter(
-        queryset=Collection.objects.all(),
+    collection_tmp = django_filters.ModelMultipleChoiceFilter(
+        queryset=Collection_TMP.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
 
     class Meta:
-        model = PersonCollectionRelation
+        model = PersonCollection_TMPRelation
         exclude = ['uuid']
 
 

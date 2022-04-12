@@ -14,9 +14,9 @@ class CatalogueTypeViewSet(viewsets.ModelViewSet):
     http_method_names = ['get']
 
 
-class CollectionViewSet(viewsets.ModelViewSet):
-    queryset = Collection.objects.all()
-    serializer_class = CollectionSerializer
+class Collection_TMPViewSet(viewsets.ModelViewSet):
+    queryset = Collection_TMP.objects.all()
+    serializer_class = Collection_TMPSerializer
     http_method_names = ['get']
 
 
@@ -38,15 +38,15 @@ class PersonCatalogueRelationRoleViewSet(viewsets.ModelViewSet):
     http_method_names = ['get']
 
 
-class PersonCollectionRelationViewSet(viewsets.ModelViewSet):
-    queryset = PersonCollectionRelation.objects.all()
-    serializer_class = PersonCollectionRelationSerializer
+class PersonCollection_TMPRelationViewSet(viewsets.ModelViewSet):
+    queryset = PersonCollection_TMPRelation.objects.all()
+    serializer_class = PersonCollection_TMPRelationSerializer
     http_method_names = ['get']
 
 
-class CollectionYearViewSet(viewsets.ModelViewSet):
-    queryset = CollectionYear.objects.all()
-    serializer_class = CollectionYearSerializer
+class Collection_TMPYearViewSet(viewsets.ModelViewSet):
+    queryset = Collection_TMPYear.objects.all()
+    serializer_class = Collection_TMPYearSerializer
     http_method_names = ['get']
 
 

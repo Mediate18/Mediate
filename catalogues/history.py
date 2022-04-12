@@ -3,15 +3,15 @@ from .models import *
 
 
 register(Dataset)
-register(Collection)
-register(CollectionYear)
+register(Collection_TMP)
+register(Collection_TMPYear)
 register(CatalogueType)
 register(Library)
 register(Catalogue)
 register(CatalogueCatalogueTypeRelation)
 register(CatalogueHeldBy)
 register(Lot)
-register(PersonCollectionRelation)
+register(PersonCollection_TMPRelation)
 register(PersonCatalogueRelationRole)
 register(PersonCatalogueRelation)
 register(CataloguePlaceRelation)

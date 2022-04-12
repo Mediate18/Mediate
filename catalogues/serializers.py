@@ -14,9 +14,9 @@ class CatalogueTypeSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
-class CollectionSerializer(serializers.HyperlinkedModelSerializer):
+class Collection_TMPSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Collection
+        model = Collection_TMP
         fields = "__all__"
 
 
@@ -38,15 +38,15 @@ class PersonCatalogueRelationRoleSerializer(serializers.HyperlinkedModelSerializ
         fields = "__all__"
 
 
-class PersonCollectionRelationSerializer(serializers.HyperlinkedModelSerializer):
+class PersonCollection_TMPRelationSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = PersonCollectionRelation
+        model = PersonCollection_TMPRelation
         fields = "__all__"
 
 
-class CollectionYearSerializer(serializers.HyperlinkedModelSerializer):
+class Collection_TMPYearSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = CollectionYear
+        model = Collection_TMPYear
         fields = "__all__"
 
 

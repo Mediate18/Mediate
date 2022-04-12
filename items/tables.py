@@ -206,7 +206,7 @@ class TaggedItemTable(tables.Table):
             'index_in_lot',
             'sales_price',
             'catalogue',
-            'collection',
+            'collection_tmp',
             'number_of_volumes',
             'book_format',
             'material_details',

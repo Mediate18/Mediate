@@ -24,13 +24,13 @@ class PersonCatalogueRelationRoleAdmin(SimpleHistoryAdmin):
     pass
 
 
-@admin.register(PersonCollectionRelation)
-class PersonCollectionRelationAdmin(SimpleHistoryAdmin):
+@admin.register(PersonCollection_TMPRelation)
+class PersonCollection_TMPRelationAdmin(SimpleHistoryAdmin):
     pass
 
 
-@admin.register(Collection)
-class CollectionAdmin(SimpleHistoryAdmin):
+@admin.register(Collection_TMP)
+class Collection_TMPAdmin(SimpleHistoryAdmin):
     search_fields = ['name']
 
 

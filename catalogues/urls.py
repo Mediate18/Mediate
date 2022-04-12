@@ -72,32 +72,32 @@ urlpatterns = [
        name="delete_cataloguecataloguetyperelation"),
 
 
-    # Collection urls
-    path('collections/', permission_required('global.view_all')(CollectionTableView.as_view()), name='collections'),
-    path(r'collections/<uuid:pk>', permission_required('global.view_all')(CollectionDetailView.as_view()),
-       name="collection_detail"),
-    path(r'collections/add', permission_required('catalogues.add_collection')(CollectionCreateView.as_view()),
-       name="add_collection"),
-    path(r'collections/edit/<uuid:pk>',
-       permission_required('catalogues.change_collection')(CollectionUpdateView.as_view()),
-       name="change_collection"),
-    path(r'collections/delete/<uuid:pk>',
-       permission_required('catalogues.delete_collection')(CollectionDeleteView.as_view()),
-       name="delete_collection"),
+    # Collection_TMP urls
+    path('collection_tmps/', permission_required('global.view_all')(Collection_TMPTableView.as_view()), name='collection_tmps'),
+    path(r'collection_tmps/<uuid:pk>', permission_required('global.view_all')(Collection_TMPDetailView.as_view()),
+       name="collection_tmp_detail"),
+    path(r'collection_tmps/add', permission_required('catalogues.add_collection_tmp')(Collection_TMPCreateView.as_view()),
+       name="add_collection_tmp"),
+    path(r'collection_tmps/edit/<uuid:pk>',
+       permission_required('catalogues.change_collection_tmp')(Collection_TMPUpdateView.as_view()),
+       name="change_collection_tmp"),
+    path(r'collection_tmps/delete/<uuid:pk>',
+       permission_required('catalogues.delete_collection_tmp')(Collection_TMPDeleteView.as_view()),
+       name="delete_collection_tmp"),
 
 
-    # CollectionYear urls
-    path('collectionyears/', permission_required('global.view_all')(CollectionYearTableView.as_view()), name='collectionyears'),
-    path(r'collectionyears/<uuid:pk>', permission_required('global.view_all')(CollectionYearDetailView.as_view()),
-       name="collectionyear_detail"),
-    path(r'collectionyears/add', permission_required('catalogues.add_collectionyear')(CollectionYearCreateView.as_view()),
-       name="add_collectionyear"),
-    path(r'collectionyears/edit/<uuid:pk>',
-       permission_required('catalogues.change_collectionyear')(CollectionYearUpdateView.as_view()),
-       name="change_collectionyear"),
-    path(r'collectionyears/delete/<uuid:pk>',
-       permission_required('catalogues.delete_collectionyear')(CollectionYearDeleteView.as_view()),
-       name="delete_collectionyear"),
+    # Collection_TMPYear urls
+    path('collection_tmpyears/', permission_required('global.view_all')(Collection_TMPYearTableView.as_view()), name='collection_tmpyears'),
+    path(r'collection_tmpyears/<uuid:pk>', permission_required('global.view_all')(Collection_TMPYearDetailView.as_view()),
+       name="collection_tmpyear_detail"),
+    path(r'collection_tmpyears/add', permission_required('catalogues.add_collection_tmpyear')(Collection_TMPYearCreateView.as_view()),
+       name="add_collection_tmpyear"),
+    path(r'collection_tmpyears/edit/<uuid:pk>',
+       permission_required('catalogues.change_collection_tmpyear')(Collection_TMPYearUpdateView.as_view()),
+       name="change_collection_tmpyear"),
+    path(r'collection_tmpyears/delete/<uuid:pk>',
+       permission_required('catalogues.delete_collection_tmpyear')(Collection_TMPYearDeleteView.as_view()),
+       name="delete_collection_tmpyear"),
 
 
     # Library urls
@@ -159,18 +159,18 @@ urlpatterns = [
        name="delete_personcataloguerelationrole"),
 
 
-    # PersonCollectionRelation urls
-    path('personcollectionrelations/', permission_required('global.view_all')(PersonCollectionRelationTableView.as_view()), name='personcollectionrelations'),
-    path(r'personcollectionrelations/<uuid:pk>', permission_required('global.view_all')(PersonCollectionRelationDetailView.as_view()),
-       name="personcollectionrelation_detail"),
-    path(r'personcollectionrelations/add', permission_required('catalogues.add_personcollectionrelation')(PersonCollectionRelationCreateView.as_view()),
-       name="add_personcollectionrelation"),
-    path(r'personcollectionrelations/edit/<uuid:pk>',
-       permission_required('catalogues.change_personcollectionrelation')(PersonCollectionRelationUpdateView.as_view()),
-       name="change_personcollectionrelation"),
-    path(r'personcollectionrelations/delete/<uuid:pk>',
-       permission_required('catalogues.delete_personcollectionrelation')(PersonCollectionRelationDeleteView.as_view()),
-       name="delete_personcollectionrelation"),
+    # PersonCollection_TMPRelation urls
+    path('personcollection_tmprelations/', permission_required('global.view_all')(PersonCollection_TMPRelationTableView.as_view()), name='personcollection_tmprelations'),
+    path(r'personcollection_tmprelations/<uuid:pk>', permission_required('global.view_all')(PersonCollection_TMPRelationDetailView.as_view()),
+       name="personcollection_tmprelation_detail"),
+    path(r'personcollection_tmprelations/add', permission_required('catalogues.add_personcollection_tmprelation')(PersonCollection_TMPRelationCreateView.as_view()),
+       name="add_personcollection_tmprelation"),
+    path(r'personcollection_tmprelations/edit/<uuid:pk>',
+       permission_required('catalogues.change_personcollection_tmprelation')(PersonCollection_TMPRelationUpdateView.as_view()),
+       name="change_personcollection_tmprelation"),
+    path(r'personcollection_tmprelations/delete/<uuid:pk>',
+       permission_required('catalogues.delete_personcollection_tmprelation')(PersonCollection_TMPRelationDeleteView.as_view()),
+       name="delete_personcollection_tmprelation"),
 
 
     # CataloguePlaceRelation urls

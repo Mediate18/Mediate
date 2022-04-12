@@ -4,7 +4,7 @@ from openpyxl import load_workbook
 
 import os
 
-from catalogues.models import Catalogue, Collection, Lot, Category
+from catalogues.models import Catalogue, Collection_TMP, Lot, Category
 from items.models import Item, Edition, BookFormat
 from persons.models import Place
 
@@ -42,11 +42,11 @@ class Command(BaseCommand):
             index_in_catalogue = 1
             for lot_dict in lots_data:
 
-                # Collection and Catalogue
+                # Collection_TMP and Catalogue
                 catalogue_short_title = os.path.splitext(os.path.basename(transcription_file))[0]
-                collection, created = Collection.objects.get_or_create(name=catalogue_short_title)
+                collection_tmp, created = Collection_TMP.objects.get_or_create(name=catalogue_short_title)
                 catalogue, created = Catalogue.objects.get_or_create(
-                    collection=collection,
+                    collection_tmp=collection_tmp,
                     short_title=catalogue_short_title,
                     full_title=lot_dict['full_catalogue_title'],
                     preface_and_paratexts=lot_dict['preface_and paratexts'],
@@ -85,7 +85,7 @@ class Command(BaseCommand):
                 item = Item.objects.create(
                     short_title=lot_dict['item_as_listed_in_catalogue'][:128],
                     lot=lot,
-                    collection=collection,
+                    collection_tmp=collection_tmp,
                     book_format=book_format,
                     index_in_lot=1,
                     edition=edition
