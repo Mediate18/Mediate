@@ -9,7 +9,7 @@ from collections import defaultdict
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import Count, Q
-from catalogues.models import Catalogue
+from catalogues.models import Collection
 from items.models import Item, PersonItemRelation
 
 
@@ -34,10 +34,10 @@ class Command(BaseCommand):
                 catalogue_ids = [id.strip() for id in cat_ids_file.readlines()]
 
         print("#catalogue_ids:", len(catalogue_ids))
-        print("#catalogues:", Catalogue.objects.filter(short_title__in=catalogue_ids).count())
+        print("#catalogues:", Collection.objects.filter(short_title__in=catalogue_ids).count())
         for catalogue_id in catalogue_ids:
             try:
-                Catalogue.objects.get(short_title=catalogue_id)
+                Collection.objects.get(short_title=catalogue_id)
             except:
                 print("catalogue <{}> not found".format(catalogue_id))
 

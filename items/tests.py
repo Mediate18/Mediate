@@ -149,7 +149,7 @@ class ItemTests(GenericCRUDTestMixin, TestCase):
     @staticmethod
     def get_add_form_data():
         lot, created = Lot.objects.get_or_create(**LotTests().get_add_form_data())
-        collection_tmp = lot.catalogue.collection_tmp
+        collection_tmp = lot.collection.collection_tmp
         book_format, created = BookFormat.objects.get_or_create(**BookFormatTests().get_add_form_data())
         edition, created = Edition.objects\
             .get_or_create(**EditionTests().get_add_form_data())

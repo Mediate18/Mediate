@@ -64,7 +64,7 @@ class Collection_TMPTests(GenericCRUDTestMixin, TestCase):
 
 
 class CatalogueTests(GenericCRUDTestMixin, TestCase):
-    model = Catalogue
+    model = Collection
 
     def get_add_form_data(self):
         source_material, created = SourceMaterial.objects.get_or_create(name="source_material test")
@@ -151,7 +151,7 @@ class Collection_TMPYearTests(GenericCRUDTestMixin, TestCase):
 
 
 class CatalogueTypeTests(GenericCRUDTestMixin, TestCase):
-    model = CatalogueType
+    model = CollectionType
 
     def get_add_form_data(self):
         return {
@@ -188,19 +188,19 @@ class LibraryTests(GenericCRUDTestMixin, TestCase):
 
 
 class CatalogueCatalogueTypeRelationTests(GenericCRUDTestMixin, TestCase):
-    model = CatalogueCatalogueTypeRelation
+    model = CollectionCollectionTypeRelation
 
     def get_add_form_data(self):
-        catalogue, created = Catalogue.objects.get_or_create(**CatalogueTests().get_add_form_data())
-        catalogue_type, created = CatalogueType.objects.get_or_create(**CatalogueTypeTests().get_add_form_data())
+        catalogue, created = Collection.objects.get_or_create(**CatalogueTests().get_add_form_data())
+        catalogue_type, created = CollectionType.objects.get_or_create(**CatalogueTypeTests().get_add_form_data())
         return {
             'catalogue_id': catalogue.pk,
             'type_id': catalogue_type.pk
         }
 
     def get_change_form_data(self):
-        catalogue_change, created = Catalogue.objects.get_or_create(**CatalogueTests().get_change_form_data())
-        catalogue_type_change, created = CatalogueType.objects.get_or_create(**CatalogueTypeTests().get_change_form_data())
+        catalogue_change, created = Collection.objects.get_or_create(**CatalogueTests().get_change_form_data())
+        catalogue_type_change, created = CollectionType.objects.get_or_create(**CatalogueTypeTests().get_change_form_data())
         return {
             'catalogue_id': catalogue_change.pk,
             'type_id': catalogue_type_change.pk
@@ -212,11 +212,11 @@ class CatalogueCatalogueTypeRelationTests(GenericCRUDTestMixin, TestCase):
 
 
 class CatalogueHeldByTests(GenericCRUDTestMixin, TestCase):
-    model = CatalogueHeldBy
+    model = CollectionHeldBy
 
     def get_add_form_data(self):
         library, created = Library.objects.get_or_create(**LibraryTests().get_add_form_data())
-        catalogue, created = Catalogue.objects.get_or_create(**CatalogueTests().get_add_form_data())
+        catalogue, created = Collection.objects.get_or_create(**CatalogueTests().get_add_form_data())
         return {
             'library': library,
             'catalogue': catalogue
@@ -224,7 +224,7 @@ class CatalogueHeldByTests(GenericCRUDTestMixin, TestCase):
 
     def get_change_form_data(self):
         library_change, created = Library.objects.get_or_create(**LibraryTests().get_change_form_data())
-        catalogue_change, created = Catalogue.objects.get_or_create(**CatalogueTests().get_change_form_data())
+        catalogue_change, created = Collection.objects.get_or_create(**CatalogueTests().get_change_form_data())
 
         return {
             'library': library_change,
@@ -241,7 +241,7 @@ class LotTests(GenericCRUDTestMixin, TestCase):
 
     def get_add_form_data(self):
         category, created = Category.objects.get_or_create(**CategoryTests().get_add_form_data())
-        catalogue = category.catalogue
+        catalogue = category.collection
         return {
             'catalogue_id': catalogue.pk,  # TODO: find out why the '_id' and '.pk' are necessary
             'number_in_catalogue': 1,
@@ -282,7 +282,7 @@ class PersonCollection_TMPRelationTests(GenericCRUDTestMixin, TestCase):
 
 
 class PersonCatalogueRelationRoleTests(GenericCRUDTestMixin, TestCase):
-    model = PersonCatalogueRelationRole
+    model = PersonCollectionRelationRole
 
     def get_add_form_data(self):
         return {
@@ -300,12 +300,12 @@ class PersonCatalogueRelationRoleTests(GenericCRUDTestMixin, TestCase):
 
 
 class PersonCatalogueRelationTests(GenericCRUDTestMixin, TestCase):
-    model = PersonCatalogueRelation
+    model = PersonCollectionRelation
 
     def get_add_form_data(self):
         person, created = Person.objects.get_or_create(**PersonTests().get_add_form_data())
-        catalogue, created = Catalogue.objects.get_or_create(**CatalogueTests().get_add_form_data())
-        role, created = PersonCatalogueRelationRole.objects.get_or_create(**PersonCatalogueRelationRoleTests().get_add_form_data())
+        catalogue, created = Collection.objects.get_or_create(**CatalogueTests().get_add_form_data())
+        role, created = PersonCollectionRelationRole.objects.get_or_create(**PersonCatalogueRelationRoleTests().get_add_form_data())
         return {
             'person_id': person.pk,
             'catalogue_id': catalogue.pk,
@@ -350,7 +350,7 @@ class CategoryTests(GenericCRUDTestMixin, TestCase):
     url_names = {'list': 'categories'}
 
     def get_add_form_data(self):
-        catalogue, created = Catalogue.objects.get_or_create(**CatalogueTests().get_add_form_data())
+        catalogue, created = Collection.objects.get_or_create(**CatalogueTests().get_add_form_data())
         parent, created = Category.objects.get_or_create(catalogue=catalogue,
                                                          bookseller_category='bookseller_category test2')
         parisian_category, create = ParisianCategory.objects.get_or_create(**ParisianCategoryTests().get_add_form_data())
@@ -382,11 +382,11 @@ class LotModelTests(TestCase):
         """
         with self.assertRaises(Exception) as exception_context_manager:
             # Create a dummy catalogue
-            dummy_catalogue = Catalogue(short_title="short_title test")
+            dummy_catalogue = Collection(short_title="short_title test")
             dummy_catalogue.save()
 
             # Create a second dummy catalogue
-            dummy_catalogue2 = Catalogue(short_title="short_title test2")
+            dummy_catalogue2 = Collection(short_title="short_title test2")
             dummy_catalogue2.save()
 
             # Create a dummy category

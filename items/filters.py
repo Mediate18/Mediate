@@ -6,7 +6,7 @@ from django_select2.forms import ModelSelect2MultipleWidget, Select2MultipleWidg
 from tagme.models import Tag
 from .models import *
 from persons.models import Country, Profession, Religion
-from catalogues.models import Catalogue, ParisianCategory, PersonCatalogueRelation
+from catalogues.models import Collection, ParisianCategory, PersonCollectionRelation
 from catalogues.views.views import get_catalogues_for_session
 from mediate.tools import filter_multiple_words
 from mediate.filters import QBasedFilterset, RangeFilterQ, MultipleChoiceFilterQWithExtraLookups, \
@@ -40,10 +40,10 @@ class ItemTagRankingFilter(QBasedFilterset):
     value = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
     catalogue = ModelMultipleChoiceFilterQ(
         label="Catalogue",
-        queryset=Catalogue.objects.all(),
+        queryset=Collection.objects.all(),
         widget=ModelSelect2MultipleWidget(
             attrs={'data-placeholder': "Select multiple"},
-            model=Catalogue,
+            model=Collection,
             search_fields=['short_title__icontains']
         ),
         field_name='taggedentity__items__lot__catalogue',
@@ -150,10 +150,10 @@ class ItemFilter(django_filters.FilterSet):
     )
     catalogue = django_filters.ModelMultipleChoiceFilter(
         label="Catalogue",
-        queryset=Catalogue.objects.all(),
+        queryset=Collection.objects.all(),
         widget=ModelSelect2MultipleWidget(
             attrs={'data-placeholder': "Select multiple"},
-            model=Catalogue,
+            model=Collection,
             search_fields=['short_title__icontains', 'full_title__icontains',
                            'preface_and_paratexts__icontains']
         ),
@@ -530,36 +530,36 @@ class ItemFilter(django_filters.FilterSet):
     def owner_gender_filter(self, queryset, name, value):
         if value:
             return queryset.filter(lot__catalogue__personcataloguerelation__in=
-                                   PersonCatalogueRelation.objects.filter(role__name__iexact='owner', person__sex=value))
+                                   PersonCollectionRelation.objects.filter(role__name__iexact='owner', person__sex=value))
         return queryset
 
     def owner_country_of_birth_filter(self, queryset, name, value):
         if value:
-            return queryset.filter(lot__catalogue__personcataloguerelation__in=PersonCatalogueRelation.objects.filter(
+            return queryset.filter(lot__catalogue__personcataloguerelation__in=PersonCollectionRelation.objects.filter(
                 role__name__iexact='owner', person__city_of_birth__country__in=value))
         return queryset
 
     def owner_country_of_death_filter(self, queryset, name, value):
         if value:
-            return queryset.filter(lot__catalogue__personcataloguerelation__in=PersonCatalogueRelation.objects.filter(
+            return queryset.filter(lot__catalogue__personcataloguerelation__in=PersonCollectionRelation.objects.filter(
                 role__name__iexact='owner', person__city_of_death__country__in=value))
         return queryset
 
     def owner_country_of_residence_filter(self, queryset, name, value):
         if value:
-            return queryset.filter(lot__catalogue__personcataloguerelation__in=PersonCatalogueRelation.objects.filter(
+            return queryset.filter(lot__catalogue__personcataloguerelation__in=PersonCollectionRelation.objects.filter(
                 role__name__iexact='owner', person__residence__place__country__in=value))
         return queryset
 
     def owner_profession_filter(self, queryset, name, value):
         if value:
-            return queryset.filter(lot__catalogue__personcataloguerelation__in=PersonCatalogueRelation.objects.filter(
+            return queryset.filter(lot__catalogue__personcataloguerelation__in=PersonCollectionRelation.objects.filter(
                 role__name__iexact='owner', person__personprofession__profession__in=value))
         return queryset
 
     def owner_religion_filter(self, queryset, name, value):
         if value:
-            return queryset.filter(lot__catalogue__personcataloguerelation__in=PersonCatalogueRelation.objects.filter(
+            return queryset.filter(lot__catalogue__personcataloguerelation__in=PersonCollectionRelation.objects.filter(
                 role__name__iexact='owner', person__religiousaffiliation__religion__in=value))
         return queryset
 
@@ -640,10 +640,10 @@ class ItemWorkRelationFilter(django_filters.FilterSet):
 class LanguageFilter(QBasedFilterset):
     catalogue = ModelMultipleChoiceFilterQ(
         label="Catalogue",
-        queryset=Catalogue.objects.all(),
+        queryset=Collection.objects.all(),
         widget=ModelSelect2MultipleWidget(
             attrs={'data-placeholder': "Select multiple"},
-            model=Catalogue,
+            model=Collection,
             search_fields=['short_title__icontains']
         ),
         field_name='items__item__lot__catalogue',
@@ -760,10 +760,10 @@ class EditionFilter(django_filters.FilterSet):
     )
     catalogue = django_filters.ModelMultipleChoiceFilter(
         label="Catalogue",
-        queryset=Catalogue.objects.all(),
+        queryset=Collection.objects.all(),
         widget=ModelSelect2MultipleWidget(
             attrs={'data-placeholder': "Select multiple"},
-            model=Catalogue,
+            model=Collection,
             search_fields=['short_title__icontains', 'full_title__icontains',
                            'preface_and_paratexts__icontains']
         ),
@@ -945,8 +945,8 @@ class WorkFilter(QBasedFilterset):
     def catalogue_owner_gender_filter(self, q, name, value):
         if value:
             q &= Q(items__item__lot__catalogue__personcataloguerelation__in=
-                                   PersonCatalogueRelation.objects.filter(role__name__iexact='owner',
-                                                                          person__sex__in=value))
+                                   PersonCollectionRelation.objects.filter(role__name__iexact='owner',
+                                                                           person__sex__in=value))
         return q
 
     def catalogue_owner_religion_filter(self, q, name, value):

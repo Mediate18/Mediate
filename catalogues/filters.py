@@ -12,7 +12,7 @@ class CatalogueFilter(django_filters.FilterSet):
     full_title = django_filters.Filter(lookup_expr='icontains', method='multiple_words_filter')
     types = django_filters.ModelMultipleChoiceFilter(
         label='Types',
-        queryset=CatalogueType.objects.all(),
+        queryset=CollectionType.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
         method='catalogue_types_filter'
     )
@@ -24,7 +24,7 @@ class CatalogueFilter(django_filters.FilterSet):
                                             widget=django_filters.widgets.RangeWidget())
     publisher = django_filters.ModelMultipleChoiceFilter(
         label="Publisher",
-        queryset=Person.objects.filter(personcataloguerelation__role__name='publisher'),
+        queryset=Person.objects.filter(personcollectionrelation__role__name='publisher'),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
         field_name='personcataloguerelation__person',
         lookup_expr='in'
@@ -61,7 +61,7 @@ class CatalogueFilter(django_filters.FilterSet):
     )
 
     class Meta:
-        model = Catalogue
+        model = Collection
         fields = [
             'short_title',
             'full_title',
@@ -135,12 +135,12 @@ class CatalogueHeldByFilter(django_filters.FilterSet):
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
     )
     catalogue = django_filters.ModelMultipleChoiceFilter(
-        queryset=Catalogue.objects.all(),
+        queryset=Collection.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
     )
 
     class Meta:
-        model = CatalogueHeldBy
+        model = CollectionHeldBy
         exclude = ['uuid']
 
 
@@ -149,23 +149,23 @@ class CatalogueTypeFilter(django_filters.FilterSet):
     name = django_filters.Filter(lookup_expr='icontains')
 
     class Meta:
-        model = CatalogueType
+        model = CollectionType
         exclude = ['uuid']
 
 
 # CatalogueCatalogueTypeRelation filter
 class CatalogueCatalogueTypeRelationFilter(django_filters.FilterSet):
     catalogue = django_filters.ModelMultipleChoiceFilter(
-        queryset=Catalogue.objects.all(),
+        queryset=Collection.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
     type = django_filters.ModelMultipleChoiceFilter(
-        queryset=CatalogueType.objects.all(),
+        queryset=CollectionType.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
 
     class Meta:
-        model = CatalogueCatalogueTypeRelation
+        model = CollectionCollectionTypeRelation
         exclude = ['uuid']
 
 
@@ -232,16 +232,16 @@ class PersonCatalogueRelationFilter(django_filters.FilterSet):
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
     catalogue = django_filters.ModelMultipleChoiceFilter(
-        queryset=Catalogue.objects.all(),
+        queryset=Collection.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
     role = django_filters.ModelMultipleChoiceFilter(
-        queryset=PersonCatalogueRelationRole.objects.all(),
+        queryset=PersonCollectionRelationRole.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
 
     class Meta:
-        model = PersonCatalogueRelation
+        model = PersonCollectionRelation
         exclude = ['uuid']
 
 
@@ -250,7 +250,7 @@ class PersonCatalogueRelationRoleFilter(django_filters.FilterSet):
     name = django_filters.Filter(lookup_expr='icontains')
 
     class Meta:
-        model = PersonCatalogueRelationRole
+        model = PersonCollectionRelationRole
         exclude = ['uuid']
 
 
@@ -273,7 +273,7 @@ class PersonCollection_TMPRelationFilter(django_filters.FilterSet):
 # CataloguePlaceRelation filter
 class CataloguePlaceRelationFilter(django_filters.FilterSet):
     catalogue = django_filters.ModelMultipleChoiceFilter(
-        queryset=Catalogue.objects.all(),
+        queryset=Collection.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
     place = django_filters.ModelMultipleChoiceFilter(
@@ -282,14 +282,14 @@ class CataloguePlaceRelationFilter(django_filters.FilterSet):
     )
 
     class Meta:
-        model = CataloguePlaceRelation
+        model = CollectionPlaceRelation
         exclude = ['uuid']
 
 
 # Category filter
 class CategoryFilter(django_filters.FilterSet):
     catalogue = django_filters.ModelMultipleChoiceFilter(
-        queryset=Catalogue.objects.all(),
+        queryset=Collection.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
     parent = django_filters.ModelMultipleChoiceFilter(
@@ -320,7 +320,7 @@ class ParisianCategoryFilter(django_filters.FilterSet):
 # CataloguePlaceRelationType Filter
 class CataloguePlaceRelationTypeFilter(django_filters.FilterSet):
     class Meta:
-        model = CataloguePlaceRelationType
+        model = CollectionPlaceRelationType
         fields = {
             'name': ['icontains'],
         }

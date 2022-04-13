@@ -5,7 +5,7 @@ from .models import *
 
 from collections import defaultdict
 
-from catalogues.models import PersonCatalogueRelation
+from catalogues.models import PersonCollectionRelation
 from persons.models import Country
 from mediate.columns import ActionColumn
 
@@ -21,7 +21,7 @@ class CatalogueTable(tables.Table):
     countries = tables.Column(empty_values=(), verbose_name="Publication countries", orderable=False)
 
     class Meta:
-        model = Catalogue
+        model = Collection
         attrs = {'class': 'table table-sortable'}
         fields = [
             'short_title',
@@ -69,7 +69,7 @@ class CatalogueTable(tables.Table):
         return record.item_count()
 
     def render_related_places(self, record):
-        relations = CataloguePlaceRelation.objects.filter(catalogue=record).prefetch_related('type')
+        relations = CollectionPlaceRelation.objects.filter(catalogue=record).prefetch_related('type')
         type_dict = defaultdict(list)
         for relation in relations:
             type_dict[relation.type.name].append(relation.place)
@@ -97,7 +97,7 @@ class CatalogueHeldByTable(tables.Table):
     uuid = ActionColumn('catalogueheldby_detail', 'change_catalogueheldby', 'delete_catalogueheldby', orderable=False)
 
     class Meta:
-        model = CatalogueHeldBy
+        model = CollectionHeldBy
         attrs = {'class': 'table table-sortable'}
         sequence = [
             'library',
@@ -111,7 +111,7 @@ class CatalogueTypeTable(tables.Table):
     uuid = ActionColumn('cataloguetype_detail', 'change_cataloguetype', 'delete_cataloguetype', orderable=False)
 
     class Meta:
-        model = CatalogueType
+        model = CollectionType
         attrs = {'class': 'table table-sortable'}
         sequence = [
             'name',
@@ -125,7 +125,7 @@ class CatalogueCatalogueTypeRelationTable(tables.Table):
                         'delete_cataloguecataloguetyperelation', orderable=False)
 
     class Meta:
-        model = CatalogueCatalogueTypeRelation
+        model = CollectionCollectionTypeRelation
         attrs = {'class': 'table table-sortable'}
         sequence = [
             'catalogue',
@@ -201,7 +201,7 @@ class PersonCatalogueRelationTable(tables.Table):
                         'delete_personcataloguerelation', orderable=False)
 
     class Meta:
-        model = PersonCatalogueRelation
+        model = PersonCollectionRelation
         attrs = {'class': 'table table-sortable'}
         sequence = [
             'person',
@@ -217,7 +217,7 @@ class PersonCatalogueRelationRoleTable(tables.Table):
                         'delete_personcataloguerelationrole', orderable=False)
 
     class Meta:
-        model = PersonCatalogueRelationRole
+        model = PersonCollectionRelationRole
         attrs = {'class': 'table table-sortable'}
         sequence = [
             'name',
@@ -246,7 +246,7 @@ class CataloguePlaceRelationTable(tables.Table):
                         'delete_catalogueplacerelation', orderable=False)
 
     class Meta:
-        model = CataloguePlaceRelation
+        model = CollectionPlaceRelation
         attr = {'class': 'table table-sortable'}
         sequence = [
             'catalogue',
@@ -291,7 +291,7 @@ class CataloguePlaceRelationTypeTable(tables.Table):
     uuid = ActionColumn('catalogueplacerelationtype_detail', 'change_catalogueplacerelationtype', 'delete_catalogueplacerelationtype', orderable=False)
 
     class Meta:
-        model = CataloguePlaceRelationType
+        model = CollectionPlaceRelationType
         attrs = {'class': 'table table-sortable'}
         sequence = [
             'name',

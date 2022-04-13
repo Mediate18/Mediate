@@ -62,7 +62,7 @@ class Command(BaseCommand):
                     items_writer.writerow([
                         str(item.uuid),
                         item.short_title,
-                        item.lot.catalogue,
+                        item.lot.collection,
                         item.book_format,
                         item.edition,
                         ", ".join([lang.language.name for lang in item.languages.all()])

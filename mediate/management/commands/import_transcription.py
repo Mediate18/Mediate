@@ -8,7 +8,7 @@ from collections import OrderedDict
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.forms.models import model_to_dict
-from catalogues.models import Collection_TMP, Catalogue, Lot, Category
+from catalogues.models import Collection_TMP, Collection, Lot, Category
 from items.models import Item, Edition, BookFormat
 from persons.models import Place
 
@@ -116,8 +116,8 @@ class Command(BaseCommand):
                                     print("Page", page)
                             if "TITLE" in fields:
                                 title = fields["TITLE"]
-                                catalogue = Catalogue(short_title=catalogue_short_title, full_title=title,
-                                                      collection_tmp=collection_tmp)
+                                catalogue = Collection(short_title=catalogue_short_title, full_title=title,
+                                                       collection_tmp=collection_tmp)
                                 print_obj(catalogue)
                                 catalogue.save()
                             if "CATEGORY" in fields:

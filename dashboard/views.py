@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.db.models import Count, Q
 
 from items.models import Item, Edition, Work, Language, PersonItemRelation, ItemWorkRelation
-from catalogues.models import Lot, Catalogue
+from catalogues.models import Lot, Collection
 from catalogues.views.views import get_catalogues_for_session
 from persons.models import Place, Person, Country
 

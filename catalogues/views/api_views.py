@@ -3,13 +3,13 @@ from ..serializers import *
 
 
 class CatalogueViewSet(viewsets.ModelViewSet):
-    queryset = Catalogue.objects.all()
+    queryset = Collection.objects.all()
     serializer_class = CatalogueSerializer
     http_method_names = ['get']
 
 
 class CatalogueTypeViewSet(viewsets.ModelViewSet):
-    queryset = CatalogueType.objects.all()
+    queryset = CollectionType.objects.all()
     serializer_class = CatalogueTypeSerializer
     http_method_names = ['get']
 
@@ -27,13 +27,13 @@ class LotViewSet(viewsets.ModelViewSet):
 
 
 class PersonCatalogueRelationViewSet(viewsets.ModelViewSet):
-    queryset = PersonCatalogueRelation.objects.all()
+    queryset = PersonCollectionRelation.objects.all()
     serializer_class = PersonCatalogueRelationSerializer
     http_method_names = ['get']
 
 
 class PersonCatalogueRelationRoleViewSet(viewsets.ModelViewSet):
-    queryset = PersonCatalogueRelationRole.objects.all()
+    queryset = PersonCollectionRelationRole.objects.all()
     serializer_class = PersonCatalogueRelationRoleSerializer
     http_method_names = ['get']
 
@@ -57,13 +57,13 @@ class LibraryViewSet(viewsets.ModelViewSet):
 
 
 class CatalogueCatalogueTypeRelationViewSet(viewsets.ModelViewSet):
-    queryset = CatalogueCatalogueTypeRelation.objects.all()
+    queryset = CollectionCollectionTypeRelation.objects.all()
     serializer_class = CatalogueCatalogueTypeRelationSerializer
     http_method_names = ['get']
 
 
 class CatalogueHeldByViewSet(viewsets.ModelViewSet):
-    queryset = CatalogueHeldBy.objects.all()
+    queryset = CollectionHeldBy.objects.all()
     serializer_class = CatalogueHeldBySerializer
     http_method_names = ['get']
 

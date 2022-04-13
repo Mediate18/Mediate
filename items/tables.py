@@ -76,7 +76,7 @@ class ItemTable(tables.Table):
             '<span class="expand-cell glyphicon glyphicon-chevron-down" title="Expand"></span>'
             '<span class="collapse-cell glyphicon glyphicon-chevron-up" title="Collapse"></span>'
             '</div>',
-            reverse_lazy('change_lot', args=[record.lot.uuid]), record.lot.lot_as_listed_in_catalogue
+            reverse_lazy('change_lot', args=[record.lot.uuid]), record.lot.lot_as_listed_in_collection
         )
 
     def render_checkbox(self, record):
@@ -123,8 +123,8 @@ class ItemTable(tables.Table):
     def render_catalogue(self, record):
         try:
             return format_html('<a href="{}">{}</a>'.format(
-                reverse_lazy('catalogue_detail', args=[str(record.lot.catalogue.uuid)]),
-                str(record.lot.catalogue))
+                reverse_lazy('catalogue_detail', args=[str(record.lot.collection.uuid)]),
+                str(record.lot.collection))
             )
         except AttributeError:
             # Record has not lot or lot has no catalogue
@@ -147,7 +147,7 @@ class ItemTable(tables.Table):
 
     # All value_XX methods are for the table export
     def value_lot(self, record):
-        return record.lot.lot_as_listed_in_catalogue
+        return record.lot.lot_as_listed_in_collection
 
     def value_people(self, record):
         person_item_relations = PersonItemRelation.objects.filter(item=record)
@@ -176,7 +176,7 @@ class ItemTable(tables.Table):
         return " | ".join(work_entries)
 
     def value_catalogue(self, record):
-        return str(record.lot.catalogue) or ""
+        return str(record.lot.collection) or ""
 
     def value_sales_price(self, record):
         return record.lot.sales_price or ""
@@ -246,7 +246,7 @@ class TaggedItemTable(tables.Table):
         return format_html(" | ".join(work_entries))
 
     def render_catalogue(self, record):
-        return format_html(str(record.lot.catalogue))
+        return format_html(str(record.lot.collection))
 
     def render_sales_price(self, record):
         return record.lot.sales_price
@@ -259,7 +259,7 @@ class TaggedItemTable(tables.Table):
 
     # All value_XX methods are for the table export
     def value_lot(self, record):
-        return record.lot.lot_as_listed_in_catalogue
+        return record.lot.lot_as_listed_in_collection
 
     def value_people(self, record):
         person_item_relations = PersonItemRelation.objects.filter(item=record)
@@ -288,7 +288,7 @@ class TaggedItemTable(tables.Table):
         return " | ".join(work_entries)
 
     def value_catalogue(self, record):
-        return str(record.lot.catalogue) or ""
+        return str(record.lot.collection) or ""
 
     def value_sales_price(self, record):
         return record.lot.sales_price or ""

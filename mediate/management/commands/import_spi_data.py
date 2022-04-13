@@ -123,7 +123,7 @@ class Command(BaseCommand):
                 insert_fields = {
                     'short_title': short_title[:128],
                     'lot': lot,
-                    'collection_tmp': lot.catalogue.collection_tmp,
+                    'collection_tmp': lot.collection.collection_tmp,
                     'number_of_volumes': row['number_of_volumes'],
                     'book_format': book_format,
                     'index_in_lot': row['index_in_lot'],
@@ -231,7 +231,7 @@ class Command(BaseCommand):
                     if collection_tmp.catalogue_set.count() != 0 and not self.multiple_catalogues_per_collection_tmp:
                         raise Exception("Collection_TMP {} already exists and has catalogues linked to.".format(collection_tmp))
 
-                catalogue = catalogues.models.Catalogue(**insert_fields)
+                catalogue = catalogues.models.Collection(**insert_fields)
                 catalogue.collection_tmp = collection_tmp
                 catalogue.save()
                 self.create_lots(catalogue, row['id'], cursor)

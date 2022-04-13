@@ -4,22 +4,22 @@ from .models import *
 from guardian.admin import GuardedModelAdmin
 
 
-@admin.register(Catalogue)
+@admin.register(Collection)
 class CatalogueAdmin(SimpleHistoryAdmin):
     pass
 
 
-@admin.register(CatalogueType)
+@admin.register(CollectionType)
 class CatalogueTypeAdmin(SimpleHistoryAdmin):
     pass
 
 
-@admin.register(PersonCatalogueRelation)
+@admin.register(PersonCollectionRelation)
 class PersonCatalogueRelationAdmin(SimpleHistoryAdmin):
     pass
 
 
-@admin.register(PersonCatalogueRelationRole)
+@admin.register(PersonCollectionRelationRole)
 class PersonCatalogueRelationRoleAdmin(SimpleHistoryAdmin):
     pass
 

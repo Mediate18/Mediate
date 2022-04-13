@@ -9,7 +9,7 @@ from tagme.models import Tag
 
 class CatalogueModelForm(forms.ModelForm):
     class Meta:
-        model = Catalogue
+        model = Collection
         fields = "__all__"
         widgets = {
             'collection_tmp': ModelSelect2Widget(
@@ -40,12 +40,12 @@ class CatalogueModelForm(forms.ModelForm):
     def add_types_field(self):
         types = forms.ModelMultipleChoiceField(
             widget=ModelSelect2MultipleWidget(
-                    model=CatalogueType,
+                    model=CollectionType,
                     search_fields=['name__icontains'],
                 ),
-            queryset=CatalogueType.objects.all(),
+            queryset=CollectionType.objects.all(),
             required=False,
-            initial=CatalogueType.objects.filter(cataloguecataloguetyperelation__catalogue=self.instance)
+            initial=CollectionType.objects.filter(cataloguecataloguetyperelation__catalogue=self.instance)
         )
         self.fields['types'] = types
 
@@ -53,7 +53,7 @@ class CatalogueModelForm(forms.ModelForm):
         return 'type_' + str(type.uuid) + '_places'
 
     def add_related_places_field(self):
-        for type in CataloguePlaceRelationType.objects.all():
+        for type in CollectionPlaceRelationType.objects.all():
             places = forms.ModelMultipleChoiceField(
                 label="{} places".format(type.name).capitalize(),
                 widget=ModelSelect2MultipleWidget(
@@ -91,27 +91,27 @@ class CatalogueModelForm(forms.ModelForm):
         submitted_types = self.cleaned_data['types']
 
         # Delete relations for types that are not in the submitted types
-        relations_to_delete = CatalogueCatalogueTypeRelation.objects \
+        relations_to_delete = CollectionCollectionTypeRelation.objects \
             .filter(catalogue=self.instance).exclude(type__in=submitted_types)
         for relation in relations_to_delete:
             relation.delete()
 
         # Add relations for submitted types that are not in the existing types
-        new_types = set(submitted_types) - set(CatalogueType.objects.filter(
+        new_types = set(submitted_types) - set(CollectionType.objects.filter(
             cataloguecataloguetyperelation__catalogue=self.instance))
         for new_type in new_types:
-            catalogue_cataloguetype_relation = CatalogueCatalogueTypeRelation(catalogue=self.instance, type=new_type)
+            catalogue_cataloguetype_relation = CollectionCollectionTypeRelation(catalogue=self.instance, type=new_type)
             catalogue_cataloguetype_relation.save()
 
     def save_relation_places(self):
-        for type in CataloguePlaceRelationType.objects.all():
+        for type in CollectionPlaceRelationType.objects.all():
             try:
                 submitted_related_places = self.cleaned_data[self.get_catalogueplacerelationtype_id(type)]
             except KeyError:
                 continue
 
             # Delete places that are not in the submitted places
-            related_places_to_delete = CataloguePlaceRelation.objects \
+            related_places_to_delete = CollectionPlaceRelation.objects \
                 .filter(catalogue=self.instance, type=type).exclude(place__in=submitted_related_places)
             for place in related_places_to_delete:
                 place.delete()
@@ -120,8 +120,8 @@ class CatalogueModelForm(forms.ModelForm):
             new_related_places = set(submitted_related_places) - set(Place.objects.filter(
                 related_catalogues__catalogue=self.instance, related_catalogues__type=type))
             for new_related_place in new_related_places:
-                catalogue_place_relation = CataloguePlaceRelation(catalogue=self.instance,
-                                                                     place=new_related_place, type=type)
+                catalogue_place_relation = CollectionPlaceRelation(catalogue=self.instance,
+                                                                   place=new_related_place, type=type)
                 catalogue_place_relation.save()
 
     def save_tags(self):
@@ -142,19 +142,19 @@ class CatalogueModelForm(forms.ModelForm):
 
 class CatalogueHeldByModelForm(forms.ModelForm):
     class Meta:
-        model = CatalogueHeldBy
+        model = CollectionHeldBy
         fields = "__all__"
 
 
 class CatalogueTypeModelForm(forms.ModelForm):
     class Meta:
-        model = CatalogueType
+        model = CollectionType
         fields = "__all__"
 
 
 class CatalogueCatalogueTypeRelationModelForm(forms.ModelForm):
     class Meta:
-        model = CatalogueCatalogueTypeRelation
+        model = CollectionCollectionTypeRelation
         fields = "__all__"
 
     def __init__(self, *args, **kwargs):
@@ -231,7 +231,7 @@ class LotModelForm(forms.ModelForm):
 
 class PersonCatalogueRelationModelForm(forms.ModelForm):
     class Meta:
-        model = PersonCatalogueRelation
+        model = PersonCollectionRelation
         fields = "__all__"
         widgets = {
             'person': ModelSelect2Widget(
@@ -239,7 +239,7 @@ class PersonCatalogueRelationModelForm(forms.ModelForm):
                 search_fields=['short_name__icontains', 'surname__icontains', 'first_names__icontains']
             ),
             'role': ModelSelect2Widget(
-                model=PersonCatalogueRelationRole,
+                model=PersonCollectionRelationRole,
                 search_fields=['name__icontains']
             )
         }
@@ -260,7 +260,7 @@ class PersonCatalogueRelationModelForm(forms.ModelForm):
 
 class PersonCatalogueRelationRoleModelForm(forms.ModelForm):
     class Meta:
-        model = PersonCatalogueRelationRole
+        model = PersonCollectionRelationRole
         fields = "__all__"
 
 
@@ -291,7 +291,7 @@ class PersonCollection_TMPRelationModelForm(forms.ModelForm):
 
 class CataloguePlaceRelationModelForm(forms.ModelForm):
     class Meta:
-        model = CataloguePlaceRelation
+        model = CollectionPlaceRelation
         fields = "__all__"
         widgets = {
             'place': ModelSelect2Widget(
@@ -299,7 +299,7 @@ class CataloguePlaceRelationModelForm(forms.ModelForm):
                 search_fields=['name__icontains']
             ),
             'type': ModelSelect2Widget(
-                model=CataloguePlaceRelationType,
+                model=CollectionPlaceRelationType,
                 search_fields=['name__icontains']
             )
         }
@@ -367,7 +367,7 @@ class ParisianCategoryModelForm(forms.ModelForm):
 
 class CataloguePlaceRelationTypeModelForm(forms.ModelForm):
     class Meta:
-        model = CataloguePlaceRelationType
+        model = CollectionPlaceRelationType
         fields = "__all__"
 
 

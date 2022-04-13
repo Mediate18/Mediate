@@ -11,7 +11,7 @@ from django.utils.safestring import mark_safe
 from mediate.tools import filter_multiple_words
 from mediate.filters import QBasedFilter, RangeFilterQ, RangeRangeFilterQ, MultipleChoiceFilterQWithExtraLookups, \
     ModelMultipleChoiceFilterQ, ModelMultipleChoiceFilterQWithExtraLookups, QBasedFilterset
-from catalogues.models import PersonCatalogueRelationRole, Catalogue
+from catalogues.models import PersonCollectionRelationRole, Collection
 from catalogues.views.views import get_catalogues_for_session
 from items.models import PersonItemRelationRole
 from tagme.models import Tag
@@ -65,7 +65,7 @@ class PersonFilter(django_filters.FilterSet):
     )
     catalogue_roles = django_filters.ModelMultipleChoiceFilter(
         label="Catalogue roles",
-        queryset=PersonCatalogueRelationRole.objects.all(),
+        queryset=PersonCollectionRelationRole.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
         field_name='personcataloguerelation__role',
         lookup_expr='in'
@@ -389,10 +389,10 @@ class PlaceRankingFilter(QBasedFilterset, PlaceFilter):
     )
     catalogue = ModelMultipleChoiceFilterQ(
         label="Catalogue",
-        queryset=Catalogue.objects.all(),
+        queryset=Collection.objects.all(),
         widget=ModelSelect2MultipleWidget(
             attrs={'data-placeholder': "Select multiple"},
-            model=Catalogue,
+            model=Collection,
             search_fields=['short_title__icontains']
         ),
         field_name='edition__items__lot__catalogue',
@@ -493,7 +493,7 @@ class PlaceLinksFilter(django_filters.FilterSet):
     )
     related_catalogues = django_filters.ModelMultipleChoiceFilter(
         label="Catalogues",
-        queryset=Catalogue.objects.all(),
+        queryset=Collection.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
         method='related_catalogues_filter'
     )

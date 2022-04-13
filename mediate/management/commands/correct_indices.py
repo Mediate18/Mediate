@@ -9,7 +9,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import Max, F
 
-from catalogues.models import Catalogue, Lot
+from catalogues.models import Collection, Lot
 
 
 class Command(BaseCommand):
@@ -68,8 +68,8 @@ class Command(BaseCommand):
 
         catalogue_uuids = kwargs.get('catalogue', [])
 
-        catalogues_to_check = Catalogue.objects.filter(uuid__in=catalogue_uuids) if catalogue_uuids \
-             else Catalogue.objects.all()
+        catalogues_to_check = Collection.objects.filter(uuid__in=catalogue_uuids) if catalogue_uuids \
+             else Collection.objects.all()
 
         incorrect_catalogues = []
 

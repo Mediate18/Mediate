@@ -7,7 +7,7 @@ import itertools
 
 from .models import *
 from mediate.columns import ActionColumn
-from catalogues.models import PersonCatalogueRelation, Catalogue, CataloguePlaceRelation
+from catalogues.models import PersonCollectionRelation, Collection, CollectionPlaceRelation
 from items.models import PersonItemRelation, Edition
 from apiconnectors.cerlapi import cerl_record_url
 from django.utils.translation import ugettext_lazy as _
@@ -50,13 +50,13 @@ class PersonTable(tables.Table):
         ]
 
     def render_catalogues(self, record):
-        person_catalogue_relations = PersonCatalogueRelation.objects.filter(person=record, role__name="owner")
+        person_catalogue_relations = PersonCollectionRelation.objects.filter(person=record, role__name="owner")
         relation_groups = []
         for role in set([relation.role for relation in person_catalogue_relations]):
             role_relations = person_catalogue_relations.filter(role=role)
             catalogues = []
             for relation in role_relations:
-                catalogue = relation.catalogue
+                catalogue = relation.collection
                 title = catalogue.short_title
                 catalogue_entry = "<a href='{}'>{}</a>".format(reverse_lazy('catalogue_detail', args=[catalogue.pk]), title)
                 catalogues.append(catalogue_entry)
@@ -68,7 +68,7 @@ class PersonTable(tables.Table):
         roles_dict = {}
 
         # Catalogues
-        catalogue_roles = list(PersonCatalogueRelation.objects.filter(person=record).distinct()
+        catalogue_roles = list(PersonCollectionRelation.objects.filter(person=record).distinct()
                                .values_list('role__name', flat=True))
         if catalogue_roles:
             roles_dict['catalogues'] = catalogue_roles
@@ -354,10 +354,10 @@ class PlaceLinksTable(tables.Table):
         ]
 
     def render_catalogues(self, record):
-        relations = CataloguePlaceRelation.objects.filter(place=record).prefetch_related('type')
+        relations = CollectionPlaceRelation.objects.filter(place=record).prefetch_related('type')
         type_dict = defaultdict(list)
         for relation in relations:
-            type_dict[relation.type.name].append(relation.catalogue)
+            type_dict[relation.type.name].append(relation.collection)
 
         return format_html("<br/>".join([
             type.capitalize() + ": " + ", ".join([
