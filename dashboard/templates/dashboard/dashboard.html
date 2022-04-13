@@ -125,7 +125,7 @@
         <h3>{% trans "Collections" %}</h3>
         <table class="table">
             <tbody>
-                {% if perms.collections.change_collection %}
+                {% if perms.catalogues.change_collection %}
                 <tr>
                     <td>
                         <a href="{% url 'collections' %}">Collections</a>
@@ -134,7 +134,7 @@
                 {% endif %}
 
 
-                {% if perms.collections.change_collectionheldby %}
+                {% if perms.catalogues.change_collectionheldby %}
                 <tr>
                     <td>
                         <a href="{% url 'collectionheldbys' %}">CollectionHeldBys</a>
@@ -143,7 +143,7 @@
                 {% endif %}
 
 
-                {% if perms.collections.change_collectionplacerelation %}
+                {% if perms.catalogues.change_collectionplacerelation %}
                 <tr>
                     <td>
                         <a href="{% url 'collectionplacerelations' %}">CollectionPlaceRelation</a>
@@ -152,7 +152,7 @@
                 {% endif %}
 
 
-                {% if perms.collections.change_collectionplacerelationtype %}
+                {% if perms.catalogues.change_collectionplacerelationtype %}
                 <tr>
                     <td>
                         <a href="{% url 'collectionplacerelationtypes' %}">CollectionPlaceRelationType</a>
@@ -161,7 +161,7 @@
                 {% endif %}
 
 
-                {% if perms.collections.change_collectiontype %}
+                {% if perms.catalogues.change_collectiontype %}
                 <tr>
                     <td>
                         <a href="{% url 'collectiontypes' %}">CollectionTypes</a>
@@ -170,7 +170,7 @@
                 {% endif %}
 
 
-                {% if perms.collections.change_collectioncollectiontyperelation %}
+                {% if perms.catalogues.change_collectioncollectiontyperelation %}
                 <tr>
                     <td>
                         <a href="{% url 'collectioncollectiontyperelations' %}">CollectionCollectionTypeRelation</a>
@@ -179,7 +179,7 @@
                 {% endif %}
 
 
-                {% if perms.collections.change_category %}
+                {% if perms.catalogues.change_category %}
                 <tr>
                     <td>
                         <a href="{% url 'categories' %}">Category</a>
@@ -188,7 +188,7 @@
                 {% endif %}
 
 
-                {% if perms.collections.change_parisiancategory %}
+                {% if perms.catalogues.change_parisiancategory %}
                 <tr>
                     <td>
                         <a href="{% url 'parisiancategories' %}">ParisianCategory</a>
@@ -197,7 +197,7 @@
                 {% endif %}
 
 
-                {% if perms.collections.change_collection_tmp %}
+                {% if perms.catalogues.change_collection_tmp %}
                 <tr>
                     <td>
                         <a href="{% url 'collection_tmps' %}">Collection_TMPs</a>
@@ -206,7 +206,7 @@
                 {% endif %}
 
 
-                {% if perms.collections.change_collection_tmpyear %}
+                {% if perms.catalogues.change_collection_tmpyear %}
                 <tr>
                     <td>
                         <a href="{% url 'collection_tmpyears' %}">Collection_TMPYears</a>
@@ -215,7 +215,7 @@
                 {% endif %}
 
 
-                {% if perms.collections.change_library %}
+                {% if perms.catalogues.change_library %}
                 <tr>
                     <td>
                         <a href="{% url 'libraries' %}">Libraries</a>
@@ -224,7 +224,7 @@
                 {% endif %}
 
 
-                {% if perms.collections.change_lot %}
+                {% if perms.catalogues.change_lot %}
                 <tr>
                     <td>
                         <a href="{% url 'lots' %}">Lots</a>
@@ -233,7 +233,7 @@
                 {% endif %}
 
 
-                {% if perms.collections.change_personcollectionrelation %}
+                {% if perms.catalogues.change_personcollectionrelation %}
                 <tr>
                     <td>
                         <a href="{% url 'personcollectionrelations' %}">PersonCollectionRelations</a>
@@ -242,7 +242,7 @@
                 {% endif %}
 
 
-                {% if perms.collections.change_personcollectionrelationrole %}
+                {% if perms.catalogues.change_personcollectionrelationrole %}
                 <tr>
                     <td>
                         <a href="{% url 'personcollectionrelationroles' %}">PersonCollectionRelationRoles</a>
@@ -251,7 +251,7 @@
                 {% endif %}
 
 
-                {% if perms.collections.change_personcollection_tmprelation %}
+                {% if perms.catalogues.change_personcollection_tmprelation %}
                 <tr>
                     <td>
                         <a href="{% url 'personcollection_tmprelations' %}">PersonCollection_TMPRelations</a>
