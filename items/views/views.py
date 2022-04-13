@@ -33,7 +33,7 @@ from ..tables import *
 from catalogues.models import Category
 from persons.forms import PersonModelForm
 from mediate.views import GenericDetailView
-from catalogues.views.views import get_catalogues_for_session
+from catalogues.views.views import get_collections_for_session
 from catalogues.tools import get_datasets_for_session
 from simplemoderation.models import Moderation, ModerationAction
 
@@ -110,9 +110,9 @@ class ItemTableView(ListView):
 
     def get_queryset(self):
         items = Item.objects \
-            .filter(lot__catalogue_id__in=get_catalogues_for_session(self.request)) \
-            .order_by('lot__catalogue__year_of_publication', 'lot__catalogue__short_title',
-                                      'lot__index_in_catalogue', 'index_in_lot', 'lot__lot_as_listed_in_catalogue')
+            .filter(lot__collection_id__in=get_collections_for_session(self.request)) \
+            .order_by('lot__collection__year_of_publication', 'lot__collection__short_title',
+                                      'lot__index_in_collection', 'index_in_lot', 'lot__lot_as_listed_in_collection')
         lot_uuid = self.request.GET.get('lot__uuid')
         if lot_uuid:
             items = items.filter(lot__uuid=uuid.UUID(lot_uuid))
@@ -227,7 +227,7 @@ class PersonAndRoleAutocompleteView(AutoResponseView):
         role_query = Q(role__name__icontains=term)
 
         person_item_relations = PersonItemRelation.objects\
-                .filter(item__lot__catalogue__collection_tmp__dataset__in=get_datasets_for_session(request)) \
+                .filter(item__lot__collection__collection_tmp__dataset__in=get_datasets_for_session(request)) \
                 .filter(person_query | role_query)\
                 .values('person', 'person__short_name', 'role', 'role__name')\
                 .distinct().order_by('person__short_name')[begin:end]
@@ -256,7 +256,7 @@ class TaggedItemTableView(ListView):
     def get_queryset(self):
         tags = get_objects_for_user(self.request.user, 'tagme.view_entities_with_this_tag')
         return Item.objects\
-            .filter(lot__catalogue_id__in=get_catalogues_for_session(self.request))\
+            .filter(lot__collection_id__in=get_collections_for_session(self.request))\
             .filter(tags__tag__in=tags)
 
     def get(self, request, *args, **kwargs):
@@ -320,7 +320,7 @@ class ItemLocationMapView(ListView):
 
     def get_queryset(self):
         items = Item.objects\
-            .filter(lot__catalogue_id__in=get_catalogues_for_session(self.request))\
+            .filter(lot__collection_id__in=get_collections_for_session(self.request))\
             .filter(edition__place__latitude__isnull=False, edition__place__longitude__isnull=False)
         return items
 
@@ -363,7 +363,7 @@ class ItemCreateView(CreateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['collection_tmps'] = Collection_TMP.objects.filter(dataset__in=get_datasets_for_session(self.request))
-        kwargs['lots'] = Lot.objects.filter(catalogue__in=get_catalogues_for_session(self.request))
+        kwargs['lots'] = Lot.objects.filter(collection__in=get_collections_for_session(self.request))
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -390,7 +390,7 @@ class ItemUpdateView(PermissionRequiredMixin, UpdateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['collection_tmps'] = Collection_TMP.objects.filter(dataset__in=get_datasets_for_session(self.request))
-        kwargs['lots'] = Lot.objects.filter(catalogue__in=get_catalogues_for_session(self.request))
+        kwargs['lots'] = Lot.objects.filter(collection__in=get_collections_for_session(self.request))
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -421,7 +421,7 @@ class ItemAuthorTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return ItemAuthor.objects.filter(item__lot__catalogue__in=get_catalogues_for_session(self.request))
+        return ItemAuthor.objects.filter(item__lot__collection__in=get_collections_for_session(self.request))
 
     def get_context_data(self, **kwargs):
         context = super(ItemAuthorTableView, self).get_context_data(**kwargs)
@@ -460,7 +460,7 @@ class ItemAuthorCreateView(CreateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['items'] = Item.objects.filter(lot__catalogue__in=get_catalogues_for_session(self.request))
+        kwargs['items'] = Item.objects.filter(lot__collection__in=get_collections_for_session(self.request))
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -485,7 +485,7 @@ class ItemAuthorUpdateView(PermissionRequiredMixin, UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['items'] = Item.objects.filter(lot__catalogue__in=get_catalogues_for_session(self.request))
+        kwargs['items'] = Item.objects.filter(lot__collection__in=get_collections_for_session(self.request))
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -513,7 +513,7 @@ class ItemItemTypeRelationTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return ItemItemTypeRelation.objects.filter(item__lot__catalogue__in=get_catalogues_for_session(self.request))
+        return ItemItemTypeRelation.objects.filter(item__lot__collection__in=get_collections_for_session(self.request))
 
     def get_context_data(self, **kwargs):
         context = super(ItemItemTypeRelationTableView, self).get_context_data(**kwargs)
@@ -552,7 +552,7 @@ class ItemItemTypeRelationCreateView(CreateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['items'] = Item.objects.filter(lot__catalogue__in=get_catalogues_for_session(self.request))
+        kwargs['items'] = Item.objects.filter(lot__collection__in=get_collections_for_session(self.request))
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -577,7 +577,7 @@ class ItemItemTypeRelationUpdateView(PermissionRequiredMixin, UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['items'] = Item.objects.filter(lot__catalogue__in=get_catalogues_for_session(self.request))
+        kwargs['items'] = Item.objects.filter(lot__collection__in=get_collections_for_session(self.request))
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -605,7 +605,7 @@ class ItemLanguageRelationTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return ItemLanguageRelation.objects.filter(item__lot__catalogue__in=get_catalogues_for_session(self.request))
+        return ItemLanguageRelation.objects.filter(item__lot__collection__in=get_collections_for_session(self.request))
 
     def get_context_data(self, **kwargs):
         context = super(ItemLanguageRelationTableView, self).get_context_data(**kwargs)
@@ -644,7 +644,7 @@ class ItemLanguageRelationCreateView(CreateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['items'] = Item.objects.filter(lot__catalogue__in=get_catalogues_for_session(self.request))
+        kwargs['items'] = Item.objects.filter(lot__collection__in=get_collections_for_session(self.request))
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -669,7 +669,7 @@ class ItemLanguageRelationUpdateView(PermissionRequiredMixin, UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['items'] = Item.objects.filter(lot__catalogue__in=get_catalogues_for_session(self.request))
+        kwargs['items'] = Item.objects.filter(lot__collection__in=get_collections_for_session(self.request))
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -698,7 +698,7 @@ class ItemMaterialDetailsRelationTableView(ListView):
 
     def get_queryset(self):
         return ItemMaterialDetailsRelation.objects.filter(
-            item__lot__catalogue__in=get_catalogues_for_session(self.request)
+            item__lot__collection__in=get_collections_for_session(self.request)
         )
 
     def get_context_data(self, **kwargs):
@@ -738,7 +738,7 @@ class ItemMaterialDetailsRelationCreateView(CreateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['items'] = Item.objects.filter(lot__catalogue__in=get_catalogues_for_session(self.request))
+        kwargs['items'] = Item.objects.filter(lot__collection__in=get_collections_for_session(self.request))
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -763,7 +763,7 @@ class ItemMaterialDetailsRelationUpdateView(PermissionRequiredMixin, UpdateView)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['items'] = Item.objects.filter(lot__catalogue__in=get_catalogues_for_session(self.request))
+        kwargs['items'] = Item.objects.filter(lot__collection__in=get_collections_for_session(self.request))
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -851,7 +851,7 @@ class ItemWorkRelationTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return ItemWorkRelation.objects.filter(item__lot__catalogue__in=get_catalogues_for_session(self.request))
+        return ItemWorkRelation.objects.filter(item__lot__collection__in=get_collections_for_session(self.request))
 
     def get_context_data(self, **kwargs):
         context = super(ItemWorkRelationTableView, self).get_context_data(**kwargs)
@@ -890,7 +890,7 @@ class ItemWorkRelationCreateView(CreateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['items'] = Item.objects.filter(lot__catalogue__in=get_catalogues_for_session(self.request))
+        kwargs['items'] = Item.objects.filter(lot__collection__in=get_collections_for_session(self.request))
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -915,7 +915,7 @@ class ItemWorkRelationUpdateView(PermissionRequiredMixin, UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['items'] = Item.objects.filter(lot__catalogue__in=get_catalogues_for_session(self.request))
+        kwargs['items'] = Item.objects.filter(lot__collection__in=get_collections_for_session(self.request))
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -1200,7 +1200,7 @@ class PersonItemRelationTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return PersonItemRelation.objects.filter(item__lot__catalogue__in=get_catalogues_for_session(self.request))
+        return PersonItemRelation.objects.filter(item__lot__collection__in=get_collections_for_session(self.request))
 
     def get_context_data(self, **kwargs):
         context = super(PersonItemRelationTableView, self).get_context_data(**kwargs)
@@ -1239,7 +1239,7 @@ class PersonItemRelationCreateView(CreateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['items'] = Item.objects.filter(lot__catalogue__in=get_catalogues_for_session(self.request))
+        kwargs['items'] = Item.objects.filter(lot__collection__in=get_collections_for_session(self.request))
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -1264,7 +1264,7 @@ class PersonItemRelationUpdateView(PermissionRequiredMixin, UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['items'] = Item.objects.filter(lot__catalogue__in=get_catalogues_for_session(self.request))
+        kwargs['items'] = Item.objects.filter(lot__collection__in=get_collections_for_session(self.request))
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -1637,7 +1637,7 @@ def add_parisian_category_to_items(request):
     if request.method == 'POST':
         if 'entries' in request.POST and 'parisian_category' in request.POST:
             item_ids = request.POST.getlist('entries')
-            items = Item.objects.filter(uuid__in=item_ids, lot__catalogue__in=get_catalogues_for_session(request))
+            items = Item.objects.filter(uuid__in=item_ids, lot__collection__in=get_collections_for_session(request))
             if len(item_ids) != items.count():
                 messages.add_message(request, messages.ERROR,
                                      _("Some items could not be used for adding a parisian category"
@@ -2196,7 +2196,7 @@ class ItemAndEditionCreateView(CreateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['collection_tmps'] = Collection_TMP.objects.filter(dataset__in=get_datasets_for_session(self.request))
-        kwargs['lots'] = Lot.objects.filter(catalogue__in=get_catalogues_for_session(self.request))
+        kwargs['lots'] = Lot.objects.filter(collection__in=get_collections_for_session(self.request))
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -2250,5 +2250,5 @@ class ItemAndEditionUpdateView(PermissionRequiredMixin, ItemAndEditionCreateView
             'edition': self.object.edition,
         })
         kwargs['collection_tmps'] = Collection_TMP.objects.filter(dataset__in=get_datasets_for_session(self.request))
-        kwargs['lots'] = Lot.objects.filter(catalogue__in=get_catalogues_for_session(self.request))
+        kwargs['lots'] = Lot.objects.filter(collection__in=get_collections_for_session(self.request))
         return kwargs

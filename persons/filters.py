@@ -12,7 +12,7 @@ from mediate.tools import filter_multiple_words
 from mediate.filters import QBasedFilter, RangeFilterQ, RangeRangeFilterQ, MultipleChoiceFilterQWithExtraLookups, \
     ModelMultipleChoiceFilterQ, ModelMultipleChoiceFilterQWithExtraLookups, QBasedFilterset
 from catalogues.models import PersonCollectionRelationRole, Collection
-from catalogues.views.views import get_catalogues_for_session
+from catalogues.views.views import get_collections_for_session
 from items.models import PersonItemRelationRole
 from tagme.models import Tag
 
@@ -63,11 +63,11 @@ class PersonFilter(django_filters.FilterSet):
         field_name='personprofession__profession',
         lookup_expr='in'
     )
-    catalogue_roles = django_filters.ModelMultipleChoiceFilter(
-        label="Catalogue roles",
+    collection_roles = django_filters.ModelMultipleChoiceFilter(
+        label="Collection roles",
         queryset=PersonCollectionRelationRole.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
-        field_name='personcataloguerelation__role',
+        field_name='personcollectionrelation__role',
         lookup_expr='in'
     )
     item_roles = django_filters.ModelMultipleChoiceFilter(
@@ -128,7 +128,7 @@ class PersonFilter(django_filters.FilterSet):
             'country_of_death',
             'date_of_death',
             'profession',
-            'catalogue_roles',
+            'collection_roles',
             'item_roles',
             'work_author',
             'publisher',
@@ -190,11 +190,11 @@ class PersonRankingFilter(QBasedFilterset):
         field_names=('personitemrelation__item__edition__year_start', 'personitemrelation__item__edition__year_end'),
         lookup_expr='range',
     )
-    catalogue_publication_country = ModelMultipleChoiceFilterQ(
-        label="Catalogue country",
+    collection_publication_country = ModelMultipleChoiceFilterQ(
+        label="Collection country",
         queryset=Country.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
-        field_name='personitemrelation__item__lot__catalogue__related_places__place__country',
+        field_name='personitemrelation__item__lot__collection__related_places__place__country',
         lookup_expr='in',
     )
     sex = MultipleChoiceFilterQWithExtraLookups(
@@ -203,28 +203,28 @@ class PersonRankingFilter(QBasedFilterset):
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
         lookup_expr='in',
     )
-    catalogue_year = RangeFilterQ(
-        label="Catalogue publication year",
+    collection_year = RangeFilterQ(
+        label="Collection publication year",
         widget=RangeWidget(),
-        field_name='personitemrelation__item__lot__catalogue__year_of_publication',
+        field_name='personitemrelation__item__lot__collection__year_of_publication',
         lookup_expr='range'
     )
-    catalogue_owner_sex = MultipleChoiceFilterQWithExtraLookups(
-        label="Catalogue owner gender",
+    collection_owner_sex = MultipleChoiceFilterQWithExtraLookups(
+        label="Collection owner gender",
         choices=Person.SEX_CHOICES,
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
-        field_name='personitemrelation__item__lot__catalogue__personcataloguerelation__person__sex',
+        field_name='personitemrelation__item__lot__collection__personcollectionrelation__person__sex',
         lookup_expr='in',
-        extra_field_lookups={'personitemrelation__item__lot__catalogue__personcataloguerelation__role__name': 'owner'}
+        extra_field_lookups={'personitemrelation__item__lot__collection__personcollectionrelation__role__name': 'owner'}
     )
-    catalogue_owner_religion = ModelMultipleChoiceFilterQWithExtraLookups(
-        label="Catalogue owner religion",
+    collection_owner_religion = ModelMultipleChoiceFilterQWithExtraLookups(
+        label="Collection owner religion",
         queryset=Religion.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
         field_name=
-        'personitemrelation__item__lot__catalogue__personcataloguerelation__person__religiousaffiliation__religion',
+        'personitemrelation__item__lot__collection__personcollectionrelation__person__religiousaffiliation__religion',
         lookup_expr='in',
-        extra_field_lookups={'personitemrelation__item__lot__catalogue__personcataloguerelation__role__name': 'owner'}
+        extra_field_lookups={'personitemrelation__item__lot__collection__personcollectionrelation__role__name': 'owner'}
     )
     country_of_birth = ModelMultipleChoiceFilterQ(
         label="Country of birth of Person related to Item",
@@ -254,11 +254,11 @@ class PersonRankingFilter(QBasedFilterset):
         fields = [
             'item_roles',
             'edition_year',
-            'catalogue_publication_country',
+            'collection_publication_country',
             'sex',
-            'catalogue_year',
-            'catalogue_owner_sex',
-            'catalogue_owner_religion',
+            'collection_year',
+            'collection_owner_sex',
+            'collection_owner_religion',
             'country_of_birth',
             'date_of_birth',
             'country_of_death',
@@ -276,12 +276,12 @@ class PersonRankingFilter(QBasedFilterset):
         qs = super().qs
         self._qs = qs.distinct() \
             .annotate(item_count=Count('personitemrelation__item',
-                                       filter=Q(personitemrelation__item__lot__catalogue__in=
-                                         get_catalogues_for_session(self.request)),
+                                       filter=Q(personitemrelation__item__lot__collection__in=
+                                         get_collections_for_session(self.request)),
                                        distinct=True)) \
-            .annotate(catalogue_count=Count('personitemrelation__item__lot__catalogue',
-                                       filter=Q(personitemrelation__item__lot__catalogue__in=
-                                         get_catalogues_for_session(self.request)),
+            .annotate(collection_count=Count('personitemrelation__item__lot__collection',
+                                       filter=Q(personitemrelation__item__lot__collection__in=
+                                         get_collections_for_session(self.request)),
                                         distinct=True)) \
             .order_by('-item_count')
         return self._qs
@@ -354,12 +354,12 @@ class CountryRankingFilter(CountryFilter):
         qs = super().qs
         self._qs = qs.distinct() \
             .annotate(item_count=Count('place__edition__items',
-                                       filter=Q(place__edition__items__lot__catalogue__in=
-                                         get_catalogues_for_session(self.request)),
+                                       filter=Q(place__edition__items__lot__collection__in=
+                                         get_collections_for_session(self.request)),
                                        distinct=True)) \
-            .annotate(catalogue_count=Count('place__edition__items__lot__catalogue',
-                                       filter=Q(place__edition__items__lot__catalogue__in=
-                                         get_catalogues_for_session(self.request)),
+            .annotate(collection_count=Count('place__edition__items__lot__collection',
+                                       filter=Q(place__edition__items__lot__collection__in=
+                                         get_collections_for_session(self.request)),
                                        distinct=True)) \
             .order_by('-item_count')
         return self._qs
@@ -387,47 +387,47 @@ class PlaceRankingFilter(QBasedFilterset, PlaceFilter):
         widget=RangeWidget(),
         field_name='edition__year_start'
     )
-    catalogue = ModelMultipleChoiceFilterQ(
-        label="Catalogue",
+    collection = ModelMultipleChoiceFilterQ(
+        label="Collection",
         queryset=Collection.objects.all(),
         widget=ModelSelect2MultipleWidget(
             attrs={'data-placeholder': "Select multiple"},
             model=Collection,
             search_fields=['short_title__icontains']
         ),
-        field_name='edition__items__lot__catalogue',
+        field_name='edition__items__lot__collection',
         lookup_expr='in'
     )
-    catalogue_publication_year = RangeFilterQ(
-        label="Catalogue publication year",
+    collection_publication_year = RangeFilterQ(
+        label="Collection publication year",
         widget=RangeWidget(),
-        field_name='edition__items__lot__catalogue__year_of_publication'
+        field_name='edition__items__lot__collection__year_of_publication'
     )
-    catalogue_country_of_publication = ModelMultipleChoiceFilterQ(
-        label="Catalogue country of publication",
+    collection_country_of_publication = ModelMultipleChoiceFilterQ(
+        label="Collection country of publication",
         queryset=Country.objects.all(),
         widget=ModelSelect2MultipleWidget(
             attrs={'data-placeholder': "Select multiple"},
             model=Country,
             search_fields=['name__icontains']
         ),
-        method='catalogue_country_of_publication_filter'
+        method='collection_country_of_publication_filter'
     )
-    catalogue_tag = ModelMultipleChoiceFilterQ(
-        label="Catalogue tag",
+    collection_tag = ModelMultipleChoiceFilterQ(
+        label="Collection tag",
         queryset=Tag.objects.all(),
         widget=ModelSelect2MultipleWidget(
             attrs={'data-placeholder': "Select multiple"},
             model=Tag,
             search_fields=['namespace__icontains', 'name__icontains', 'value__icontains']
         ),
-        method='catalogue_tag_filter'
+        method='collection_tag_filter'
     )
-    catalogue_owner_religion = ModelMultipleChoiceFilterQ(
-        label="Catalogue owner religion",
+    collection_owner_religion = ModelMultipleChoiceFilterQ(
+        label="Collection owner religion",
         queryset=Religion.objects.all().order_by('name'),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
-        method='catalogue_owner_religion_filter'
+        method='collection_owner_religion_filter'
     )
 
     class Meta:
@@ -442,31 +442,31 @@ class PlaceRankingFilter(QBasedFilterset, PlaceFilter):
         qs = super().qs
         self._qs = qs.distinct() \
             .annotate(item_count=Count('edition__items',
-                                       filter=Q(edition__items__lot__catalogue__in=
-                                         get_catalogues_for_session(self.request)),
+                                       filter=Q(edition__items__lot__collection__in=
+                                         get_collections_for_session(self.request)),
                                        distinct=True)) \
-            .annotate(catalogue_count=Count('edition__items__lot__catalogue',
-                                       filter=Q(edition__items__lot__catalogue__in=
-                                         get_catalogues_for_session(self.request)),
+            .annotate(collection_count=Count('edition__items__lot__collection',
+                                       filter=Q(edition__items__lot__collection__in=
+                                         get_collections_for_session(self.request)),
                                        distinct=True)) \
             .order_by('-item_count')
         return self._qs
 
-    def catalogue_country_of_publication_filter(self, q, name, value):
+    def collection_country_of_publication_filter(self, q, name, value):
         if value:
-            q &= Q(edition__items__lot__catalogue__related_places__type__name='publication',
-                   edition__items__lot__catalogue__related_places__place__country__in=value)
+            q &= Q(edition__items__lot__collection__related_places__type__name='publication',
+                   edition__items__lot__collection__related_places__place__country__in=value)
         return q
 
-    def catalogue_tag_filter(self, q, name, value):
+    def collection_tag_filter(self, q, name, value):
         if value:
-            q &= Q(edition__items__lot__catalogue__tags__tag__in=value)
+            q &= Q(edition__items__lot__collection__tags__tag__in=value)
         return q
 
-    def catalogue_owner_religion_filter(self, q, name, value):
+    def collection_owner_religion_filter(self, q, name, value):
         if value:
-            q &= Q(edition__items__lot__catalogue__personcataloguerelation__role__name='owner',
-              edition__items__lot__catalogue__personcataloguerelation__person__religiousaffiliation__religion__in=value)
+            q &= Q(edition__items__lot__collection__personcollectionrelation__role__name='owner',
+              edition__items__lot__collection__personcollectionrelation__person__religiousaffiliation__religion__in=value)
         return q
 
     def get_year_range(self):
@@ -477,9 +477,9 @@ class PlaceRankingFilter(QBasedFilterset, PlaceFilter):
         else:
             return None
 
-    def get_catalogues(self):
+    def get_collections(self):
         if self.data:
-            return self.data.getlist('catalogue')
+            return self.data.getlist('collection')
         else:
             return None
 
@@ -491,11 +491,11 @@ class PlaceLinksFilter(django_filters.FilterSet):
         queryset=Country.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
-    related_catalogues = django_filters.ModelMultipleChoiceFilter(
-        label="Catalogues",
+    related_collections = django_filters.ModelMultipleChoiceFilter(
+        label="Collections",
         queryset=Collection.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
-        method='related_catalogues_filter'
+        method='related_collections_filter'
     )
     persons = django_filters.ModelMultipleChoiceFilter(
         label="People born/inhabiting/died",
@@ -511,9 +511,9 @@ class PlaceLinksFilter(django_filters.FilterSet):
     def multiple_words_filter(self, queryset, name, value):
         return filter_multiple_words(self.filters[name].lookup_expr, queryset, name, value)
 
-    def related_catalogues_filter(self, queryset, name, value):
+    def related_collections_filter(self, queryset, name, value):
         if value:
-            return queryset.filter(related_catalogues__catalogue__in=value)
+            return queryset.filter(related_collections__collection__in=value)
         return queryset
 
     def persons_filter(self, queryset, name, value):

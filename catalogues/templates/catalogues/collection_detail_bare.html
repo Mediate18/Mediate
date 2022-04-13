@@ -4,16 +4,16 @@
 {% load dictionary_lookup %}
 
 {% block extracss %}
-    <link rel="stylesheet" href="{% static 'catalogues/css/catalogue_detail.css' %}">
+    <link rel="stylesheet" href="{% static 'collections/css/collection_detail.css' %}">
 {% endblock %}
 
 {% block content %}
 
-{% if catalogue.under_moderation %}
-    <span class="glyphicon glyphicon-ban-circle pull-right" title="{% trans 'Catalogue is being moderated' %}"></span>
+{% if collection.under_moderation %}
+    <span class="glyphicon glyphicon-ban-circle pull-right" title="{% trans 'Collection is being moderated' %}"></span>
 {% else %}
-    <a class="pull-right" href="{% url 'change_catalogue' object.pk %}?layout=bare&next={{ request.path }}">
-        <span class="glyphicon glyphicon-pencil" title="{% trans 'Change catalogue' %}"></span>
+    <a class="pull-right" href="{% url 'change_collection' object.pk %}?layout=bare&next={{ request.path }}">
+        <span class="glyphicon glyphicon-pencil" title="{% trans 'Change collection' %}"></span>
     </a>
 {% endif %}
 
@@ -29,7 +29,7 @@
 
     <dt>{% trans "Type(s)" %}</dt>
     <dd>
-        {% for typerelation in object.cataloguecataloguetyperelation_set.all %}
+        {% for typerelation in object.collectioncollectiontyperelation_set.all %}
             typerelation.type
             {% if not forloop.last %}, {% endif %}
         {% endfor %}
@@ -50,19 +50,19 @@
 
     <dt>{% trans "Types" %}</dt>
     <dd>
-        {% for cataloguecataloguetyperelation in object.cataloguecataloguetyperelation_set.all %}
-            {{ cataloguecataloguetyperelation.type }}{% if not forloop.last %}, {% endif %}
+        {% for collectioncollectiontyperelation in object.collectioncollectiontyperelation_set.all %}
+            {{ collectioncollectiontyperelation.type }}{% if not forloop.last %}, {% endif %}
         {% endfor %}
     </dd>
 </dl>
 <h2 class="text-center">{% trans "Lots" %}</h2>
 <table class="table table-hover">
 {% for lot in object.sorted_lot_set %}
-            {% if lot.index_in_catalogue in first_lot_on_page_dict %}
+            {% if lot.index_in_collection in first_lot_on_page_dict %}
     <tr>
         <td colspan="4" style="padding: 0px;">
-            <!--before page {{ lot.page_in_catalogue }}, before lot index {{ lot.index_in_catalogue }}-->
-            {% if lot.index_in_catalogue in first_lot_in_category_dict %}
+            <!--before page {{ lot.page_in_collection }}, before lot index {{ lot.index_in_collection }}-->
+            {% if lot.index_in_collection in first_lot_in_category_dict %}
                 <a href="{% url 'add_lot_before' lot.pk %}?page&category" title="Add lot here">
                 <div style="padding-top: 5px; padding-bottom: 5px;">
                     <div style="height: 1px; background-color: #ddd;"></div>
@@ -79,14 +79,14 @@
     </tr>
     <tr>
         <td class="text-center" colspan="4">
-                <b>{% trans "Page" %} {{ lot.page_in_catalogue }}</b>
+                <b>{% trans "Page" %} {{ lot.page_in_collection }}</b>
         </td>
     </tr>
             {% endif %}
-            {% if lot.index_in_catalogue in first_lot_in_category_dict %}
+            {% if lot.index_in_collection in first_lot_in_category_dict %}
     <tr>
         <td colspan="4" style="padding: 0px;">
-            <!-- before category {{ lot.category.bookseller_category }}, before lot index {{ lot.index_in_catalogue }}-->
+            <!-- before category {{ lot.category.bookseller_category }}, before lot index {{ lot.index_in_collection }}-->
             <a href="{% url 'add_lot_before' lot.pk %}?category" title="Add lot here">
                 <div style="padding-top: 5px; padding-bottom: 5px;">
                     <div style="height: 1px; background-color: #ddd;"></div>
@@ -103,7 +103,7 @@
             {% endif %}
     <tr>
         <td colspan="4" style="padding: 0px;">
-            <!--before lot index {{ lot.index_in_catalogue }}-->
+            <!--before lot index {{ lot.index_in_collection }}-->
             <a href="{% url 'add_lot_before' lot.pk %}" title="Add lot here">
                 <div style="padding-top: 5px; padding-bottom: 5px;">
                     <div style="height: 1px; background-color: #ddd;"></div>
@@ -113,7 +113,7 @@
     </tr>
     <tr>
         <td>
-            <b>{{ lot.number_in_catalogue }}</b>
+            <b>{{ lot.number_in_collection }}</b>
         </td>
         <td>
             <a class="lot-anchor" id="lot__{{ lot.uuid }}"></a>
@@ -141,7 +141,7 @@
 {% endfor %}
     <tr>
         <td colspan="4" style="padding: 0px;">
-            <!--before lot index {{ lot.index_in_catalogue }}-->
+            <!--before lot index {{ lot.index_in_collection }}-->
             <a href="{% url 'add_lot_at_end' object.pk %}" title="Add lot here">
                 <div style="padding-top: 5px; padding-bottom: 5px;">
                     <div style="height: 1px; background-color: #ddd;"></div>

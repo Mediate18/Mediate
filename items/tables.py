@@ -30,8 +30,8 @@ class ItemTable(tables.Table):
                                      attrs={'th__input': {'id': 'checkbox_column', 'title': 'Select/deselect all'}})
     people = tables.Column(empty_values=(), orderable=False)
     works = tables.Column(empty_values=(), verbose_name=_("Works"))
-    lot = tables.Column(order_by='lot__lot_as_listed_in_catalogue', )
-    catalogue = tables.Column(empty_values=(), order_by='lot__catalogue__short_title')
+    lot = tables.Column(order_by='lot__lot_as_listed_in_collection', )
+    collection = tables.Column(empty_values=(), order_by='lot__collection__short_title')
     number_of_volumes = tables.Column(empty_values=(), verbose_name=_('Number of volumes'))
     material_details = tables.Column(empty_values=(), orderable=False)
     edition = tables.LinkColumn()
@@ -54,7 +54,7 @@ class ItemTable(tables.Table):
             'works',
             'lot',
             'index_in_lot',
-            'catalogue',
+            'collection',
             'number_of_volumes',
             'book_format',
             'material_details',
@@ -120,14 +120,14 @@ class ItemTable(tables.Table):
         return format_html(" | ".join(work_entries))
 
 
-    def render_catalogue(self, record):
+    def render_collection(self, record):
         try:
             return format_html('<a href="{}">{}</a>'.format(
-                reverse_lazy('catalogue_detail', args=[str(record.lot.collection.uuid)]),
+                reverse_lazy('collection_detail', args=[str(record.lot.collection.uuid)]),
                 str(record.lot.collection))
             )
         except AttributeError:
-            # Record has not lot or lot has no catalogue
+            # Record has not lot or lot has no collection
             return ''
 
     def render_number_of_volumes(self, record):
@@ -175,7 +175,7 @@ class ItemTable(tables.Table):
             work_entries.append(work_entry)
         return " | ".join(work_entries)
 
-    def value_catalogue(self, record):
+    def value_collection(self, record):
         return str(record.lot.collection) or ""
 
     def value_sales_price(self, record):
@@ -189,9 +189,9 @@ class ItemTable(tables.Table):
 class TaggedItemTable(tables.Table):
     people = tables.Column(empty_values=())
     works = tables.Column(empty_values=(), verbose_name=_("Works"))
-    lot = tables.Column(order_by='lot__lot_as_listed_in_catalogue', )
+    lot = tables.Column(order_by='lot__lot_as_listed_in_collection', )
     sales_price = tables.Column(empty_values=(), order_by='lot__sales_price')
-    catalogue = tables.Column(empty_values=(), order_by='lot__catalogue__short_title')
+    collection = tables.Column(empty_values=(), order_by='lot__collection__short_title')
     number_of_volumes = tables.Column(empty_values=(), verbose_name=_('Number of volumes'))
     material_details = tables.Column(empty_values=())
 
@@ -205,7 +205,7 @@ class TaggedItemTable(tables.Table):
             'lot',
             'index_in_lot',
             'sales_price',
-            'catalogue',
+            'collection',
             'collection_tmp',
             'number_of_volumes',
             'book_format',
@@ -245,7 +245,7 @@ class TaggedItemTable(tables.Table):
             work_entries.append(work_entry)
         return format_html(" | ".join(work_entries))
 
-    def render_catalogue(self, record):
+    def render_collection(self, record):
         return format_html(str(record.lot.collection))
 
     def render_sales_price(self, record):
@@ -287,7 +287,7 @@ class TaggedItemTable(tables.Table):
             work_entries.append(work_entry)
         return " | ".join(work_entries)
 
-    def value_catalogue(self, record):
+    def value_collection(self, record):
         return str(record.lot.collection) or ""
 
     def value_sales_price(self, record):
@@ -537,7 +537,7 @@ class EditionTable(tables.Table):
 class EditionRankingTable(EditionTable):
     row_index = tables.Column(empty_values=(), orderable=False, verbose_name="")
     item_count = tables.Column(empty_values=(), verbose_name=_("# items"))
-    catalogue_count = tables.Column(empty_values=(), verbose_name=_("# catalogues"))
+    collection_count = tables.Column(empty_values=(), verbose_name=_("# collections"))
 
     class Meta:
         model = Edition
@@ -545,7 +545,7 @@ class EditionRankingTable(EditionTable):
         sequence = [
             'row_index',
             'item_count',
-            'catalogue_count',
+            'collection_count',
             'items',
             'year_of_publication',
             'year_tag',
@@ -618,8 +618,8 @@ class WorkTable(tables.Table):
 class WorkRankingTable(WorkTable):
     row_index = tables.Column(empty_values=(), orderable=False, verbose_name="")
     item_count = tables.Column(empty_values=(), verbose_name=_("# items"))
-    catalogue_count = tables.Column(empty_values=(), verbose_name=_("# catalogues"),
-                                    order_by=("catalogue_count", "item_count"))
+    collection_count = tables.Column(empty_values=(), verbose_name=_("# collections"),
+                                    order_by=("collection_count", "item_count"))
 
     class Meta:
         model = Work
@@ -627,7 +627,7 @@ class WorkRankingTable(WorkTable):
         sequence = [
             'row_index',
             'item_count',
-            'catalogue_count',
+            'collection_count',
             'title',
             'viaf_id',
             'uuid'

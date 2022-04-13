@@ -122,64 +122,64 @@
 
     </div>
     <div class="col-md-3">
-        <h3>{% trans "Catalogues" %}</h3>
+        <h3>{% trans "Collections" %}</h3>
         <table class="table">
             <tbody>
-                {% if perms.catalogues.change_catalogue %}
+                {% if perms.collections.change_collection %}
                 <tr>
                     <td>
-                        <a href="{% url 'catalogues' %}">Catalogues</a>
+                        <a href="{% url 'collections' %}">Collections</a>
                     </td>
                 </tr>
                 {% endif %}
 
 
-                {% if perms.catalogues.change_catalogueheldby %}
+                {% if perms.collections.change_collectionheldby %}
                 <tr>
                     <td>
-                        <a href="{% url 'catalogueheldbys' %}">CatalogueHeldBys</a>
+                        <a href="{% url 'collectionheldbys' %}">CollectionHeldBys</a>
                     </td>
                 </tr>
                 {% endif %}
 
 
-                {% if perms.catalogues.change_catalogueplacerelation %}
+                {% if perms.collections.change_collectionplacerelation %}
                 <tr>
                     <td>
-                        <a href="{% url 'catalogueplacerelations' %}">CataloguePlaceRelation</a>
+                        <a href="{% url 'collectionplacerelations' %}">CollectionPlaceRelation</a>
                     </td>
                 </tr>
                 {% endif %}
 
 
-                {% if perms.catalogues.change_catalogueplacerelationtype %}
+                {% if perms.collections.change_collectionplacerelationtype %}
                 <tr>
                     <td>
-                        <a href="{% url 'catalogueplacerelationtypes' %}">CataloguePlaceRelationType</a>
+                        <a href="{% url 'collectionplacerelationtypes' %}">CollectionPlaceRelationType</a>
                     </td>
                 </tr>
                 {% endif %}
 
 
-                {% if perms.catalogues.change_cataloguetype %}
+                {% if perms.collections.change_collectiontype %}
                 <tr>
                     <td>
-                        <a href="{% url 'cataloguetypes' %}">CatalogueTypes</a>
+                        <a href="{% url 'collectiontypes' %}">CollectionTypes</a>
                     </td>
                 </tr>
                 {% endif %}
 
 
-                {% if perms.catalogues.change_cataloguecataloguetyperelation %}
+                {% if perms.collections.change_collectioncollectiontyperelation %}
                 <tr>
                     <td>
-                        <a href="{% url 'cataloguecataloguetyperelations' %}">CatalogueCatalogueTypeRelation</a>
+                        <a href="{% url 'collectioncollectiontyperelations' %}">CollectionCollectionTypeRelation</a>
                     </td>
                 </tr>
                 {% endif %}
 
 
-                {% if perms.catalogues.change_category %}
+                {% if perms.collections.change_category %}
                 <tr>
                     <td>
                         <a href="{% url 'categories' %}">Category</a>
@@ -188,7 +188,7 @@
                 {% endif %}
 
 
-                {% if perms.catalogues.change_parisiancategory %}
+                {% if perms.collections.change_parisiancategory %}
                 <tr>
                     <td>
                         <a href="{% url 'parisiancategories' %}">ParisianCategory</a>
@@ -197,7 +197,7 @@
                 {% endif %}
 
 
-                {% if perms.catalogues.change_collection_tmp %}
+                {% if perms.collections.change_collection_tmp %}
                 <tr>
                     <td>
                         <a href="{% url 'collection_tmps' %}">Collection_TMPs</a>
@@ -206,7 +206,7 @@
                 {% endif %}
 
 
-                {% if perms.catalogues.change_collection_tmpyear %}
+                {% if perms.collections.change_collection_tmpyear %}
                 <tr>
                     <td>
                         <a href="{% url 'collection_tmpyears' %}">Collection_TMPYears</a>
@@ -215,7 +215,7 @@
                 {% endif %}
 
 
-                {% if perms.catalogues.change_library %}
+                {% if perms.collections.change_library %}
                 <tr>
                     <td>
                         <a href="{% url 'libraries' %}">Libraries</a>
@@ -224,7 +224,7 @@
                 {% endif %}
 
 
-                {% if perms.catalogues.change_lot %}
+                {% if perms.collections.change_lot %}
                 <tr>
                     <td>
                         <a href="{% url 'lots' %}">Lots</a>
@@ -233,25 +233,25 @@
                 {% endif %}
 
 
-                {% if perms.catalogues.change_personcataloguerelation %}
+                {% if perms.collections.change_personcollectionrelation %}
                 <tr>
                     <td>
-                        <a href="{% url 'personcataloguerelations' %}">PersonCatalogueRelations</a>
+                        <a href="{% url 'personcollectionrelations' %}">PersonCollectionRelations</a>
                     </td>
                 </tr>
                 {% endif %}
 
 
-                {% if perms.catalogues.change_personcataloguerelationrole %}
+                {% if perms.collections.change_personcollectionrelationrole %}
                 <tr>
                     <td>
-                        <a href="{% url 'personcataloguerelationroles' %}">PersonCatalogueRelationRoles</a>
+                        <a href="{% url 'personcollectionrelationroles' %}">PersonCollectionRelationRoles</a>
                     </td>
                 </tr>
                 {% endif %}
 
 
-                {% if perms.catalogues.change_personcollection_tmprelation %}
+                {% if perms.collections.change_personcollection_tmprelation %}
                 <tr>
                     <td>
                         <a href="{% url 'personcollection_tmprelations' %}">PersonCollection_TMPRelations</a>

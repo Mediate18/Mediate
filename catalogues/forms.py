@@ -7,7 +7,7 @@ from catalogues.tools import get_datasets_for_session
 from tagme.models import Tag
 
 
-class CatalogueModelForm(forms.ModelForm):
+class CollectionModelForm(forms.ModelForm):
     class Meta:
         model = Collection
         fields = "__all__"
@@ -45,11 +45,11 @@ class CatalogueModelForm(forms.ModelForm):
                 ),
             queryset=CollectionType.objects.all(),
             required=False,
-            initial=CollectionType.objects.filter(cataloguecataloguetyperelation__catalogue=self.instance)
+            initial=CollectionType.objects.filter(collectioncollectiontyperelation__collection=self.instance)
         )
         self.fields['types'] = types
 
-    def get_catalogueplacerelationtype_id(self, type):
+    def get_collectionplacerelationtype_id(self, type):
         return 'type_' + str(type.uuid) + '_places'
 
     def add_related_places_field(self):
@@ -62,9 +62,9 @@ class CatalogueModelForm(forms.ModelForm):
                 ),
                 queryset=Place.objects.all(),
                 required=False,
-                initial=Place.objects.filter(related_catalogues__catalogue=self.instance, related_catalogues__type=type)
+                initial=Place.objects.filter(related_collections__collection=self.instance, related_collections__type=type)
             )
-            self.fields[self.get_catalogueplacerelationtype_id(type)] = places
+            self.fields[self.get_collectionplacerelationtype_id(type)] = places
 
     def add_tag_field(self):
         tag = forms.ModelMultipleChoiceField(
@@ -85,44 +85,44 @@ class CatalogueModelForm(forms.ModelForm):
             self.save_types()
             self.save_relation_places()
             self.save_tags()
-        return super(CatalogueModelForm, self).save(commit=commit)
+        return super(CollectionModelForm, self).save(commit=commit)
 
     def save_types(self):
         submitted_types = self.cleaned_data['types']
 
         # Delete relations for types that are not in the submitted types
         relations_to_delete = CollectionCollectionTypeRelation.objects \
-            .filter(catalogue=self.instance).exclude(type__in=submitted_types)
+            .filter(collection=self.instance).exclude(type__in=submitted_types)
         for relation in relations_to_delete:
             relation.delete()
 
         # Add relations for submitted types that are not in the existing types
         new_types = set(submitted_types) - set(CollectionType.objects.filter(
-            cataloguecataloguetyperelation__catalogue=self.instance))
+            collectioncollectiontyperelation__collection=self.instance))
         for new_type in new_types:
-            catalogue_cataloguetype_relation = CollectionCollectionTypeRelation(catalogue=self.instance, type=new_type)
-            catalogue_cataloguetype_relation.save()
+            collection_collectiontype_relation = CollectionCollectionTypeRelation(collection=self.instance, type=new_type)
+            collection_collectiontype_relation.save()
 
     def save_relation_places(self):
         for type in CollectionPlaceRelationType.objects.all():
             try:
-                submitted_related_places = self.cleaned_data[self.get_catalogueplacerelationtype_id(type)]
+                submitted_related_places = self.cleaned_data[self.get_collectionplacerelationtype_id(type)]
             except KeyError:
                 continue
 
             # Delete places that are not in the submitted places
             related_places_to_delete = CollectionPlaceRelation.objects \
-                .filter(catalogue=self.instance, type=type).exclude(place__in=submitted_related_places)
+                .filter(collection=self.instance, type=type).exclude(place__in=submitted_related_places)
             for place in related_places_to_delete:
                 place.delete()
 
             # Add submitted places that are not in the existing places
             new_related_places = set(submitted_related_places) - set(Place.objects.filter(
-                related_catalogues__catalogue=self.instance, related_catalogues__type=type))
+                related_collections__collection=self.instance, related_collections__type=type))
             for new_related_place in new_related_places:
-                catalogue_place_relation = CollectionPlaceRelation(catalogue=self.instance,
+                collection_place_relation = CollectionPlaceRelation(collection=self.instance,
                                                                    place=new_related_place, type=type)
-                catalogue_place_relation.save()
+                collection_place_relation.save()
 
     def save_tags(self):
         tags_in_form = self.cleaned_data['tag']
@@ -140,32 +140,32 @@ class CatalogueModelForm(forms.ModelForm):
             self.instance.tags.create(tag=tag)
 
 
-class CatalogueHeldByModelForm(forms.ModelForm):
+class CollectionHeldByModelForm(forms.ModelForm):
     class Meta:
         model = CollectionHeldBy
         fields = "__all__"
 
 
-class CatalogueTypeModelForm(forms.ModelForm):
+class CollectionTypeModelForm(forms.ModelForm):
     class Meta:
         model = CollectionType
         fields = "__all__"
 
 
-class CatalogueCatalogueTypeRelationModelForm(forms.ModelForm):
+class CollectionCollectionTypeRelationModelForm(forms.ModelForm):
     class Meta:
         model = CollectionCollectionTypeRelation
         fields = "__all__"
 
     def __init__(self, *args, **kwargs):
-        self.catalogues = kwargs.pop('catalogues', None)
+        self.collections = kwargs.pop('collections', None)
         super().__init__(*args, **kwargs)
 
-        if self.catalogues:
-            self.fields['catalogue'] = forms.ModelChoiceField(
-                queryset=self.catalogues,
+        if self.collections:
+            self.fields['collection'] = forms.ModelChoiceField(
+                queryset=self.collections,
                 widget=ModelSelect2Widget(
-                    queryset=self.catalogues,
+                    queryset=self.collections,
                     search_fields=['short_title__icontains'],
                 ),
             )
@@ -210,26 +210,26 @@ class LotModelForm(forms.ModelForm):
             'category': ModelSelect2Widget(
                 model=Category,
                 search_fields=['bookseller_category__icontains'],
-                dependent_fields={'catalogue': 'catalogue'}
+                dependent_fields={'collection': 'collection'}
             )
         }
 
     def __init__(self, *args, **kwargs):
-        self.catalogues = kwargs.pop('catalogues', None)
+        self.collections = kwargs.pop('collections', None)
         super().__init__(*args, **kwargs)
 
-        if self.catalogues:
-            self.fields['catalogue'] = forms.ModelChoiceField(
-                queryset=self.catalogues,
+        if self.collections:
+            self.fields['collection'] = forms.ModelChoiceField(
+                queryset=self.collections,
                 widget=ModelSelect2Widget(
-                    queryset=self.catalogues,
+                    queryset=self.collections,
                     search_fields=['short_title__icontains'],
                     dependent_fields={'category': 'category'}
                 ),
             )
 
 
-class PersonCatalogueRelationModelForm(forms.ModelForm):
+class PersonCollectionRelationModelForm(forms.ModelForm):
     class Meta:
         model = PersonCollectionRelation
         fields = "__all__"
@@ -245,20 +245,20 @@ class PersonCatalogueRelationModelForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        self.catalogues = kwargs.pop('catalogues', None)
+        self.collections = kwargs.pop('collections', None)
         super().__init__(*args, **kwargs)
 
-        if self.catalogues:
-            self.fields['catalogue'] = forms.ModelChoiceField(
-                queryset=self.catalogues,
+        if self.collections:
+            self.fields['collection'] = forms.ModelChoiceField(
+                queryset=self.collections,
                 widget=ModelSelect2Widget(
-                    queryset=self.catalogues,
+                    queryset=self.collections,
                     search_fields=['short_title__icontains'],
                 ),
             )
 
 
-class PersonCatalogueRelationRoleModelForm(forms.ModelForm):
+class PersonCollectionRelationRoleModelForm(forms.ModelForm):
     class Meta:
         model = PersonCollectionRelationRole
         fields = "__all__"
@@ -289,7 +289,7 @@ class PersonCollection_TMPRelationModelForm(forms.ModelForm):
             )
 
 
-class CataloguePlaceRelationModelForm(forms.ModelForm):
+class CollectionPlaceRelationModelForm(forms.ModelForm):
     class Meta:
         model = CollectionPlaceRelation
         fields = "__all__"
@@ -305,14 +305,14 @@ class CataloguePlaceRelationModelForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        self.catalogues = kwargs.pop('catalogues', None)
+        self.collections = kwargs.pop('collections', None)
         super().__init__(*args, **kwargs)
 
-        if self.catalogues:
-            self.fields['catalogue'] = forms.ModelChoiceField(
-                queryset=self.catalogues,
+        if self.collections:
+            self.fields['collection'] = forms.ModelChoiceField(
+                queryset=self.collections,
                 widget=ModelSelect2Widget(
-                    queryset=self.catalogues,
+                    queryset=self.collections,
                     search_fields=['short_title__icontains'],
                 ),
             )
@@ -333,15 +333,15 @@ class CategoryModelForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        self.catalogues = kwargs.pop('catalogues', None)
+        self.collections = kwargs.pop('collections', None)
         self.categories = kwargs.pop('categories', None)
         super().__init__(*args, **kwargs)
 
-        if self.catalogues:
-            self.fields['catalogue'] = forms.ModelChoiceField(
-                queryset=self.catalogues,
+        if self.collections:
+            self.fields['collection'] = forms.ModelChoiceField(
+                queryset=self.collections,
                 widget=ModelSelect2Widget(
-                    queryset=self.catalogues,
+                    queryset=self.collections,
                     search_fields=['short_title__icontains'],
                     dependent_fields={'parent': 'category'}
                 ),
@@ -351,10 +351,10 @@ class CategoryModelForm(forms.ModelForm):
             self.fields['parent'] = forms.ModelChoiceField(
                 queryset=self.categories,
                 widget=ModelSelect2Widget(
-                    attrs={'data-placeholder': "First select a catalogue"},
+                    attrs={'data-placeholder': "First select a collection"},
                     queryset=self.categories,
                     search_fields=['bookseller_category__icontains'],
-                    dependent_fields={'catalogue': 'catalogue'}
+                    dependent_fields={'collection': 'collection'}
                 ),
             )
 
@@ -365,7 +365,7 @@ class ParisianCategoryModelForm(forms.ModelForm):
         fields = "__all__"
 
 
-class CataloguePlaceRelationTypeModelForm(forms.ModelForm):
+class CollectionPlaceRelationTypeModelForm(forms.ModelForm):
     class Meta:
         model = CollectionPlaceRelationType
         fields = "__all__"
@@ -377,27 +377,27 @@ class LotExpandForm(forms.Form):
 
 
 class AddLotBeforeForm(LotModelForm):
-    def __init__(self, *args, category=None, page=None, index=None, catalogue=None, **kwargs):
+    def __init__(self, *args, category=None, page=None, index=None, collection=None, **kwargs):
         super().__init__(*args, **kwargs)
         if category:
             self.fields['category'] = forms.CharField(widget=forms.HiddenInput(), initial=category.uuid)
         if page:
-            self.fields['page_in_catalogue'] = forms.IntegerField(widget=forms.HiddenInput(), initial=page)
+            self.fields['page_in_collection'] = forms.IntegerField(widget=forms.HiddenInput(), initial=page)
         if index:
-            self.fields['index_in_catalogue'] = forms.IntegerField(widget=forms.HiddenInput(), initial=index)
-        if catalogue:
-            self.fields['catalogue'] = forms.CharField(widget=forms.HiddenInput(), initial=catalogue.uuid)
+            self.fields['index_in_collection'] = forms.IntegerField(widget=forms.HiddenInput(), initial=index)
+        if collection:
+            self.fields['collection'] = forms.CharField(widget=forms.HiddenInput(), initial=collection.uuid)
 
 
 class AddLotAtEndForm(LotModelForm):
-    def __init__(self, *args, category=None, page=None, index=None, catalogue=None, **kwargs):
+    def __init__(self, *args, category=None, page=None, index=None, collection=None, **kwargs):
         super().__init__(*args, **kwargs)
         if category:
-            self.fields['category'] = forms.ModelChoiceField(Category.objects.filter(catalogue=catalogue),
+            self.fields['category'] = forms.ModelChoiceField(Category.objects.filter(collection=collection),
                                                              initial=category.uuid)
         if page:
-            self.fields['page_in_catalogue'] = forms.IntegerField(initial=page)
+            self.fields['page_in_collection'] = forms.IntegerField(initial=page)
         if index:
-            self.fields['index_in_catalogue'] = forms.IntegerField(widget=forms.HiddenInput(), initial=index)
-        if catalogue:
-            self.fields['catalogue'] = forms.CharField(widget=forms.HiddenInput(), initial=catalogue.uuid)
+            self.fields['index_in_collection'] = forms.IntegerField(widget=forms.HiddenInput(), initial=index)
+        if collection:
+            self.fields['collection'] = forms.CharField(widget=forms.HiddenInput(), initial=collection.uuid)

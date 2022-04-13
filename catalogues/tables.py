@@ -10,9 +10,9 @@ from persons.models import Country
 from mediate.columns import ActionColumn
 
 
-# Catalogue table
-class CatalogueTable(tables.Table):
-    uuid = ActionColumn('catalogue_detail', 'change_catalogue', 'delete_catalogue', orderable=False)
+# Collection table
+class CollectionTable(tables.Table):
+    uuid = ActionColumn('collection_detail', 'change_collection', 'delete_collection', orderable=False)
     types = tables.Column(empty_values=(), verbose_name="Type(s)")
     owner = tables.Column(empty_values=(), orderable=False)
     number_of_lots = tables.Column(empty_values=(), orderable=False)
@@ -36,7 +36,7 @@ class CatalogueTable(tables.Table):
         ]
 
     def render_full_title(self, record, value):
-        return format_html('<a href="{}">{}</a>'.format(reverse_lazy('catalogue_detail', args=[record.pk]),
+        return format_html('<a href="{}">{}</a>'.format(reverse_lazy('collection_detail', args=[record.pk]),
                                                         value[:50] + "..." if len(value) > 50 else value))
 
     def render_types(self, record):
@@ -44,17 +44,17 @@ class CatalogueTable(tables.Table):
             ", ".join(
                 [
                     '<a href="{}">{}</a>'.format(
-                        reverse_lazy('change_cataloguecataloguetyperelation', args=[relation.pk]),
+                        reverse_lazy('change_collectioncollectiontyperelation', args=[relation.pk]),
                         relation.type
                     )
-                    for relation in record.cataloguecataloguetyperelation_set.all()
+                    for relation in record.collectioncollectiontyperelation_set.all()
                 ]
             )
         )
 
     def render_owner(self, record):
-        owners = Person.objects.filter(personcataloguerelation__role__name__iexact="owner",
-                                       personcataloguerelation__catalogue=record)
+        owners = Person.objects.filter(personcollectionrelation__role__name__iexact="owner",
+                                       personcollectionrelation__collection=record)
         return format_html(", ".join(
             [
                 '<a href="{}">{}</a>'.format(reverse_lazy('change_person', args=[owner.pk]), owner)
@@ -69,7 +69,7 @@ class CatalogueTable(tables.Table):
         return record.item_count()
 
     def render_related_places(self, record):
-        relations = CollectionPlaceRelation.objects.filter(catalogue=record).prefetch_related('type')
+        relations = CollectionPlaceRelation.objects.filter(collection=record).prefetch_related('type')
         type_dict = defaultdict(list)
         for relation in relations:
             type_dict[relation.type.name].append(relation.place)
@@ -82,7 +82,7 @@ class CatalogueTable(tables.Table):
             ]))
 
     def render_countries(self, record):
-        countries = Country.objects.filter(place__related_catalogues__catalogue=record).distinct()
+        countries = Country.objects.filter(place__related_collections__collection=record).distinct()
         return format_html(", ".join(
             [
                 '<a href="{}">{}</a>'.format(reverse_lazy('country_detail', args=[country.pk]), country)
@@ -92,23 +92,23 @@ class CatalogueTable(tables.Table):
 
 
 
-# CatalogueHeldBy table
-class CatalogueHeldByTable(tables.Table):
-    uuid = ActionColumn('catalogueheldby_detail', 'change_catalogueheldby', 'delete_catalogueheldby', orderable=False)
+# CollectionHeldBy table
+class CollectionHeldByTable(tables.Table):
+    uuid = ActionColumn('collectionheldby_detail', 'change_collectionheldby', 'delete_collectionheldby', orderable=False)
 
     class Meta:
         model = CollectionHeldBy
         attrs = {'class': 'table table-sortable'}
         sequence = [
             'library',
-            'catalogue',
+            'collection',
             'uuid'
         ]
 
 
-# CatalogueType table
-class CatalogueTypeTable(tables.Table):
-    uuid = ActionColumn('cataloguetype_detail', 'change_cataloguetype', 'delete_cataloguetype', orderable=False)
+# CollectionType table
+class CollectionTypeTable(tables.Table):
+    uuid = ActionColumn('collectiontype_detail', 'change_collectiontype', 'delete_collectiontype', orderable=False)
 
     class Meta:
         model = CollectionType
@@ -119,16 +119,16 @@ class CatalogueTypeTable(tables.Table):
         ]
 
 
-# CatalogueCatalogueTypeRelation table
-class CatalogueCatalogueTypeRelationTable(tables.Table):
-    uuid = ActionColumn('cataloguecataloguetyperelation_detail', 'change_cataloguecataloguetyperelation',
-                        'delete_cataloguecataloguetyperelation', orderable=False)
+# CollectionCollectionTypeRelation table
+class CollectionCollectionTypeRelationTable(tables.Table):
+    uuid = ActionColumn('collectioncollectiontyperelation_detail', 'change_collectioncollectiontyperelation',
+                        'delete_collectioncollectiontyperelation', orderable=False)
 
     class Meta:
         model = CollectionCollectionTypeRelation
         attrs = {'class': 'table table-sortable'}
         sequence = [
-            'catalogue',
+            'collection',
             'type',
             'uuid'
         ]
@@ -178,43 +178,43 @@ class LibraryTable(tables.Table):
 # Lot table
 class LotTable(tables.Table):
     uuid = ActionColumn('lot_detail', 'change_lot', 'delete_lot', orderable=False)
-    catalogue = tables.RelatedLinkColumn()
+    collection = tables.RelatedLinkColumn()
     category = tables.RelatedLinkColumn()
 
     class Meta:
         model = Lot
         attrs = {'class': 'table table-sortable'}
         sequence = [
-            'catalogue',
+            'collection',
             'category',
-            'number_in_catalogue',
-            'page_in_catalogue',
-            'lot_as_listed_in_catalogue',
+            'number_in_collection',
+            'page_in_collection',
+            'lot_as_listed_in_collection',
             'sales_price',
             'uuid'
         ]
 
 
-# PersonCatalogueRelation table
-class PersonCatalogueRelationTable(tables.Table):
-    uuid = ActionColumn('personcataloguerelation_detail', 'change_personcataloguerelation',
-                        'delete_personcataloguerelation', orderable=False)
+# PersonCollectionRelation table
+class PersonCollectionRelationTable(tables.Table):
+    uuid = ActionColumn('personcollectionrelation_detail', 'change_personcollectionrelation',
+                        'delete_personcollectionrelation', orderable=False)
 
     class Meta:
         model = PersonCollectionRelation
         attrs = {'class': 'table table-sortable'}
         sequence = [
             'person',
-            'catalogue',
+            'collection',
             'role',
             'uuid'
         ]
 
 
-# PersonCatalogueRelationRole table
-class PersonCatalogueRelationRoleTable(tables.Table):
-    uuid = ActionColumn('personcataloguerelationrole_detail', 'change_personcataloguerelationrole',
-                        'delete_personcataloguerelationrole', orderable=False)
+# PersonCollectionRelationRole table
+class PersonCollectionRelationRoleTable(tables.Table):
+    uuid = ActionColumn('personcollectionrelationrole_detail', 'change_personcollectionrelationrole',
+                        'delete_personcollectionrelationrole', orderable=False)
 
     class Meta:
         model = PersonCollectionRelationRole
@@ -240,16 +240,16 @@ class PersonCollection_TMPRelationTable(tables.Table):
         ]
 
 
-# CataloguePlaceRelation table
-class CataloguePlaceRelationTable(tables.Table):
-    uuid = ActionColumn('catalogueplacerelation_detail', 'change_catalogueplacerelation',
-                        'delete_catalogueplacerelation', orderable=False)
+# CollectionPlaceRelation table
+class CollectionPlaceRelationTable(tables.Table):
+    uuid = ActionColumn('collectionplacerelation_detail', 'change_collectionplacerelation',
+                        'delete_collectionplacerelation', orderable=False)
 
     class Meta:
         model = CollectionPlaceRelation
         attr = {'class': 'table table-sortable'}
         sequence = [
-            'catalogue',
+            'collection',
             'place',
             'type',
             'uuid'
@@ -264,7 +264,7 @@ class CategoryTable(tables.Table):
         model = Category
         attrs = {'class': 'table table-sortable'}
         sequence = [
-            'catalogue',
+            'collection',
             'parent',
             'bookseller_category',
             'parisian_category',
@@ -286,9 +286,9 @@ class ParisianCategoryTable(tables.Table):
         ]
 
 
-# CataloguePlaceRelationType table
-class CataloguePlaceRelationTypeTable(tables.Table):
-    uuid = ActionColumn('catalogueplacerelationtype_detail', 'change_catalogueplacerelationtype', 'delete_catalogueplacerelationtype', orderable=False)
+# CollectionPlaceRelationType table
+class CollectionPlaceRelationTypeTable(tables.Table):
+    uuid = ActionColumn('collectionplacerelationtype_detail', 'change_collectionplacerelationtype', 'delete_collectionplacerelationtype', orderable=False)
 
     class Meta:
         model = CollectionPlaceRelationType

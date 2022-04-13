@@ -18,30 +18,30 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         # Optional
-        parser.add_argument('-c', '--catalogue_ids_filename', type=str,
-                            help='Path to a list of catalogue IDs to process (one ID per line)')
+        parser.add_argument('-c', '--collection_ids_filename', type=str,
+                            help='Path to a list of collection IDs to process (one ID per line)')
 
     @transaction.atomic
     def handle(self, *args, **kwargs):
         # Get the command line arguments
-        if 'catalogue_ids_filename' in kwargs:
-            catalogue_ids_filename = kwargs['catalogue_ids_filename']
+        if 'collection_ids_filename' in kwargs:
+            collection_ids_filename = kwargs['collection_ids_filename']
 
-        # Read catalogue IDs
-        catalogue_ids = []
-        if catalogue_ids_filename:
-            with open(catalogue_ids_filename, 'r') as cat_ids_file:
-                catalogue_ids = [id.strip() for id in cat_ids_file.readlines()]
+        # Read collection IDs
+        collection_ids = []
+        if collection_ids_filename:
+            with open(collection_ids_filename, 'r') as cat_ids_file:
+                collection_ids = [id.strip() for id in cat_ids_file.readlines()]
 
-        print("#catalogue_ids:", len(catalogue_ids))
-        print("#catalogues:", Collection.objects.filter(short_title__in=catalogue_ids).count())
-        for catalogue_id in catalogue_ids:
+        print("#collection_ids:", len(collection_ids))
+        print("#collections:", Collection.objects.filter(short_title__in=collection_ids).count())
+        for collection_id in collection_ids:
             try:
-                Collection.objects.get(short_title=catalogue_id)
+                Collection.objects.get(short_title=collection_id)
             except:
-                print("catalogue <{}> not found".format(catalogue_id))
+                print("collection <{}> not found".format(collection_id))
 
-        self.do_matching(catalogue_ids)
+        self.do_matching(collection_ids)
 
     def normalize(self, string):
         return re.sub(r' +', ' ', string.replace(":", ".").replace(",", ".").lower())
@@ -65,15 +65,15 @@ class Command(BaseCommand):
 
         return duplicates
 
-    def do_matching(self, catalogue_ids=None):
+    def do_matching(self, collection_ids=None):
         """Matches normalized short_titles and copies the PersonItemRelations."""
 
         short_titles_with_relations = self.get_short_titles_with_relations()
         print("#short_titles_with_relations", len(short_titles_with_relations))
 
         filter = Q()
-        if catalogue_ids:
-            filter = Q(lot__catalogue__short_title__in=catalogue_ids)
+        if collection_ids:
+            filter = Q(lot__collection__short_title__in=collection_ids)
         short_titles_target_items = self.get_short_titles_with_filter(filter)
         print("#short_titles_target_items", len(short_titles_target_items))
 
@@ -107,19 +107,19 @@ class Command(BaseCommand):
     def get_short_titles_with_filter(self, filter=None):
         """Get short_titles from items and filter them"""
 
-        items_from_selected_catalogues = Item.objects \
+        items_from_selected_collections = Item.objects \
             .values_list('short_title', 'uuid') \
             .annotate(personitemrelation_cnt=Count('personitemrelation')) \
             .order_by() \
             .filter(personitemrelation_cnt=0)
         if filter:
-            items_from_selected_catalogues = items_from_selected_catalogues.filter(filter) \
+            items_from_selected_collections = items_from_selected_collections.filter(filter) \
 
-        short_titles_from_selected_catalogues = defaultdict(list)
-        for short_title, uuid, cnt in items_from_selected_catalogues:
-            short_titles_from_selected_catalogues[self.normalize(short_title)].append(uuid)
+        short_titles_from_selected_collections = defaultdict(list)
+        for short_title, uuid, cnt in items_from_selected_collections:
+            short_titles_from_selected_collections[self.normalize(short_title)].append(uuid)
 
-        return short_titles_from_selected_catalogues
+        return short_titles_from_selected_collections
 
     def get_short_titles_with_relations(self):
         """Get short_titles from items that also have a relation to a person"""

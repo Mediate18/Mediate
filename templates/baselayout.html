@@ -19,7 +19,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block bootstrap3_title %}Mediate - Catalogues{% endblock %}</title>
+    <title>{% block bootstrap3_title %}Mediate - Collections{% endblock %}</title>
     {% block extracss %}{% endblock %}
     <link rel="stylesheet" href="{% static 'css/mediate.css' %}">
     <script src="{% static 'django_select2/django_select2.js' %}"></script>
@@ -113,8 +113,8 @@
                     </ul>
                 </li>
               {% endif %}
-              {% if perms.persons.change_catalogue or perms.global.view_all %}
-                <li class="{% if url_name == 'catalogues' %}active{% endif %}"><a href="{% url 'catalogues' %}">{% trans "Catalogues" %}</a></li>
+              {% if perms.persons.change_collection or perms.global.view_all %}
+                <li class="{% if url_name == 'collections' %}active{% endif %}"><a href="{% url 'collections' %}">{% trans "Collections" %}</a></li>
               {% endif %}
               {% if perms.persons.change_item or perms.global.view_all %}
                 <li class="{% if url_name == 'items' %}active{% endif %}"><a href="{% url 'items' %}">{% trans "Items" %}</a></li>

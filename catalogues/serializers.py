@@ -2,13 +2,13 @@ from .models import *
 from rest_framework import serializers
 
 
-class CatalogueSerializer(serializers.HyperlinkedModelSerializer):
+class CollectionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Collection
         fields = "__all__"
 
 
-class CatalogueTypeSerializer(serializers.HyperlinkedModelSerializer):
+class CollectionTypeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = CollectionType
         fields = "__all__"
@@ -26,13 +26,13 @@ class LotSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
-class PersonCatalogueRelationSerializer(serializers.HyperlinkedModelSerializer):
+class PersonCollectionRelationSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = PersonCollectionRelation
         fields = "__all__"
 
 
-class PersonCatalogueRelationRoleSerializer(serializers.HyperlinkedModelSerializer):
+class PersonCollectionRelationRoleSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = PersonCollectionRelationRole
         fields = "__all__"
@@ -56,13 +56,13 @@ class LibrarySerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
-class CatalogueCatalogueTypeRelationSerializer(serializers.HyperlinkedModelSerializer):
+class CollectionCollectionTypeRelationSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = CollectionCollectionTypeRelation
         fields = "__all__"
 
 
-class CatalogueHeldBySerializer(serializers.HyperlinkedModelSerializer):
+class CollectionHeldBySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = CollectionHeldBy
         fields = "__all__"

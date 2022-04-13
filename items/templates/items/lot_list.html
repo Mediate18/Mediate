@@ -4,30 +4,30 @@
 {% block content %}
 <div class="row">
     <div class="col-xs-10 col-xs-offset-1">
-    <h1>Catalogue Entries</h1>
+    <h1>Collection Entries</h1>
     {% if object_list %}
         <div>
             <table class="table">
                 <thead>
                     <tr>
-                        <th>{% trans "Number in catalogue" %}</th>
-                        <th>{% trans "Item as listed in catalogue" %}</th>
-                        <th>{% trans "Catalogue" %}</th>
+                        <th>{% trans "Number in collection" %}</th>
+                        <th>{% trans "Item as listed in collection" %}</th>
+                        <th>{% trans "Collection" %}</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for lot in object_list %}
                         <tr>
-                            <td>{{ lot.number_in_catalogue }}</td>
-                            <td>{{ lot.lot_as_listed_in_catalogue }}</td>
-                            <td>{{ lot.catalogue.short_title }}</td>
+                            <td>{{ lot.number_in_collection }}</td>
+                            <td>{{ lot.lot_as_listed_in_collection }}</td>
+                            <td>{{ lot.collection.short_title }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     {% else %}
-        <div>No catalogue entries.</div>
+        <div>No collection entries.</div>
     {% endif %}
     </div>
 </div>

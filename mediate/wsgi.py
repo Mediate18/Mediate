@@ -1,5 +1,5 @@
 """
-WSGI config for Mediate Catalogues project.
+WSGI config for Mediate Collections project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

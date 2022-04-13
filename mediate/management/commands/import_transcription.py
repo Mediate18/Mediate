@@ -85,13 +85,13 @@ class Command(BaseCommand):
             return slots
 
         for file in transcription_files:
-            # Take catalogue short_title from filename
-            catalogue_short_title = os.path.splitext(os.path.basename(file))[0]
+            # Take collection short_title from filename
+            collection_short_title = os.path.splitext(os.path.basename(file))[0]
 
             try:
                 with open(file, 'r', encoding='utf-8') as transcription_file:
                     with transaction.atomic():
-                        collection_tmp = Collection_TMP(name=catalogue_short_title)
+                        collection_tmp = Collection_TMP(name=collection_short_title)
                         print_obj(collection_tmp)
                         collection_tmp.save()
 
@@ -100,8 +100,8 @@ class Command(BaseCommand):
                         # print(transcription_with_field_markers)
                         records = [record.strip() for record in transcription_with_field_markers.split("<%%>")]
                         page = 0
-                        index_in_catalogue = 1
-                        catalogue = None
+                        index_in_collection = 1
+                        collection = None
                         category = None
                         for record in records:
                             if verbose:
@@ -116,31 +116,31 @@ class Command(BaseCommand):
                                     print("Page", page)
                             if "TITLE" in fields:
                                 title = fields["TITLE"]
-                                catalogue = Collection(short_title=catalogue_short_title, full_title=title,
+                                collection = Collection(short_title=collection_short_title, full_title=title,
                                                        collection_tmp=collection_tmp)
-                                print_obj(catalogue)
-                                catalogue.save()
+                                print_obj(collection)
+                                collection.save()
                             if "CATEGORY" in fields:
                                 # print(fields)
                                 category_books = fields["CATEGORY"]
-                                category = Category(catalogue=catalogue, bookseller_category=category_books)
+                                category = Category(collection=collection, bookseller_category=category_books)
                                 print_obj(category)
                                 category.save()
                             if "FULL_ITEM_DESC" in fields:
                                 full_item_desc_books = fields["FULL_ITEM_DESC"]
-                                page_in_catalogue = page if page else None
+                                page_in_collection = page if page else None
 
                                 # Lot
-                                lot, created = Lot.objects.get_or_create(catalogue=catalogue,
-                                          number_in_catalogue=fields.get("ITEM_NUMBER", '-1'),
-                                          page_in_catalogue=page_in_catalogue,
+                                lot, created = Lot.objects.get_or_create(collection=collection,
+                                          number_in_collection=fields.get("ITEM_NUMBER", '-1'),
+                                          page_in_collection=page_in_collection,
                                           sales_price=fields.get("SALES_PRICE", ""),
-                                          lot_as_listed_in_catalogue=full_item_desc_books,
-                                          index_in_catalogue=index_in_catalogue,
+                                          lot_as_listed_in_collection=full_item_desc_books,
+                                          index_in_collection=index_in_collection,
                                           category=category)
                                 print_obj(lot)
                                 lot.save()
-                                index_in_catalogue += 1
+                                index_in_collection += 1
 
                                 # Place
                                 if "CITY" in fields:
@@ -189,13 +189,13 @@ class Command(BaseCommand):
                                 item.save()
 
                             if "PREFACE" in fields:
-                                if not catalogue.preface_and_paratexts:
-                                    catalogue.preface_and_paratexts = fields.get("PREFACE")
+                                if not collection.preface_and_paratexts:
+                                    collection.preface_and_paratexts = fields.get("PREFACE")
                                 else:
-                                    catalogue.preface_and_paratexts = catalogue.preface_and_paratexts + " [...] " + \
+                                    collection.preface_and_paratexts = collection.preface_and_paratexts + " [...] " + \
                                                                       fields.get("PREFACE")
-                                print_obj(catalogue)
-                                catalogue.save()
+                                print_obj(collection)
+                                collection.save()
 
                         # The following, including the try-except is meant to handle a dry run
                         if dry_run:

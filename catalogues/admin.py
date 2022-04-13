@@ -5,22 +5,22 @@ from guardian.admin import GuardedModelAdmin
 
 
 @admin.register(Collection)
-class CatalogueAdmin(SimpleHistoryAdmin):
+class CollectionAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(CollectionType)
-class CatalogueTypeAdmin(SimpleHistoryAdmin):
+class CollectionTypeAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(PersonCollectionRelation)
-class PersonCatalogueRelationAdmin(SimpleHistoryAdmin):
+class PersonCollectionRelationAdmin(SimpleHistoryAdmin):
     pass
 
 
 @admin.register(PersonCollectionRelationRole)
-class PersonCatalogueRelationRoleAdmin(SimpleHistoryAdmin):
+class PersonCollectionRelationRoleAdmin(SimpleHistoryAdmin):
     pass
 
 

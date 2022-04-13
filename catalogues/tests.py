@@ -63,7 +63,7 @@ class Collection_TMPTests(GenericCRUDTestMixin, TestCase):
         }
 
 
-class CatalogueTests(GenericCRUDTestMixin, TestCase):
+class CollectionTests(GenericCRUDTestMixin, TestCase):
     model = Collection
 
     def get_add_form_data(self):
@@ -94,35 +94,35 @@ class CatalogueTests(GenericCRUDTestMixin, TestCase):
 
     def test_Deletion_of_Editions(self):
         """
-        When a Catalogue is deleted, all linked Editions that are not also linked to another Catalogue
+        When a Collection is deleted, all linked Editions that are not also linked to another Collection
         should be deleted
         :return:
         """
 
-        # Create two Catalogues
-        catalogue_data = self.get_add_form_data()
-        catalogue1, created = self.model.objects.get_or_create(**catalogue_data)
-        catalogue_data['short_title'] = 'short_title test2'
-        catalogue2, created = self.model.objects.get_or_create(**catalogue_data)
+        # Create two Collections
+        collection_data = self.get_add_form_data()
+        collection1, created = self.model.objects.get_or_create(**collection_data)
+        collection_data['short_title'] = 'short_title test2'
+        collection2, created = self.model.objects.get_or_create(**collection_data)
 
         # Create two Lots
-        lot1 = Lot.objects.create(catalogue=catalogue1, number_in_catalogue=1, index_in_catalogue=1,
-                                  lot_as_listed_in_catalogue="lot1_text")
-        lot2 = Lot.objects.create(catalogue=catalogue2, number_in_catalogue=1, index_in_catalogue=1,
-                                  lot_as_listed_in_catalogue="lot2_text")
+        lot1 = Lot.objects.create(collection=collection1, number_in_collection=1, index_in_collection=1,
+                                  lot_as_listed_in_collection="lot1_text")
+        lot2 = Lot.objects.create(collection=collection2, number_in_collection=1, index_in_collection=1,
+                                  lot_as_listed_in_collection="lot2_text")
 
         # Create two Edition
         from items.models import Item, Edition
         edition1 = Edition.objects.create(year_start=1111)
         edition2 = Edition.objects.create(year_start=2222)
 
-        # Create three Items. The third makes Edition2 link to two different Catalogues
+        # Create three Items. The third makes Edition2 link to two different Collections
         item1 = Item.objects.create(short_title="item1", lot=lot1, edition=edition1, index_in_lot=1)
         item2 = Item.objects.create(short_title="item2", lot=lot2, edition=edition2, index_in_lot=1)
         item3 = Item.objects.create(short_title="item3", lot=lot1, edition=edition2, index_in_lot=2)
 
-        # Deleting catalogue1 should result in deleting edition1, but not edition2
-        catalogue1.delete()
+        # Deleting collection1 should result in deleting edition1, but not edition2
+        collection1.delete()
 
         def object_exists_in_database(obj):
             return obj.__class__.objects.filter(uuid=obj.pk).exists() if obj.pk else False
@@ -150,7 +150,7 @@ class Collection_TMPYearTests(GenericCRUDTestMixin, TestCase):
         pass
 
 
-class CatalogueTypeTests(GenericCRUDTestMixin, TestCase):
+class CollectionTypeTests(GenericCRUDTestMixin, TestCase):
     model = CollectionType
 
     def get_add_form_data(self):
@@ -164,7 +164,7 @@ class CatalogueTypeTests(GenericCRUDTestMixin, TestCase):
         }
 
     def test_Detail(self):
-        """TODO: add CatalogueType detail template"""
+        """TODO: add CollectionType detail template"""
         pass
 
 
@@ -187,52 +187,52 @@ class LibraryTests(GenericCRUDTestMixin, TestCase):
         pass
 
 
-class CatalogueCatalogueTypeRelationTests(GenericCRUDTestMixin, TestCase):
+class CollectionCollectionTypeRelationTests(GenericCRUDTestMixin, TestCase):
     model = CollectionCollectionTypeRelation
 
     def get_add_form_data(self):
-        catalogue, created = Collection.objects.get_or_create(**CatalogueTests().get_add_form_data())
-        catalogue_type, created = CollectionType.objects.get_or_create(**CatalogueTypeTests().get_add_form_data())
+        collection, created = Collection.objects.get_or_create(**CollectionTests().get_add_form_data())
+        collection_type, created = CollectionType.objects.get_or_create(**CollectionTypeTests().get_add_form_data())
         return {
-            'catalogue_id': catalogue.pk,
-            'type_id': catalogue_type.pk
+            'collection_id': collection.pk,
+            'type_id': collection_type.pk
         }
 
     def get_change_form_data(self):
-        catalogue_change, created = Collection.objects.get_or_create(**CatalogueTests().get_change_form_data())
-        catalogue_type_change, created = CollectionType.objects.get_or_create(**CatalogueTypeTests().get_change_form_data())
+        collection_change, created = Collection.objects.get_or_create(**CollectionTests().get_change_form_data())
+        collection_type_change, created = CollectionType.objects.get_or_create(**CollectionTypeTests().get_change_form_data())
         return {
-            'catalogue_id': catalogue_change.pk,
-            'type_id': catalogue_type_change.pk
+            'collection_id': collection_change.pk,
+            'type_id': collection_type_change.pk
         }
 
     def test_Detail(self):
-        """TODO: add CatalogueCatalogueTypeRelation detail template"""
+        """TODO: add CollectionCollectionTypeRelation detail template"""
         pass
 
 
-class CatalogueHeldByTests(GenericCRUDTestMixin, TestCase):
+class CollectionHeldByTests(GenericCRUDTestMixin, TestCase):
     model = CollectionHeldBy
 
     def get_add_form_data(self):
         library, created = Library.objects.get_or_create(**LibraryTests().get_add_form_data())
-        catalogue, created = Collection.objects.get_or_create(**CatalogueTests().get_add_form_data())
+        collection, created = Collection.objects.get_or_create(**CollectionTests().get_add_form_data())
         return {
             'library': library,
-            'catalogue': catalogue
+            'collection': collection
         }
 
     def get_change_form_data(self):
         library_change, created = Library.objects.get_or_create(**LibraryTests().get_change_form_data())
-        catalogue_change, created = Collection.objects.get_or_create(**CatalogueTests().get_change_form_data())
+        collection_change, created = Collection.objects.get_or_create(**CollectionTests().get_change_form_data())
 
         return {
             'library': library_change,
-            'catalogue': catalogue_change
+            'collection': collection_change
         }
 
     def test_Detail(self):
-        """TODO: add CatalogueHeldBy detail template"""
+        """TODO: add CollectionHeldBy detail template"""
         pass
 
 
@@ -241,20 +241,20 @@ class LotTests(GenericCRUDTestMixin, TestCase):
 
     def get_add_form_data(self):
         category, created = Category.objects.get_or_create(**CategoryTests().get_add_form_data())
-        catalogue = category.collection
+        collection = category.collection
         return {
-            'catalogue_id': catalogue.pk,  # TODO: find out why the '_id' and '.pk' are necessary
-            'number_in_catalogue': 1,
-            'page_in_catalogue': 1,
+            'collection_id': collection.pk,  # TODO: find out why the '_id' and '.pk' are necessary
+            'number_in_collection': 1,
+            'page_in_collection': 1,
             'sales_price': '10 gulden',
-            'lot_as_listed_in_catalogue': 'lot_as_listed_in_catalogue test',
-            'index_in_catalogue': 1,
+            'lot_as_listed_in_collection': 'lot_as_listed_in_collection test',
+            'index_in_collection': 1,
             'category_id': category.pk
         }
 
     def get_change_form_data(self):
         return {
-            'number_in_catalogue': 2
+            'number_in_collection': 2
         }
 
 
@@ -281,7 +281,7 @@ class PersonCollection_TMPRelationTests(GenericCRUDTestMixin, TestCase):
         pass
 
 
-class PersonCatalogueRelationRoleTests(GenericCRUDTestMixin, TestCase):
+class PersonCollectionRelationRoleTests(GenericCRUDTestMixin, TestCase):
     model = PersonCollectionRelationRole
 
     def get_add_form_data(self):
@@ -295,20 +295,20 @@ class PersonCatalogueRelationRoleTests(GenericCRUDTestMixin, TestCase):
         }
 
     def test_Detail(self):
-        """TODO: add a PersonCatalogueRelationRole detail template"""
+        """TODO: add a PersonCollectionRelationRole detail template"""
         pass
 
 
-class PersonCatalogueRelationTests(GenericCRUDTestMixin, TestCase):
+class PersonCollectionRelationTests(GenericCRUDTestMixin, TestCase):
     model = PersonCollectionRelation
 
     def get_add_form_data(self):
         person, created = Person.objects.get_or_create(**PersonTests().get_add_form_data())
-        catalogue, created = Collection.objects.get_or_create(**CatalogueTests().get_add_form_data())
-        role, created = PersonCollectionRelationRole.objects.get_or_create(**PersonCatalogueRelationRoleTests().get_add_form_data())
+        collection, created = Collection.objects.get_or_create(**CollectionTests().get_add_form_data())
+        role, created = PersonCollectionRelationRole.objects.get_or_create(**PersonCollectionRelationRoleTests().get_add_form_data())
         return {
             'person_id': person.pk,
-            'catalogue_id': catalogue.pk,
+            'collection_id': collection.pk,
             'role_id': role.pk
         }
 
@@ -320,7 +320,7 @@ class PersonCatalogueRelationTests(GenericCRUDTestMixin, TestCase):
         }
 
     def test_Detail(self):
-        """TODO: add a PersonCatalogueRelation detail template"""
+        """TODO: add a PersonCollectionRelation detail template"""
         pass
 
 
@@ -350,12 +350,12 @@ class CategoryTests(GenericCRUDTestMixin, TestCase):
     url_names = {'list': 'categories'}
 
     def get_add_form_data(self):
-        catalogue, created = Collection.objects.get_or_create(**CatalogueTests().get_add_form_data())
-        parent, created = Category.objects.get_or_create(catalogue=catalogue,
+        collection, created = Collection.objects.get_or_create(**CollectionTests().get_add_form_data())
+        parent, created = Category.objects.get_or_create(collection=collection,
                                                          bookseller_category='bookseller_category test2')
         parisian_category, create = ParisianCategory.objects.get_or_create(**ParisianCategoryTests().get_add_form_data())
         return {
-            'catalogue_id': catalogue.pk,
+            'collection_id': collection.pk,
             'parent_id': parent.pk,
             'bookseller_category': 'bookseller_category test',
             'parisian_category_id': parisian_category.pk
@@ -375,29 +375,29 @@ class CategoryTests(GenericCRUDTestMixin, TestCase):
 
 
 class LotModelTests(TestCase):
-    def test_catalogue_of_lot_and_category(self):
+    def test_collection_of_lot_and_category(self):
         """
-        Test whether a exception is raised if the catalogue of a lot is not the same as
-        the catalogue of the category of that lot.
+        Test whether a exception is raised if the collection of a lot is not the same as
+        the collection of the category of that lot.
         """
         with self.assertRaises(Exception) as exception_context_manager:
-            # Create a dummy catalogue
-            dummy_catalogue = Collection(short_title="short_title test")
-            dummy_catalogue.save()
+            # Create a dummy collection
+            dummy_collection = Collection(short_title="short_title test")
+            dummy_collection.save()
 
-            # Create a second dummy catalogue
-            dummy_catalogue2 = Collection(short_title="short_title test2")
-            dummy_catalogue2.save()
+            # Create a second dummy collection
+            dummy_collection2 = Collection(short_title="short_title test2")
+            dummy_collection2.save()
 
             # Create a dummy category
-            dummy_category = Category(catalogue=dummy_catalogue, bookseller_category="bookseller_category test")
+            dummy_category = Category(collection=dummy_collection, bookseller_category="bookseller_category test")
             dummy_category.save()
 
             # Create a dummy lot
             dummy_lot = Lot(
-                catalogue=dummy_catalogue2,
-                number_in_catalogue=1,
-                lot_as_listed_in_catalogue="lot_as_listed_in_catalogue test",
+                collection=dummy_collection2,
+                number_in_collection=1,
+                lot_as_listed_in_collection="lot_as_listed_in_collection test",
                 category=dummy_category
             )
 
@@ -405,6 +405,6 @@ class LotModelTests(TestCase):
 
         exception = exception_context_manager.exception
 
-        self.assertEqual(exception.args, ("Lot {}: the catalogue is not the same as the category's catalogue"
+        self.assertEqual(exception.args, ("Lot {}: the collection is not the same as the category's collection"
                                          .format(dummy_lot),))
 

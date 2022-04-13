@@ -11,7 +11,7 @@ class SelectDatasetForm(forms.Form):
 
         super(SelectDatasetForm, self).__init__(*args, **kwargs)
 
-        datasets = get_objects_for_user(self.request.user, 'catalogues.change_dataset', Dataset)
+        datasets = get_objects_for_user(self.request.user, 'collections.change_dataset', Dataset)
 
         if 'datasets' in self.request.session:
             selected_datasets = [dataset['uuid'] for dataset in self.request.session['datasets']]

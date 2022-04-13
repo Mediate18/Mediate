@@ -27,7 +27,7 @@ class Command(BaseCommand):
                                      'Sex', 'City of birth', 'City of death'])
             
             items_writer = csv.writer(items_csv_file)
-            items_writer.writerow(['ID', 'Short title', 'Catalogue', 'Book format', 'Edition', 'Language'])
+            items_writer.writerow(['ID', 'Short title', 'Collection', 'Book format', 'Edition', 'Language'])
             
             persons_seen = set()
             items_seen = set()

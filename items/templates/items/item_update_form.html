@@ -44,7 +44,7 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>{% trans "Index in catalogue" %}</th>
+                            <th>{% trans "Index in collection" %}</th>
                             <th>{% trans "Lot text" %}</th>
                         </tr>
                     </thead>
@@ -52,13 +52,13 @@
                         {% with previous_lots=object.lot.get_previous_lots %}
                             {% for lot in  previous_lots %}
                             <tr>
-                                <td>{{ lot.index_in_catalogue }}</td>
-                                <td>{{ lot.lot_as_listed_in_catalogue}}</td>
+                                <td>{{ lot.index_in_collection }}</td>
+                                <td>{{ lot.lot_as_listed_in_collection}}</td>
                             </tr>
                             {% endfor %}
                             {% with first_lot=previous_lots|first %}
                             <script type="text/javascript">
-                                var previous_lot_index = {{ first_lot.index_in_catalogue }} - 1;
+                                var previous_lot_index = {{ first_lot.index_in_collection }} - 1;
                             </script>
                             {% endwith %}
                         {% endwith %}
@@ -159,14 +159,14 @@
 $(document).ready(function(){
     $('.django-select2').djangoSelect2({placeholder: 'Select an option'});
 
-    var previous_lot_url_base = "{% url 'get_previous_lot' object.lot.catalogue.uuid 0 %}".slice(0, -1);
+    var previous_lot_url_base = "{% url 'get_previous_lot' object.lot.collection.uuid 0 %}".slice(0, -1);
 
     $('#getlotbutton').on('click', function() {
         $.get(previous_lot_url_base + previous_lot_index, function(data) {
                 if(data.success) {
                     // Update Previous lots table: add row add the top
                     $('#previouslotstablebody').prepend(
-                        `<tr><td>${data.index_in_catalogue}</td><td>${data.lot_as_listed_in_catalogue}</td></tr>`
+                        `<tr><td>${data.index_in_collection}</td><td>${data.lot_as_listed_in_collection}</td></tr>`
                     );
                     previous_lot_index--;
                 }

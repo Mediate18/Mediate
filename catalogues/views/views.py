@@ -30,43 +30,43 @@ import json
 import django_tables2
 
 
-def get_catalogues_for_session(request, extra_catalogue=None):
+def get_collections_for_session(request, extra_collection=None):
     return Collection.objects.filter(
         Q(collection_tmp__dataset__in=get_datasets_for_session(request))
-        | Q(pk=extra_catalogue.pk if extra_catalogue else None)
+        | Q(pk=extra_collection.pk if extra_collection else None)
     )
 
 
-# Catalogue views
-class CatalogueTableView(ListView):
+# Collection views
+class CollectionTableView(ListView):
     model = Collection
-    template_name = 'catalogue_list.html'
+    template_name = 'collection_list.html'
 
     def get_queryset(self):
-        return get_catalogues_for_session(self.request).distinct()
+        return get_collections_for_session(self.request).distinct()
 
     def get_context_data(self, **kwargs):
-        context = super(CatalogueTableView, self).get_context_data(**kwargs)
-        filter = CatalogueFilter(self.request.GET, queryset=self.get_queryset())
+        context = super(CollectionTableView, self).get_context_data(**kwargs)
+        filter = CollectionFilter(self.request.GET, queryset=self.get_queryset())
 
-        table = CatalogueTable(filter.qs)
+        table = CollectionTable(filter.qs)
         django_tables2.RequestConfig(self.request, paginate={'per_page': 10}).configure(table)
 
         context['filter'] = filter
         context['table'] = table
 
         context['action'] = _("add")
-        context['object_name'] = "catalogue"
-        context['add_url'] = reverse_lazy('add_catalogue')
+        context['object_name'] = "collection"
+        context['add_url'] = reverse_lazy('add_collection')
 
         # Extra data, used for e.g. charts
-        max_publication_year = get_catalogues_for_session(self.request).aggregate(Max('lot__catalogue__year_of_publication'))['lot__catalogue__year_of_publication__max']
+        max_publication_year = get_collections_for_session(self.request).aggregate(Max('lot__collection__year_of_publication'))['lot__collection__year_of_publication__max']
         if not max_publication_year:
             max_publication_year = 0
         context['max_publication_year'] = max_publication_year
 
         item_count_per_decade = Item.objects\
-            .filter(lot__catalogue__in=filter.qs, edition__year_start__lte=max_publication_year)\
+            .filter(lot__collection__in=filter.qs, edition__year_start__lte=max_publication_year)\
             .annotate(decade=10 * Substr('edition__year_start', 1, Length('edition__year_start') - 1))\
             .values('decade')\
             .order_by('decade')\
@@ -76,48 +76,48 @@ class CatalogueTableView(ListView):
         }
         context['extra_data'] = json.dumps(extra_data)
 
-        item_count_total = Item.objects.filter(lot__catalogue__in=filter.qs).count()
+        item_count_total = Item.objects.filter(lot__collection__in=filter.qs).count()
         context['item_count_total'] = item_count_total
-        item_count_without_year = Item.objects.filter(lot__catalogue__in=filter.qs, edition__year_start__isnull=True).count()
+        item_count_without_year = Item.objects.filter(lot__collection__in=filter.qs, edition__year_start__isnull=True).count()
         context['item_count_without_year'] = item_count_without_year
-        item_count_in_plot = Item.objects.filter(lot__catalogue__in=filter.qs, edition__year_start__lte=max_publication_year).count()
+        item_count_in_plot = Item.objects.filter(lot__collection__in=filter.qs, edition__year_start__lte=max_publication_year).count()
         context['item_count_in_plot'] = item_count_in_plot
         context['item_percentage_in_plot'] = int(100 * item_count_in_plot / item_count_total) if item_count_total != 0 else 0
 
-        context['map_url'] = reverse_lazy('cataloguesmap')
+        context['map_url'] = reverse_lazy('collectionsmap')
 
         context['per_page_choices'] = [10, 25, 50, 100]
 
         return context
 
 
-class CatalogueLocationMapView(ListView):
+class CollectionLocationMapView(ListView):
     model = Collection
     template_name = 'generic_location_map.html'
 
     def get_queryset(self):
-        catalogues = get_catalogues_for_session(self.request).filter(related_places__place__latitude__isnull=False,
+        collections = get_collections_for_session(self.request).filter(related_places__place__latitude__isnull=False,
                                                                      related_places__place__longitude__isnull=False)
-        return catalogues
+        return collections
 
     def get_context_data(self, **kwargs):
         queryset = self.get_queryset()
-        context = super(CatalogueLocationMapView, self).get_context_data(**kwargs)
-        filter = CatalogueFilter(self.request.GET, queryset=queryset)
+        context = super(CollectionLocationMapView, self).get_context_data(**kwargs)
+        filter = CollectionFilter(self.request.GET, queryset=queryset)
 
         context['filter'] = filter
-        context['object_name'] = "catalogue"
+        context['object_name'] = "collection"
 
         context['object_list'] = filter.qs
-        context['places'] = Place.objects.filter(related_catalogues__catalogue__in=filter.qs)\
-                                .annotate(object_count=Count('related_catalogues__catalogue'))
-        context['objects_url_name'] = 'catalogues'
+        context['places'] = Place.objects.filter(related_collections__collection__in=filter.qs)\
+                                .annotate(object_count=Count('related_collections__collection'))
+        context['objects_url_name'] = 'collections'
         context['place_search_field'] = 'place'
 
         return context
 
 
-class CatalogueDetailView(PermissionRequiredMixin, DetailView):
+class CollectionDetailView(PermissionRequiredMixin, DetailView):
     model = Collection
 
     # Object permission check by Django Guardian
@@ -133,36 +133,36 @@ class CatalogueDetailView(PermissionRequiredMixin, DetailView):
 
         # Find the first lot for each page
         context['first_lot_on_page_dict'] = dict([
-            (lot['first_lot_on_page'], lot['page_in_catalogue']) for lot in
-            self.object.lot_set.filter(page_in_catalogue__isnull=False).values('page_in_catalogue')
-                .annotate(first_lot_on_page=Min('index_in_catalogue')).order_by()
+            (lot['first_lot_on_page'], lot['page_in_collection']) for lot in
+            self.object.lot_set.filter(page_in_collection__isnull=False).values('page_in_collection')
+                .annotate(first_lot_on_page=Min('index_in_collection')).order_by()
         ])
 
         # Find the first lot for each category
-        # by looping over the ordered lots in the catalogue
+        # by looping over the ordered lots in the collection
         lots = self.object.lot_set.filter(category__isnull=False).values(
-            'index_in_catalogue', 'category__bookseller_category', 'number_in_catalogue').order_by('index_in_catalogue')
+            'index_in_collection', 'category__bookseller_category', 'number_in_collection').order_by('index_in_collection')
         first_lot_in_category_dict = {}
         last_category = ""
         for lot in lots:
-            if lot['category__bookseller_category'] != last_category or lot['number_in_catalogue'] == 1:
+            if lot['category__bookseller_category'] != last_category or lot['number_in_collection'] == 1:
                 last_category = lot['category__bookseller_category']
-                first_lot_in_category_dict[lot['index_in_catalogue']] = lot['category__bookseller_category']
+                first_lot_in_category_dict[lot['index_in_collection']] = lot['category__bookseller_category']
         context['first_lot_in_category_dict'] = first_lot_in_category_dict
 
         return context
 
 
-class CatalogueDetailBareView(CatalogueDetailView):
-    template_name = 'catalogues/catalogue_detail_bare.html'
+class CollectionDetailBareView(CollectionDetailView):
+    template_name = 'collections/collection_detail_bare.html'
 
 
 @moderate()
-class CatalogueCreateView(CreateView):
+class CollectionCreateView(CreateView):
     model = Collection
     template_name = 'generic_form.html'
-    form_class = CatalogueModelForm
-    success_url = reverse_lazy('catalogues')
+    form_class = CollectionModelForm
+    success_url = reverse_lazy('collections')
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -172,15 +172,15 @@ class CatalogueCreateView(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("add")
-        context['object_name'] = "catalogue"
+        context['object_name'] = "collection"
         return context
 
 
 @moderate()
-class CatalogueUpdateView(PermissionRequiredMixin, UpdateView):
+class CollectionUpdateView(PermissionRequiredMixin, UpdateView):
     model = Collection
     template_name = 'generic_form.html'
-    form_class = CatalogueModelForm
+    form_class = CollectionModelForm
 
     # Object permission check by Django Guardian
     permission_required = 'catalogues.change_dataset'
@@ -191,41 +191,41 @@ class CatalogueUpdateView(PermissionRequiredMixin, UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        catalogue = self.get_object()
+        collection = self.get_object()
         kwargs['datasets'] = get_datasets_for_session(
             self.request,
-            catalogue.collection_tmp.dataset
+            collection.collection_tmp.dataset
         )
-        if catalogue.collection_tmp.dataset not in get_datasets_for_session(self.request):
+        if collection.collection_tmp.dataset not in get_datasets_for_session(self.request):
             messages.warning(self.request,
-                             format_html(_("The dataset this Catalogue belongs to, <i>{}</i>, is "
+                             format_html(_("The dataset this Collection belongs to, <i>{}</i>, is "
                                            "currently not selected."),
-                                         catalogue.collection_tmp.dataset))
+                                         collection.collection_tmp.dataset))
 
         return kwargs
 
     def get(self, request, *args, **kwargs):
-        # Check whether the user has permission to view this catalogue
+        # Check whether the user has permission to view this collection
         if not self.request.user.has_perm('catalogues.change_dataset', self.get_object().collection_tmp.dataset):
             raise PermissionDenied
         return super().get(request, *args, **kwargs)
 
     def get_success_url(self):
-        return self.request.GET.get('next') or reverse_lazy('catalogues')
+        return self.request.GET.get('next') or reverse_lazy('collections')
 
     @put_get_variable_in_context([('next', 'next_url'),])
     @put_layout_in_context
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("update")
-        context['object_name'] = "catalogue"
+        context['object_name'] = "collection"
         return context
 
 
 @moderate()
-class CatalogueDeleteView(PermissionRequiredMixin, DeleteView):
+class CollectionDeleteView(PermissionRequiredMixin, DeleteView):
     model = Collection
-    success_url = reverse_lazy('catalogues')
+    success_url = reverse_lazy('collections')
 
     # Object permission check by Django Guardian
     permission_required = 'catalogues.change_dataset'
@@ -235,38 +235,38 @@ class CatalogueDeleteView(PermissionRequiredMixin, DeleteView):
     # End permission check
 
     def get(self, request, *args, **kwargs):
-        # Check whether the user has permission to view this catalogue
+        # Check whether the user has permission to view this collection
         if not self.request.user.has_perm('catalogues.change_dataset', self.get_object().collection_tmp.dataset):
             raise PermissionDenied
         return super().get(request, *args, **kwargs)
 
 
-# CatalogueHeldBy views
-class CatalogueHeldByTableView(ListView):
+# CollectionHeldBy views
+class CollectionHeldByTableView(ListView):
     model = CollectionHeldBy
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return CollectionHeldBy.objects.filter(catalogue__collection_tmp__dataset__in=get_datasets_for_session(self.request))
+        return CollectionHeldBy.objects.filter(collection__collection_tmp__dataset__in=get_datasets_for_session(self.request))
 
     def get_context_data(self, **kwargs):
-        context = super(CatalogueHeldByTableView, self).get_context_data(**kwargs)
-        filter = CatalogueHeldByFilter(self.request.GET, queryset=self.get_queryset())
+        context = super(CollectionHeldByTableView, self).get_context_data(**kwargs)
+        filter = CollectionHeldByFilter(self.request.GET, queryset=self.get_queryset())
 
-        table = CatalogueHeldByTable(filter.qs)
+        table = CollectionHeldByTable(filter.qs)
         django_tables2.RequestConfig(self.request, ).configure(table)
 
         context['filter'] = filter
         context['table'] = table
 
         context['action'] = _("add")
-        context['object_name'] = "catalogueheldby"
-        context['add_url'] = reverse_lazy('add_catalogueheldby')
+        context['object_name'] = "collectionheldby"
+        context['add_url'] = reverse_lazy('add_collectionheldby')
 
         return context
 
 
-class CatalogueHeldByDetailView(PermissionRequiredMixin, DetailView):
+class CollectionHeldByDetailView(PermissionRequiredMixin, DetailView):
     model = CollectionHeldBy
     template_name = 'generic_detail.html'
 
@@ -278,39 +278,39 @@ class CatalogueHeldByDetailView(PermissionRequiredMixin, DetailView):
     # End permission check
 
 
-class CatalogueHeldByCreateView(CreateView):
+class CollectionHeldByCreateView(CreateView):
     model = CollectionHeldBy
     template_name = 'generic_form.html'
-    form_class = CatalogueHeldByModelForm
-    success_url = reverse_lazy('catalogueheldbys')
+    form_class = CollectionHeldByModelForm
+    success_url = reverse_lazy('collectionheldbys')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("add")
-        context['object_name'] = "catalogueheldby"
+        context['object_name'] = "collectionheldby"
         return context
 
 
-class CatalogueHeldByUpdateView(UpdateView):
+class CollectionHeldByUpdateView(UpdateView):
     model = CollectionHeldBy
     template_name = 'generic_form.html'
-    form_class = CatalogueHeldByModelForm
-    success_url = reverse_lazy('catalogueheldbys')
+    form_class = CollectionHeldByModelForm
+    success_url = reverse_lazy('collectionheldbys')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("update")
-        context['object_name'] = "catalogueheldby"
+        context['object_name'] = "collectionheldby"
         return context
 
 
-class CatalogueHeldByDeleteView(DeleteView):
+class CollectionHeldByDeleteView(DeleteView):
     model = CollectionHeldBy
-    success_url = reverse_lazy('catalogueheldbys')
+    success_url = reverse_lazy('collectionheldbys')
 
 
-# CatalogueType views
-class CatalogueTypeTableView(ListView):
+# CollectionType views
+class CollectionTypeTableView(ListView):
     model = CollectionType
     template_name = 'generic_list.html'
 
@@ -318,84 +318,84 @@ class CatalogueTypeTableView(ListView):
         return CollectionType.objects.all()
 
     def get_context_data(self, **kwargs):
-        context = super(CatalogueTypeTableView, self).get_context_data(**kwargs)
-        filter = CatalogueTypeFilter(self.request.GET, queryset=self.get_queryset())
+        context = super(CollectionTypeTableView, self).get_context_data(**kwargs)
+        filter = CollectionTypeFilter(self.request.GET, queryset=self.get_queryset())
 
-        table = CatalogueTypeTable(filter.qs)
+        table = CollectionTypeTable(filter.qs)
         django_tables2.RequestConfig(self.request, ).configure(table)
 
         context['filter'] = filter
         context['table'] = table
 
         context['action'] = _("add")
-        context['object_name'] = "cataloguetype"
-        context['add_url'] = reverse_lazy('add_cataloguetype')
+        context['object_name'] = "collectiontype"
+        context['add_url'] = reverse_lazy('add_collectiontype')
 
         return context
 
 
-class CatalogueTypeDetailView(DetailView):
+class CollectionTypeDetailView(DetailView):
     model = CollectionType
 
 
-class CatalogueTypeCreateView(CreateView):
+class CollectionTypeCreateView(CreateView):
     model = CollectionType
     template_name = 'generic_form.html'
-    form_class = CatalogueTypeModelForm
-    success_url = reverse_lazy('cataloguetypes')
+    form_class = CollectionTypeModelForm
+    success_url = reverse_lazy('collectiontypes')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("add")
-        context['object_name'] = "cataloguetype"
+        context['object_name'] = "collectiontype"
         return context
 
 
-class CatalogueTypeUpdateView(UpdateView):
+class CollectionTypeUpdateView(UpdateView):
     model = CollectionType
     template_name = 'generic_form.html'
-    form_class = CatalogueTypeModelForm
-    success_url = reverse_lazy('cataloguetypes')
+    form_class = CollectionTypeModelForm
+    success_url = reverse_lazy('collectiontypes')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("update")
-        context['object_name'] = "cataloguetype"
+        context['object_name'] = "collectiontype"
         return context
 
 
-class CatalogueTypeDeleteView(DeleteView):
+class CollectionTypeDeleteView(DeleteView):
     model = CollectionType
-    success_url = reverse_lazy('cataloguetypes')
+    success_url = reverse_lazy('collectiontypes')
 
 
-# CatalogueCatalogueTypeRelation views
-class CatalogueCatalogueTypeRelationTableView(ListView):
+# CollectionCollectionTypeRelation views
+class CollectionCollectionTypeRelationTableView(ListView):
     model = CollectionCollectionTypeRelation
     template_name = 'generic_list.html'
 
     def get_queryset(self):
         return CollectionCollectionTypeRelation.objects\
-            .filter(catalogue__collection_tmp__dataset__in=get_datasets_for_session(self.request))
+            .filter(collection__collection_tmp__dataset__in=get_datasets_for_session(self.request))
 
     def get_context_data(self, **kwargs):
-        context = super(CatalogueCatalogueTypeRelationTableView, self).get_context_data(**kwargs)
-        filter = CatalogueCatalogueTypeRelationFilter(self.request.GET, queryset=self.get_queryset())
+        context = super(CollectionCollectionTypeRelationTableView, self).get_context_data(**kwargs)
+        filter = CollectionCollectionTypeRelationFilter(self.request.GET, queryset=self.get_queryset())
 
-        table = CatalogueCatalogueTypeRelationTable(filter.qs)
+        table = CollectionCollectionTypeRelationTable(filter.qs)
         django_tables2.RequestConfig(self.request, ).configure(table)
 
         context['filter'] = filter
         context['table'] = table
 
         context['action'] = _("add")
-        context['object_name'] = "cataloguecataloguetyperelation"
-        context['add_url'] = reverse_lazy('add_cataloguecataloguetyperelation')
+        context['object_name'] = "collectioncollectiontyperelation"
+        context['add_url'] = reverse_lazy('add_collectioncollectiontyperelation')
 
         return context
 
 
-class CatalogueCatalogueTypeRelationDetailView(PermissionRequiredMixin, DetailView):
+class CollectionCollectionTypeRelationDetailView(PermissionRequiredMixin, DetailView):
     model = CollectionCollectionTypeRelation
     template_name = 'generic_detail.html'
 
@@ -407,29 +407,29 @@ class CatalogueCatalogueTypeRelationDetailView(PermissionRequiredMixin, DetailVi
     # End permission check
 
 
-class CatalogueCatalogueTypeRelationCreateView(CreateView):
+class CollectionCollectionTypeRelationCreateView(CreateView):
     model = CollectionCollectionTypeRelation
     template_name = 'generic_form.html'
-    form_class = CatalogueCatalogueTypeRelationModelForm
-    success_url = reverse_lazy('cataloguecataloguetyperelations')
+    form_class = CollectionCollectionTypeRelationModelForm
+    success_url = reverse_lazy('collectioncollectiontyperelations')
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['catalogues'] = get_catalogues_for_session(self.request)
+        kwargs['collections'] = get_collections_for_session(self.request)
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("add")
-        context['object_name'] = "cataloguecataloguetyperelation"
+        context['object_name'] = "collectioncollectiontyperelation"
         return context
 
 
-class CatalogueCatalogueTypeRelationUpdateView(PermissionRequiredMixin, UpdateView):
+class CollectionCollectionTypeRelationUpdateView(PermissionRequiredMixin, UpdateView):
     model = CollectionCollectionTypeRelation
     template_name = 'generic_form.html'
-    form_class = CatalogueCatalogueTypeRelationModelForm
-    success_url = reverse_lazy('cataloguecataloguetyperelations')
+    form_class = CollectionCollectionTypeRelationModelForm
+    success_url = reverse_lazy('collectioncollectiontyperelations')
 
     # Object permission check by Django Guardian
     permission_required = 'catalogues.change_dataset'
@@ -441,13 +441,13 @@ class CatalogueCatalogueTypeRelationUpdateView(PermissionRequiredMixin, UpdateVi
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         relation = self.get_object()
-        kwargs['catalogues'] = get_catalogues_for_session(
+        kwargs['collections'] = get_collections_for_session(
             self.request,
             relation.collection
         )
         if relation.collection.collection_tmp.dataset not in get_datasets_for_session(self.request):
             messages.warning(self.request,
-                             format_html(_("The dataset this CatalogueCatalogueTypeRelation belongs to, <i>{}</i>, is "
+                             format_html(_("The dataset this CollectionCollectionTypeRelation belongs to, <i>{}</i>, is "
                                            "currently not selected."),
                                          relation.collection.collection_tmp.dataset))
 
@@ -456,13 +456,13 @@ class CatalogueCatalogueTypeRelationUpdateView(PermissionRequiredMixin, UpdateVi
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("update")
-        context['object_name'] = "cataloguecataloguetyperelation"
+        context['object_name'] = "collectioncollectiontyperelation"
         return context
 
 
-class CatalogueCatalogueTypeRelationDeleteView(PermissionRequiredMixin, DeleteView):
+class CollectionCollectionTypeRelationDeleteView(PermissionRequiredMixin, DeleteView):
     model = CollectionCollectionTypeRelation
-    success_url = reverse_lazy('cataloguecataloguetyperelations')
+    success_url = reverse_lazy('collectioncollectiontyperelations')
 
     # Object permission check by Django Guardian
     permission_required = 'catalogues.change_dataset'
@@ -694,9 +694,9 @@ class LotTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return Lot.objects.filter(catalogue__collection_tmp__dataset__in=get_datasets_for_session(self.request))\
-            .order_by('catalogue__year_of_publication', 'catalogue__short_title', 'index_in_catalogue',
-                                    'lot_as_listed_in_catalogue')
+        return Lot.objects.filter(collection__collection_tmp__dataset__in=get_datasets_for_session(self.request))\
+            .order_by('collection__year_of_publication', 'collection__short_title', 'index_in_collection',
+                                    'lot_as_listed_in_collection')
 
     def get_context_data(self, **kwargs):
         context = super(LotTableView, self).get_context_data(**kwargs)
@@ -717,8 +717,8 @@ class LotTableView(ListView):
 
 class LotDetailView(PermissionRequiredMixin, GenericDetailView):
     model = Lot
-    object_fields = ['catalogue', 'number_in_catalogue', 'page_in_catalogue', 'sales_price',
-                     'lot_as_listed_in_catalogue', 'index_in_catalogue', 'category']
+    object_fields = ['collection', 'number_in_collection', 'page_in_collection', 'sales_price',
+                     'lot_as_listed_in_collection', 'index_in_collection', 'category']
 
     # Object permission check by Django Guardian
     permission_required = 'catalogues.view_dataset'
@@ -737,7 +737,7 @@ class LotCreateView(CreateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['catalogues'] = get_catalogues_for_session(self.request)
+        kwargs['collections'] = get_collections_for_session(self.request)
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -763,7 +763,7 @@ class LotUpdateView(PermissionRequiredMixin, UpdateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         lot = self.get_object()
-        kwargs['catalogues'] = get_catalogues_for_session(
+        kwargs['collections'] = get_collections_for_session(
             self.request,
             lot.collection
         )
@@ -802,13 +802,13 @@ class LotDeleteView(PermissionRequiredMixin, DeleteView):
 
 def previous_lot_view(request, pk, index):
     try:
-        lot = Lot.objects.get(catalogue__uuid=pk, index_in_catalogue=index)
+        lot = Lot.objects.get(collection__uuid=pk, index_in_collection=index)
         if not request.user.has_perm('catalogues.view_dataset', lot.collection.collection_tmp.dataset):
             raise PermissionDenied()
         return JsonResponse({
             'success': True,
-            'lot_as_listed_in_catalogue': lot.lot_as_listed_in_collection,
-            'index_in_catalogue': lot.index_in_collection
+            'lot_as_listed_in_collection': lot.lot_as_listed_in_collection,
+            'index_in_collection': lot.index_in_collection
         })
     except ObjectDoesNotExist:
         return JsonResponse({
@@ -820,7 +820,7 @@ def expand_lot_view(request, pk):
     lot = get_object_or_404(Lot, pk=pk)
     if not request.user.has_perm('catalogues.view_dataset', lot.collection.collection_tmp.dataset):
         raise PermissionDenied()
-    next_url = reverse_lazy('catalogue_detail_bare', args=[str(lot.collection.uuid)])
+    next_url = reverse_lazy('collection_detail_bare', args=[str(lot.collection.uuid)])
 
     if request.method == 'POST':
         next_url = '{}#lot__{}'.format(next_url, lot.uuid)
@@ -853,7 +853,7 @@ def expand_lot_view(request, pk):
 
 def add_lot_before(request, pk):
     """
-    Add a lot at a certain position in the list of lots of a catalogue.
+    Add a lot at a certain position in the list of lots of a collection.
     The position is determined as *before* the lot with 'pk' as the id.
     If the 'page' url parameter is set, it means the page before the page of the selected lot.
     If the 'category' url parameter is set, it means the category before the category of the selected lot.
@@ -867,12 +867,12 @@ def add_lot_before(request, pk):
 
     # Determine whether there is a lot before the selected position
     try:
-        lot_before = Lot.objects.filter(catalogue=lot_after.collection, index_in_catalogue__lt=lot_after.index_in_collection)\
-            .order_by('-index_in_catalogue').first()
+        lot_before = Lot.objects.filter(collection=lot_after.collection, index_in_collection__lt=lot_after.index_in_collection)\
+            .order_by('-index_in_collection').first()
     except:
         lot_before = None
 
-    next_url = reverse_lazy('catalogue_detail_bare', args=[str(lot_after.collection.uuid)])
+    next_url = reverse_lazy('collection_detail_bare', args=[str(lot_after.collection.uuid)])
     next_url = '{}#lot__{}'.format(next_url, lot_after.uuid)
 
     if request.method == 'POST':
@@ -901,7 +901,7 @@ def add_lot_before(request, pk):
 
         if 'page' in request.GET:
             if lot_before:
-                page = lot_before.page_in_catalogue
+                page = lot_before.page_in_collection
             elif lot_after.page_in_collection > 1:
                 page = lot_after.page_in_collection - 1
             else:
@@ -911,7 +911,7 @@ def add_lot_before(request, pk):
 
         index = lot_after.index_in_collection
 
-        form = AddLotBeforeForm(category=category, page=page, index=index, catalogue=lot_after.collection)
+        form = AddLotBeforeForm(category=category, page=page, index=index, collection=lot_after.collection)
     else:
         form = AddLotBeforeForm()
 
@@ -927,17 +927,17 @@ def add_lot_before(request, pk):
 
 def add_lot_at_end(request, pk):
     """
-    Add a lot at the end of a catalogue
+    Add a lot at the end of a collection
     :param request:
     :param pk:
     :return:
     """
-    catalogue = get_object_or_404(Collection, pk=pk)
-    if request.user.has_perm('catalogues.view_dataset', catalogue.collection_tmp.dataset):
+    collection = get_object_or_404(Collection, pk=pk)
+    if request.user.has_perm('catalogues.view_dataset', collection.collection_tmp.dataset):
         raise PermissionDenied()
-    last_lot = Lot.objects.filter(catalogue=catalogue).order_by('-index_in_catalogue').first()
+    last_lot = Lot.objects.filter(collection=collection).order_by('-index_in_collection').first()
 
-    next_url = reverse_lazy('catalogue_detail_bare', args=[str(catalogue.uuid)])
+    next_url = reverse_lazy('collection_detail_bare', args=[str(collection.uuid)])
     next_url = '{}#lot__{}'.format(next_url, last_lot.uuid)
 
     if request.method == 'POST':
@@ -959,7 +959,7 @@ def add_lot_at_end(request, pk):
         category = last_lot.category
         page = last_lot.page_in_collection
         index = last_lot.index_in_collection + 1
-        form = AddLotAtEndForm(category=category, page=page, index=index, catalogue=catalogue)
+        form = AddLotAtEndForm(category=category, page=page, index=index, collection=collection)
     else:
         form = AddLotAtEndForm()
 
@@ -973,34 +973,34 @@ def add_lot_at_end(request, pk):
     return render(request, 'generic_form.html', context=context)
 
 
-# PersonCatalogueRelation views
-class PersonCatalogueRelationTableView(ListView):
+# PersonCollectionRelation views
+class PersonCollectionRelationTableView(ListView):
     model = PersonCollectionRelation
     template_name = 'generic_list.html'
 
     def get_queryset(self):
         return PersonCollectionRelation.objects.filter(
-            catalogue__collection_tmp__dataset__in=get_datasets_for_session(self.request)
+            collection__collection_tmp__dataset__in=get_datasets_for_session(self.request)
         )
 
     def get_context_data(self, **kwargs):
-        context = super(PersonCatalogueRelationTableView, self).get_context_data(**kwargs)
-        filter = PersonCatalogueRelationFilter(self.request.GET, queryset=self.get_queryset())
+        context = super(PersonCollectionRelationTableView, self).get_context_data(**kwargs)
+        filter = PersonCollectionRelationFilter(self.request.GET, queryset=self.get_queryset())
 
-        table = PersonCatalogueRelationTable(filter.qs)
+        table = PersonCollectionRelationTable(filter.qs)
         django_tables2.RequestConfig(self.request, ).configure(table)
 
         context['filter'] = filter
         context['table'] = table
 
         context['action'] = _("add")
-        context['object_name'] = "personcataloguerelation"
-        context['add_url'] = reverse_lazy('add_personcataloguerelation')
+        context['object_name'] = "personcollectionrelation"
+        context['add_url'] = reverse_lazy('add_personcollectionrelation')
 
         return context
 
 
-class PersonCatalogueRelationDetailView(PermissionRequiredMixin, DetailView):
+class PersonCollectionRelationDetailView(PermissionRequiredMixin, DetailView):
     model = PersonCollectionRelation
     template_name = 'generic_detail.html'
 
@@ -1012,29 +1012,29 @@ class PersonCatalogueRelationDetailView(PermissionRequiredMixin, DetailView):
     # End permission check
 
 
-class PersonCatalogueRelationCreateView(CreateView):
+class PersonCollectionRelationCreateView(CreateView):
     model = PersonCollectionRelation
     template_name = 'generic_form.html'
-    form_class = PersonCatalogueRelationModelForm
-    success_url = reverse_lazy('personcataloguerelations')
+    form_class = PersonCollectionRelationModelForm
+    success_url = reverse_lazy('personcollectionrelations')
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['catalogues'] = get_catalogues_for_session(self.request)
+        kwargs['collections'] = get_collections_for_session(self.request)
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("add")
-        context['object_name'] = "personcataloguerelation"
+        context['object_name'] = "personcollectionrelation"
         return context
 
 
-class PersonCatalogueRelationUpdateView(PermissionRequiredMixin, UpdateView):
+class PersonCollectionRelationUpdateView(PermissionRequiredMixin, UpdateView):
     model = PersonCollectionRelation
     template_name = 'generic_form.html'
-    form_class = PersonCatalogueRelationModelForm
-    success_url = reverse_lazy('personcataloguerelations')
+    form_class = PersonCollectionRelationModelForm
+    success_url = reverse_lazy('personcollectionrelations')
 
     # Object permission check by Django Guardian
     permission_required = 'catalogues.view_dataset'
@@ -1046,28 +1046,28 @@ class PersonCatalogueRelationUpdateView(PermissionRequiredMixin, UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        personcataloguerelation = self.get_object()
-        kwargs['catalogues'] = get_catalogues_for_session(
+        personcollectionrelation = self.get_object()
+        kwargs['collections'] = get_collections_for_session(
             self.request,
-            personcataloguerelation.collection
+            personcollectionrelation.collection
         )
-        if personcataloguerelation.collection.collection_tmp.dataset not in get_datasets_for_session(self.request):
+        if personcollectionrelation.collection.collection_tmp.dataset not in get_datasets_for_session(self.request):
             messages.warning(self.request,
-                             format_html(_("The dataset this PersonCatalogueRelation belongs to, <i>{}</i>, is "
+                             format_html(_("The dataset this PersonCollectionRelation belongs to, <i>{}</i>, is "
                                            "currently not selected."),
-                                         personcataloguerelation.collection.collection_tmp.dataset))
+                                         personcollectionrelation.collection.collection_tmp.dataset))
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("update")
-        context['object_name'] = "personcataloguerelation"
+        context['object_name'] = "personcollectionrelation"
         return context
 
 
-class PersonCatalogueRelationDeleteView(PermissionRequiredMixin, DeleteView):
+class PersonCollectionRelationDeleteView(PermissionRequiredMixin, DeleteView):
     model = PersonCollectionRelation
-    success_url = reverse_lazy('personcataloguerelations')
+    success_url = reverse_lazy('personcollectionrelations')
 
     # Object permission check by Django Guardian
     permission_required = 'catalogues.view_dataset'
@@ -1077,8 +1077,8 @@ class PersonCatalogueRelationDeleteView(PermissionRequiredMixin, DeleteView):
     # End permission check
 
 
-# PersonCatalogueRelationRole views
-class PersonCatalogueRelationRoleTableView(ListView):
+# PersonCollectionRelationRole views
+class PersonCollectionRelationRoleTableView(ListView):
     model = PersonCollectionRelationRole
     template_name = 'generic_list.html'
 
@@ -1086,55 +1086,55 @@ class PersonCatalogueRelationRoleTableView(ListView):
         return PersonCollectionRelationRole.objects.all()
 
     def get_context_data(self, **kwargs):
-        context = super(PersonCatalogueRelationRoleTableView, self).get_context_data(**kwargs)
-        filter = PersonCatalogueRelationRoleFilter(self.request.GET, queryset=self.get_queryset())
+        context = super(PersonCollectionRelationRoleTableView, self).get_context_data(**kwargs)
+        filter = PersonCollectionRelationRoleFilter(self.request.GET, queryset=self.get_queryset())
 
-        table = PersonCatalogueRelationRoleTable(filter.qs)
+        table = PersonCollectionRelationRoleTable(filter.qs)
         django_tables2.RequestConfig(self.request, ).configure(table)
 
         context['filter'] = filter
         context['table'] = table
 
         context['action'] = _("add")
-        context['object_name'] = "personcataloguerelationrole"
-        context['add_url'] = reverse_lazy('add_personcataloguerelationrole')
+        context['object_name'] = "personcollectionrelationrole"
+        context['add_url'] = reverse_lazy('add_personcollectionrelationrole')
 
         return context
 
 
-class PersonCatalogueRelationRoleDetailView(DetailView):
+class PersonCollectionRelationRoleDetailView(DetailView):
     model = PersonCollectionRelationRole
 
 
-class PersonCatalogueRelationRoleCreateView(CreateView):
+class PersonCollectionRelationRoleCreateView(CreateView):
     model = PersonCollectionRelationRole
     template_name = 'generic_form.html'
-    form_class = PersonCatalogueRelationRoleModelForm
-    success_url = reverse_lazy('personcataloguerelationroles')
+    form_class = PersonCollectionRelationRoleModelForm
+    success_url = reverse_lazy('personcollectionrelationroles')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("add")
-        context['object_name'] = "personcataloguerelationrole"
+        context['object_name'] = "personcollectionrelationrole"
         return context
 
 
-class PersonCatalogueRelationRoleUpdateView(UpdateView):
+class PersonCollectionRelationRoleUpdateView(UpdateView):
     model = PersonCollectionRelationRole
     template_name = 'generic_form.html'
-    form_class = PersonCatalogueRelationRoleModelForm
-    success_url = reverse_lazy('personcataloguerelationroles')
+    form_class = PersonCollectionRelationRoleModelForm
+    success_url = reverse_lazy('personcollectionrelationroles')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("update")
-        context['object_name'] = "personcataloguerelationrole"
+        context['object_name'] = "personcollectionrelationrole"
         return context
 
 
-class PersonCatalogueRelationRoleDeleteView(DeleteView):
+class PersonCollectionRelationRoleDeleteView(DeleteView):
     model = PersonCollectionRelationRole
-    success_url = reverse_lazy('personcataloguerelationroles')
+    success_url = reverse_lazy('personcollectionrelationroles')
 
 
 # PersonCollection_TMPRelation views
@@ -1239,19 +1239,19 @@ class PersonCollection_TMPRelationDeleteView(PermissionRequiredMixin, DeleteView
     # End permission check
 
 
-class CataloguePlaceRelationTableView(ListView):
+class CollectionPlaceRelationTableView(ListView):
     model = CollectionPlaceRelation
     template_name = 'generic_list.html'
 
     def get_queryset(self):
         return CollectionPlaceRelation.objects\
-            .filter(catalogue__collection_tmp__dataset__in=get_datasets_for_session(self.request))
+            .filter(collection__collection_tmp__dataset__in=get_datasets_for_session(self.request))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        filter = CataloguePlaceRelationFilter(self.request.GET, queryset=self.get_queryset())
+        filter = CollectionPlaceRelationFilter(self.request.GET, queryset=self.get_queryset())
 
-        table = CataloguePlaceRelationTable(filter.qs)
+        table = CollectionPlaceRelationTable(filter.qs)
         django_tables2.RequestConfig(self.request, ).configure(table)
 
         context['filter'] = filter
@@ -1259,12 +1259,12 @@ class CataloguePlaceRelationTableView(ListView):
 
         context['action'] = _("add")
         context['object_name_plural'] = self.model._meta.verbose_name_plural
-        context['add_url'] = reverse_lazy('add_catalogueplacerelation')
+        context['add_url'] = reverse_lazy('add_collectionplacerelation')
 
         return context
 
 
-class CataloguePlaceRelationDetailView(PermissionRequiredMixin, DetailView):
+class CollectionPlaceRelationDetailView(PermissionRequiredMixin, DetailView):
     model = CollectionPlaceRelation
     template_name = 'generic_detail.html'
 
@@ -1276,29 +1276,29 @@ class CataloguePlaceRelationDetailView(PermissionRequiredMixin, DetailView):
     # End permission check
 
 
-class CataloguePlaceRelationCreateView(CreateView):
+class CollectionPlaceRelationCreateView(CreateView):
     model = CollectionPlaceRelation
     template_name = 'generic_form.html'
-    form_class = CataloguePlaceRelationModelForm
-    success_url = reverse_lazy('catalogueplacerelations')
+    form_class = CollectionPlaceRelationModelForm
+    success_url = reverse_lazy('collectionplacerelations')
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['catalogues'] = get_catalogues_for_session(self.request)
+        kwargs['collections'] = get_collections_for_session(self.request)
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("add")
-        context['object_name'] = "catalogue publication place"
+        context['object_name'] = "collection publication place"
         return context
 
 
-class CataloguePlaceRelationUpdateView(PermissionRequiredMixin, UpdateView):
+class CollectionPlaceRelationUpdateView(PermissionRequiredMixin, UpdateView):
     model = CollectionPlaceRelation
     template_name = 'generic_form.html'
-    form_class = CataloguePlaceRelationModelForm
-    success_url = reverse_lazy('catalogueplacerelations')
+    form_class = CollectionPlaceRelationModelForm
+    success_url = reverse_lazy('collectionplacerelations')
 
     # Object permission check by Django Guardian
     permission_required = 'catalogues.change_dataset'
@@ -1310,13 +1310,13 @@ class CataloguePlaceRelationUpdateView(PermissionRequiredMixin, UpdateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         relation = self.get_object()
-        kwargs['catalogues'] = get_catalogues_for_session(
+        kwargs['collections'] = get_collections_for_session(
             self.request,
             relation.collection
         )
         if relation.collection.collection_tmp.dataset not in get_datasets_for_session(self.request):
             messages.warning(self.request,
-                             format_html(_("The dataset this CataloguePlaceRelation belongs to, <i>{}</i>, is "
+                             format_html(_("The dataset this CollectionPlaceRelation belongs to, <i>{}</i>, is "
                                            "currently not selected."),
                                          relation.collection.collection_tmp.dataset))
 
@@ -1325,13 +1325,13 @@ class CataloguePlaceRelationUpdateView(PermissionRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("update")
-        context['object_name'] = "catalogue publication place"
+        context['object_name'] = "collection publication place"
         return context
 
 
-class CataloguePlaceRelationDeleteView(PermissionRequiredMixin, DeleteView):
+class CollectionPlaceRelationDeleteView(PermissionRequiredMixin, DeleteView):
     model = CollectionPlaceRelation
-    success_url = reverse_lazy('catalogueplacerelations')
+    success_url = reverse_lazy('collectionplacerelations')
 
     # Object permission check by Django Guardian
     permission_required = 'catalogues.change_dataset'
@@ -1347,7 +1347,7 @@ class CategoryTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return Category.objects.filter(catalogue__collection_tmp__dataset__in=get_datasets_for_session(self.request))
+        return Category.objects.filter(collection__collection_tmp__dataset__in=get_datasets_for_session(self.request))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1368,7 +1368,7 @@ class CategoryTableView(ListView):
 
 class CategoryDetailView(PermissionRequiredMixin, GenericDetailView):
     model = Category
-    object_fields = ['catalogue', 'parent', 'bookseller_category', 'parisian_category']
+    object_fields = ['collection', 'parent', 'bookseller_category', 'parisian_category']
     template_name = 'generic_detail.html'
 
     # Object permission check by Django Guardian
@@ -1387,8 +1387,8 @@ class CategoryCreateView(CreateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['catalogues'] = get_catalogues_for_session(self.request)
-        kwargs['categories'] = Category.objects.filter(catalogue__collection_tmp__dataset__in=get_datasets_for_session(self.request))
+        kwargs['collections'] = get_collections_for_session(self.request)
+        kwargs['categories'] = Category.objects.filter(collection__collection_tmp__dataset__in=get_datasets_for_session(self.request))
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -1414,12 +1414,12 @@ class CategoryUpdateView(PermissionRequiredMixin, UpdateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         category = self.get_object()
-        kwargs['catalogues'] = get_catalogues_for_session(
+        kwargs['collections'] = get_collections_for_session(
             self.request,
             category.collection
         )
         kwargs['categories'] = Category.objects.filter(
-            Q(catalogue__collection_tmp__dataset__in=get_datasets_for_session(self.request))
+            Q(collection__collection_tmp__dataset__in=get_datasets_for_session(self.request))
             | Q(pk=category.pk)
         )
         if category.collection.collection_tmp.dataset not in get_datasets_for_session(self.request):
@@ -1508,8 +1508,8 @@ class ParisianCategoryDeleteView(DeleteView):
     success_url = reverse_lazy('parisiancategories')
 
 
-# CataloguePlaceRelationType views
-class CataloguePlaceRelationTypeTableView(ListView):
+# CollectionPlaceRelationType views
+class CollectionPlaceRelationTypeTableView(ListView):
     model = CollectionPlaceRelationType
     template_name = 'generic_list.html'
 
@@ -1518,9 +1518,9 @@ class CataloguePlaceRelationTypeTableView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        filter = CataloguePlaceRelationTypeFilter(self.request.GET, queryset=self.get_queryset())
+        filter = CollectionPlaceRelationTypeFilter(self.request.GET, queryset=self.get_queryset())
 
-        table = CataloguePlaceRelationTypeTable(filter.qs)
+        table = CollectionPlaceRelationTypeTable(filter.qs)
         django_tables2.RequestConfig(self.request, ).configure(table)
 
         context['filter'] = filter
@@ -1528,41 +1528,41 @@ class CataloguePlaceRelationTypeTableView(ListView):
 
         context['action'] = _("add")
         context['object_name_plural'] = self.model._meta.verbose_name_plural
-        context['add_url'] = reverse_lazy('add_catalogueplacerelationtype')
+        context['add_url'] = reverse_lazy('add_collectionplacerelationtype')
 
         return context
 
 
-class CataloguePlaceRelationTypeDetailView(DetailView):
+class CollectionPlaceRelationTypeDetailView(DetailView):
     model = CollectionPlaceRelationType
 
 
-class CataloguePlaceRelationTypeCreateView(CreateView):
+class CollectionPlaceRelationTypeCreateView(CreateView):
     model = CollectionPlaceRelationType
     template_name = 'generic_form.html'
-    form_class = CataloguePlaceRelationTypeModelForm
-    success_url = reverse_lazy('catalogueplacerelationtypes')
+    form_class = CollectionPlaceRelationTypeModelForm
+    success_url = reverse_lazy('collectionplacerelationtypes')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("add")
-        context['object_name'] = "catalogueplacerelationtype"
+        context['object_name'] = "collectionplacerelationtype"
         return context
 
 
-class CataloguePlaceRelationTypeUpdateView(UpdateView):
+class CollectionPlaceRelationTypeUpdateView(UpdateView):
     model = CollectionPlaceRelationType
     template_name = 'generic_form.html'
-    form_class = CataloguePlaceRelationTypeModelForm
-    success_url = reverse_lazy('catalogueplacerelationtypes')
+    form_class = CollectionPlaceRelationTypeModelForm
+    success_url = reverse_lazy('collectionplacerelationtypes')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("update")
-        context['object_name'] = "catalogueplacerelationtype"
+        context['object_name'] = "collectionplacerelationtype"
         return context
 
 
-class CataloguePlaceRelationTypeDeleteView(DeleteView):
+class CollectionPlaceRelationTypeDeleteView(DeleteView):
     model = CollectionPlaceRelationType
-    success_url = reverse_lazy('catalogueplacerelationtypes')
+    success_url = reverse_lazy('collectionplacerelationtypes')

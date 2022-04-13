@@ -31,8 +31,8 @@ class GenericCRUDTestMixin:
 
         # Add permission to change the test dataset
         dataset, created = Dataset.objects.get_or_create(name='name_test')
-        assign_perm('catalogue.change_dataset', self.user, dataset)
-        assign_perm('catalogue.view_dataset', self.user, dataset)
+        assign_perm('catalogues.change_dataset', self.user, dataset)
+        assign_perm('catalogues.view_dataset', self.user, dataset)
 
 
     def get_permission_string(self, verb):
@@ -117,5 +117,6 @@ class GenericCRUDTestMixin:
         # Post to the Delete form
         client = Client()
         client.login(username=self.username, password=self.password)
-        response = client.post(reverse_lazy(self.get_url_name('delete'), args=[obj.uuid]), {}, follow=True)
+        response = client.post(reverse_lazy(self.get_url_name('delete'), args=[obj.uuid]), {},
+                               HTTP_REFERER=reverse_lazy('dashboard'), follow=True)
         self.assertEqual(response.status_code, 200)

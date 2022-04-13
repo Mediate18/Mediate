@@ -18,7 +18,7 @@ from collections import defaultdict
 # Person table
 class PersonTable(tables.Table):
     uuid = ActionColumn('person_detail', 'change_person', 'delete_person', orderable=False)
-    catalogues = tables.Column(empty_values=())
+    collections = tables.Column(empty_values=())
     roles = tables.Column(empty_values=())
     viaf_id = tables.Column(empty_values=())
     relations = tables.Column(
@@ -40,7 +40,7 @@ class PersonTable(tables.Table):
             'date_of_birth',
             'city_of_death',
             'date_of_death',
-            'catalogues',
+            'collections',
             'viaf_id',
             'publisher_cerl_id',
             'notes',
@@ -49,29 +49,29 @@ class PersonTable(tables.Table):
             'uuid'
         ]
 
-    def render_catalogues(self, record):
-        person_catalogue_relations = PersonCollectionRelation.objects.filter(person=record, role__name="owner")
+    def render_collections(self, record):
+        person_collection_relations = PersonCollectionRelation.objects.filter(person=record, role__name="owner")
         relation_groups = []
-        for role in set([relation.role for relation in person_catalogue_relations]):
-            role_relations = person_catalogue_relations.filter(role=role)
-            catalogues = []
+        for role in set([relation.role for relation in person_collection_relations]):
+            role_relations = person_collection_relations.filter(role=role)
+            collections = []
             for relation in role_relations:
-                catalogue = relation.collection
-                title = catalogue.short_title
-                catalogue_entry = "<a href='{}'>{}</a>".format(reverse_lazy('catalogue_detail', args=[catalogue.pk]), title)
-                catalogues.append(catalogue_entry)
+                collection = relation.collection
+                title = collection.short_title
+                collection_entry = "<a href='{}'>{}</a>".format(reverse_lazy('collection_detail', args=[collection.pk]), title)
+                collections.append(collection_entry)
 
-            relation_groups.append(", ".join(catalogues))
+            relation_groups.append(", ".join(collections))
         return format_html("<br/> ".join(relation_groups))
 
     def render_roles(self, record):
         roles_dict = {}
 
-        # Catalogues
-        catalogue_roles = list(PersonCollectionRelation.objects.filter(person=record).distinct()
+        # Collections
+        collection_roles = list(PersonCollectionRelation.objects.filter(person=record).distinct()
                                .values_list('role__name', flat=True))
-        if catalogue_roles:
-            roles_dict['catalogues'] = catalogue_roles
+        if collection_roles:
+            roles_dict['collections'] = collection_roles
 
         # Items
         item_roles = list(PersonItemRelation.objects.filter(person=record).distinct()
@@ -132,7 +132,7 @@ class PersonTable(tables.Table):
 class PersonRankingTable(PersonTable):
     row_index = tables.Column(empty_values=(), orderable=False, verbose_name="")
     item_count = tables.Column(empty_values=(), verbose_name=_("# items"))
-    catalogue_count = tables.Column(empty_values=(), verbose_name=_("# catalogues"))
+    collection_count = tables.Column(empty_values=(), verbose_name=_("# collections"))
 
     class Meta:
         model = Person
@@ -140,7 +140,7 @@ class PersonRankingTable(PersonTable):
         sequence = [
             'row_index',
             'item_count',
-            'catalogue_count',
+            'collection_count',
             'short_name',
             'first_names',
             'surname',
@@ -150,7 +150,7 @@ class PersonRankingTable(PersonTable):
             'date_of_birth',
             'city_of_death',
             'date_of_death',
-            'catalogues',
+            'collections',
             'viaf_id',
             'uuid'
         ]
@@ -226,7 +226,7 @@ class CountryTable(tables.Table):
 class CountryRankingTable(CountryTable):
     row_index = tables.Column(empty_values=(), orderable=False, verbose_name="")
     item_count = tables.Column(empty_values=(), verbose_name=_("# items"))
-    catalogue_count = tables.Column(empty_values=(), verbose_name=_("# catalogues"))
+    collection_count = tables.Column(empty_values=(), verbose_name=_("# collections"))
 
     class Meta:
         model = Country
@@ -234,7 +234,7 @@ class CountryRankingTable(CountryTable):
         sequence = [
             'row_index',
             'item_count',
-            'catalogue_count',
+            'collection_count',
             'name',
             'uuid'
         ]
@@ -266,7 +266,7 @@ class PlaceTable(tables.Table):
 class PlaceRankingTable(PlaceTable):
     row_index = tables.Column(empty_values=(), orderable=False, verbose_name="")
     item_count = tables.Column(empty_values=(), verbose_name=_("# items"))
-    catalogue_count = tables.Column(empty_values=(), verbose_name=_("# catalogues"))
+    collection_count = tables.Column(empty_values=(), verbose_name=_("# collections"))
     person_count = tables.Column(empty_values=(), verbose_name=_("# persons"))
 
     class Meta:
@@ -275,7 +275,7 @@ class PlaceRankingTable(PlaceTable):
         sequence = [
             'row_index',
             'item_count',
-            'catalogue_count',
+            'collection_count',
             'person_count',
             'name',
             'cerl_id',
@@ -289,14 +289,14 @@ class PlaceRankingTable(PlaceTable):
         filter = kwargs.pop('filter', None)
         super().__init__(*args, **kwargs)
         self.year = filter.get_year_range()
-        self.catalogues = filter.get_catalogues()
+        self.collections = filter.get_collections()
 
     def render_row_index(self):
         self.row_index = getattr(self, 'row_index', itertools.count(self.page.start_index()))
         return next(self.row_index)
 
     def render_person_count(self, record):
-        catalogues_query = Q(personitemrelation__item__lot__catalogue__in=self.catalogues) if self.catalogues else Q()
+        collections_query = Q(personitemrelation__item__lot__collection__in=self.collections) if self.collections else Q()
         if self.year:
             year = self.year
             if year[0] and year[1]:
@@ -304,24 +304,24 @@ class PlaceRankingTable(PlaceTable):
                     .filter(Q(residence__place=record, residence__start_year__gte=year[0], residence__end_year__lte=year[1])
                             | Q(city_of_birth=record, date_of_birth__gte=year[0], date_of_birth__lte=year[1])
                             | Q(city_of_death=record, date_of_death__gte=year[0], date_of_death__lte=year[1])) \
-                    .filter(catalogues_query).distinct().count()
+                    .filter(collections_query).distinct().count()
             elif year[0]:
                 return Person.objects \
                     .filter(Q(residence__place=record, residence__start_year__gte=year[0])
                             | Q(city_of_birth=record, date_of_birth__gte=year[0])
                             | Q(city_of_death=record, date_of_death__gte=year[0])) \
-                    .filter(catalogues_query).distinct().count()
+                    .filter(collections_query).distinct().count()
             elif year[1]:
                 return Person.objects \
                     .filter(
                     Q(residence__place=record, residence__end_year__lte=year[1])
                     | Q(city_of_birth=record, date_of_birth__lte=year[1])
                     | Q(city_of_death=record, date_of_death__lte=year[1])) \
-                    .filter(catalogues_query).distinct().count()
+                    .filter(collections_query).distinct().count()
 
         # Default
         return Person.objects.filter(Q(residence__place=record) | Q(city_of_birth=record) | Q(city_of_death=record))\
-                .filter(catalogues_query) \
+                .filter(collections_query) \
                 .distinct().count()
 
 
@@ -329,7 +329,7 @@ class PlaceRankingTable(PlaceTable):
 class PlaceLinksTable(tables.Table):
     uuid = ActionColumn('place_detail', 'change_place', 'delete_place',
                         orderable=False)
-    catalogues = tables.Column(empty_values=(), verbose_name="Catalogues",
+    collections = tables.Column(empty_values=(), verbose_name="Collections",
                         orderable=False)
     editions = tables.Column(empty_values=(), verbose_name="Editions",
                         orderable=False)
@@ -345,7 +345,7 @@ class PlaceLinksTable(tables.Table):
         attrs = {'class': 'table table-sortable'}
         fields = [
             'name',
-            'catalogues',
+            'collections',
             'editions',
             'people_born',
             'people_died',
@@ -353,7 +353,7 @@ class PlaceLinksTable(tables.Table):
             'uuid'
         ]
 
-    def render_catalogues(self, record):
+    def render_collections(self, record):
         relations = CollectionPlaceRelation.objects.filter(place=record).prefetch_related('type')
         type_dict = defaultdict(list)
         for relation in relations:
@@ -361,9 +361,9 @@ class PlaceLinksTable(tables.Table):
 
         return format_html("<br/>".join([
             type.capitalize() + ": " + ", ".join([
-                '<a href="{}">{}</a>'.format(reverse_lazy('catalogue_detail', args=[catalogue.pk]), catalogue)
-                for catalogue in catalogues
-            ]) for type, catalogues in type_dict.items()
+                '<a href="{}">{}</a>'.format(reverse_lazy('collection_detail', args=[collection.pk]), collection)
+                for collection in collections
+            ]) for type, collections in type_dict.items()
         ]))
 
     def render_editions(self, record):

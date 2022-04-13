@@ -1,4 +1,4 @@
-"""Catalogues URL Configuration
+"""Collections URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/2.0/topics/http/urls/
@@ -44,18 +44,18 @@ router = routers.DefaultRouter()
 # router.register(r'users', views.UserViewSet)
 # router.register(r'groups', views.GroupViewSet)
 
-# Catalogues app
+# Collections app
 router.register(r'collection_tmp', Collection_TMPViewSet)
 router.register(r'collection_tmpyear', Collection_TMPYearViewSet)
-router.register(r'cataloguetype', CatalogueTypeViewSet)
+router.register(r'collectiontype', CollectionTypeViewSet)
 router.register(r'library', LibraryViewSet)
-router.register(r'catalogue', CatalogueViewSet)
-router.register(r'cataloguecataloguetyperelation', CatalogueCatalogueTypeRelationViewSet)
-router.register(r'catalogueheldby', CatalogueHeldByViewSet)
+router.register(r'collection', CollectionViewSet)
+router.register(r'collectioncollectiontyperelation', CollectionCollectionTypeRelationViewSet)
+router.register(r'collectionheldby', CollectionHeldByViewSet)
 router.register(r'lot', LotViewSet)
 router.register(r'personcollection_tmprelation', PersonCollection_TMPRelationViewSet)
-router.register(r'personcataloguerelationrole', PersonCatalogueRelationRoleViewSet)
-router.register(r'personcataloguerelation', PersonCatalogueRelationViewSet)
+router.register(r'personcollectionrelationrole', PersonCollectionRelationRoleViewSet)
+router.register(r'personcollectionrelation', PersonCollectionRelationViewSet)
 router.register(r'parisiancategory', ParisianCategoryViewSet)
 router.register(r'category', CategoryViewSet)
 

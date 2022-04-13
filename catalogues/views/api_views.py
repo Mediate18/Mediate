@@ -2,15 +2,15 @@ from rest_framework import viewsets
 from ..serializers import *
 
 
-class CatalogueViewSet(viewsets.ModelViewSet):
+class CollectionViewSet(viewsets.ModelViewSet):
     queryset = Collection.objects.all()
-    serializer_class = CatalogueSerializer
+    serializer_class = CollectionSerializer
     http_method_names = ['get']
 
 
-class CatalogueTypeViewSet(viewsets.ModelViewSet):
+class CollectionTypeViewSet(viewsets.ModelViewSet):
     queryset = CollectionType.objects.all()
-    serializer_class = CatalogueTypeSerializer
+    serializer_class = CollectionTypeSerializer
     http_method_names = ['get']
 
 
@@ -26,15 +26,15 @@ class LotViewSet(viewsets.ModelViewSet):
     http_method_names = ['get']
 
 
-class PersonCatalogueRelationViewSet(viewsets.ModelViewSet):
+class PersonCollectionRelationViewSet(viewsets.ModelViewSet):
     queryset = PersonCollectionRelation.objects.all()
-    serializer_class = PersonCatalogueRelationSerializer
+    serializer_class = PersonCollectionRelationSerializer
     http_method_names = ['get']
 
 
-class PersonCatalogueRelationRoleViewSet(viewsets.ModelViewSet):
+class PersonCollectionRelationRoleViewSet(viewsets.ModelViewSet):
     queryset = PersonCollectionRelationRole.objects.all()
-    serializer_class = PersonCatalogueRelationRoleSerializer
+    serializer_class = PersonCollectionRelationRoleSerializer
     http_method_names = ['get']
 
 
@@ -56,15 +56,15 @@ class LibraryViewSet(viewsets.ModelViewSet):
     http_method_names = ['get']
 
 
-class CatalogueCatalogueTypeRelationViewSet(viewsets.ModelViewSet):
+class CollectionCollectionTypeRelationViewSet(viewsets.ModelViewSet):
     queryset = CollectionCollectionTypeRelation.objects.all()
-    serializer_class = CatalogueCatalogueTypeRelationSerializer
+    serializer_class = CollectionCollectionTypeRelationSerializer
     http_method_names = ['get']
 
 
-class CatalogueHeldByViewSet(viewsets.ModelViewSet):
+class CollectionHeldByViewSet(viewsets.ModelViewSet):
     queryset = CollectionHeldBy.objects.all()
-    serializer_class = CatalogueHeldBySerializer
+    serializer_class = CollectionHeldBySerializer
     http_method_names = ['get']
 
 

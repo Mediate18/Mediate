@@ -28,7 +28,7 @@ class Dataset(models.Model):
 
 class Collection_TMP(models.Model):
     """
-    The collection_tmp a catalogue belongs to
+    The collection_tmp a collection belongs to
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("Name"), max_length=128, unique=True)
@@ -55,10 +55,10 @@ class Collection_TMPYear(models.Model):
 
 class CollectionType(models.Model):
     """
-    The type of a catalogue
+    The type of a collection
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(_("Name of the catalogue type"), max_length=128, null=True)
+    name = models.CharField(_("Name of the collection type"), max_length=128, null=True)
 
     def __str__(self):
         return self.name
@@ -66,7 +66,7 @@ class CollectionType(models.Model):
 
 class Library(models.Model):
     """
-    Library or institute that may hold one or more catalogues
+    Library or institute that may hold one or more collections
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("The name of the library/institute"), max_length=128)
@@ -81,7 +81,7 @@ class Library(models.Model):
 @moderated(['short_title', 'notes'])
 class Collection(models.Model):
     """
-    The catalogue an item occurs in
+    The collection an item occurs in
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     transcription = models.ForeignKey(Transcription, on_delete=SET_NULL, null=True)
@@ -94,7 +94,7 @@ class Collection(models.Model):
     bibliography = models.TextField(_("Bibliography"), null=True)
     collection_tmp = models.ForeignKey(Collection_TMP, on_delete=SET_NULL, null=True)
 
-    tags = GenericRelation(TaggedEntity, related_query_name='catalogues')
+    tags = GenericRelation(TaggedEntity, related_query_name='collections')
 
     class Meta:
         ordering = ['year_of_publication', 'short_title']
@@ -103,14 +103,14 @@ class Collection(models.Model):
         return "{0}".format(self.short_title)
 
     def get_absolute_url(self):
-        return reverse_lazy('catalogue_detail', args=[str(self.uuid)])
+        return reverse_lazy('collection_detail', args=[str(self.uuid)])
 
     def delete(self, *args, **kwargs):
-        # Gather edition IDs that are linked to this catalogue
+        # Gather edition IDs that are linked to this collection
         from items.models import Edition  # To prevent an import error (probably circular imports)
-        editions = list(Edition.objects.filter(items__lot__catalogue=self).values_list('uuid', flat=True))
+        editions = list(Edition.objects.filter(items__lot__collection=self).values_list('uuid', flat=True))
 
-        # Delete the catalogue
+        # Delete the collection
         super().delete(*args, **kwargs)
 
         # Delete the linked editions
@@ -124,16 +124,16 @@ class Collection(models.Model):
 
     def item_count(self):
         from items.models import Item
-        return Item.objects.filter(lot__catalogue=self).count()
+        return Item.objects.filter(lot__collection=self).count()
 
     @property
     def sorted_lot_set(self):
-        return self.lot_set.order_by('index_in_catalogue', 'number_in_catalogue')
+        return self.lot_set.order_by('index_in_collection', 'number_in_collection')
 
 
 class CollectionCollectionTypeRelation(models.Model):
     """
-    A catalogue-catalogue type relation
+    A collection-collection type relation
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE)
@@ -145,7 +145,7 @@ class CollectionCollectionTypeRelation(models.Model):
 
 class CollectionHeldBy(models.Model):
     """
-    A library/institute where a catalogue is held
+    A library/institute where a collection is held
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     library = models.ForeignKey(Library, on_delete=models.CASCADE)
@@ -155,33 +155,33 @@ class CollectionHeldBy(models.Model):
         return _("{} held by {}").format(self.collection, self.library)
 
 
-@moderated(['lot_as_listed_in_catalogue'])
+@moderated(['lot_as_listed_in_collection'])
 class Lot(models.Model):
     """
     Collection lot
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     collection = models.ForeignKey(Collection, on_delete=CASCADE, null=True)
-    number_in_collection = models.CharField(_("Number in catalogue"), max_length=128)
-    page_in_collection = models.IntegerField(_("Page in catalogue"), null=True, blank=True)
+    number_in_collection = models.CharField(_("Number in collection"), max_length=128)
+    page_in_collection = models.IntegerField(_("Page in collection"), null=True, blank=True)
     sales_price = models.CharField(_("Sales price"), max_length=128, blank=True)
-    lot_as_listed_in_collection = models.TextField(_("Full lot description, exactly as in the catalogue"))
-    index_in_collection = models.IntegerField(_("Index in catalogue"), null=True)
+    lot_as_listed_in_collection = models.TextField(_("Full lot description, exactly as in the collection"))
+    index_in_collection = models.IntegerField(_("Index in collection"), null=True)
     category = models.ForeignKey('Category', on_delete=SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.lot_as_listed_in_collection
 
     def save(self, *args, **kwargs):
-        # Check whether the catalogue of the category is the same catalogue
-        if not self.category or self.collection == self.category.catalogue:
+        # Check whether the collection of the category is the same collection
+        if not self.category or self.collection == self.category.collection:
             with transaction.atomic():
-                # Add 1 to index_in_catalogue for all lots with index_in_catalogue greater than or equal to this index
-                Lot.objects.filter(catalogue=self.collection, index_in_catalogue__gte=self.index_in_collection)\
-                    .update(index_in_catalogue=F('index_in_catalogue') + 1)
+                # Add 1 to index_in_collection for all lots with index_in_collection greater than or equal to this index
+                Lot.objects.filter(collection=self.collection, index_in_collection__gte=self.index_in_collection)\
+                    .update(index_in_collection=F('index_in_collection') + 1)
                 super(Lot, self).save(*args, **kwargs)
         else:
-            raise Exception(_("Lot {}: the catalogue is not the same as the category's catalogue").format(self))
+            raise Exception(_("Lot {}: the collection is not the same as the category's collection").format(self))
 
 
     def get_absolute_url(self):
@@ -191,8 +191,8 @@ class Lot(models.Model):
         index_incollection = self.index_in_collection
         index_start = index_incollection - number
         index_end = index_incollection - 1
-        return Lot.objects.filter(catalogue=self.collection, index_in_catalogue__gte=index_start,
-                                  index_in_catalogue__lte=index_end)
+        return Lot.objects.filter(collection=self.collection, index_in_collection__gte=index_start,
+                                  index_in_collection__lte=index_end)
 
 
 class PersonCollection_TMPRelation(models.Model):
@@ -212,10 +212,10 @@ class PersonCollection_TMPRelation(models.Model):
 
 class PersonCollectionRelationRole(models.Model):
     """
-    A type for a person-catalogue relation
+    A type for a person-collection relation
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(_("Role name for a person-catalogue relation"), max_length=128)
+    name = models.CharField(_("Role name for a person-collection relation"), max_length=128)
 
     def __str__(self):
         return self.name
@@ -223,7 +223,7 @@ class PersonCollectionRelationRole(models.Model):
 
 class PersonCollectionRelation(models.Model):
     """
-    A person-catalogue item relation (e.g. author, translator, illustrator, owner)
+    A person-collection item relation (e.g. author, translator, illustrator, owner)
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     person = models.ForeignKey(Person, on_delete=CASCADE)
@@ -236,7 +236,7 @@ class PersonCollectionRelation(models.Model):
 
 class CollectionPlaceRelationType(models.Model):
     """
-    Type of relation between a catalogue and a place
+    Type of relation between a collection and a place
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=128, unique=True)
@@ -247,10 +247,10 @@ class CollectionPlaceRelationType(models.Model):
 
 class CollectionPlaceRelation(models.Model):
     """
-    Publication place for catalogues
+    Publication place for collections
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    place = models.ForeignKey(Place, on_delete=CASCADE, related_name='related_catalogues')
+    place = models.ForeignKey(Place, on_delete=CASCADE, related_name='related_collections')
     collection = models.ForeignKey(Collection, on_delete=CASCADE, related_name='related_places')
     type = models.ForeignKey(CollectionPlaceRelationType, on_delete=SET_NULL, null=True)
 
@@ -275,7 +275,7 @@ class ParisianCategory(models.Model):
 
 class Category(models.Model):
     """
-    A category as found in a catalogue.
+    A category as found in a collection.
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     collection = models.ForeignKey(Collection, on_delete=SET_NULL, null=True)
@@ -295,11 +295,11 @@ class Category(models.Model):
         return reverse_lazy('category_detail', args=[str(self.uuid)])
 
     def save(self, *args, **kwargs):
-        # Check whether the catalogue of the parent is the same catalogue
-        if not self.parent or self.collection == self.parent.catalogue:
+        # Check whether the collection of the parent is the same collection
+        if not self.parent or self.collection == self.parent.collection:
             super(Category, self).save(*args, **kwargs)
         else:
-            raise Exception(_("Category {}: the catalogue is not the as the parent's catalogue").format(self))
+            raise Exception(_("Category {}: the collection is not the as the parent's collection").format(self))
 
 
 # Enable the simple-history registration:

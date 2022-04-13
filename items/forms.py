@@ -5,7 +5,7 @@ from django_select2.forms import Select2Widget, ModelSelect2Widget, ModelSelect2
 from apiconnectors.widgets import ApiSelectWidget
 from .models import *
 from catalogues.models import Category, ParisianCategory
-from catalogues.views.views import get_catalogues_for_session
+from catalogues.views.views import get_collections_for_session
 
 from tagme.models import Tag
 from betterforms.multiform import MultiModelForm
@@ -38,7 +38,7 @@ class ItemModelForm(forms.ModelForm):
                 queryset=self.lots,
                 widget=ModelSelect2Widget(
                     queryset=self.lots,
-                    search_fields=['lot_as_listed_in_catalogue__icontains'],
+                    search_fields=['lot_as_listed_in_collection__icontains'],
                 ),
             )
         
@@ -119,7 +119,7 @@ class ItemModelForm(forms.ModelForm):
             'collection_tmp': Select2Widget,
             'lot': ModelSelect2Widget(
                 model=Lot,
-                search_fields=['lot_as_listed_in_catalogue__icontains']
+                search_fields=['lot_as_listed_in_collection__icontains']
             ),
             'edition': ModelSelect2Widget(
                 model=Edition,
@@ -220,7 +220,7 @@ class ItemModelForm(forms.ModelForm):
 
 class ItemSuggest(autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        qs = Item.objects.filter(lot__catalogue__in=get_catalogues_for_session(self.request))
+        qs = Item.objects.filter(lot__collection__in=get_collections_for_session(self.request))
 
         if self.q:
             qs = qs.filter(short_title__icontains=self.q)
@@ -672,6 +672,6 @@ class ItemAndEditionForm(MultiModelForm):
                 queryset=self.lots,
                 widget=ModelSelect2Widget(
                     queryset=self.lots,
-                    search_fields=['lot_as_listed_in_catalogue__icontains'],
+                    search_fields=['lot_as_listed_in_collection__icontains'],
                 ),
             )

@@ -4,7 +4,7 @@
 {% load dictionary_lookup %}
 
 {% block extracss %}
-    <link rel="stylesheet" href="{% static 'catalogues/css/catalogue_detail.css' %}">
+    <link rel="stylesheet" href="{% static 'collections/css/collection_detail.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -41,13 +41,13 @@
             </dl>
 
             <div>
-                {% with object.personcataloguerelation_set.all as catalogue_relations %}
-                    {% if catalogue_relations %}
-                        <h3>{% trans "Catalogues" %}</h3>
+                {% with object.personcollectionrelation_set.all as collection_relations %}
+                    {% if collection_relations %}
+                        <h3>{% trans "Collections" %}</h3>
                         <ul>
-                        {% for relation in catalogue_relations %}
+                        {% for relation in collection_relations %}
                             <li>
-                                <a href="{{ relation.catalogue.get_absolute_url }}">{{ relation.catalogue }}</a> ({{ relation.role }})
+                                <a href="{{ relation.collection.get_absolute_url }}">{{ relation.collection }}</a> ({{ relation.role }})
                             </li>
                         {% endfor %}
                         </ul>

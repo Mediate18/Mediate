@@ -3,26 +3,26 @@ from django.db.models import Count, Q
 
 from items.models import Item, Edition, Work, Language, PersonItemRelation, ItemWorkRelation
 from catalogues.models import Lot, Collection
-from catalogues.views.views import get_catalogues_for_session
+from catalogues.views.views import get_collections_for_session
 from persons.models import Place, Person, Country
 
 def view_dashboard(request):
     if request.user.is_superuser:
         number_of_editions_without_items = Edition.objects\
-                                               .filter(items__lot__catalogue__in=get_catalogues_for_session(request))\
+                                               .filter(items__lot__collection__in=get_collections_for_session(request))\
                                                .annotate(number_of_items=Count('items'))\
                                                .filter(number_of_items=0).count() or 0
         number_of_editions_gt_1_item = Edition.objects\
-                                           .filter(items__lot__catalogue__in=get_catalogues_for_session(request))\
+                                           .filter(items__lot__collection__in=get_collections_for_session(request))\
                                            .annotate(number_of_items=Count('items'))\
                                            .filter(number_of_items__gt=1).count() or 0
-        number_of_items_without_editions = Item.objects.filter(lot__catalogue__in=get_catalogues_for_session(request),
+        number_of_items_without_editions = Item.objects.filter(lot__collection__in=get_collections_for_session(request),
                                                                edition__isnull=True).count() or 0
 
-        number_of_items_without_lot = Item.objects.filter(lot__catalogue__in=get_catalogues_for_session(request),
+        number_of_items_without_lot = Item.objects.filter(lot__collection__in=get_collections_for_session(request),
                                                           lot__isnull=True).count() or 0
         number_of_lots_without_items = Lot.objects\
-                                           .filter(catalogue__in=get_catalogues_for_session(request))\
+                                           .filter(collection__in=get_collections_for_session(request))\
                                            .annotate(number_of_items=Count('item')).filter(number_of_items=0)\
                                            .count() or 0
 
@@ -44,10 +44,10 @@ def view_totals(request):
     :param request:
     :return:
     """
-    catalogues = list(get_catalogues_for_session(request))
-    catalogues_count = get_catalogues_for_session(request).count()
-    book_items = Item.objects.filter(lot__catalogue__in=catalogues, non_book=False).count()
-    non_book_items = Item.objects.filter(lot__catalogue__in=catalogues, non_book=True).count()
+    collections = list(get_collections_for_session(request))
+    collections_count = get_collections_for_session(request).count()
+    book_items = Item.objects.filter(lot__collection__in=collections, non_book=False).count()
+    non_book_items = Item.objects.filter(lot__collection__in=collections, non_book=True).count()
     works = Work.objects.count()
     persons = Person.objects.count()
     female_persons = Person.objects.filter(sex=Person.FEMALE).count()
@@ -60,27 +60,27 @@ def view_totals(request):
     countries = Country.objects.filter(place__in=cities_list).distinct().count()
 
     languages = Language.objects\
-        .annotate(item_cnt=Count('items', filter=Q(items__item__lot__catalogue__in=catalogues,
+        .annotate(item_cnt=Count('items', filter=Q(items__item__lot__collection__in=collections,
                                                    items__item__non_book=False)))\
         .filter(item_cnt__gt=0).count()
 
-    item_person_relations = PersonItemRelation.objects.filter(item__lot__catalogue__in=catalogues,
+    item_person_relations = PersonItemRelation.objects.filter(item__lot__collection__in=collections,
                                                               item__non_book=False).values('item').distinct().count()
-    item_work_relations = ItemWorkRelation.objects.filter(item__lot__catalogue__in=catalogues,
+    item_work_relations = ItemWorkRelation.objects.filter(item__lot__collection__in=collections,
                                                           item__non_book=False).distinct().count()
-    items_with_date = Item.objects.filter(lot__catalogue__in=catalogues, edition__year_start__isnull=False,
+    items_with_date = Item.objects.filter(lot__collection__in=collections, edition__year_start__isnull=False,
                                           non_book=False).distinct().count()
-    items_with_place_of_publication = Item.objects.filter(lot__catalogue__in=catalogues, edition__place__isnull=False,
+    items_with_place_of_publication = Item.objects.filter(lot__collection__in=collections, edition__place__isnull=False,
                                                           non_book=False).distinct().count()
     
     persons_with_place_of_birth = Person.objects.filter(city_of_birth__isnull=False).distinct().count()
     persons_with_place_of_death = Person.objects.filter(city_of_death__isnull=False).distinct().count()
 
-    books_with_language = Item.objects.filter(lot__catalogue__in=catalogues, languages__isnull=False, non_book=False)\
+    books_with_language = Item.objects.filter(lot__collection__in=collections, languages__isnull=False, non_book=False)\
         .distinct().count()
 
     context = {
-        'catalogues': catalogues_count,
+        'collections': collections_count,
         'book_items': book_items,
         'non_book_items': non_book_items,
         'percentage_non_book_items': round(100 * non_book_items/book_items, 1),

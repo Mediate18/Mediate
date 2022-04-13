@@ -39,33 +39,33 @@ class Command(BaseCommand):
                 lots_data.append(dict(zip(header, row_as_list)))
 
             # Handle each lot dict
-            index_in_catalogue = 1
+            index_in_collection = 1
             for lot_dict in lots_data:
 
-                # Collection_TMP and Catalogue
-                catalogue_short_title = os.path.splitext(os.path.basename(transcription_file))[0]
-                collection_tmp, created = Collection_TMP.objects.get_or_create(name=catalogue_short_title)
-                catalogue, created = Collection.objects.get_or_create(
+                # Collection_TMP and Collection
+                collection_short_title = os.path.splitext(os.path.basename(transcription_file))[0]
+                collection_tmp, created = Collection_TMP.objects.get_or_create(name=collection_short_title)
+                collection, created = Collection.objects.get_or_create(
                     collection_tmp=collection_tmp,
-                    short_title=catalogue_short_title,
-                    full_title=lot_dict['full_catalogue_title'],
+                    short_title=collection_short_title,
+                    full_title=lot_dict['full_collection_title'],
                     preface_and_paratexts=lot_dict['preface_and paratexts'],
-                    year_of_publication=lot_dict['catalogue_date_of_publication'],
+                    year_of_publication=lot_dict['collection_date_of_publication'],
                 )
 
                 # Category
                 category, created = Category.objects\
-                    .get_or_create(catalogue=catalogue, bookseller_category=lot_dict['bookseller_category_books'])
+                    .get_or_create(collection=collection, bookseller_category=lot_dict['bookseller_category_books'])
 
                 # Lot
                 lot = Lot.objects.create(
-                    catalogue=catalogue,
-                    number_in_catalogue=lot_dict['number_in_catalogue'],
-                    lot_as_listed_in_catalogue=lot_dict['item_as_listed_in_catalogue'],
-                    index_in_catalogue=index_in_catalogue,
+                    collection=collection,
+                    number_in_collection=lot_dict['number_in_collection'],
+                    lot_as_listed_in_collection=lot_dict['item_as_listed_in_collection'],
+                    index_in_collection=index_in_collection,
                     category=category
                 )
-                index_in_catalogue += 1
+                index_in_collection += 1
 
                 # Place
                 place = None
@@ -83,7 +83,7 @@ class Command(BaseCommand):
 
                 # Item
                 item = Item.objects.create(
-                    short_title=lot_dict['item_as_listed_in_catalogue'][:128],
+                    short_title=lot_dict['item_as_listed_in_collection'][:128],
                     lot=lot,
                     collection_tmp=collection_tmp,
                     book_format=book_format,
