@@ -862,7 +862,7 @@ def add_lot_before(request, pk):
     :return: 
     """
     lot_after = get_object_or_404(Lot, pk=pk)
-    if not request.user.has_perm('catalogues.view_dataset', lot_after.collection.catalogue.dataset):
+    if not request.user.has_perm('catalogues.change_dataset', lot_after.collection.catalogue.dataset):
         raise PermissionDenied()
 
     # Determine whether there is a lot before the selected position
@@ -933,7 +933,7 @@ def add_lot_at_end(request, pk):
     :return:
     """
     collection = get_object_or_404(Collection, pk=pk)
-    if request.user.has_perm('catalogues.view_dataset', collection.catalogue.dataset):
+    if not request.user.has_perm('catalogues.change_dataset', collection.catalogue.dataset):
         raise PermissionDenied()
     last_lot = Lot.objects.filter(collection=collection).order_by('-index_in_collection').first()
 
