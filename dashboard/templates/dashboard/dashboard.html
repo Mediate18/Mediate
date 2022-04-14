@@ -197,19 +197,19 @@
                 {% endif %}
 
 
-                {% if perms.catalogues.change_collection_tmp %}
+                {% if perms.catalogues.change_catalogue %}
                 <tr>
                     <td>
-                        <a href="{% url 'collection_tmps' %}">Collection_TMPs</a>
+                        <a href="{% url 'catalogues' %}">Catalogues</a>
                     </td>
                 </tr>
                 {% endif %}
 
 
-                {% if perms.catalogues.change_collection_tmpyear %}
+                {% if perms.catalogues.change_catalogueyear %}
                 <tr>
                     <td>
-                        <a href="{% url 'collection_tmpyears' %}">Collection_TMPYears</a>
+                        <a href="{% url 'catalogueyears' %}">CatalogueYears</a>
                     </td>
                 </tr>
                 {% endif %}
@@ -251,10 +251,10 @@
                 {% endif %}
 
 
-                {% if perms.catalogues.change_personcollection_tmprelation %}
+                {% if perms.catalogues.change_personcataloguerelation %}
                 <tr>
                     <td>
-                        <a href="{% url 'personcollection_tmprelations' %}">PersonCollection_TMPRelations</a>
+                        <a href="{% url 'personcataloguerelations' %}">PersonCatalogueRelations</a>
                     </td>
                 </tr>
                 {% endif %}

@@ -8,7 +8,7 @@ from collections import OrderedDict
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.forms.models import model_to_dict
-from catalogues.models import Collection_TMP, Collection, Lot, Category
+from catalogues.models import Catalogue, Collection, Lot, Category
 from items.models import Item, Edition, BookFormat
 from persons.models import Place
 
@@ -91,9 +91,9 @@ class Command(BaseCommand):
             try:
                 with open(file, 'r', encoding='utf-8') as transcription_file:
                     with transaction.atomic():
-                        collection_tmp = Collection_TMP(name=collection_short_title)
-                        print_obj(collection_tmp)
-                        collection_tmp.save()
+                        catalogue = Catalogue(name=collection_short_title)
+                        print_obj(catalogue)
+                        catalogue.save()
 
                         transcription = transcription_file.read().replace(u'\ufeff', '')
                         transcription_with_field_markers = add_field_marker(transcription)
@@ -117,7 +117,7 @@ class Command(BaseCommand):
                             if "TITLE" in fields:
                                 title = fields["TITLE"]
                                 collection = Collection(short_title=collection_short_title, full_title=title,
-                                                       collection_tmp=collection_tmp)
+                                                       catalogue=catalogue)
                                 print_obj(collection)
                                 collection.save()
                             if "CATEGORY" in fields:

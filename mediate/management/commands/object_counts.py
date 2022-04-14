@@ -3,7 +3,7 @@
 
 Example:
 
-    ./manage.py object_counts collections__Collection_TMP collections__Collection collections__Category collections__Lot \
+    ./manage.py object_counts collections__Catalogue collections__Collection collections__Category collections__Lot \
     persons__Place persons__Person items__Edition items__Item items__Publisher items__BookFormat \
     items__MaterialDetails items__ItemMaterialDetailsRelation
 

@@ -16,7 +16,7 @@ from simplemoderation.tools import moderated
 
 class Dataset(models.Model):
     """
-    The dataset a collection_tmp belongs to
+    The dataset a catalogue belongs to
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("Name"), max_length=128, unique=True)
@@ -26,9 +26,9 @@ class Dataset(models.Model):
 
 
 
-class Collection_TMP(models.Model):
+class Catalogue(models.Model):
     """
-    The collection_tmp a collection belongs to
+    The catalogue a collection belongs to
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("Name"), max_length=128, unique=True)
@@ -38,19 +38,19 @@ class Collection_TMP(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse_lazy('collection_tmp_detail', args=[str(self.uuid)])
+        return reverse_lazy('catalogue_detail', args=[str(self.uuid)])
 
 
-class Collection_TMPYear(models.Model):
+class CatalogueYear(models.Model):
     """
-    The recorded year of a collection_tmp
+    The recorded year of a catalogue
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     year = models.IntegerField(_("Year"))
-    collection_tmp = models.ForeignKey(Collection_TMP, on_delete=models.CASCADE)
+    catalogue = models.ForeignKey(Catalogue, on_delete=models.CASCADE)
 
     def __str__(self):
-        return "{}: {}".format(self.collection_tmp, self.year)
+        return "{}: {}".format(self.catalogue, self.year)
 
 
 class CollectionType(models.Model):
@@ -92,7 +92,7 @@ class Collection(models.Model):
     terminus_post_quem = models.BooleanField(_("Terminus post quem"), default=False)
     notes = models.TextField(_("Notes for the Mediate project"), null=True)
     bibliography = models.TextField(_("Bibliography"), null=True)
-    collection_tmp = models.ForeignKey(Collection_TMP, on_delete=SET_NULL, null=True)
+    catalogue = models.ForeignKey(Catalogue, on_delete=SET_NULL, null=True)
 
     tags = GenericRelation(TaggedEntity, related_query_name='collections')
 
@@ -195,19 +195,19 @@ class Lot(models.Model):
                                   index_in_collection__lte=index_end)
 
 
-class PersonCollection_TMPRelation(models.Model):
+class PersonCatalogueRelation(models.Model):
     """
-    A person-collection_tmp relation (i.e. collector)
+    A person-catalogue relation (i.e. collector)
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     person = models.ForeignKey(Person, on_delete=CASCADE)
-    collection_tmp = models.ForeignKey(Collection_TMP, on_delete=CASCADE)
+    catalogue = models.ForeignKey(Catalogue, on_delete=CASCADE)
 
     class Meta:
-        unique_together = (("person", "collection_tmp"),)  # Multiple identical relation would be redundant
+        unique_together = (("person", "catalogue"),)  # Multiple identical relation would be redundant
 
     def __str__(self):
-        return _("{} is collector of {}").format(self.person, self.collection_tmp)
+        return _("{} is collector of {}").format(self.person, self.catalogue)
 
 
 class PersonCollectionRelationRole(models.Model):

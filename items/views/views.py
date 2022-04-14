@@ -227,7 +227,7 @@ class PersonAndRoleAutocompleteView(AutoResponseView):
         role_query = Q(role__name__icontains=term)
 
         person_item_relations = PersonItemRelation.objects\
-                .filter(item__lot__collection__collection_tmp__dataset__in=get_datasets_for_session(request)) \
+                .filter(item__lot__collection__catalogue__dataset__in=get_datasets_for_session(request)) \
                 .filter(person_query | role_query)\
                 .values('person', 'person__short_name', 'role', 'role__name')\
                 .distinct().order_by('person__short_name')[begin:end]
@@ -350,7 +350,7 @@ class ItemDetailView(PermissionRequiredMixin, DetailView):
     permission_required = 'catalogues.view_dataset'
 
     def get_permission_object(self):
-        return self.get_object().lot.collection.collection_tmp.dataset
+        return self.get_object().lot.collection.catalogue.dataset
     # End permission check
 
 
@@ -362,7 +362,7 @@ class ItemCreateView(CreateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['collection_tmps'] = Collection_TMP.objects.filter(dataset__in=get_datasets_for_session(self.request))
+        kwargs['catalogues'] = Catalogue.objects.filter(dataset__in=get_datasets_for_session(self.request))
         kwargs['lots'] = Lot.objects.filter(collection__in=get_collections_for_session(self.request))
         return kwargs
 
@@ -384,12 +384,12 @@ class ItemUpdateView(PermissionRequiredMixin, UpdateView):
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().lot.collection.collection_tmp.dataset
+        return self.get_object().lot.collection.catalogue.dataset
     # End permission check
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['collection_tmps'] = Collection_TMP.objects.filter(dataset__in=get_datasets_for_session(self.request))
+        kwargs['catalogues'] = Catalogue.objects.filter(dataset__in=get_datasets_for_session(self.request))
         kwargs['lots'] = Lot.objects.filter(collection__in=get_collections_for_session(self.request))
         return kwargs
 
@@ -408,7 +408,7 @@ class ItemDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().lot.collection.collection_tmp.dataset
+        return self.get_object().lot.collection.catalogue.dataset
     # End permission check
 
     def get_success_url(self):
@@ -448,7 +448,7 @@ class ItemAuthorDetailView(PermissionRequiredMixin, DetailView):
     permission_required = 'catalogues.view_dataset'
 
     def get_permission_object(self):
-        return self.get_object().item.lot.collection.collection_tmp.dataset
+        return self.get_object().item.lot.collection.catalogue.dataset
     # End permission check
 
 
@@ -480,7 +480,7 @@ class ItemAuthorUpdateView(PermissionRequiredMixin, UpdateView):
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().item.lot.collection.collection_tmp.dataset
+        return self.get_object().item.lot.collection.catalogue.dataset
     # End permission check
 
     def get_form_kwargs(self):
@@ -503,7 +503,7 @@ class ItemAuthorDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().item.lot.collection.collection_tmp.dataset
+        return self.get_object().item.lot.collection.catalogue.dataset
     # End permission check
 
 
@@ -540,7 +540,7 @@ class ItemItemTypeRelationDetailView(PermissionRequiredMixin, DetailView):
     permission_required = 'catalogues.view_dataset'
 
     def get_permission_object(self):
-        return self.get_object().item.lot.collection.collection_tmp.dataset
+        return self.get_object().item.lot.collection.catalogue.dataset
     # End permission check
 
 
@@ -572,7 +572,7 @@ class ItemItemTypeRelationUpdateView(PermissionRequiredMixin, UpdateView):
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().item.lot.collection.collection_tmp.dataset
+        return self.get_object().item.lot.collection.catalogue.dataset
     # End permission check
 
     def get_form_kwargs(self):
@@ -595,7 +595,7 @@ class ItemItemTypeRelationDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().item.lot.collection.collection_tmp.dataset
+        return self.get_object().item.lot.collection.catalogue.dataset
     # End permission check
 
 
@@ -632,7 +632,7 @@ class ItemLanguageRelationDetailView(PermissionRequiredMixin, DetailView):
     permission_required = 'catalogues.view_dataset'
 
     def get_permission_object(self):
-        return self.get_object().item.lot.collection.collection_tmp.dataset
+        return self.get_object().item.lot.collection.catalogue.dataset
     # End permission check
 
 
@@ -664,7 +664,7 @@ class ItemLanguageRelationUpdateView(PermissionRequiredMixin, UpdateView):
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().item.lot.collection.collection_tmp.dataset
+        return self.get_object().item.lot.collection.catalogue.dataset
     # End permission check
 
     def get_form_kwargs(self):
@@ -687,7 +687,7 @@ class ItemLanguageRelationDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().item.lot.collection.collection_tmp.dataset
+        return self.get_object().item.lot.collection.catalogue.dataset
     # End permission check
 
 
@@ -726,7 +726,7 @@ class ItemMaterialDetailsRelationDetailView(PermissionRequiredMixin, DetailView)
     permission_required = 'catalogues.view_dataset'
 
     def get_permission_object(self):
-        return self.get_object().item.lot.collection.collection_tmp.dataset
+        return self.get_object().item.lot.collection.catalogue.dataset
     # End permission check
 
 
@@ -758,7 +758,7 @@ class ItemMaterialDetailsRelationUpdateView(PermissionRequiredMixin, UpdateView)
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().item.lot.collection.collection_tmp.dataset
+        return self.get_object().item.lot.collection.catalogue.dataset
     # End permission check
 
     def get_form_kwargs(self):
@@ -781,7 +781,7 @@ class ItemMaterialDetailsRelationDeleteView(PermissionRequiredMixin, DeleteView)
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().item.lot.collection.collection_tmp.dataset
+        return self.get_object().item.lot.collection.catalogue.dataset
     # End permission check
 
 
@@ -878,7 +878,7 @@ class ItemWorkRelationDetailView(PermissionRequiredMixin, DetailView):
     permission_required = 'catalogues.view_dataset'
 
     def get_permission_object(self):
-        return self.get_object().item.lot.collection.collection_tmp.dataset
+        return self.get_object().item.lot.collection.catalogue.dataset
     # End permission check
 
 
@@ -910,7 +910,7 @@ class ItemWorkRelationUpdateView(PermissionRequiredMixin, UpdateView):
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().item.lot.collection.collection_tmp.dataset
+        return self.get_object().item.lot.collection.catalogue.dataset
     # End permission check
 
     def get_form_kwargs(self):
@@ -932,7 +932,7 @@ class ItemWorkRelationDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().item.lot.collection.collection_tmp.dataset
+        return self.get_object().item.lot.collection.catalogue.dataset
     # End permission check
 
     def get_success_url(self):
@@ -1019,7 +1019,7 @@ class ItemWorkRelationAddView(PermissionRequiredMixin, UpdateView):
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().lot.collection.collection_tmp.dataset
+        return self.get_object().lot.collection.catalogue.dataset
     # End permission check
 
     def get_success_url(self):
@@ -1227,7 +1227,7 @@ class PersonItemRelationDetailView(PermissionRequiredMixin, DetailView):
     permission_required = 'catalogues.view_dataset'
 
     def get_permission_object(self):
-        return self.get_object().item.lot.collection.collection_tmp.dataset
+        return self.get_object().item.lot.collection.catalogue.dataset
     # End permission check
 
 
@@ -1259,7 +1259,7 @@ class PersonItemRelationUpdateView(PermissionRequiredMixin, UpdateView):
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().item.lot.collection.collection_tmp.dataset
+        return self.get_object().item.lot.collection.catalogue.dataset
     # End permission check
 
     def get_form_kwargs(self):
@@ -1282,7 +1282,7 @@ class PersonItemRelationDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().item.lot.collection.collection_tmp.dataset
+        return self.get_object().item.lot.collection.catalogue.dataset
     # End permission check
 
     def get_success_url(self):
@@ -1304,7 +1304,7 @@ class PersonItemRelationAddView(PermissionRequiredMixin, SingleObjectMixin, Form
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().lot.collection.collection_tmp.dataset
+        return self.get_object().lot.collection.catalogue.dataset
     # End permission check
 
     def get_success_url(self):
@@ -1356,7 +1356,7 @@ def add_person_to_items(request):
                 item = Item.objects.get(uuid=item_id)
                 form_set = PersonItemRelationAddFormSet(data=request.POST)
                 if form_set.is_valid() and 'change_dataset' in \
-                        get_perms(request.user, item.lot.collection.collection_tmp.dataset):
+                        get_perms(request.user, item.lot.collection.catalogue.dataset):
                     for form in form_set:
                         if form.is_valid() and form.has_changed():
                             try:
@@ -1390,7 +1390,7 @@ def set_publication_place_for_items(request):
             if publicationplaceform.is_valid():
                 for item_id in items:
                     item = Item.objects.get(uuid=item_id)
-                    if 'change_dataset' in get_perms(request.user, item.lot.collection.collection_tmp.dataset):
+                    if 'change_dataset' in get_perms(request.user, item.lot.collection.catalogue.dataset):
                         if not item.edition:
                             item.edition = Edition()
                             item.save()
@@ -1420,7 +1420,7 @@ def set_bookformat_for_items(request):
             if itemformatform.is_valid():
                 for item_id in items:
                     item = Item.objects.get(uuid=item_id)
-                    if 'change_dataset' in get_perms(request.user, item.lot.collection.collection_tmp.dataset):
+                    if 'change_dataset' in get_perms(request.user, item.lot.collection.catalogue.dataset):
                         item.book_format = itemformatform.cleaned_data['book_format']
                         item.save()
                     else:
@@ -1447,7 +1447,7 @@ def set_publisher_for_items(request):
             if publisherform.is_valid():
                 for item_id in items:
                     item = Item.objects.get(uuid=item_id)
-                    if 'change_dataset' in get_perms(request.user, item.lot.collection.collection_tmp.dataset):
+                    if 'change_dataset' in get_perms(request.user, item.lot.collection.catalogue.dataset):
                         if not item.edition:
                             item.edition = Edition()
                             item.save()
@@ -1482,7 +1482,7 @@ def add_language_to_items(request):
                 language = Language.objects.get(uuid=language_id)
                 for item_id in items:
                     item = Item.objects.get(uuid=item_id)
-                    if 'change_dataset' in get_perms(request.user, item.lot.collection.collection_tmp.dataset):
+                    if 'change_dataset' in get_perms(request.user, item.lot.collection.catalogue.dataset):
                         try:
                             itemlanguagerelation = ItemLanguageRelation(item=item,
                                                                         language=language)
@@ -1515,7 +1515,7 @@ def add_type_to_items(request):
                 itemtype = ItemType.objects.get(uuid=type_id)
                 for item_id in items:
                     item = Item.objects.get(uuid=item_id)
-                    if 'change_dataset' in get_perms(request.user, item.lot.collection.collection_tmp.dataset):
+                    if 'change_dataset' in get_perms(request.user, item.lot.collection.catalogue.dataset):
                         try:
                             itemitemtyperelation = ItemItemTypeRelation(item=item, type=itemtype)
                             itemitemtyperelation.save()
@@ -1547,7 +1547,7 @@ def add_tags_to_items(request):
                 tag = Tag.objects.get(id=tag_id)
                 for item_id in items:
                     item = Item.objects.get(uuid=item_id)
-                    if 'change_dataset' in get_perms(request.user, item.lot.collection.collection_tmp.dataset):
+                    if 'change_dataset' in get_perms(request.user, item.lot.collection.catalogue.dataset):
                         try:
                             if tag.id not in item.tags.values_list('tag', flat=True):
                                 item.tags.create(tag=tag)
@@ -1580,7 +1580,7 @@ def add_works_to_items(request):
                 work = Work.objects.get(uuid=work_id)
                 for item_id in items:
                     item = Item.objects.get(uuid=item_id)
-                    if 'change_dataset' in get_perms(request.user, item.lot.collection.collection_tmp.dataset):
+                    if 'change_dataset' in get_perms(request.user, item.lot.collection.catalogue.dataset):
                         try:
                             ItemWorkRelation.objects.create(item=item, work=work)
                         except IntegrityError:
@@ -1611,7 +1611,7 @@ def add_materialdetails_to_items(request):
                 material_details = MaterialDetails.objects.get(uuid=material_details_id)
                 for item_id in items:
                     item = Item.objects.get(uuid=item_id)
-                    if 'change_dataset' in get_perms(request.user, item.lot.collection.collection_tmp.dataset):
+                    if 'change_dataset' in get_perms(request.user, item.lot.collection.catalogue.dataset):
                         try:
                             ItemMaterialDetailsRelation.objects.create(item=item, material_details=material_details)
                         except IntegrityError:
@@ -2195,7 +2195,7 @@ class ItemAndEditionCreateView(CreateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['collection_tmps'] = Collection_TMP.objects.filter(dataset__in=get_datasets_for_session(self.request))
+        kwargs['catalogues'] = Catalogue.objects.filter(dataset__in=get_datasets_for_session(self.request))
         kwargs['lots'] = Lot.objects.filter(collection__in=get_collections_for_session(self.request))
         return kwargs
 
@@ -2234,7 +2234,7 @@ class ItemAndEditionUpdateView(PermissionRequiredMixin, ItemAndEditionCreateView
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().lot.collection.collection_tmp.dataset
+        return self.get_object().lot.collection.catalogue.dataset
     # End permission check
 
     def get_context_data(self, **kwargs):
@@ -2249,6 +2249,6 @@ class ItemAndEditionUpdateView(PermissionRequiredMixin, ItemAndEditionCreateView
             'item': self.object,
             'edition': self.object.edition,
         })
-        kwargs['collection_tmps'] = Collection_TMP.objects.filter(dataset__in=get_datasets_for_session(self.request))
+        kwargs['catalogues'] = Catalogue.objects.filter(dataset__in=get_datasets_for_session(self.request))
         kwargs['lots'] = Lot.objects.filter(collection__in=get_collections_for_session(self.request))
         return kwargs

@@ -47,8 +47,8 @@ class DatasetTests(GenericCRUDTestMixin, TestCase):
         pass
 
 
-class Collection_TMPTests(GenericCRUDTestMixin, TestCase):
-    model = Collection_TMP
+class CatalogueTests(GenericCRUDTestMixin, TestCase):
+    model = Catalogue
 
     def get_add_form_data(self):
         dataset, created = Dataset.objects.get_or_create(**DatasetTests().get_add_form_data())
@@ -69,7 +69,7 @@ class CollectionTests(GenericCRUDTestMixin, TestCase):
     def get_add_form_data(self):
         source_material, created = SourceMaterial.objects.get_or_create(name="source_material test")
         transcription, created = Transcription.objects.get_or_create(source_material=source_material, curator="curator test")
-        collection_tmp, created = Collection_TMP.objects.get_or_create(**Collection_TMPTests().get_add_form_data())
+        catalogue, created = Catalogue.objects.get_or_create(**CatalogueTests().get_add_form_data())
         return {
             'transcription_id': transcription.pk,
             'short_title': 'short_title test1',
@@ -77,7 +77,7 @@ class CollectionTests(GenericCRUDTestMixin, TestCase):
             'preface_and_paratexts': 'preface_and_paratexts test',
             'year_of_publication': 1666,
             'bibliography': 'bibliography test',
-            'collection_tmp_id': collection_tmp.pk
+            'catalogue_id': catalogue.pk
         }
 
     def get_change_form_data(self):
@@ -131,14 +131,14 @@ class CollectionTests(GenericCRUDTestMixin, TestCase):
         self.assertTrue(object_exists_in_database(edition2))
 
 
-class Collection_TMPYearTests(GenericCRUDTestMixin, TestCase):
-    model = Collection_TMPYear
+class CatalogueYearTests(GenericCRUDTestMixin, TestCase):
+    model = CatalogueYear
 
     def get_add_form_data(self):
-        collection_tmp, created = Collection_TMP.objects.get_or_create(**Collection_TMPTests().get_add_form_data())
+        catalogue, created = Catalogue.objects.get_or_create(**CatalogueTests().get_add_form_data())
         return {
             'year': 1666,
-            'collection_tmp': collection_tmp
+            'catalogue': catalogue
         }
 
     def get_change_form_data(self):
@@ -258,15 +258,15 @@ class LotTests(GenericCRUDTestMixin, TestCase):
         }
 
 
-class PersonCollection_TMPRelationTests(GenericCRUDTestMixin, TestCase):
-    model = PersonCollection_TMPRelation
+class PersonCatalogueRelationTests(GenericCRUDTestMixin, TestCase):
+    model = PersonCatalogueRelation
 
     def get_add_form_data(self):
         person, created = Person.objects.get_or_create(**PersonTests().get_add_form_data())
-        collection_tmp, created = Collection_TMP.objects.get_or_create(**Collection_TMPTests().get_add_form_data())
+        catalogue, created = Catalogue.objects.get_or_create(**CatalogueTests().get_add_form_data())
         return {
             'person_id': person.pk,
-            'collection_tmp_id': collection_tmp.pk
+            'catalogue_id': catalogue.pk
         }
 
     def get_change_form_data(self):
@@ -277,7 +277,7 @@ class PersonCollection_TMPRelationTests(GenericCRUDTestMixin, TestCase):
         }
 
     def test_Detail(self):
-        """TODO: add a PersonCollection_TMPRelation detail template"""
+        """TODO: add a PersonCatalogueRelation detail template"""
         pass
 
 

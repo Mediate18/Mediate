@@ -20,15 +20,15 @@ class BookFormatModelForm(forms.ModelForm):
 
 class ItemModelForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        self.collection_tmps = kwargs.pop('collection_tmps', None)
+        self.catalogues = kwargs.pop('catalogues', None)
         self.lots = kwargs.pop('lots', None)
         super().__init__(*args, **kwargs)
 
-        if self.collection_tmps:
-            self.fields['collection_tmp'] = forms.ModelChoiceField(
-                queryset=self.collection_tmps,
+        if self.catalogues:
+            self.fields['catalogue'] = forms.ModelChoiceField(
+                queryset=self.catalogues,
                 widget=ModelSelect2Widget(
-                    queryset=self.collection_tmps,
+                    queryset=self.catalogues,
                     search_fields=['name__icontains'],
                 ),
             )
@@ -116,7 +116,7 @@ class ItemModelForm(forms.ModelForm):
         model = Item
         fields = "__all__"
         widgets = {
-            'collection_tmp': Select2Widget,
+            'catalogue': Select2Widget,
             'lot': ModelSelect2Widget(
                 model=Lot,
                 search_fields=['lot_as_listed_in_collection__icontains']
@@ -651,18 +651,18 @@ class ItemAndEditionForm(MultiModelForm):
     ])
 
     def __init__(self, *args, **kwargs):
-        self.collection_tmps = kwargs.pop('collection_tmps', None)
+        self.catalogues = kwargs.pop('catalogues', None)
         self.lots = kwargs.pop('lots', None)
         super().__init__(*args, **kwargs)
 
         fields = self.fields
         d = self.__dict__
 
-        if self.collection_tmps:
-            self.forms['item'].fields['collection_tmp'] = forms.ModelChoiceField(
-                queryset=self.collection_tmps,
+        if self.catalogues:
+            self.forms['item'].fields['catalogue'] = forms.ModelChoiceField(
+                queryset=self.catalogues,
                 widget=ModelSelect2Widget(
-                    queryset=self.collection_tmps,
+                    queryset=self.catalogues,
                     search_fields=['name__icontains'],
                 ),
             )

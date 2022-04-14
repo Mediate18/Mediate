@@ -169,25 +169,25 @@ class CollectionCollectionTypeRelationFilter(django_filters.FilterSet):
         exclude = ['uuid']
 
 
-# Collection_TMP filter
-class Collection_TMPFilter(django_filters.FilterSet):
+# Catalogue filter
+class CatalogueFilter(django_filters.FilterSet):
     name = django_filters.Filter(lookup_expr='icontains')
 
     class Meta:
-        model = Collection_TMP
+        model = Catalogue
         fields = ['name', 'dataset']
 
 
-# Collection_TMPYear filter
-class Collection_TMPYearFilter(django_filters.FilterSet):
+# CatalogueYear filter
+class CatalogueYearFilter(django_filters.FilterSet):
     year = django_filters.RangeFilter(widget=django_filters.widgets.RangeWidget())
-    collection_tmp = django_filters.ModelMultipleChoiceFilter(
-        queryset=Collection_TMP.objects.all(),
+    catalogue = django_filters.ModelMultipleChoiceFilter(
+        queryset=Catalogue.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
 
     class Meta:
-        model = Collection_TMPYear
+        model = CatalogueYear
         exclude = ['uuid']
 
 
@@ -254,19 +254,19 @@ class PersonCollectionRelationRoleFilter(django_filters.FilterSet):
         exclude = ['uuid']
 
 
-# PersonCollection_TMPRelation filter
-class PersonCollection_TMPRelationFilter(django_filters.FilterSet):
+# PersonCatalogueRelation filter
+class PersonCatalogueRelationFilter(django_filters.FilterSet):
     person = django_filters.ModelMultipleChoiceFilter(
         queryset=Person.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
-    collection_tmp = django_filters.ModelMultipleChoiceFilter(
-        queryset=Collection_TMP.objects.all(),
+    catalogue = django_filters.ModelMultipleChoiceFilter(
+        queryset=Catalogue.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
     )
 
     class Meta:
-        model = PersonCollection_TMPRelation
+        model = PersonCatalogueRelation
         exclude = ['uuid']
 
 

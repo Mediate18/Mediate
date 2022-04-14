@@ -12,8 +12,8 @@ class CollectionModelForm(forms.ModelForm):
         model = Collection
         fields = "__all__"
         widgets = {
-            'collection_tmp': ModelSelect2Widget(
-                queryset=Collection_TMP.objects.all(),
+            'catalogue': ModelSelect2Widget(
+                queryset=Catalogue.objects.all(),
                 search_fields=['name__icontains'],
             ),
             'transcription': Select2Widget,
@@ -24,10 +24,10 @@ class CollectionModelForm(forms.ModelForm):
         super().__init__(**kwargs)
 
         if self.datasets:
-            self.fields['collection_tmp'] = forms.ModelChoiceField(
-                queryset=Collection_TMP.objects.filter(dataset__in=self.datasets),
+            self.fields['catalogue'] = forms.ModelChoiceField(
+                queryset=Catalogue.objects.filter(dataset__in=self.datasets),
                 widget=ModelSelect2Widget(
-                    queryset=Collection_TMP.objects.filter(dataset__in=self.datasets),
+                    queryset=Catalogue.objects.filter(dataset__in=self.datasets),
                     search_fields=['name__icontains'],
                 ),
             )
@@ -171,9 +171,9 @@ class CollectionCollectionTypeRelationModelForm(forms.ModelForm):
             )
 
 
-class Collection_TMPModelForm(forms.ModelForm):
+class CatalogueModelForm(forms.ModelForm):
     class Meta:
-        model = Collection_TMP
+        model = Catalogue
         fields = "__all__"
 
     def __init__(self, *args, **kwargs):
@@ -190,9 +190,9 @@ class Collection_TMPModelForm(forms.ModelForm):
             )
 
 
-class Collection_TMPYearModelForm(forms.ModelForm):
+class CatalogueYearModelForm(forms.ModelForm):
     class Meta:
-        model = Collection_TMPYear
+        model = CatalogueYear
         fields = "__all__"
 
 
@@ -264,9 +264,9 @@ class PersonCollectionRelationRoleModelForm(forms.ModelForm):
         fields = "__all__"
 
 
-class PersonCollection_TMPRelationModelForm(forms.ModelForm):
+class PersonCatalogueRelationModelForm(forms.ModelForm):
     class Meta:
-        model = PersonCollection_TMPRelation
+        model = PersonCatalogueRelation
         fields = "__all__"
         widgets = {
             'person': ModelSelect2Widget(
@@ -276,14 +276,14 @@ class PersonCollection_TMPRelationModelForm(forms.ModelForm):
         }
 
     def __init__(self, **kwargs):
-        self.collection_tmps = kwargs.pop('collection_tmps', None)
+        self.catalogues = kwargs.pop('catalogues', None)
         super().__init__(**kwargs)
 
-        if self.collection_tmps:
-            self.fields['collection_tmp'] = forms.ModelChoiceField(
-                queryset=self.collection_tmps,
+        if self.catalogues:
+            self.fields['catalogue'] = forms.ModelChoiceField(
+                queryset=self.catalogues,
                 widget=ModelSelect2Widget(
-                    queryset=self.collection_tmps,
+                    queryset=self.catalogues,
                     search_fields=['name__icontains'],
                 ),
             )

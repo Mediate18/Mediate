@@ -28,18 +28,18 @@ class Command(BaseCommand):
         # Optional
         parser.add_argument('-c', '--collection_ids_filename', type=str,
                             help='Path to a list of collection IDs to process (one ID per line)')
-        parser.add_argument('-m', '--multiple_collections_per_collection_tmp',
+        parser.add_argument('-m', '--multiple_collections_per_catalogue',
                             action='store_true',
-                            help='Allow for multiple collections per collection_tmp')
+                            help='Allow for multiple collections per catalogue')
         parser.add_argument('-d', '--dataset_name', type=str,
-                            help='Name of the dataset the collection_tmp/collection must put into')
+                            help='Name of the dataset the catalogue/collection must put into')
 
     @transaction.atomic
     def handle(self, *args, **kwargs):
         # Get the command line arguments
         database_path = kwargs['database_path']
         collection_ids_filename = kwargs['collection_ids_filename']
-        self.multiple_collections_per_collection_tmp = kwargs.get('multiple_collections_per_collection_tmp', False)
+        self.multiple_collections_per_catalogue = kwargs.get('multiple_collections_per_catalogue', False)
         self.dataset_name = kwargs.get('dataset_name', "Dump")
 
         # Read collection IDs
@@ -123,7 +123,7 @@ class Command(BaseCommand):
                 insert_fields = {
                     'short_title': short_title[:128],
                     'lot': lot,
-                    'collection_tmp': lot.collection.collection_tmp,
+                    'catalogue': lot.collection.catalogue,
                     'number_of_volumes': row['number_of_volumes'],
                     'book_format': book_format,
                     'index_in_lot': row['index_in_lot'],
@@ -222,17 +222,17 @@ class Command(BaseCommand):
             }
 
             try:
-                # Only use a collection_tmp that is new or that does not have any collections linked to it.
-                collection_tmp, created = collections.models.Collection_TMP.objects.get_or_create(name=row['short_title'])
+                # Only use a catalogue that is new or that does not have any collections linked to it.
+                catalogue, created = collections.models.Catalogue.objects.get_or_create(name=row['short_title'])
                 if created:
-                    collection_tmp.dataset = collections.models.Dataset.objects.get(name=self.dataset_name)
-                    collection_tmp.save()
+                    catalogue.dataset = collections.models.Dataset.objects.get(name=self.dataset_name)
+                    catalogue.save()
                 else:
-                    if collection_tmp.collection_set.count() != 0 and not self.multiple_collections_per_collection_tmp:
-                        raise Exception("Collection_TMP {} already exists and has collections linked to.".format(collection_tmp))
+                    if catalogue.collection_set.count() != 0 and not self.multiple_collections_per_catalogue:
+                        raise Exception("Catalogue {} already exists and has collections linked to.".format(catalogue))
 
                 collection = collections.models.Collection(**insert_fields)
-                collection.collection_tmp = collection_tmp
+                collection.catalogue = catalogue
                 collection.save()
                 self.create_lots(collection, row['id'], cursor)
             except Exception as e:

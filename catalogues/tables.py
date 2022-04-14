@@ -134,12 +134,12 @@ class CollectionCollectionTypeRelationTable(tables.Table):
         ]
 
 
-# Collection_TMP table
-class Collection_TMPTable(tables.Table):
-    uuid = ActionColumn('collection_tmp_detail', 'change_collection_tmp', 'delete_collection_tmp', orderable=False)
+# Catalogue table
+class CatalogueTable(tables.Table):
+    uuid = ActionColumn('catalogue_detail', 'change_catalogue', 'delete_catalogue', orderable=False)
 
     class Meta:
-        model = Collection_TMP
+        model = Catalogue
         attrs = {'class': 'table table-sortable'}
         sequence = [
             'name',
@@ -148,15 +148,15 @@ class Collection_TMPTable(tables.Table):
         ]
 
 
-# Collection_TMPYear table
-class Collection_TMPYearTable(tables.Table):
-    uuid = ActionColumn('collection_tmpyear_detail', 'change_collection_tmpyear', 'delete_collection_tmpyear', orderable=False)
+# CatalogueYear table
+class CatalogueYearTable(tables.Table):
+    uuid = ActionColumn('catalogueyear_detail', 'change_catalogueyear', 'delete_catalogueyear', orderable=False)
 
     class Meta:
-        model = Collection_TMPYear
+        model = CatalogueYear
         attrs = {'class': 'table table-sortable'}
         sequence = [
-            'collection_tmp',
+            'catalogue',
             'year',
             'uuid'
         ]
@@ -225,17 +225,17 @@ class PersonCollectionRelationRoleTable(tables.Table):
         ]
 
 
-# PersonCollection_TMPRelation table
-class PersonCollection_TMPRelationTable(tables.Table):
-    uuid = ActionColumn('personcollection_tmprelation_detail', 'change_personcollection_tmprelation',
-                        'delete_personcollection_tmprelation', orderable=False)
+# PersonCatalogueRelation table
+class PersonCatalogueRelationTable(tables.Table):
+    uuid = ActionColumn('personcataloguerelation_detail', 'change_personcataloguerelation',
+                        'delete_personcataloguerelation', orderable=False)
 
     class Meta:
-        model = PersonCollection_TMPRelation
+        model = PersonCatalogueRelation
         attrs = {'class': 'table table-sortable'}
         sequence = [
             'person',
-            'collection_tmp',
+            'catalogue',
             'uuid'
         ]
 
