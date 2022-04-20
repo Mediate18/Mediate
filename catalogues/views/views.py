@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 from django.utils.html import format_html
+from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
@@ -40,7 +41,7 @@ def get_catalogues_for_session(request, extra_catalogue=None):
 # Catalogue views
 class CatalogueTableView(ListView):
     model = Catalogue
-    template_name = 'catalogue_list.html'
+    template_name = 'generic_list.html'
 
     def get_queryset(self):
         return get_catalogues_for_session(self.request).distinct()
@@ -62,6 +63,23 @@ class CatalogueTableView(ListView):
         context['map_url'] = reverse_lazy('cataloguesmap')
 
         context['per_page_choices'] = [10, 25, 50, 100]
+
+        context['url_params'] = self.request.GET.urlencode()
+        context['statistics_url'] = reverse_lazy('catalogue_statistics')
+
+        return context
+
+
+class CatalogueStatisticsView(TemplateView):
+    template_name = 'generic_statistics.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['chart_url'] = reverse_lazy('get_catalogue_chart')
+        filter = CatalogueFilter(self.request.GET, queryset=get_catalogues_for_session(self.request).distinct())
+
+        context['filter'] = filter
+        context['object_name'] = "catalogue"
 
         context['url_params'] = self.request.GET.urlencode()
 
