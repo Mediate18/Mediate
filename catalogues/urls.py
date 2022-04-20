@@ -27,6 +27,8 @@ urlpatterns = [
     path(r'previouslot/<uuid:pk>/<int:index>', permission_required('global.view_all')(previous_lot_view),
          name='get_previous_lot'),
 
+    path(r'catalogues/chart', permission_required('global.view_all')(get_catalogues_chart), name='get_catalogue_chart'),
+
 
     # CatalogueHeldBy urls
     path('catalogueheldbys/', permission_required('global.view_all')(CatalogueHeldByTableView.as_view()), name='catalogueheldbys'),

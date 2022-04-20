@@ -1,0 +1,74 @@
+{% load i18n %}
+
+
+<div>
+    <span>{% trans "Total number of items:" %} {{ item_count_total }}</span> |
+    <span>{% trans "Items without a date:" %} {{ item_count_without_year }}</span> |
+    <span>{% trans "Number of items in the plot:" %} {{ item_count_in_plot }} ({{ item_percentage_in_plot }}% of total number of items)</span>
+    <span class="glyphicon glyphicon-info-sign" title="{% blocktrans %}Only items with a publication year lower or equal to the maximum publication year of all catalogues ({{ max_publication_year }}) are used. {% endblocktrans %}"></span>
+</div>
+<div class="item_count_per_decade">
+    <div id="item_count_per_decade__chart"></div>
+</div>
+<div class="pull-right">
+    <span class="glyphicon glyphicon-exclamation-sign"></span>
+    <span><small>Please note that when the publication date is a date range, only the start of the range is shown in this diagram.</small></span>
+</div>
+
+
+<script type="text/javascript">
+    var extra_data = {{ extra_data|safe }};
+    var item_count_in_plot = {{ item_count_in_plot }};
+
+    var data = ['number of items'];
+    extra_data['item_count_per_decade'].forEach(function(el) { data.push(el['count']) });
+    var x = ['x']
+    extra_data['item_count_per_decade'].forEach(function(el) { x.push(el['decade']) });
+
+    var chart = c3.generate({
+        bindto: '#item_count_per_decade__chart',
+        data: {
+            x: 'x',
+            columns: [
+                x,
+                data
+            ],
+            type: 'bar'
+        },
+        bar: {
+            width: {
+                ratio: 0.5,
+                max: 40
+            }
+        },
+        tooltip: {
+            format: {
+                title: function(d) {
+                    // range of begin year to end year
+                    return d + '-' + (d + 9);
+                },
+                value: function(value, ratio, id) {
+                    // value and percentage
+                    percentage = (100 * value / item_count_in_plot);
+                    if(percentage < 0.01) {
+                        percentage = percentage.toFixed(5);
+                    } else {
+                        percentage = percentage.toFixed(2);
+                    }
+                    return value + ' (' + percentage + '%)';
+                }
+            },
+        },
+        axis: {
+            y: {
+                tick: {
+                    format: function (d) {
+                        // integers only
+                        return (parseInt(d) == d) ? d : null;
+                    }
+                },
+            }
+        }
+    });
+
+</script>

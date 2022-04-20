@@ -6,7 +6,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 from django.db.models import Count, Min, Max, Q
 from django.db.models.functions import Substr, Length
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 
@@ -59,36 +59,49 @@ class CatalogueTableView(ListView):
         context['object_name'] = "catalogue"
         context['add_url'] = reverse_lazy('add_catalogue')
 
-        # Extra data, used for e.g. charts
-        max_publication_year = get_catalogues_for_session(self.request).aggregate(Max('lot__catalogue__year_of_publication'))['lot__catalogue__year_of_publication__max']
-        if not max_publication_year:
-            max_publication_year = 0
-        context['max_publication_year'] = max_publication_year
-
-        item_count_per_decade = Item.objects\
-            .filter(lot__catalogue__in=filter.qs, edition__year_start__lte=max_publication_year)\
-            .annotate(decade=10 * Substr('edition__year_start', 1, Length('edition__year_start') - 1))\
-            .values('decade')\
-            .order_by('decade')\
-            .annotate(count=Count('decade'))
-        extra_data = {
-            'item_count_per_decade': list(item_count_per_decade)
-        }
-        context['extra_data'] = json.dumps(extra_data)
-
-        item_count_total = Item.objects.filter(lot__catalogue__in=filter.qs).count()
-        context['item_count_total'] = item_count_total
-        item_count_without_year = Item.objects.filter(lot__catalogue__in=filter.qs, edition__year_start__isnull=True).count()
-        context['item_count_without_year'] = item_count_without_year
-        item_count_in_plot = Item.objects.filter(lot__catalogue__in=filter.qs, edition__year_start__lte=max_publication_year).count()
-        context['item_count_in_plot'] = item_count_in_plot
-        context['item_percentage_in_plot'] = int(100 * item_count_in_plot / item_count_total) if item_count_total != 0 else 0
-
         context['map_url'] = reverse_lazy('cataloguesmap')
 
         context['per_page_choices'] = [10, 25, 50, 100]
 
+        context['url_params'] = self.request.GET.urlencode()
+
         return context
+
+
+def get_catalogues_chart(request):
+    context = {}
+    filter = CatalogueFilter(request.GET, queryset=get_catalogues_for_session(request).distinct())
+
+    max_publication_year = \
+    get_catalogues_for_session(request).aggregate(Max('lot__catalogue__year_of_publication'))[
+        'lot__catalogue__year_of_publication__max']
+    if not max_publication_year:
+        max_publication_year = 0
+    context['max_publication_year'] = max_publication_year
+
+    item_count_per_decade = Item.objects \
+        .filter(lot__catalogue__in=filter.qs, edition__year_start__lte=max_publication_year) \
+        .annotate(decade=10 * Substr('edition__year_start', 1, Length('edition__year_start') - 1)) \
+        .values('decade') \
+        .order_by('decade') \
+        .annotate(count=Count('decade'))
+    extra_data = {
+        'item_count_per_decade': list(item_count_per_decade)
+    }
+    context['extra_data'] = json.dumps(extra_data)
+
+    item_count_total = Item.objects.filter(lot__catalogue__in=filter.qs).count()
+    context['item_count_total'] = item_count_total
+    item_count_without_year = Item.objects.filter(lot__catalogue__in=filter.qs,
+                                                  edition__year_start__isnull=True).count()
+    context['item_count_without_year'] = item_count_without_year
+    item_count_in_plot = Item.objects.filter(lot__catalogue__in=filter.qs,
+                                             edition__year_start__lte=max_publication_year).count()
+    context['item_count_in_plot'] = item_count_in_plot
+    context['item_percentage_in_plot'] = int(
+        100 * item_count_in_plot / item_count_total) if item_count_total != 0 else 0
+
+    return render(request, 'catalogues/catalogue_chart.html', context=context)
 
 
 class CatalogueLocationMapView(ListView):
