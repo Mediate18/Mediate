@@ -30,6 +30,8 @@ urlpatterns = [
     path(r'catalogues/statistics', permission_required('global.view_all')(CatalogueStatisticsView.as_view()),
          name='catalogue_statistics'),
     path(r'catalogues/chart', permission_required('global.view_all')(get_catalogues_chart), name='get_catalogue_chart'),
+    path(r'catalogues/country_chart', permission_required('global.view_all')(get_catalogue_country_chart),
+         name='get_catalogue_country_chart'),
 
 
     # CatalogueHeldBy urls

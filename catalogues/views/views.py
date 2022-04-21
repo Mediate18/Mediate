@@ -87,6 +87,10 @@ class CatalogueStatisticsView(TemplateView):
             {
                 'title': _('Number of items per decade'),
                 'url': reverse_lazy('get_catalogue_chart')
+            },
+            {
+                'title': _('Countries'),
+                'url': reverse_lazy('get_catalogue_country_chart')
             }
         ]
 
@@ -127,6 +131,28 @@ def get_catalogues_chart(request):
         100 * item_count_in_plot / item_count_total) if item_count_total != 0 else 0
 
     return render(request, 'catalogues/catalogue_chart.html', context=context)
+
+
+def get_catalogue_country_chart(request):
+    context = {}
+    filter = CatalogueFilter(request.GET, queryset=get_catalogues_for_session(request).distinct())
+
+    max_publication_year = \
+        get_catalogues_for_session(request).aggregate(Max('lot__catalogue__year_of_publication'))[
+            'lot__catalogue__year_of_publication__max']
+    if not max_publication_year:
+        max_publication_year = 0
+
+    item_count_per_country = [ [country['name'], country['item_count'] ] for country in
+        Country.objects \
+            .filter(place__edition__items__lot__catalogue__in=filter.qs,
+                    place__edition__year_start__lte=max_publication_year) \
+            .annotate(item_count=Count('place__edition__items'))\
+            .values('name', 'item_count')
+    ]
+    context['item_count_per_country'] = json.dumps(item_count_per_country)
+
+    return render(request, 'catalogues/catalogue_country_chart.html', context=context)
 
 
 class CatalogueLocationMapView(ListView):
