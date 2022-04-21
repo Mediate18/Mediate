@@ -83,6 +83,13 @@ class CatalogueStatisticsView(TemplateView):
 
         context['url_params'] = self.request.GET.urlencode()
 
+        context['charts'] = [
+            {
+                'title': _('Number of items per decade'),
+                'url': reverse_lazy('get_catalogue_chart')
+            }
+        ]
+
         return context
 
 

@@ -56,12 +56,15 @@
 <div class="row">
     <div class="col-xs-12">
 
-        <h3>Number of items per decade</h3>
-        <div hx-get="{% url 'get_catalogue_chart'  %}?{{ url_params }}" hx-trigger="load">
-            <img  alt="Loading..." class="htmx-indicator" width="20" src="/static/img/oval.svg"/>
-            {% trans 'Loading...' %}
-        </div>
+        {% for chart in charts %}
 
+            <h3>{{ chart.title }}</h3>
+            <div hx-get="{{ chart.url }}?{{ url_params }}" hx-trigger="load">
+                <img  alt="Loading..." class="htmx-indicator" width="20" src="/static/img/oval.svg"/>
+                {% trans 'Loading...' %}
+            </div>
+
+        {% endfor %}
 
     </div>
 </div>
