@@ -156,6 +156,7 @@ def get_catalogue_country_chart(request):
             .filter(place__edition__items__lot__catalogue__in=filter.qs,
                     place__edition__year_start__lte=max_publication_year) \
             .annotate(item_count=Count('place__edition__items'))\
+            .order_by('-item_count')\
             .values('name', 'item_count')
     ]
     context['item_count_per_country'] = json.dumps(item_count_per_country)
@@ -177,6 +178,7 @@ def get_catalogue_language_chart(request):
     languages = languages.filter(items__item__lot__catalogue__in=filter.qs,
                          items__item__edition__year_start__lte=max_publication_year)
     languages = languages.annotate(item_count=Count('items__item'))
+    languages = languages.order_by('-item_count')
     languages = languages.values('name', 'item_count')
 
     context['item_count_per_language'] = [ [language['name'], language['item_count']] for language in languages]
@@ -198,6 +200,7 @@ def get_catalogue_parisian_category_chart(request):
     parisian_categories = parisian_categories.annotate(item_count=Count('category__lot__item',
                                                                         Q(category__lot__item__edition__year_start__lte=
                                                                           max_publication_year)))
+    parisian_categories = parisian_categories.order_by('-item_count')
     parisian_categories = parisian_categories.values('name', 'item_count')
 
     context['item_count_per_parisian_category'] = [ [language['name'], language['item_count']]
