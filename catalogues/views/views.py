@@ -89,7 +89,7 @@ class CatalogueStatisticsView(TemplateView):
                 'url': reverse_lazy('get_catalogue_chart')
             },
             {
-                'title': _('Number of items per country'),
+                'title': _('Number of items per country (stated place of publication, including false imprints)'),
                 'url': reverse_lazy('get_catalogue_country_chart')
             },
             {
