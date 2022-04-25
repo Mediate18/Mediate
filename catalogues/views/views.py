@@ -97,7 +97,7 @@ class CatalogueStatisticsView(TemplateView):
                 'url': reverse_lazy('get_catalogue_language_chart')
             },
             {
-                'title': _('Number of items per parisian category'),
+                'title': _('Number of items per Parisian category'),
                 'url': reverse_lazy('get_catalogue_parisian_category_chart')
             }
         ]
