@@ -170,8 +170,8 @@ def get_catalogue_language_chart(request):
         max_publication_year = 0
 
     languages = Language.objects.all()
-    languages = languages.filter(items__item__lot__catalogue__collection__dataset__name='Sandbox',
-                         items__item__edition__year_start__lte=1830)
+    languages = languages.filter(items__item__lot__catalogue__in=filter.qs,
+                         items__item__edition__year_start__lte=max_publication_year)
     languages = languages.annotate(item_count=Count('items__item'))
     languages = languages.values('name', 'item_count')
 
