@@ -25,7 +25,7 @@ from ..filters import *
 from ..models import *
 from catalogues.tools import get_datasets_for_session, get_dataset_for_anonymoususer
 
-from items.models import Item, Edition
+from items.models import Item, Edition, Language
 import json
 
 import django_tables2
@@ -89,8 +89,12 @@ class CatalogueStatisticsView(TemplateView):
                 'url': reverse_lazy('get_catalogue_chart')
             },
             {
-                'title': _('Countries'),
+                'title': _('Number of items per country'),
                 'url': reverse_lazy('get_catalogue_country_chart')
+            },
+            {
+                'title': _('Number of items per language'),
+                'url': reverse_lazy('get_catalogue_language_chart')
             }
         ]
 
@@ -153,6 +157,27 @@ def get_catalogue_country_chart(request):
     context['item_count_per_country'] = json.dumps(item_count_per_country)
 
     return render(request, 'catalogues/catalogue_country_chart.html', context=context)
+
+
+def get_catalogue_language_chart(request):
+    context = {}
+    filter = CatalogueFilter(request.GET, queryset=get_catalogues_for_session(request).distinct())
+
+    max_publication_year = \
+        get_catalogues_for_session(request).aggregate(Max('lot__catalogue__year_of_publication'))[
+            'lot__catalogue__year_of_publication__max']
+    if not max_publication_year:
+        max_publication_year = 0
+
+    languages = Language.objects.all()
+    languages = languages.filter(items__item__lot__catalogue__collection__dataset__name='Sandbox',
+                         items__item__edition__year_start__lte=1830)
+    languages = languages.annotate(item_count=Count('items__item'))
+    languages = languages.values('name', 'item_count')
+
+    context['item_count_per_language'] = [ [language['name'], language['item_count']] for language in languages]
+
+    return render(request, 'catalogues/catalogue_language_chart.html', context=context)
 
 
 class CatalogueLocationMapView(ListView):

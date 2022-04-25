@@ -1,0 +1,20 @@
+{% load i18n %}
+
+
+<div class="item_count_per_language">
+    <div id="item_count_per_language__chart"></div>
+</div>
+
+
+<script type="text/javascript">
+    var data = {{ item_count_per_language|safe }};
+
+    var chart = c3.generate({
+        bindto: '#item_count_per_language__chart',
+        data: {
+            columns: data,
+            type: 'pie'
+        },
+    });
+
+</script>
