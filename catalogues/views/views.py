@@ -95,6 +95,10 @@ class CatalogueStatisticsView(TemplateView):
             {
                 'title': _('Number of items per language'),
                 'url': reverse_lazy('get_catalogue_language_chart')
+            },
+            {
+                'title': _('Number of items per parisian category'),
+                'url': reverse_lazy('get_catalogue_parisian_category_chart')
             }
         ]
 
@@ -178,6 +182,29 @@ def get_catalogue_language_chart(request):
     context['item_count_per_language'] = [ [language['name'], language['item_count']] for language in languages]
 
     return render(request, 'catalogues/catalogue_language_chart.html', context=context)
+
+
+def get_catalogue_parisian_category_chart(request):
+    context = {}
+    filter = CatalogueFilter(request.GET, queryset=get_catalogues_for_session(request).distinct())
+
+    max_publication_year = \
+        get_catalogues_for_session(request).aggregate(Max('lot__catalogue__year_of_publication'))[
+            'lot__catalogue__year_of_publication__max']
+    if not max_publication_year:
+        max_publication_year = 0
+
+    parisian_categories = ParisianCategory.objects.filter(category__lot__catalogue__in=filter.qs)
+    parisian_categories = parisian_categories.annotate(item_count=Count('category__lot__item',
+                                                                        Q(category__lot__item__edition__year_start__lte=
+                                                                          max_publication_year)))
+    parisian_categories = parisian_categories.values('name', 'item_count')
+
+    context['item_count_per_parisian_category'] = [ [language['name'], language['item_count']]
+                                                    for language in parisian_categories]
+
+    return render(request, 'catalogues/catalogue_parisian_category_chart.html', context=context)
+
 
 
 class CatalogueLocationMapView(ListView):
