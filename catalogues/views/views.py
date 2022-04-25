@@ -153,9 +153,10 @@ def get_catalogue_country_chart(request):
 
     item_count_per_country = [ [country['name'], country['item_count'] ] for country in
         Country.objects \
-            .filter(place__edition__items__lot__catalogue__in=filter.qs,
-                    place__edition__year_start__lte=max_publication_year) \
-            .annotate(item_count=Count('place__edition__items'))\
+            .filter(place__edition__items__lot__catalogue__in=filter.qs) \
+            .annotate(item_count=Count('place__edition__items',
+                                       Q(place__edition__year_start__lte=
+                                         max_publication_year)))\
             .order_by('-item_count')\
             .values('name', 'item_count')
     ]
@@ -175,9 +176,10 @@ def get_catalogue_language_chart(request):
         max_publication_year = 0
 
     languages = Language.objects.all()
-    languages = languages.filter(items__item__lot__catalogue__in=filter.qs,
-                         items__item__edition__year_start__lte=max_publication_year)
-    languages = languages.annotate(item_count=Count('items__item'))
+    languages = languages.filter(items__item__lot__catalogue__in=filter.qs)
+    languages = languages.annotate(item_count=Count('items__item',
+                                                    Q(items__item__edition__year_start__lte=
+                                                      max_publication_year)))
     languages = languages.order_by('-item_count')
     languages = languages.values('name', 'item_count')
 
