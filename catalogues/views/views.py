@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
-from django.utils.html import format_html
+from django.utils.html import format_html, escape
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -146,7 +146,6 @@ def get_catalogues_chart(request):
 
 
 def get_catalogue_country_chart(request):
-    context = {}
     filter = CatalogueFilter(request.GET, queryset=get_catalogues_for_session(request).distinct())
 
     max_publication_year = \
@@ -155,7 +154,7 @@ def get_catalogue_country_chart(request):
     if not max_publication_year:
         max_publication_year = 0
 
-    item_count_per_country = [ [country['name'], country['item_count'] ] for country in
+    item_count_per_country = [ [escape(country['name']), country['item_count'] ] for country in
         Country.objects \
             .filter(place__edition__items__lot__catalogue__in=filter.qs) \
             .annotate(item_count=Count('place__edition__items',
@@ -164,13 +163,14 @@ def get_catalogue_country_chart(request):
             .order_by('-item_count')\
             .values('name', 'item_count')
     ]
-    context['item_count_per_country'] = json.dumps(item_count_per_country)
+    context = {
+        'item_count_per_country': json.dumps(item_count_per_country)
+    }
 
     return render(request, 'catalogues/catalogue_country_chart.html', context=context)
 
 
 def get_catalogue_language_chart(request):
-    context = {}
     filter = CatalogueFilter(request.GET, queryset=get_catalogues_for_session(request).distinct())
 
     max_publication_year = \
@@ -187,13 +187,14 @@ def get_catalogue_language_chart(request):
     languages = languages.order_by('-item_count')
     languages = languages.values('name', 'item_count')
 
-    context['item_count_per_language'] = [ [language['name'], language['item_count']] for language in languages]
+    context = {
+        'item_count_per_language': json.dumps([ [escape(language['name']), language['item_count']] for language in languages])
+    }
 
     return render(request, 'catalogues/catalogue_language_chart.html', context=context)
 
 
 def get_catalogue_parisian_category_chart(request):
-    context = {}
     filter = CatalogueFilter(request.GET, queryset=get_catalogues_for_session(request).distinct())
 
     max_publication_year = \
@@ -209,8 +210,11 @@ def get_catalogue_parisian_category_chart(request):
     parisian_categories = parisian_categories.order_by('-item_count')
     parisian_categories = parisian_categories.values('name', 'item_count')
 
-    context['item_count_per_parisian_category'] = [ [language['name'], language['item_count']]
-                                                    for language in parisian_categories]
+    context = {
+        'item_count_per_parisian_category': json.dumps([
+            [escape(category['name']), category['item_count']] for category in parisian_categories
+        ])
+    }
 
     return render(request, 'catalogues/catalogue_parisian_category_chart.html', context=context)
 
@@ -230,7 +234,7 @@ def get_catalogue_format_chart(request):
         formats = formats.values('name', 'item_count')
 
         context = {
-            'item_count_per_format': [[format['name'], format['item_count']] for format in formats]
+            'item_count_per_format': json.dumps([[escape(format['name']), format['item_count']] for format in formats])
         }
 
         return render(request, 'catalogues/catalogue_format_chart.html', context=context)
