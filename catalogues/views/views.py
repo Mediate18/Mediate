@@ -25,7 +25,7 @@ from ..filters import *
 from ..models import *
 from catalogues.tools import get_datasets_for_session, get_dataset_for_anonymoususer
 
-from items.models import Item, Edition, Language
+from items.models import Item, Edition, Language, BookFormat
 import json
 
 import django_tables2
@@ -99,6 +99,10 @@ class CatalogueStatisticsView(TemplateView):
             {
                 'title': _('Number of items per Parisian category'),
                 'url': reverse_lazy('get_catalogue_parisian_category_chart')
+            },
+            {
+                'title': _('Number of items per format'),
+                'url': reverse_lazy('get_catalogue_format_chart')
             }
         ]
 
@@ -210,6 +214,26 @@ def get_catalogue_parisian_category_chart(request):
 
     return render(request, 'catalogues/catalogue_parisian_category_chart.html', context=context)
 
+
+def get_catalogue_format_chart(request):
+        filter = CatalogueFilter(request.GET, queryset=get_catalogues_for_session(request).distinct())
+
+        max_publication_year = \
+            get_catalogues_for_session(request).aggregate(Max('lot__catalogue__year_of_publication'))[
+                'lot__catalogue__year_of_publication__max']
+        if not max_publication_year:
+            max_publication_year = 0
+
+        formats = BookFormat.objects.filter(items__lot__catalogue__in=filter.qs)
+        formats = formats.annotate(item_count=Count('items', Q(items__edition__year_start__lte=max_publication_year)))
+        formats = formats.order_by('-item_count')
+        formats = formats.values('name', 'item_count')
+
+        context = {
+            'item_count_per_format': [[format['name'], format['item_count']] for format in formats]
+        }
+
+        return render(request, 'catalogues/catalogue_format_chart.html', context=context)
 
 
 class CatalogueLocationMapView(ListView):
