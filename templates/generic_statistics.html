@@ -53,21 +53,29 @@
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="col-xs-12">
 
-        {% for chart in charts %}
+{% for chart_row in charts %}
+    <div class="row">
+        {% with chart_row|length as column_size %}
+        {% for chart in chart_row %}
+            {# Divide 12 by the number of charts in the row #}
+            <div class="col-lg-{% widthratio 12 column_size 1 %}">
 
-            <h3>{{ chart.title }}</h3>
-            <div hx-get="{{ chart.url }}?{{ url_params }}" hx-trigger="load">
-                <img  alt="Loading..." class="htmx-indicator" width="20" src="/static/img/oval.svg"/>
-                {% trans 'Loading...' %}
+                <div class="panel panel-default">
+                      <div class="panel-heading text-center">{{ chart.title }}</div>
+                      <div class="panel-body">
+                            <div hx-get="{{ chart.url }}?{{ url_params }}" hx-trigger="load">
+                                <img  alt="Loading..." class="htmx-indicator" width="20" src="/static/img/oval.svg"/>
+                                {% trans 'Loading...' %}
+                            </div>
+                      </div>
+                </div>
+
             </div>
-
         {% endfor %}
-
+        {% endwith %}
     </div>
-</div>
+{% endfor %}
 
 {% block abstracts %}
 {% endblock %}

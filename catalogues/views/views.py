@@ -84,30 +84,42 @@ class CatalogueStatisticsView(TemplateView):
         context['url_params'] = self.request.GET.urlencode()
 
         context['charts'] = [
-            {
-                'title': _('Number of items per decade'),
-                'url': reverse_lazy('get_catalogue_chart')
-            },
-            {
-                'title': _('Number of items per country (stated place of publication, including false imprints)'),
-                'url': reverse_lazy('get_catalogue_country_chart')
-            },
-            {
-                'title': _('Number of items per language'),
-                'url': reverse_lazy('get_catalogue_language_chart')
-            },
-            {
-                'title': _('Number of items per Parisian category'),
-                'url': reverse_lazy('get_catalogue_parisian_category_chart')
-            },
-            {
-                'title': _('Number of items per format'),
-                'url': reverse_lazy('get_catalogue_format_chart')
-            },
-            {
-                'title': _('Number of items per author gender'),
-                'url': reverse_lazy('get_catalogue_author_gender_chart')
-            }
+            [
+                {
+                    'id': 'catalogue_chart',
+                    'title': _('Number of items per decade'),
+                    'url': reverse_lazy('get_catalogue_chart')
+                },
+            ],
+            [
+                {
+                    'id': 'catalogue_country_chart',
+                    'title': _('Number of items per country (stated place of publication, including false imprints)'),
+                    'url': reverse_lazy('get_catalogue_country_chart')
+                },
+                {
+                    'id': 'catalogue_language_chart',
+                    'title': _('Number of items per language'),
+                    'url': reverse_lazy('get_catalogue_language_chart')
+                },
+                {
+                    'id': 'catalogue_parisian_category_chart',
+                    'title': _('Number of items per Parisian category'),
+                    'url': reverse_lazy('get_catalogue_parisian_category_chart')
+                },
+            ],
+            [
+                {
+                    'id': 'catalogue_format_chart',
+                    'title': _('Number of items per format'),
+                    'url': reverse_lazy('get_catalogue_format_chart')
+                },
+                {
+                    'id': 'catalogue_author_gender_chart',
+                    'title': _('Number of items per author gender'),
+                    'url': reverse_lazy('get_catalogue_author_gender_chart')
+                }
+            ]
         ]
 
         return context
