@@ -38,6 +38,8 @@ urlpatterns = [
          name='get_catalogue_parisian_category_chart'),
     path(r'catalogues/format_chart', permission_required('global.view_all')(get_catalogue_format_chart),
          name='get_catalogue_format_chart'),
+    path(r'catalogues/author_gender_chart', permission_required('global.view_all')(get_catalogue_author_gender_chart),
+         name='get_catalogue_author_gender_chart'),
 
 
     # CatalogueHeldBy urls

@@ -103,6 +103,10 @@ class CatalogueStatisticsView(TemplateView):
             {
                 'title': _('Number of items per format'),
                 'url': reverse_lazy('get_catalogue_format_chart')
+            },
+            {
+                'title': _('Number of items per author gender'),
+                'url': reverse_lazy('get_catalogue_author_gender_chart')
             }
         ]
 
@@ -238,6 +242,40 @@ def get_catalogue_format_chart(request):
         }
 
         return render(request, 'catalogues/catalogue_format_chart.html', context=context)
+
+
+def get_catalogue_author_gender_chart(request):
+    filter = CatalogueFilter(request.GET, queryset=get_catalogues_for_session(request).distinct())
+
+    max_publication_year = \
+        get_catalogues_for_session(request).aggregate(Max('lot__catalogue__year_of_publication'))[
+            'lot__catalogue__year_of_publication__max']
+    if not max_publication_year:
+        max_publication_year = 0
+
+    from functools import reduce
+    from collections import defaultdict
+
+    sexes = list(Person.objects.annotate(item_count=Count('personitemrelation__item',
+                                      filter=Q(personitemrelation__role__name="author",
+                                               personitemrelation__item__lot__catalogue__in=filter.qs,
+                                               personitemrelation__item__edition__year_start__lte=max_publication_year),
+                                      distinct=True)) \
+                 .values_list('sex', 'item_count'))
+
+    sexes_dict = defaultdict(int)
+    for item in sexes:
+        sexes_dict[item[0]] += item[1]
+    sex_choices = dict(Person.SEX_CHOICES)
+    sexes_list = sorted(sexes_dict.items(), key=lambda x: x[1], reverse=True)
+
+    context = {
+        'item_count_per_author_gender': json.dumps([
+            [ escape(sex_choices[sex[0]]), sex[1] ] for sex in sexes_list
+        ])
+    }
+
+    return render(request, 'catalogues/catalogue_author_gender_chart.html', context=context)
 
 
 class CatalogueLocationMapView(ListView):
