@@ -180,10 +180,11 @@ def get_catalogue_country_chart(request):
             .values('name', 'item_count')
     ]
     context = {
-        'item_count_per_country': json.dumps(item_count_per_country)
+        'chart_id': 'item_count_per_country',
+        'item_count': json.dumps(item_count_per_country)
     }
 
-    return render(request, 'catalogues/catalogue_country_chart.html', context=context)
+    return render(request, 'generic_pie_chart.html', context=context)
 
 
 def get_catalogue_language_chart(request):
@@ -204,10 +205,11 @@ def get_catalogue_language_chart(request):
     languages = languages.values('name', 'item_count')
 
     context = {
-        'item_count_per_language': json.dumps([ [escape(language['name']), language['item_count']] for language in languages])
+        'chart_id': 'item_count_per_language',
+        'item_count': json.dumps([ [escape(language['name']), language['item_count']] for language in languages])
     }
 
-    return render(request, 'catalogues/catalogue_language_chart.html', context=context)
+    return render(request, 'generic_pie_chart.html', context=context)
 
 
 def get_catalogue_parisian_category_chart(request):
@@ -227,12 +229,13 @@ def get_catalogue_parisian_category_chart(request):
     parisian_categories = parisian_categories.values('name', 'item_count')
 
     context = {
-        'item_count_per_parisian_category': json.dumps([
+        'chart_id': 'item_count_per_parisian_category',
+        'item_count': json.dumps([
             [escape(category['name']), category['item_count']] for category in parisian_categories
         ])
     }
 
-    return render(request, 'catalogues/catalogue_parisian_category_chart.html', context=context)
+    return render(request, 'generic_pie_chart.html', context=context)
 
 
 def get_catalogue_format_chart(request):
@@ -250,10 +253,11 @@ def get_catalogue_format_chart(request):
         formats = formats.values('name', 'item_count')
 
         context = {
-            'item_count_per_format': json.dumps([[escape(format['name']), format['item_count']] for format in formats])
+            'chart_id': 'item_count_per_format',
+            'item_count': json.dumps([[escape(format['name']), format['item_count']] for format in formats])
         }
 
-        return render(request, 'catalogues/catalogue_format_chart.html', context=context)
+        return render(request, 'generic_pie_chart.html', context=context)
 
 
 def get_catalogue_author_gender_chart(request):
@@ -282,12 +286,13 @@ def get_catalogue_author_gender_chart(request):
     sexes_list = sorted(sexes_dict.items(), key=lambda x: x[1], reverse=True)
 
     context = {
-        'item_count_per_author_gender': json.dumps([
+        'chart_id': 'item_count_per_author_gender',
+        'item_count': json.dumps([
             [ escape(sex_choices[sex[0]]), sex[1] ] for sex in sexes_list
         ])
     }
 
-    return render(request, 'catalogues/catalogue_author_gender_chart.html', context=context)
+    return render(request, 'generic_pie_chart.html', context=context)
 
 
 class CatalogueLocationMapView(ListView):
