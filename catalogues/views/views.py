@@ -98,17 +98,22 @@ class CatalogueStatisticsView(TemplateView):
                     'url': reverse_lazy('get_catalogue_country_chart')
                 },
                 {
+                    'id': 'catalogue_city_chart',
+                    'title': _('Number of items per city'),
+                    'url': reverse_lazy('get_catalogue_city_chart')
+                },
+                {
                     'id': 'catalogue_language_chart',
                     'title': _('Number of items per language'),
                     'url': reverse_lazy('get_catalogue_language_chart')
                 },
+            ],
+            [
                 {
                     'id': 'catalogue_parisian_category_chart',
                     'title': _('Number of items per Parisian category'),
                     'url': reverse_lazy('get_catalogue_parisian_category_chart')
                 },
-            ],
-            [
                 {
                     'id': 'catalogue_format_chart',
                     'title': _('Number of items per format'),
@@ -182,6 +187,33 @@ def get_catalogue_country_chart(request):
     context = {
         'chart_id': 'item_count_per_country',
         'item_count': json.dumps(item_count_per_country)
+    }
+
+    return render(request, 'generic_pie_chart.html', context=context)
+
+
+def get_catalogue_city_chart(request):
+    filter = CatalogueFilter(request.GET, queryset=get_catalogues_for_session(request).distinct())
+
+    max_publication_year = \
+        get_catalogues_for_session(request).aggregate(Max('lot__catalogue__year_of_publication'))[
+            'lot__catalogue__year_of_publication__max']
+    if not max_publication_year:
+        max_publication_year = 0
+
+    cities = Place.objects\
+        .filter(edition__items__lot__catalogue__in=filter.qs) \
+        .annotate(item_count=Count('edition__items', Q(edition__year_start__lte=max_publication_year))) \
+        .filter(item_count__gt=0) \
+        .order_by('-item_count') \
+        .values('name', 'item_count')
+
+    context = {
+        'chart_id': 'item_count_per_city',
+        'item_count': json.dumps([
+            [escape(city['name']), city['item_count'] ] for city in cities
+        ]),
+        'show_legend': 'false'
     }
 
     return render(request, 'generic_pie_chart.html', context=context)
