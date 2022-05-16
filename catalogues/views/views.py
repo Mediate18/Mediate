@@ -27,6 +27,7 @@ from catalogues.tools import get_datasets_for_session, get_dataset_for_anonymous
 
 from items.models import Item, Edition, Language, BookFormat
 import json
+from collections import Counter
 
 import django_tables2
 
@@ -166,6 +167,15 @@ def get_catalogues_chart(request):
     return render(request, 'catalogues/catalogue_chart.html', context=context)
 
 
+def get_item_counts_for(item_field_name, catalogue_qs, max_publication_year):
+    items = Item.objects.filter(lot__catalogue__in=catalogue_qs, edition__year_start__lte=max_publication_year)
+    items = items.values(item_field_name)
+    targets = [item[item_field_name]
+                           for item in items
+                           if item[item_field_name] is not None]
+    return Counter(targets).items()
+
+
 def get_catalogue_country_chart(request):
     filter = CatalogueFilter(request.GET, queryset=get_catalogues_for_session(request).distinct())
 
@@ -252,18 +262,13 @@ def get_catalogue_parisian_category_chart(request):
             'lot__catalogue__year_of_publication__max']
     if not max_publication_year:
         max_publication_year = 0
-
-    parisian_categories = ParisianCategory.objects.filter(category__lot__catalogue__in=filter.qs)
-    parisian_categories = parisian_categories.annotate(item_count=Count('category__lot__item',
-                                                                        Q(category__lot__item__edition__year_start__lte=
-                                                                          max_publication_year)))
-    parisian_categories = parisian_categories.order_by('-item_count')
-    parisian_categories = parisian_categories.values('name', 'item_count')
+    
+    counts = get_item_counts_for('parisian_category__name', filter.qs, max_publication_year)
 
     context = {
         'chart_id': 'item_count_per_parisian_category',
         'item_count': json.dumps([
-            [escape(category['name']), category['item_count']] for category in parisian_categories
+            [item[0], item[1]] for item in sorted(counts, key=lambda pair: pair[1], reverse=True)
         ])
     }
 
