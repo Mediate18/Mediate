@@ -1,0 +1,68 @@
+{% load i18n %}
+<!-- Item-Edition links -->
+        <div class="panel panel-default">
+            <div class="panel-heading">Item-edition links</div>
+            <div class="panel-body">
+                <div class="list-group">
+                    <div class="list-group-item">
+                        <span>Editions without items: </span>
+                        <span>{{ number_of_editions_without_items }}</span>
+                        {% if number_of_editions_without_items > 0 %}
+                            <a title="View editions without items"
+                               href="{% url 'editions' %}?number_of_items_0=0&number_of_items_1=0">
+                                <span class="glyphicon glyphicon-th-list"></span>
+                            </a>
+                        {% endif %}
+                    </div>
+                    <div class="list-group-item">
+                        <span>Edition with more than one item: </span>
+                        <span>{{ number_of_editions_gt_1_item }}</span>
+                        {% if number_of_editions_gt_1_item > 0 %}
+                            <a title="View edition with more than one item"
+                               href="{% url 'editions' %}?number_of_items_0=2">
+                                <span class="glyphicon glyphicon-th-list"></span>
+                            </a>
+                        {% endif %}
+                    </div>
+                    <div class="list-group-item">
+                        <span>Items without edition: </span>
+                        <span>{{ number_of_items_without_editions }}</span>
+                        {% if number_of_items_without_editions > 0 %}
+                            <a title="View items without edition"
+                               href="{% url 'items' %}?edition_isnull=on">
+                                <span class="glyphicon glyphicon-th-list"></span>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lot-item links -->
+        <div class="panel panel-default">
+            <div class="panel-heading">Lot-item links</div>
+            <div class="panel-body">
+                <div class="list-group">
+                    <div class="list-group-item">
+                        <span>Items without a Lot: </span>
+                        <span>{{ number_of_items_without_lot }}</span>
+                        {% if number_of_items_without_lot > 0 %}
+                            <a title="View editions without items"
+                               href="{% url 'items' %}?lot_isnull=on">
+                                <span class="glyphicon glyphicon-th-list"></span>
+                            </a>
+                        {% endif %}
+                    </div>
+                    <div class="list-group-item">
+                        <span>Lots without items: </span>
+                        <span>{{ number_of_lots_without_items }}</span>
+                        {% if number_of_lots_without_items > 0 %}
+                            <a title="View editions without items"
+                               href="{% url 'lots' %}?number_of_items_0=0&number_of_items_1=0">
+                                <span class="glyphicon glyphicon-th-list"></span>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
