@@ -2,7 +2,7 @@
 
 {% if user.is_authenticated %}
 <li>
-    <a href="{% url 'dashboard' %}"> <span class="glyphicon glyphicon-user"> </span>
+    <a href="{% url 'dashboard' %}" style="max-height: 50px"> <span class="glyphicon glyphicon-user"> </span>
         {% if user.first_name or user.last_name %}
             {{ user.first_name }} {{ user.last_name }}
         {% else %}
@@ -11,10 +11,10 @@
     </a>
 </li>
 <li>
-    <a href="{% url 'logout' %}"><span class="glyphicon glyphicon-log-out"> </span> Log out</a>
+    <a href="{% url 'logout' %}" style="max-height: 50px"><span class="glyphicon glyphicon-log-out"> </span> Log out</a>
 </li>
 {% else %}
 <li>
-    <a href="{% url 'login' %}"><span class="glyphicon glyphicon-log-in"></span> Log in</a>
+    <a href="{% url 'login' %}" style="max-height: 50px"><span class="glyphicon glyphicon-log-in"></span> Log in</a>
 </li>
 {% endif %}
