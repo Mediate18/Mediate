@@ -29,7 +29,7 @@ import items.urls
 import catalogues.urls
 import persons.urls
 import transcriptions.urls
-from dashboard.views import view_dashboard, view_totals
+from dashboard.views import view_dashboard, view_totals, get_dashboard_stats
 
 from mediate. views import select_dataset
 from catalogues.views.api_views import *
@@ -107,6 +107,7 @@ urlpatterns = [
     path(r'persons/', include(persons.urls)),
     path(r'transcriptions/', include(transcriptions.urls)),
     path(r'dashboard/', login_required(view_dashboard), name='dashboard'),
+    path(r'dashboard_stats/', login_required(get_dashboard_stats), name='get_dashboard_stats'),
     path(r'totals/', view_totals, name='totals'),
     path(r'dataset/', login_required(select_dataset), name='select_dataset'),
     path(r'moderation/', include('simplemoderation.urls')),

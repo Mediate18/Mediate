@@ -13,8 +13,8 @@ class LanguageTests(GenericCRUDTestMixin, TestCase):
     def get_add_form_data(self):
         return {
             'name': 'name test',
-            'language_code_2char': 'xx',
-            'language_code_3char': 'xxx',
+            'language_code_2char': 'xy',
+            'language_code_3char': 'xyz',
             'description': 'description test'
         }
 

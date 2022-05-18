@@ -7,6 +7,10 @@ from catalogues.views.views import get_collections_for_session
 from persons.models import Place, Person, Country
 
 def view_dashboard(request):
+    return render(request, 'dashboard/dashboard.html', {})
+
+
+def get_dashboard_stats(request):
     if request.user.is_superuser:
         number_of_editions_without_items = Edition.objects\
                                                .filter(items__lot__collection__in=get_collections_for_session(request))\
@@ -35,7 +39,7 @@ def view_dashboard(request):
         }
     else:
         context = {}
-    return render(request, 'dashboard/dashboard.html', context)
+    return render(request, 'dashboard/dashboard_stats.html', context)
 
 
 def view_totals(request):

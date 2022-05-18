@@ -1,0 +1,93 @@
+{% extends "baselayout.html" %}
+{% load i18n %}
+{% load render_table from django_tables2 %}
+{% load static %}
+
+{% load leaflet_tags %}
+
+
+{% block extracss %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.13/c3.css"/>
+<link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" type="text/css" media="screen" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-2">
+        <h4>
+            {% if page_heading %}
+                {{ page_heading }}
+            {% else %}
+                {{ object_name|title }}
+                {% trans " statistics" %}
+            {% endif %}
+        </h4>
+    </div>
+    <div class="col-md-8">
+        <div class="panel panel-default" style="margin-bottom: 10px">
+            <div class="panel-heading">
+              <h4 class="panel-title">
+                <a data-toggle="collapse" href="#collapse1">Filter <span class="glyphicon glyphicon-chevron-down"></span></a>
+              </h4>
+            </div>
+            <div id="collapse1" class="panel-collapse collapse">
+              <div class="panel-body">
+                <form action="" method="get">
+                    <table class="table">
+                    {{ filter.form.as_table }}
+                    </table>
+                    <div class="pull-right">
+                        <input type="submit" class="btn"/>
+                        <a href='{{ request.path }}' class="btn">Clear</a>
+                    </div>
+                </form>
+              </div>
+            </div>
+          </div>
+    </div>
+    <div class="col-md-2">
+        <div class="small pull-right" style="margin-top: 10px">
+            <p>Displaying {{ filter.qs.count }} of {{ filter.queryset.count }}</p>
+        </div>
+    </div>
+</div>
+
+{% for chart_row in charts %}
+    <div class="row">
+        {% with chart_row|length as column_size %}
+        {% for chart in chart_row %}
+            {# Divide 12 by the number of charts in the row #}
+            <div class="col-lg-{% widthratio 12 column_size 1 %}">
+
+                <div class="panel panel-default">
+                      <div class="panel-heading text-center">{{ chart.title }}</div>
+                      <div class="panel-body">
+                            <div hx-get="{{ chart.url }}?{{ url_params }}" hx-trigger="load">
+                                <img  alt="Loading..." class="htmx-indicator" width="20" src="/static/img/oval.svg"/>
+                                {% trans 'Loading...' %}
+                            </div>
+                      </div>
+                </div>
+
+            </div>
+        {% endfor %}
+        {% endwith %}
+    </div>
+{% endfor %}
+
+{% block abstracts %}
+{% endblock %}
+
+{% endblock %}
+
+{% block extrajs %}
+{{ block.super }}
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+{{ form.media.js }}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.13/c3.js"></script>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="/static/js/htmx.min.js" defer></script>
+{% endblock %}

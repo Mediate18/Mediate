@@ -1,0 +1,32 @@
+{% load i18n %}
+
+<div class="{{ chart_id }}">
+    <div id="{{ chart_id }}__chart"></div>
+</div>
+
+
+<script type="text/javascript">
+    var data = {{ item_count|safe }};
+
+    var chart = c3.generate({
+        bindto: '#{{ chart_id }}__chart',
+        data: {
+            columns: data,
+            type: 'pie'
+        },
+        legend: {
+            show: {{ show_legend|default:"true" }},
+            position: 'right',
+        },
+        tooltip: {
+            format: {
+                title: function (d) { return d; },
+                value: function (value, ratio, id) {
+                    percentage = (100 * ratio).toFixed(1)
+                    return percentage + '% (' + value + ' items)';
+                }
+            }
+        }
+    });
+
+</script>

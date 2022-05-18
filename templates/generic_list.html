@@ -109,6 +109,11 @@
                   <span class="glyphicon glyphicon-map-marker"></span> Map
                 </a>
             {% endif %}
+            {% if statistics_url %}
+                <a href="{{ statistics_url }}?{{ url_params }}" class="btn btn-default" id="statistics_url">
+                  <span class="glyphicon glyphicon-stats"></span> Statistics
+                </a>
+            {% endif %}
         </div>
         <div class="small">Displaying {{ filter.qs.count }} of {{ filter.queryset.count }}</div>
     </div>

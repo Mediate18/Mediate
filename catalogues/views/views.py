@@ -1,12 +1,13 @@
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
-from django.utils.html import format_html
+from django.utils.html import format_html, escape
+from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 from django.db.models import Count, Min, Max, Q
 from django.db.models.functions import Substr, Length
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 
@@ -24,8 +25,9 @@ from ..filters import *
 from ..models import *
 from catalogues.tools import get_datasets_for_session, get_dataset_for_anonymoususer
 
-from items.models import Item, Edition
+from items.models import Item, Edition, Language, BookFormat
 import json
+from collections import Counter
 
 import django_tables2
 
@@ -40,7 +42,7 @@ def get_collections_for_session(request, extra_collection=None):
 # Collection views
 class CollectionTableView(ListView):
     model = Collection
-    template_name = 'collection_list.html'
+    template_name = 'generic_list.html'
 
     def get_queryset(self):
         return get_collections_for_session(self.request).distinct()
@@ -58,37 +60,275 @@ class CollectionTableView(ListView):
         context['action'] = _("add")
         context['object_name'] = "collection"
         context['add_url'] = reverse_lazy('add_collection')
-
-        # Extra data, used for e.g. charts
-        max_publication_year = get_collections_for_session(self.request).aggregate(Max('lot__collection__year_of_publication'))['lot__collection__year_of_publication__max']
-        if not max_publication_year:
-            max_publication_year = 0
-        context['max_publication_year'] = max_publication_year
-
-        item_count_per_decade = Item.objects\
-            .filter(lot__collection__in=filter.qs, edition__year_start__lte=max_publication_year)\
-            .annotate(decade=10 * Substr('edition__year_start', 1, Length('edition__year_start') - 1))\
-            .values('decade')\
-            .order_by('decade')\
-            .annotate(count=Count('decade'))
-        extra_data = {
-            'item_count_per_decade': list(item_count_per_decade)
-        }
-        context['extra_data'] = json.dumps(extra_data)
-
-        item_count_total = Item.objects.filter(lot__collection__in=filter.qs).count()
-        context['item_count_total'] = item_count_total
-        item_count_without_year = Item.objects.filter(lot__collection__in=filter.qs, edition__year_start__isnull=True).count()
-        context['item_count_without_year'] = item_count_without_year
-        item_count_in_plot = Item.objects.filter(lot__collection__in=filter.qs, edition__year_start__lte=max_publication_year).count()
-        context['item_count_in_plot'] = item_count_in_plot
-        context['item_percentage_in_plot'] = int(100 * item_count_in_plot / item_count_total) if item_count_total != 0 else 0
-
         context['map_url'] = reverse_lazy('collectionsmap')
 
         context['per_page_choices'] = [10, 25, 50, 100]
 
+        context['url_params'] = self.request.GET.urlencode()
+        context['statistics_url'] = reverse_lazy('collection_statistics')
+
         return context
+
+
+class CollectionStatisticsView(TemplateView):
+    template_name = 'generic_statistics.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['chart_url'] = reverse_lazy('get_collection_chart')
+        filter = CollectionFilter(self.request.GET, queryset=get_collections_for_session(self.request).distinct())
+
+        context['filter'] = filter
+        context['object_name'] = "collection"
+
+        context['url_params'] = self.request.GET.urlencode()
+
+        context['charts'] = [
+            [
+                {
+                    'id': 'collection_chart',
+                    'title': _('Number of items per decade'),
+                    'url': reverse_lazy('get_collection_chart')
+                },
+            ],
+            [
+                {
+                    'id': 'collection_country_chart',
+                    'title': _('Number of items per country (stated place of publication, including false imprints)'),
+                    'url': reverse_lazy('get_collection_country_chart')
+                },
+                {
+                    'id': 'collection_city_chart',
+                    'title': _('Number of items per city'),
+                    'url': reverse_lazy('get_collection_city_chart')
+                },
+                {
+                    'id': 'collection_language_chart',
+                    'title': _('Number of items per language'),
+                    'url': reverse_lazy('get_collection_language_chart')
+                },
+            ],
+            [
+                {
+                    'id': 'collection_parisian_category_chart',
+                    'title': _('Number of items per Parisian category'),
+                    'url': reverse_lazy('get_collection_parisian_category_chart')
+                },
+                {
+                    'id': 'collection_format_chart',
+                    'title': _('Number of items per format'),
+                    'url': reverse_lazy('get_collection_format_chart')
+                },
+                {
+                    'id': 'collection_author_gender_chart',
+                    'title': _('Number of items per author gender'),
+                    'url': reverse_lazy('get_collection_author_gender_chart')
+                }
+            ]
+        ]
+
+        return context
+
+
+def get_collections_chart(request):
+    context = {}
+    filter = CollectionFilter(request.GET, queryset=get_collections_for_session(request).distinct())
+
+    max_publication_year = \
+    get_collections_for_session(request).aggregate(Max('lot__collection__year_of_publication'))[
+        'lot__collection__year_of_publication__max']
+    if not max_publication_year:
+        max_publication_year = 0
+    context['max_publication_year'] = max_publication_year
+
+    item_count_per_decade = Item.objects \
+        .filter(lot__collection__in=filter.qs, edition__year_start__lte=max_publication_year) \
+        .annotate(decade=10 * Substr('edition__year_start', 1, Length('edition__year_start') - 1)) \
+        .values('decade') \
+        .order_by('decade') \
+        .annotate(count=Count('decade'))
+    extra_data = {
+        'item_count_per_decade': list(item_count_per_decade)
+    }
+    context['extra_data'] = json.dumps(extra_data)
+
+    item_count_total = Item.objects.filter(lot__collection__in=filter.qs).count()
+    context['item_count_total'] = item_count_total
+    item_count_without_year = Item.objects.filter(lot__collection__in=filter.qs,
+                                                  edition__year_start__isnull=True).count()
+    context['item_count_without_year'] = item_count_without_year
+    item_count_in_plot = Item.objects.filter(lot__collection__in=filter.qs,
+                                             edition__year_start__lte=max_publication_year).count()
+    context['item_count_in_plot'] = item_count_in_plot
+    context['item_percentage_in_plot'] = int(
+        100 * item_count_in_plot / item_count_total) if item_count_total != 0 else 0
+
+    return render(request, 'catalogues/catalogue_chart.html', context=context)
+
+
+def get_item_counts_for(item_field_name, collection_qs, max_publication_year):
+    items = Item.objects.filter(lot__collection__in=collection_qs, edition__year_start__lte=max_publication_year)
+    items = items.values(item_field_name)
+    targets = [item[item_field_name]
+                           for item in items
+                           if item[item_field_name] is not None]
+    return Counter(targets).items()
+
+
+def get_collection_country_chart(request):
+    filter = CollectionFilter(request.GET, queryset=get_collections_for_session(request).distinct())
+
+    max_publication_year = \
+        get_collections_for_session(request).aggregate(Max('lot__collection__year_of_publication'))[
+            'lot__collection__year_of_publication__max']
+    if not max_publication_year:
+        max_publication_year = 0
+
+    item_count_per_country = [ [escape(country['name']), country['item_count'] ] for country in
+        Country.objects \
+            .filter(place__edition__items__lot__collection__in=filter.qs) \
+            .annotate(item_count=Count('place__edition__items',
+                                       Q(place__edition__year_start__lte=
+                                         max_publication_year)))\
+            .order_by('-item_count')\
+            .values('name', 'item_count')
+    ]
+    context = {
+        'chart_id': 'item_count_per_country',
+        'item_count': json.dumps(item_count_per_country)
+    }
+
+    return render(request, 'generic_pie_chart.html', context=context)
+
+
+def get_collection_city_chart(request):
+    filter = CollectionFilter(request.GET, queryset=get_collections_for_session(request).distinct())
+
+    max_publication_year = \
+        get_collections_for_session(request).aggregate(Max('lot__collection__year_of_publication'))[
+            'lot__collection__year_of_publication__max']
+    if not max_publication_year:
+        max_publication_year = 0
+
+    cities = Place.objects\
+        .filter(edition__items__lot__collection__in=filter.qs) \
+        .annotate(item_count=Count('edition__items', Q(edition__year_start__lte=max_publication_year))) \
+        .filter(item_count__gt=0) \
+        .order_by('-item_count') \
+        .values('name', 'item_count')
+
+    context = {
+        'chart_id': 'item_count_per_city',
+        'item_count': json.dumps([
+            [escape(city['name']), city['item_count'] ] for city in cities
+        ]),
+        'show_legend': 'false'
+    }
+
+    return render(request, 'generic_pie_chart.html', context=context)
+
+
+def get_collection_language_chart(request):
+    filter = CollectionFilter(request.GET, queryset=get_collections_for_session(request).distinct())
+
+    max_publication_year = \
+        get_collections_for_session(request).aggregate(Max('lot__collection__year_of_publication'))[
+            'lot__collection__year_of_publication__max']
+    if not max_publication_year:
+        max_publication_year = 0
+
+    languages = Language.objects.all()
+    languages = languages.filter(items__item__lot__collection__in=filter.qs)
+    languages = languages.annotate(item_count=Count('items__item',
+                                                    Q(items__item__edition__year_start__lte=
+                                                      max_publication_year)))
+    languages = languages.order_by('-item_count')
+    languages = languages.values('name', 'item_count')
+
+    context = {
+        'chart_id': 'item_count_per_language',
+        'item_count': json.dumps([ [escape(language['name']), language['item_count']] for language in languages])
+    }
+
+    return render(request, 'generic_pie_chart.html', context=context)
+
+
+def get_collection_parisian_category_chart(request):
+    filter = CollectionFilter(request.GET, queryset=get_collections_for_session(request).distinct())
+
+    max_publication_year = \
+        get_collections_for_session(request).aggregate(Max('lot__collection__year_of_publication'))[
+            'lot__collection__year_of_publication__max']
+    if not max_publication_year:
+        max_publication_year = 0
+    
+    counts = get_item_counts_for('parisian_category__name', filter.qs, max_publication_year)
+
+    context = {
+        'chart_id': 'item_count_per_parisian_category',
+        'item_count': json.dumps([
+            [item[0], item[1]] for item in sorted(counts, key=lambda pair: pair[1], reverse=True)
+        ])
+    }
+
+    return render(request, 'generic_pie_chart.html', context=context)
+
+
+def get_collection_format_chart(request):
+        filter = CollectionFilter(request.GET, queryset=get_collections_for_session(request).distinct())
+
+        max_publication_year = \
+            get_collections_for_session(request).aggregate(Max('lot__collection__year_of_publication'))[
+                'lot__collection__year_of_publication__max']
+        if not max_publication_year:
+            max_publication_year = 0
+
+        formats = BookFormat.objects.filter(items__lot__collection__in=filter.qs)
+        formats = formats.annotate(item_count=Count('items', Q(items__edition__year_start__lte=max_publication_year)))
+        formats = formats.order_by('-item_count')
+        formats = formats.values('name', 'item_count')
+
+        context = {
+            'chart_id': 'item_count_per_format',
+            'item_count': json.dumps([[escape(format['name']), format['item_count']] for format in formats])
+        }
+
+        return render(request, 'generic_pie_chart.html', context=context)
+
+
+def get_collection_author_gender_chart(request):
+    filter = CollectionFilter(request.GET, queryset=get_collections_for_session(request).distinct())
+
+    max_publication_year = \
+        get_collections_for_session(request).aggregate(Max('lot__collection__year_of_publication'))[
+            'lot__collection__year_of_publication__max']
+    if not max_publication_year:
+        max_publication_year = 0
+
+    from functools import reduce
+    from collections import defaultdict
+
+    sexes = list(Person.objects.annotate(item_count=Count('personitemrelation__item',
+                                      filter=Q(personitemrelation__role__name="author",
+                                               personitemrelation__item__lot__collection__in=filter.qs,
+                                               personitemrelation__item__edition__year_start__lte=max_publication_year),
+                                      distinct=True)) \
+                 .values_list('sex', 'item_count'))
+
+    sexes_dict = defaultdict(int)
+    for item in sexes:
+        sexes_dict[item[0]] += item[1]
+    sex_choices = dict(Person.SEX_CHOICES)
+    sexes_list = sorted(sexes_dict.items(), key=lambda x: x[1], reverse=True)
+
+    context = {
+        'chart_id': 'item_count_per_author_gender',
+        'item_count': json.dumps([
+            [ escape(sex_choices[sex[0]]), sex[1] ] for sex in sexes_list
+        ])
+    }
+
+    return render(request, 'generic_pie_chart.html', context=context)
 
 
 class CollectionLocationMapView(ListView):

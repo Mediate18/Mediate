@@ -8,6 +8,23 @@ from .views.views import *
 urlpatterns = [
     path(r'', RedirectView.as_view(url='collections/')),
 
+    path(r'collections/statistics', permission_required('global.view_all')(CollectionStatisticsView.as_view()),
+         name='collection_statistics'),
+    path(r'collections/chart', permission_required('global.view_all')(get_collections_chart), name='get_collection_chart'),
+    path(r'collections/country_chart', permission_required('global.view_all')(get_collection_country_chart),
+         name='get_collection_country_chart'),
+    path(r'collections/language_chart', permission_required('global.view_all')(get_collection_language_chart),
+         name='get_collection_language_chart'),
+    path(r'collections/parisian_category_chart', permission_required('global.view_all')(get_collection_parisian_category_chart),
+         name='get_collection_parisian_category_chart'),
+    path(r'collections/format_chart', permission_required('global.view_all')(get_collection_format_chart),
+         name='get_collection_format_chart'),
+    path(r'collections/author_gender_chart', permission_required('global.view_all')(get_collection_author_gender_chart),
+         name='get_collection_author_gender_chart'),
+    path(r'collections/city_chart', permission_required('global.view_all')(get_collection_city_chart),
+         name='get_collection_city_chart'),
+
+
     # Collection urls
     path('collections/', permission_required('global.view_all')(CollectionTableView.as_view()), name='collections'),
     path(r'collections/<uuid:pk>', permission_required('global.view_all')(CollectionDetailView.as_view()),

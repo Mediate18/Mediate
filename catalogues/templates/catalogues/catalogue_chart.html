@@ -1,15 +1,6 @@
-{% extends "generic_list.html" %}
 {% load i18n %}
 
-{% block extracss %}
-{{ block.super }}
-<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.13/c3.css"/>
-{% endblock %}
 
-{% block abstracts %}
-{% if extra_data %}
-
-<h3>Number of items per decade</h3>
 <div>
     <span>{% trans "Total number of items:" %} {{ item_count_total }}</span> |
     <span>{% trans "Items without a date:" %} {{ item_count_without_year }}</span> |
@@ -24,8 +15,7 @@
     <span><small>Please note that when the publication date is a date range, only the start of the range is shown in this diagram.</small></span>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.13/c3.js"></script>
-<script src="https://d3js.org/d3.v5.min.js"></script>
+
 <script type="text/javascript">
     var extra_data = {{ extra_data|safe }};
     var item_count_in_plot = {{ item_count_in_plot }};
@@ -82,6 +72,3 @@
     });
 
 </script>
-{% endif %}
-
-{% endblock %}
