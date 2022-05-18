@@ -52,7 +52,7 @@ class CollectionTableView(ListView):
         filter = CollectionFilter(self.request.GET, queryset=self.get_queryset())
 
         table = CollectionTable(filter.qs)
-        django_tables2.RequestConfig(self.request, paginate={'per_page': 10}).configure(table)
+        django_tables2.RequestConfig(self.request, paginate={'per_page': 25}).configure(table)
 
         context['filter'] = filter
         context['table'] = table

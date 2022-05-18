@@ -6,6 +6,7 @@ from .models import *
 from collections import defaultdict
 
 from catalogues.models import PersonCollectionRelation
+from items.models import Item
 from persons.models import Country
 from mediate.columns import ActionColumn
 
@@ -17,6 +18,7 @@ class CollectionTable(tables.Table):
     owner = tables.Column(empty_values=(), orderable=False)
     number_of_lots = tables.Column(empty_values=(), orderable=False)
     number_of_items = tables.Column(empty_values=(), orderable=False)
+    percentage_non_books = tables.Column(empty_values=(), orderable=False)
     related_places = tables.Column(empty_values=(), verbose_name="Related places", orderable=False)
     countries = tables.Column(empty_values=(), verbose_name="Publication countries", orderable=False)
 
@@ -31,6 +33,7 @@ class CollectionTable(tables.Table):
             'owner',
             'number_of_lots',
             'number_of_items',
+            'percentage_non_books',
             'related_places',
             'countries'
         ]
@@ -67,6 +70,11 @@ class CollectionTable(tables.Table):
 
     def render_number_of_items(self, record):
         return record.item_count()
+
+    def render_percentage_non_books(self, record):
+        return "{}%".format(
+            round(100 * Item.objects.filter(lot__collection=record, non_book=True).count() / record.item_count(), 2)
+        )
 
     def render_related_places(self, record):
         relations = CollectionPlaceRelation.objects.filter(collection=record).prefetch_related('type')
