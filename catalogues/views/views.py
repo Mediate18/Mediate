@@ -163,7 +163,7 @@ def get_collections_chart(request):
     context['item_percentage_in_plot'] = int(
         100 * item_count_in_plot / item_count_total) if item_count_total != 0 else 0
 
-    return render(request, 'catalogues/catalogue_chart.html', context=context)
+    return render(request, 'catalogues/collection_chart.html', context=context)
 
 
 def get_item_counts_for(item_field_name, collection_qs, max_publication_year):
