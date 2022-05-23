@@ -394,7 +394,7 @@ class CollectionDetailView(PermissionRequiredMixin, DetailView):
 
 
 class CollectionDetailBareView(CollectionDetailView):
-    template_name = 'collections/collection_detail_bare.html'
+    template_name = 'catalogues/collection_detail_bare.html'
 
 
 @moderate()
