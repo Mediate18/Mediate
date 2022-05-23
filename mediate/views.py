@@ -91,7 +91,7 @@ def select_dataset(request):
 
             request.session['datasets'] = [
                 {'uuid': str(dataset.uuid), 'name': dataset.name}
-                for dataset in datasets if request.user.has_perm('collections.change_dataset', dataset)
+                for dataset in datasets if request.user.has_perm('catalogues.change_dataset', dataset)
             ]
             return redirect('dashboard')
     else:

@@ -18,7 +18,7 @@ def get_datasets_for_session(request, extra_dataset=None):
     datasets_session = request.session.get('datasets', [])
     datasets_retrieved = Dataset.objects.filter(uuid__in=[dataset['uuid'] for dataset in datasets_session])
     datasets_permitted = [dataset for dataset in datasets_retrieved
-                          if user.has_perm('collections.change_dataset', dataset)]
+                          if user.has_perm('catalogues.change_dataset', dataset)]
     if datasets_permitted:
         return datasets_permitted + [extra_dataset] if extra_dataset else datasets_permitted
 
