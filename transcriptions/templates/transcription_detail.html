@@ -1,11 +1,12 @@
 {% extends "baselayout.html" %}
 {% load i18n %}
+{% load class_name %}
 
 {% block content %}
 
 <div class="row">
     <div class="col-md-10">
-        <h2>Transcription <i>{{ object }}</i></h2>
+        <h2>{{ object|get_object_class_name|capfirst }} <i>{{ object }}</i></h2>
         <dl class="row">
             <dt class="col-sm-3">{% trans "Source material" %}:</dt>
             <dd class="col-sm-9">{{ object.source_material }}</dd>

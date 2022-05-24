@@ -30,6 +30,10 @@ class Transcription(models.Model):
     source_material = models.ForeignKey(SourceMaterial, on_delete=models.PROTECT)
     curator = models.CharField(_("Curator"), max_length=128)
 
+    class Meta:
+        verbose_name = "shelf mark of transcribed copy"
+        verbose_name_plural = "shelf mark of transcribed copies"
+
     def __str__(self):
         return _("{} as transcribed by {} ({})").format(self.source_material, self.author,
                                                       ", ".join([str(scan.scan) for scan in self.scans.all()]))

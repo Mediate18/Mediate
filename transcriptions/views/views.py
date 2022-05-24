@@ -157,7 +157,7 @@ class TranscriptionTableView(ListView):
         context['table'] = table
 
         context['action'] = _("add")
-        context['object_name'] = "transcription"
+        context['object_name_plural'] = Transcription._meta.verbose_name_plural
         context['add_url'] = reverse_lazy('add_transcription')
 
         return context
@@ -180,7 +180,7 @@ class TranscriptionCreateView(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("add")
-        context['object_name'] = "transcription"
+        context['object_name'] = Transcription._meta.verbose_name
         if self.request.POST:
             context['documentscans'] = DocumentScanFormset(self.request.POST, self.request.FILES)
         else:
@@ -224,7 +224,7 @@ class TranscriptionUpdateView(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = _("update")
-        context['object_name'] = "transcription"
+        context['object_name'] = Transcription._meta.verbose_name
         if self.request.POST:
             context['documentscans'] = DocumentScanFormset(self.request.POST, self.request.FILES, instance=self.object)
         else:
