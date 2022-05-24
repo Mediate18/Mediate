@@ -1,0 +1,35 @@
+{% load i18n %}
+
+{% trans 'Number of items without a place of publication:' %} {{ item_without_city_count }}
+({{ percentage_item_without_city_count }}%)
+<div class="{{ chart_id }}">
+    <div id="{{ chart_id }}__chart"></div>
+</div>
+<a href="{% url 'places_ranking' %}" target="_blank" class="btn btn-default">{% trans 'Full list of places of publication' %}</a>
+
+
+<script type="text/javascript">
+    var data = {{ item_count|safe }};
+
+    var chart = c3.generate({
+        bindto: '#{{ chart_id }}__chart',
+        data: {
+            columns: data,
+            type: 'pie'
+        },
+        legend: {
+            show: {{ show_legend|default:"true" }},
+            position: 'right',
+        },
+        tooltip: {
+            format: {
+                title: function (d) { return d; },
+                value: function (value, ratio, id) {
+                    percentage = (100 * ratio).toFixed(1)
+                    return percentage + '% (' + value + ' items)';
+                }
+            }
+        }
+    });
+
+</script>

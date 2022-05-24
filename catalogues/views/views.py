@@ -99,7 +99,7 @@ class CollectionStatisticsView(TemplateView):
                 },
                 {
                     'id': 'collection_city_chart',
-                    'title': _('Number of items per city'),
+                    'title': _('Number of items per place of publication'),
                     'url': reverse_lazy('get_collection_city_chart')
                 },
                 {
@@ -217,15 +217,22 @@ def get_collection_city_chart(request):
         .order_by('-item_count') \
         .values('name', 'item_count')
 
+    item_with_city_count = Item.objects.filter(lot__collection__in=filter.qs, edition__place__isnull=False).count()
+    item_without_city_count = Item.objects.filter(lot__collection__in=filter.qs, edition__place__isnull=True).count()
+
     context = {
         'chart_id': 'item_count_per_city',
         'item_count': json.dumps([
             [escape(city['name']), city['item_count'] ] for city in cities
         ]),
-        'show_legend': 'false'
+        'show_legend': 'false',
+        'item_without_city_count': item_without_city_count,
+        'percentage_item_without_city_count': round(100 * item_without_city_count
+                                                    / (item_without_city_count + item_with_city_count),
+                                                    2)
     }
 
-    return render(request, 'generic_pie_chart.html', context=context)
+    return render(request, 'catalogues/place_of_publication_pie_chart.html', context=context)
 
 
 def get_collection_language_chart(request):
