@@ -138,6 +138,11 @@
     </nav>
     <!-- end top bar -->
 
+    <div class="alert alert-warning">
+        <span class="glyphicon glyphicon-warning-sign"></span>
+        This database is under construction - For more information, see the page '<a href="{% url 'about' %}">About</a>'
+    </div>
+
     <div class="container-fluid">
         {% block content %}(no content){% endblock %}
     </div>
