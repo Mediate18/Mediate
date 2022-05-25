@@ -271,14 +271,21 @@ def get_collection_parisian_category_chart(request):
     
     counts = get_item_counts_for('parisian_category__name', filter.qs, max_publication_year)
 
+    unclassified_items_count = Item.objects.filter(lot__collection__in=filter.qs, parisian_category__isnull=True).count()
+    classified_items_count = Item.objects.filter(lot__collection__in=filter.qs, parisian_category__isnull=False).count()
+
     context = {
         'chart_id': 'item_count_per_parisian_category',
         'item_count': json.dumps([
             [item[0], item[1]] for item in sorted(counts, key=lambda pair: pair[1], reverse=True)
-        ])
+        ]),
+        'unclassified_items_count': unclassified_items_count,
+        'percentage_unclassified_items_count': round(100 * unclassified_items_count
+                                                     / (unclassified_items_count + classified_items_count),
+                                                     2)
     }
 
-    return render(request, 'generic_pie_chart.html', context=context)
+    return render(request, 'catalogues/parisian_category_pie_chart.html', context=context)
 
 
 def get_collection_format_chart(request):
