@@ -446,10 +446,9 @@ class CollectionUpdateView(PermissionRequiredMixin, UpdateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         collection = self.get_object()
-        kwargs['datasets'] = get_datasets_for_session(
-            self.request,
-            collection.catalogue.first().dataset
-        )
+
+        # Only offer things from the same dataset as this collection
+        kwargs['datasets'] = [collection.catalogue.first().dataset]
         if collection.catalogue.first().dataset not in get_datasets_for_session(self.request):
             messages.warning(self.request,
                              format_html(_("The dataset this Collection belongs to, <i>{}</i>, is "
