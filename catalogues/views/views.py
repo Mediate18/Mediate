@@ -167,7 +167,16 @@ def get_collections_chart(request):
 
 
 def get_item_counts_for(item_field_name, collection_qs, max_publication_year):
-    items = Item.objects.filter(lot__collection__in=collection_qs, edition__year_start__lte=max_publication_year)
+    """
+    Get item counts
+    :param item_field_name: a field relative to Item (may contain relations with __)
+    :param collection_qs: a Collection queryset to filter items with
+    :param max_publication_year: the maximum publication year of an edition to filter items with
+    :return:
+    """
+    edition_q = Q(edition__isnull=True) | Q(edition__year_start__isnull=True) | Q(edition__year_start__lte=max_publication_year)
+    items = Item.objects.filter(lot__collection__in=collection_qs)
+    items = items.filter(edition_q)
     items = items.values(item_field_name)
     targets = [item[item_field_name]
                            for item in items
@@ -184,12 +193,12 @@ def get_collection_country_chart(request):
     if not max_publication_year:
         max_publication_year = 0
 
+    edition_q = Q(place__edition__isnull=True) | Q(place__edition__year_start__isnull=True) \
+                | Q(place__edition__year_start__lte=max_publication_year)
     item_count_per_country = [ [escape(country['name']), country['item_count'] ] for country in
         Country.objects \
             .filter(place__edition__items__lot__collection__in=filter.qs) \
-            .annotate(item_count=Count('place__edition__items',
-                                       Q(place__edition__year_start__lte=
-                                         max_publication_year)))\
+            .annotate(item_count=Count('place__edition__items', edition_q))\
             .order_by('-item_count')\
             .values('name', 'item_count')
     ]
@@ -210,9 +219,11 @@ def get_collection_city_chart(request):
     if not max_publication_year:
         max_publication_year = 0
 
+    edition_q = Q(edition__isnull=True) | Q(edition__year_start__isnull=True) | Q(
+        edition__year_start__lte=max_publication_year)
     cities = Place.objects\
         .filter(edition__items__lot__collection__in=filter.qs) \
-        .annotate(item_count=Count('edition__items', Q(edition__year_start__lte=max_publication_year))) \
+        .annotate(item_count=Count('edition__items', edition_q)) \
         .filter(item_count__gt=0) \
         .order_by('-item_count') \
         .values('name', 'item_count')
@@ -244,11 +255,11 @@ def get_collection_language_chart(request):
     if not max_publication_year:
         max_publication_year = 0
 
+    edition_q = Q(items__item__edition__isnull=True) | Q(items__item__edition__year_start__isnull=True) | Q(
+        items__item__edition__year_start__lte=max_publication_year)
     languages = Language.objects.all()
     languages = languages.filter(items__item__lot__collection__in=filter.qs)
-    languages = languages.annotate(item_count=Count('items__item',
-                                                    Q(items__item__edition__year_start__lte=
-                                                      max_publication_year)))
+    languages = languages.annotate(item_count=Count('items__item', edition_q))
     languages = languages.order_by('-item_count')
     languages = languages.values('name', 'item_count')
 
@@ -297,8 +308,10 @@ def get_collection_format_chart(request):
         if not max_publication_year:
             max_publication_year = 0
 
+        edition_q = Q(items__edition__isnull=True) | Q(items__edition__year_start__isnull=True) | Q(
+            items__edition__year_start__lte=max_publication_year)
         formats = BookFormat.objects.filter(items__lot__collection__in=filter.qs)
-        formats = formats.annotate(item_count=Count('items', Q(items__edition__year_start__lte=max_publication_year)))
+        formats = formats.annotate(item_count=Count('items', edition_q))
         formats = formats.order_by('-item_count')
         formats = formats.values('name', 'item_count')
 
@@ -322,10 +335,13 @@ def get_collection_author_gender_chart(request):
     from functools import reduce
     from collections import defaultdict
 
+    edition_q = Q(personitemrelation__item__edition__isnull=True) \
+                | Q(personitemrelation__item__edition__year_start__isnull=True) \
+                | Q(personitemrelation__item__edition__year_start__lte=max_publication_year)
     sexes = list(Person.objects.annotate(item_count=Count('personitemrelation__item',
                                       filter=Q(personitemrelation__role__name="author",
-                                               personitemrelation__item__lot__collection__in=filter.qs,
-                                               personitemrelation__item__edition__year_start__lte=max_publication_year),
+                                               personitemrelation__item__lot__collection__in=filter.qs)
+                                             & edition_q,
                                       distinct=True)) \
                  .values_list('sex', 'item_count'))
 
