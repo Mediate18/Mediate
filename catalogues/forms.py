@@ -12,7 +12,7 @@ class CollectionModelForm(forms.ModelForm):
         model = Collection
         fields = "__all__"
         widgets = {
-            'catalogue': ModelSelect2Widget(
+            'catalogue': ModelSelect2MultipleWidget(
                 queryset=Catalogue.objects.all(),
                 search_fields=['name__icontains'],
             ),
@@ -24,9 +24,9 @@ class CollectionModelForm(forms.ModelForm):
         super().__init__(**kwargs)
 
         if self.datasets:
-            self.fields['catalogue'] = forms.ModelChoiceField(
+            self.fields['catalogue'] = forms.ModelMultipleChoiceField(
                 queryset=Catalogue.objects.filter(dataset__in=self.datasets),
-                widget=ModelSelect2Widget(
+                widget=ModelSelect2MultipleWidget(
                     queryset=Catalogue.objects.filter(dataset__in=self.datasets),
                     search_fields=['name__icontains'],
                 ),

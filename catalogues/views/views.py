@@ -378,7 +378,7 @@ class CollectionDetailView(PermissionRequiredMixin, DetailView):
     permission_required = 'catalogues.view_dataset'
 
     def get_permission_object(self):
-        return self.get_object().catalogue.dataset
+        return self.get_object().catalogue.first().dataset
     # End permission check
 
     def get_context_data(self, **kwargs):
@@ -440,7 +440,7 @@ class CollectionUpdateView(PermissionRequiredMixin, UpdateView):
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().catalogue.dataset
+        return self.get_object().catalogue.first().dataset
     # End permission check
 
     def get_form_kwargs(self):
@@ -448,19 +448,19 @@ class CollectionUpdateView(PermissionRequiredMixin, UpdateView):
         collection = self.get_object()
         kwargs['datasets'] = get_datasets_for_session(
             self.request,
-            collection.catalogue.dataset
+            collection.catalogue.first().dataset
         )
-        if collection.catalogue.dataset not in get_datasets_for_session(self.request):
+        if collection.catalogue.first().dataset not in get_datasets_for_session(self.request):
             messages.warning(self.request,
                              format_html(_("The dataset this Collection belongs to, <i>{}</i>, is "
                                            "currently not selected."),
-                                         collection.catalogue.dataset))
+                                         collection.catalogue.first().dataset))
 
         return kwargs
 
     def get(self, request, *args, **kwargs):
         # Check whether the user has permission to view this collection
-        if not self.request.user.has_perm('catalogues.change_dataset', self.get_object().catalogue.dataset):
+        if not self.request.user.has_perm('catalogues.change_dataset', self.get_object().catalogue.first().dataset):
             raise PermissionDenied
         return super().get(request, *args, **kwargs)
 
@@ -485,12 +485,12 @@ class CollectionDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().catalogue.dataset
+        return self.get_object().catalogue.first().dataset
     # End permission check
 
     def get(self, request, *args, **kwargs):
         # Check whether the user has permission to view this collection
-        if not self.request.user.has_perm('catalogues.change_dataset', self.get_object().catalogue.dataset):
+        if not self.request.user.has_perm('catalogues.change_dataset', self.get_object().catalogue.first().dataset):
             raise PermissionDenied
         return super().get(request, *args, **kwargs)
 
@@ -528,7 +528,7 @@ class CollectionHeldByDetailView(PermissionRequiredMixin, DetailView):
     permission_required = 'catalogues.view_dataset'
 
     def get_permission_object(self):
-        return self.get_object().collection.catalogue.dataset
+        return self.get_object().collection.catalogue.first().dataset
     # End permission check
 
 
@@ -657,7 +657,7 @@ class CollectionCollectionTypeRelationDetailView(PermissionRequiredMixin, Detail
     permission_required = 'catalogues.view_dataset'
 
     def get_permission_object(self):
-        return self.get_object().collection.catalogue.dataset
+        return self.get_object().collection.catalogue.first().dataset
     # End permission check
 
 
@@ -689,7 +689,7 @@ class CollectionCollectionTypeRelationUpdateView(PermissionRequiredMixin, Update
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().collection.catalogue.dataset
+        return self.get_object().collection.catalogue.first().dataset
     # End permission check
 
     def get_form_kwargs(self):
@@ -699,11 +699,11 @@ class CollectionCollectionTypeRelationUpdateView(PermissionRequiredMixin, Update
             self.request,
             relation.collection
         )
-        if relation.collection.catalogue.dataset not in get_datasets_for_session(self.request):
+        if relation.collection.catalogue.first().dataset not in get_datasets_for_session(self.request):
             messages.warning(self.request,
                              format_html(_("The dataset this CollectionCollectionTypeRelation belongs to, <i>{}</i>, is "
                                            "currently not selected."),
-                                         relation.collection.catalogue.dataset))
+                                         relation.collection.catalogue.first().dataset))
 
         return kwargs
 
@@ -722,7 +722,7 @@ class CollectionCollectionTypeRelationDeleteView(PermissionRequiredMixin, Delete
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().collection.catalogue.dataset
+        return self.get_object().collection.catalogue.first().dataset
     # End permission check
 
 
@@ -978,7 +978,7 @@ class LotDetailView(PermissionRequiredMixin, GenericDetailView):
     permission_required = 'catalogues.view_dataset'
 
     def get_permission_object(self):
-        return self.get_object().collection.catalogue.dataset
+        return self.get_object().collection.catalogue.first().dataset
     # End permission check
 
 
@@ -1011,7 +1011,7 @@ class LotUpdateView(PermissionRequiredMixin, UpdateView):
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().collection.catalogue.dataset
+        return self.get_object().collection.catalogue.first().dataset
     # End permission check
 
     def get_form_kwargs(self):
@@ -1021,11 +1021,11 @@ class LotUpdateView(PermissionRequiredMixin, UpdateView):
             self.request,
             lot.collection
         )
-        if lot.collection.catalogue.dataset not in get_datasets_for_session(self.request):
+        if lot.collection.catalogue.first().dataset not in get_datasets_for_session(self.request):
             messages.warning(self.request,
                              format_html(_("The dataset this Lot belongs to, <i>{}</i>, is "
                                            "currently not selected."),
-                                         lot.collection.catalogue.dataset))
+                                         lot.collection.catalogue.first().dataset))
         return kwargs
 
     def get_success_url(self):
@@ -1050,14 +1050,14 @@ class LotDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().collection.catalogue.dataset
+        return self.get_object().collection.catalogue.first().dataset
     # End permission check
 
 
 def previous_lot_view(request, pk, index):
     try:
         lot = Lot.objects.get(collection__uuid=pk, index_in_collection=index)
-        if not request.user.has_perm('catalogues.view_dataset', lot.collection.catalogue.dataset):
+        if not request.user.has_perm('catalogues.view_dataset', lot.collection.catalogue.first().dataset):
             raise PermissionDenied()
         return JsonResponse({
             'success': True,
@@ -1072,7 +1072,7 @@ def previous_lot_view(request, pk, index):
 
 def expand_lot_view(request, pk):
     lot = get_object_or_404(Lot, pk=pk)
-    if not request.user.has_perm('catalogues.view_dataset', lot.collection.catalogue.dataset):
+    if not request.user.has_perm('catalogues.view_dataset', lot.collection.catalogue.first().dataset):
         raise PermissionDenied()
     next_url = reverse_lazy('collection_detail_bare', args=[str(lot.collection.uuid)])
 
@@ -1116,7 +1116,7 @@ def add_lot_before(request, pk):
     :return: 
     """
     lot_after = get_object_or_404(Lot, pk=pk)
-    if not request.user.has_perm('catalogues.change_dataset', lot_after.collection.catalogue.dataset):
+    if not request.user.has_perm('catalogues.change_dataset', lot_after.collection.catalogue.first().dataset):
         raise PermissionDenied()
 
     # Determine whether there is a lot before the selected position
@@ -1187,7 +1187,7 @@ def add_lot_at_end(request, pk):
     :return:
     """
     collection = get_object_or_404(Collection, pk=pk)
-    if not request.user.has_perm('catalogues.change_dataset', collection.catalogue.dataset):
+    if not request.user.has_perm('catalogues.change_dataset', collection.catalogue.first().dataset):
         raise PermissionDenied()
     last_lot = Lot.objects.filter(collection=collection).order_by('-index_in_collection').first()
 
@@ -1262,7 +1262,7 @@ class PersonCollectionRelationDetailView(PermissionRequiredMixin, DetailView):
     permission_required = 'catalogues.view_dataset'
 
     def get_permission_object(self):
-        return self.get_object().collection.catalogue.dataset
+        return self.get_object().collection.catalogue.first().dataset
     # End permission check
 
 
@@ -1294,7 +1294,7 @@ class PersonCollectionRelationUpdateView(PermissionRequiredMixin, UpdateView):
     permission_required = 'catalogues.view_dataset'
 
     def get_permission_object(self):
-        return self.get_object().collection.catalogue.dataset
+        return self.get_object().collection.catalogue.first().dataset
 
     # End permission check
 
@@ -1305,11 +1305,11 @@ class PersonCollectionRelationUpdateView(PermissionRequiredMixin, UpdateView):
             self.request,
             personcollectionrelation.collection
         )
-        if personcollectionrelation.collection.catalogue.dataset not in get_datasets_for_session(self.request):
+        if personcollectionrelation.collection.catalogue.first().dataset not in get_datasets_for_session(self.request):
             messages.warning(self.request,
                              format_html(_("The dataset this PersonCollectionRelation belongs to, <i>{}</i>, is "
                                            "currently not selected."),
-                                         personcollectionrelation.collection.catalogue.dataset))
+                                         personcollectionrelation.collection.catalogue.first().dataset))
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -1327,7 +1327,7 @@ class PersonCollectionRelationDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = 'catalogues.view_dataset'
 
     def get_permission_object(self):
-        return self.get_object().collection.catalogue.dataset
+        return self.get_object().collection.catalogue.first().dataset
     # End permission check
 
 
@@ -1424,7 +1424,7 @@ class PersonCatalogueRelationDetailView(PermissionRequiredMixin, DetailView):
     permission_required = 'catalogues.view_dataset'
 
     def get_permission_object(self):
-        return self.get_object().catalogue.dataset
+        return self.get_object().catalogue.first().dataset
     # End permission check
 
 
@@ -1489,7 +1489,7 @@ class PersonCatalogueRelationDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().catalogue.dataset
+        return self.get_object().catalogue.first().dataset
     # End permission check
 
 
@@ -1526,7 +1526,7 @@ class CollectionPlaceRelationDetailView(PermissionRequiredMixin, DetailView):
     permission_required = 'catalogues.view_dataset'
 
     def get_permission_object(self):
-        return self.get_object().collection.catalogue.dataset
+        return self.get_object().collection.catalogue.first().dataset
     # End permission check
 
 
@@ -1558,7 +1558,7 @@ class CollectionPlaceRelationUpdateView(PermissionRequiredMixin, UpdateView):
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().collection.catalogue.dataset
+        return self.get_object().collection.catalogue.first().dataset
     # End permission check
 
     def get_form_kwargs(self):
@@ -1568,11 +1568,11 @@ class CollectionPlaceRelationUpdateView(PermissionRequiredMixin, UpdateView):
             self.request,
             relation.collection
         )
-        if relation.collection.catalogue.dataset not in get_datasets_for_session(self.request):
+        if relation.collection.catalogue.first().dataset not in get_datasets_for_session(self.request):
             messages.warning(self.request,
                              format_html(_("The dataset this CollectionPlaceRelation belongs to, <i>{}</i>, is "
                                            "currently not selected."),
-                                         relation.collection.catalogue.dataset))
+                                         relation.collection.catalogue.first().dataset))
 
         return kwargs
 
@@ -1591,7 +1591,7 @@ class CollectionPlaceRelationDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().collection.catalogue.dataset
+        return self.get_object().collection.catalogue.first().dataset
     # End permission check
 
 
@@ -1629,7 +1629,7 @@ class CategoryDetailView(PermissionRequiredMixin, GenericDetailView):
     permission_required = 'catalogues.view_dataset'
 
     def get_permission_object(self):
-        return self.get_object().collection.catalogue.dataset
+        return self.get_object().collection.catalogue.first().dataset
     # End permission check
 
 
@@ -1662,7 +1662,7 @@ class CategoryUpdateView(PermissionRequiredMixin, UpdateView):
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().collection.catalogue.dataset
+        return self.get_object().collection.catalogue.first().dataset
     # End permission check
 
     def get_form_kwargs(self):
@@ -1676,11 +1676,11 @@ class CategoryUpdateView(PermissionRequiredMixin, UpdateView):
             Q(collection__catalogue__dataset__in=get_datasets_for_session(self.request))
             | Q(pk=category.pk)
         )
-        if category.collection.catalogue.dataset not in get_datasets_for_session(self.request):
+        if category.collection.catalogue.first().dataset not in get_datasets_for_session(self.request):
             messages.warning(self.request,
                              format_html(_("The dataset this Category belongs to, <i>{}</i>, is "
                                            "currently not selected."),
-                                         category.collection.catalogue.dataset))
+                                         category.collection.catalogue.first().dataset))
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -1698,7 +1698,7 @@ class CategoryDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = 'catalogues.change_dataset'
 
     def get_permission_object(self):
-        return self.get_object().collection.catalogue.dataset
+        return self.get_object().collection.catalogue.first().dataset
     # End permission check
 
 

@@ -4,6 +4,8 @@ from django.db.models.deletion import CASCADE, SET_NULL
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse_lazy
 from django.contrib.contenttypes.fields import GenericRelation
+from django.dispatch import receiver
+from django.core.exceptions import ValidationError
 
 
 import uuid
@@ -92,7 +94,7 @@ class Collection(models.Model):
     terminus_post_quem = models.BooleanField(_("Terminus post quem"), default=False)
     notes = models.TextField(_("Notes for the Mediate project"), null=True)
     bibliography = models.TextField(_("Bibliography"), null=True)
-    catalogue = models.ForeignKey(Catalogue, on_delete=SET_NULL, null=True)
+    catalogue = models.ManyToManyField(Catalogue, related_name='collection', through='CatalogueCollectionRelation')
 
     tags = GenericRelation(TaggedEntity, related_query_name='collections')
 
@@ -129,6 +131,42 @@ class Collection(models.Model):
     @property
     def sorted_lot_set(self):
         return self.lot_set.order_by('index_in_collection', 'number_in_collection')
+
+
+class CatalogueCollectionRelation(models.Model):
+    """
+    The Catalogue - Collection 'through' model
+    """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    catalogue = models.ForeignKey(Catalogue, on_delete=CASCADE)
+    collection = models.ForeignKey(Collection, on_delete=CASCADE)
+
+
+def check_unique_dataset_for_catalogue_collection(catalogue, collection):
+    """
+    Checks whether all catalogues of a collection belong to a single dataset
+    """
+    first_catalogue_of_collection = collection.catalogue.first()
+    if first_catalogue_of_collection and first_catalogue_of_collection.dataset != catalogue.dataset:
+        raise ValidationError("All catalogues of one collection must belong to the same dataset")
+
+
+@receiver(models.signals.m2m_changed, sender=Collection.catalogue.through)
+def check_unique_dataset(sender, instance, action, reverse, model, pk_set, **kwargs):
+    """
+    Checks whether all catalogues of a collection belong to a single dataset on adding a relation
+    """
+    # Is there at least one pk?
+    first_pk = next(iter(pk_set)) if pk_set is not None and len(pk_set) else None
+    if not first_pk:
+        return
+
+    if not 'pre_add':
+        return
+
+    catalogue  = instance if     reverse else model.objects.get(uuid=first_pk)
+    collection = instance if not reverse else model.objects.get(uuid=first_pk)
+    check_unique_dataset_for_catalogue_collection(catalogue, collection)
 
 
 class CollectionCollectionTypeRelation(models.Model):

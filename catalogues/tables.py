@@ -72,9 +72,10 @@ class CollectionTable(tables.Table):
         return record.item_count()
 
     def render_percentage_non_books(self, record):
-        return "{}%".format(
+        item_count = record.item_count()
+        percentage = 0.00 if not item_count else \
             round(100 * Item.objects.filter(lot__collection=record, non_book=True).count() / record.item_count(), 2)
-        )
+        return "{}%".format(percentage)
 
     def render_related_places(self, record):
         relations = CollectionPlaceRelation.objects.filter(collection=record).prefetch_related('type')

@@ -50,7 +50,8 @@ class DatasetTests(GenericCRUDTestMixin, TestCase):
 class CatalogueTests(GenericCRUDTestMixin, TestCase):
     model = Catalogue
 
-    def get_add_form_data(self):
+    @staticmethod
+    def get_add_form_data():
         dataset, created = Dataset.objects.get_or_create(**DatasetTests().get_add_form_data())
         return {
             'name': 'name_test',
@@ -69,15 +70,13 @@ class CollectionTests(GenericCRUDTestMixin, TestCase):
     def get_add_form_data(self):
         source_material, created = SourceMaterial.objects.get_or_create(name="source_material test")
         transcription, created = Transcription.objects.get_or_create(source_material=source_material, curator="curator test")
-        catalogue, created = Catalogue.objects.get_or_create(**CatalogueTests().get_add_form_data())
         return {
             'transcription_id': transcription.pk,
             'short_title': 'short_title test1',
             'full_title': 'full_title test',
             'preface_and_paratexts': 'preface_and_paratexts test',
             'year_of_publication': 1666,
-            'bibliography': 'bibliography test',
-            'catalogue_id': catalogue.pk
+            'bibliography': 'bibliography test'
         }
 
     def get_change_form_data(self):
@@ -90,6 +89,39 @@ class CollectionTests(GenericCRUDTestMixin, TestCase):
         client = Client()
         client.login(username=self.username, password=self.password)
         response = client.get(reverse_lazy(self.get_url_name('list')))
+        self.assertEqual(response.status_code, 200)
+
+    def test_Detail(self):
+        """Tests the Detail view"""
+        collection, created = self.model.objects.get_or_create(**self.get_add_form_data())
+        catalogue, created = Catalogue.objects.get_or_create(**CatalogueTests.get_add_form_data())
+        collection.catalogue.add(catalogue)
+
+        client = Client()
+        client.login(username=self.username, password=self.password)
+        response = client.get(reverse_lazy(self.get_url_name('detail', postfix=True),
+                                           args=[collection.uuid]))
+        self.assertEqual(response.status_code, 200)
+
+    def test_Change(self):
+        """Tests the Change view"""
+        # Test permission
+        permission = self.get_permission_string('change')
+        self.assertTrue(self.user.has_perm(permission))
+
+        # Get the Change form
+        collection, created = self.model.objects.get_or_create(**self.get_add_form_data())
+        catalogue, created = Catalogue.objects.get_or_create(**CatalogueTests.get_add_form_data())
+        collection.catalogue.add(catalogue)
+
+        client = Client()
+        client.login(username=self.username, password=self.password)
+        response = client.get(reverse_lazy(self.get_url_name('change'), args=[collection.uuid]))
+        self.assertEqual(response.status_code, 200)
+
+        # Post to the Change form
+        response = client.post(reverse_lazy(self.get_url_name('change'), args=[collection.uuid]),
+                               self.get_change_form_data(), follow=True)
         self.assertEqual(response.status_code, 200)
 
     def test_Deletion_of_Editions(self):
@@ -191,7 +223,9 @@ class CollectionCollectionTypeRelationTests(GenericCRUDTestMixin, TestCase):
     model = CollectionCollectionTypeRelation
 
     def get_add_form_data(self):
+        catalogue, created = Catalogue.objects.get_or_create(**CatalogueTests().get_add_form_data())
         collection, created = Collection.objects.get_or_create(**CollectionTests().get_add_form_data())
+        collection.catalogue.add(catalogue)
         collection_type, created = CollectionType.objects.get_or_create(**CollectionTypeTests().get_add_form_data())
         return {
             'collection_id': collection.pk,
@@ -216,7 +250,9 @@ class CollectionHeldByTests(GenericCRUDTestMixin, TestCase):
 
     def get_add_form_data(self):
         library, created = Library.objects.get_or_create(**LibraryTests().get_add_form_data())
+        catalogue, created = Catalogue.objects.get_or_create(**CatalogueTests().get_add_form_data())
         collection, created = Collection.objects.get_or_create(**CollectionTests().get_add_form_data())
+        collection.catalogue.add(catalogue)
         return {
             'library': library,
             'collection': collection
@@ -304,7 +340,9 @@ class PersonCollectionRelationTests(GenericCRUDTestMixin, TestCase):
 
     def get_add_form_data(self):
         person, created = Person.objects.get_or_create(**PersonTests().get_add_form_data())
+        catalogue, created = Catalogue.objects.get_or_create(**CatalogueTests().get_add_form_data())
         collection, created = Collection.objects.get_or_create(**CollectionTests().get_add_form_data())
+        collection.catalogue.add(catalogue)
         role, created = PersonCollectionRelationRole.objects.get_or_create(**PersonCollectionRelationRoleTests().get_add_form_data())
         return {
             'person_id': person.pk,
@@ -350,7 +388,9 @@ class CategoryTests(GenericCRUDTestMixin, TestCase):
     url_names = {'list': 'categories'}
 
     def get_add_form_data(self):
+        catalogue, created = Catalogue.objects.get_or_create(**CatalogueTests().get_add_form_data())
         collection, created = Collection.objects.get_or_create(**CollectionTests().get_add_form_data())
+        collection.catalogue.add(catalogue)
         parent, created = Category.objects.get_or_create(collection=collection,
                                                          bookseller_category='bookseller_category test2')
         parisian_category, create = ParisianCategory.objects.get_or_create(**ParisianCategoryTests().get_add_form_data())
