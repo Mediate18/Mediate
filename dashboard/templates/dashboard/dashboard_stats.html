@@ -9,7 +9,7 @@
                         <span>{{ number_of_editions_without_items }}</span>
                         {% if number_of_editions_without_items > 0 %}
                             <a title="View editions without items"
-                               href="{% url 'editions' %}?number_of_items_0=0&number_of_items_1=0">
+                               href="{% url 'editions' %}?number_of_items_min=0&number_of_items_max=0">
                                 <span class="glyphicon glyphicon-th-list"></span>
                             </a>
                         {% endif %}
@@ -19,7 +19,7 @@
                         <span>{{ number_of_editions_gt_1_item }}</span>
                         {% if number_of_editions_gt_1_item > 0 %}
                             <a title="View edition with more than one item"
-                               href="{% url 'editions' %}?number_of_items_0=2">
+                               href="{% url 'editions' %}?number_of_items_min=2">
                                 <span class="glyphicon glyphicon-th-list"></span>
                             </a>
                         {% endif %}
@@ -58,7 +58,7 @@
                         <span>{{ number_of_lots_without_items }}</span>
                         {% if number_of_lots_without_items > 0 %}
                             <a title="View editions without items"
-                               href="{% url 'lots' %}?number_of_items_0=0&number_of_items_1=0">
+                               href="{% url 'lots' %}?number_of_items_min=0&number_of_items_max=0">
                                 <span class="glyphicon glyphicon-th-list"></span>
                             </a>
                         {% endif %}
