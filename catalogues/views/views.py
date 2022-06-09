@@ -1105,7 +1105,7 @@ def expand_lot_view(request, pk):
                 index_in_lot = last_item_index + index - 1
                 short_title = "{} [{} of {}]".format(prefix, index, number)
                 item = Item.objects.create(short_title=short_title, lot=lot, index_in_lot=index_in_lot,
-                                           catalogue=lot.collection.catalogue, edition=edition)
+                                           catalogue=lot.collection.catalogue.first(), edition=edition)
         return HttpResponseRedirect(next_url)
     elif request.method == 'GET':
         next_url = request.GET.get('next', next_url)

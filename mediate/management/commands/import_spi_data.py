@@ -123,7 +123,7 @@ class Command(BaseCommand):
                 insert_fields = {
                     'short_title': short_title[:128],
                     'lot': lot,
-                    'catalogue': lot.collection.catalogue,
+                    'catalogue': lot.collection.catalogue.first(),
                     'number_of_volumes': row['number_of_volumes'],
                     'book_format': book_format,
                     'index_in_lot': row['index_in_lot'],
@@ -232,7 +232,7 @@ class Command(BaseCommand):
                         raise Exception("Catalogue {} already exists and has collections linked to.".format(catalogue))
 
                 collection = collections.models.Collection(**insert_fields)
-                collection.catalogue = catalogue
+                collection.catalogue.add(catalogue)
                 collection.save()
                 self.create_lots(collection, row['id'], cursor)
             except Exception as e:

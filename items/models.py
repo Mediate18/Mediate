@@ -133,9 +133,10 @@ class Item(models.Model):
 
     def clean(self):
         if self.lot and self.lot.collection and self.lot.collection.catalogue:
+            collection_catalogue = self.lot.collection.catalogue.first()
             if not self.catalogue:
-                self.catalogue = self.lot.collection.catalogue
-            elif self.catalogue != self.lot.collection.catalogue:
+                self.catalogue = collection_catalogue
+            elif self.catalogue != collection_catalogue:
                 raise ValidationError({'catalogue':
                     _("The catalogue of this item and the catalogue of the collection of this item, are not the same.")
                                    })
