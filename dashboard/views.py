@@ -48,17 +48,23 @@ def view_totals(request):
     :param request:
     :return:
     """
-    collections = list(get_collections_for_session(request))
-    collections_count = get_collections_for_session(request).count()
+    collections_for_session = get_collections_for_session(request)
+    collections = list(collections_for_session)
+    collections_count = collections_for_session.distinct().count()
     book_items = Item.objects.filter(lot__collection__in=collections, non_book=False).count()
     non_book_items = Item.objects.filter(lot__collection__in=collections, non_book=True).count()
-    works = Work.objects.count()
-    persons = Person.objects.count()
-    female_persons = Person.objects.filter(sex=Person.FEMALE).count()
+    works = Work.objects.filter(items__item__lot__collection__in=collections).distinct().count()
+    persons = Person.objects.filter(personitemrelation__item__lot__collection__in=collections).distinct().count()
+    female_persons = Person.objects.filter(sex=Person.FEMALE,
+                                           personitemrelation__item__lot__collection__in=collections)\
+                                    .distinct().count()
 
-    cities_of_publication = list(Place.objects.filter(edition__isnull=False).distinct().values_list('uuid', flat=True))
-    cities_of_birth = list(Place.objects.filter(persons_born__isnull=False).distinct().values_list('uuid', flat=True))
-    cities_of_death = list(Place.objects.filter(persons_born__isnull=False).distinct().values_list('uuid', flat=True))
+    cities_of_publication = list(Place.objects.filter(edition__items__lot__collection__in=collections_for_session)
+                                 .distinct().values_list('uuid', flat=True))
+    cities_of_birth = list(Place.objects.filter(persons_born__personitemrelation__item__lot__collection__in=collections)
+                           .distinct().values_list('uuid', flat=True))
+    cities_of_death = list(Place.objects.filter(persons_died__personitemrelation__item__lot__collection__in=collections)
+                           .distinct().values_list('uuid', flat=True))
     cities_list = list(set(cities_of_publication+cities_of_birth+cities_of_death))
     cities = len(cities_list)
     countries = Country.objects.filter(place__in=cities_list).distinct().count()
@@ -66,7 +72,7 @@ def view_totals(request):
     languages = Language.objects\
         .annotate(item_cnt=Count('items', filter=Q(items__item__lot__collection__in=collections,
                                                    items__item__non_book=False)))\
-        .filter(item_cnt__gt=0).count()
+        .filter(item_cnt__gt=0).distinct().count()
 
     item_person_relations = PersonItemRelation.objects.filter(item__lot__collection__in=collections,
                                                               item__non_book=False).values('item').distinct().count()
