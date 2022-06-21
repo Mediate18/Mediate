@@ -1,5 +1,5 @@
 import django_filters
-from django.db.models import Count
+from django.db.models import Count, Q
 from django_select2.forms import Select2MultipleWidget, ModelSelect2MultipleWidget
 from .models import *
 from mediate.tools import filter_multiple_words
@@ -62,10 +62,10 @@ class CollectionFilter(django_filters.FilterSet):
     )
     tag = django_filters.ModelMultipleChoiceFilter(
         label="Tag",
-        queryset=Tag.objects.filter(namespace='Catalogue'),
+        queryset=Tag.objects.filter(Q(namespace='Catalogue') | Q(namespace='Collection')),
         widget=ModelSelect2MultipleWidget(
             attrs={'data-placeholder': "Select multiple"},
-            queryset=Tag.objects.filter(namespace='Catalogue'),
+            queryset=Tag.objects.filter(Q(namespace='Catalogue') | Q(namespace='Collection')),
             search_fields=['name__icontains', 'value__icontains']
         ),
         method='tag_filter'
