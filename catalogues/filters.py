@@ -1,9 +1,10 @@
 import django_filters
 from django.db.models import Count
-from django_select2.forms import Select2MultipleWidget
+from django_select2.forms import Select2MultipleWidget, ModelSelect2MultipleWidget
 from .models import *
 from mediate.tools import filter_multiple_words
 from persons.models import Profession, Religion, Place, Country
+from tagme.models import Tag
 
 
 # Collection filter
@@ -58,6 +59,16 @@ class CollectionFilter(django_filters.FilterSet):
         queryset=Country.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
         method='country_filter'
+    )
+    tag = django_filters.ModelMultipleChoiceFilter(
+        label="Tag",
+        queryset=Tag.objects.filter(namespace='Catalogue'),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            queryset=Tag.objects.filter(namespace='Catalogue'),
+            search_fields=['name__icontains', 'value__icontains']
+        ),
+        method='tag_filter'
     )
 
     class Meta:
@@ -125,6 +136,11 @@ class CollectionFilter(django_filters.FilterSet):
     def country_filter(self, queryset, name, value):
         if value:
             return queryset.filter(related_places__place__country__in=value)
+        return queryset
+
+    def tag_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(tags__tag__in=value)
         return queryset
 
 
