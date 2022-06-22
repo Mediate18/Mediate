@@ -59,7 +59,8 @@ class CollectionTableView(ListView):
 
         context['action'] = _("add")
         context['object_name'] = "collection"
-        context['add_url'] = reverse_lazy('add_collection')
+        if self.request.user.has_perm('catalogues.add_collection'):
+            context['add_url'] = reverse_lazy('add_collection')
         context['map_url'] = reverse_lazy('collectionsmap')
 
         context['per_page_choices'] = [10, 25, 50, 100]
