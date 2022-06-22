@@ -342,3 +342,18 @@ class Category(models.Model):
 
 # Enable the simple-history registration:
 from .history import *
+
+
+# Clear cache when a model object is saved
+from django.db.models.signals import post_save, post_delete
+from mediate.tools import receiver_with_multiple_senders
+from django.core.cache import cache
+
+
+@receiver_with_multiple_senders([post_save, post_delete],[
+    Dataset, Catalogue, CatalogueYear, CollectionType, Library, Collection, CatalogueCollectionRelation,
+    CollectionCollectionTypeRelation, CollectionHeldBy, Lot, PersonCatalogueRelation, PersonCollectionRelationRole,
+    PersonCollectionRelation, CollectionPlaceRelationType, CollectionPlaceRelation, ParisianCategory, Category
+])
+def clear_cache(sender, instance, **kwargs):
+    cache.clear()

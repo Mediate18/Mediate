@@ -38,3 +38,14 @@ class TaggedEntity(models.Model):
 
 # Enable the simple-history registration:
 from .history import *
+
+
+# Clear cache when a model object is saved
+from django.db.models.signals import post_save, post_delete
+from mediate.tools import receiver_with_multiple_senders
+from django.core.cache import cache
+
+
+@receiver_with_multiple_senders([post_save, post_delete],[Tag, TaggedEntity])
+def clear_cache(sender, instance, **kwargs):
+    cache.clear()
