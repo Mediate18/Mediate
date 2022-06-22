@@ -5,15 +5,16 @@ from .models import *
 
 from collections import defaultdict
 
+
 from catalogues.models import PersonCollectionRelation
 from items.models import Item
 from persons.models import Country
-from mediate.columns import ActionColumn
+from mediate.columns import ActionColumn, render_action_column
 
 
 # Collection table
 class CollectionTable(tables.Table):
-    uuid = ActionColumn('collection_detail', 'change_collection', 'delete_collection', orderable=False)
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)#ActionColumn('collection_detail', 'change_collection', 'delete_collection', orderable=False)
     types = tables.Column(empty_values=(), verbose_name="Type(s)")
     owner = tables.Column(empty_values=(), orderable=False)
     number_of_lots = tables.Column(empty_values=(), orderable=False)
@@ -37,6 +38,14 @@ class CollectionTable(tables.Table):
             'related_places',
             'countries'
         ]
+
+    def render_uuid(self, record, value):
+        change_dataset_perm = self.request.user.has_perm('catalogues.change_dataset', record.catalogue.first().dataset)
+
+        url_name_change = 'change_collection' if change_dataset_perm else None
+        url_name_delete = 'delete_collection' if change_dataset_perm else None
+
+        return render_action_column(value, 'collection_detail', url_name_change, url_name_delete)
 
     def render_full_title(self, record, value):
         return format_html('<a href="{}">{}</a>'.format(reverse_lazy('collection_detail', args=[record.pk]),

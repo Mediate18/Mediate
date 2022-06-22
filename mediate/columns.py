@@ -37,3 +37,31 @@ class ActionColumn(tables.Column):
         return html
 
 
+def render_action_column(value, url_name_view, url_name_change, url_name_delete):
+    links = """
+        <div class="text-nowrap">
+    """
+    if url_name_view:
+        links += """
+            <a href="{}">
+                <span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-original-title="{}"></span>
+            </a>
+        """.format(reverse_lazy(url_name_view, kwargs={'pk': value}), _('View'))
+    if url_name_change:
+        links += """
+            <a href="{}">
+                <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-original-title="{}"></span>
+            </a>
+        """.format(reverse_lazy(url_name_change, kwargs={'pk': value}), _('Change'))
+    if url_name_delete:
+        links += """
+            <a class="delete-entry" href="" data-toggle="modal" data-target="#deleteModal" modal_url="{}">
+                <span class="glyphicon glyphicon-remove" data-toggle="tooltip" data-original-title="{}"></span>
+            </a>
+        """.format(reverse_lazy(url_name_delete, kwargs={'pk': value}), _('Delete'))
+    links += """
+    </div>
+    """
+    return format_html(links)
+
+
