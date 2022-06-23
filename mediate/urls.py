@@ -37,6 +37,9 @@ from items.views.api_views import *
 from persons.views.api_views import *
 from transcriptions.views.api_views import *
 
+from django_registration.backends.activation.views import RegistrationView
+from registration.forms import CustomRegistrationForm
+
 from django.contrib import admin
 admin.autodiscover()
 
@@ -101,6 +104,8 @@ urlpatterns = [
     path(r'', RedirectView.as_view(url='dashboard/'), name='home'),
     path('about/', TemplateView.as_view(template_name="about.html"), name='about'),
     path('admin/', admin.site.urls),
+    path('accounts/register/', RegistrationView.as_view(form_class=CustomRegistrationForm),
+         name="django_registration_register"),
     path('accounts/', include('django_registration.backends.activation.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path(r'items/', include(items.urls)),
