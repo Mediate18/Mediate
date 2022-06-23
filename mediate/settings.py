@@ -283,6 +283,7 @@ if SILK:
 # Django-registration settings
 ACCOUNT_ACTIVATION_DAYS = 7
 REGISTRATION_OPEN = config('REGISTRATION_OPEN', False, cast=bool)
+GROUP_NAME_FOR_GUEST_ACCOUNTS='guest'
 
 if APPLICATION_INSTANCE_TYPE.lower().startswith('dev'):
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
