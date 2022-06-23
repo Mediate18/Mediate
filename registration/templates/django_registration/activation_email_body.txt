@@ -1,0 +1,9 @@
+Dear {{ user }},
+
+Please visit the URL below to finish your registration to the Mediate database:
+
+{{ scheme }}://{{ request.get_host }}/accounts/activate/{{ activation_key }}/
+
+Kind regards,
+
+The Mediate database team

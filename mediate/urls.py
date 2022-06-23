@@ -101,6 +101,7 @@ urlpatterns = [
     path(r'', RedirectView.as_view(url='dashboard/'), name='home'),
     path('about/', TemplateView.as_view(template_name="about.html"), name='about'),
     path('admin/', admin.site.urls),
+    path('accounts/', include('django_registration.backends.activation.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path(r'items/', include(items.urls)),
     path(r'catalogues/', include(catalogues.urls)),

@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'test_without_migrations',
     'simple_history',
     'leaflet',
+    'django_registration',
     'simplemoderation',
     'tagme',
     'mediate',
@@ -279,3 +280,9 @@ if SILK:
     except ImportError:
         SILK = False
 
+# Django-registration settings
+ACCOUNT_ACTIVATION_DAYS = 7
+REGISTRATION_OPEN = config('REGISTRATION_OPEN', False, cast=bool)
+
+if APPLICATION_INSTANCE_TYPE.lower().startswith('dev'):
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

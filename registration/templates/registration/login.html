@@ -1,5 +1,7 @@
 {% extends "baselayout.html" %}
 
+{% load settings_lookup %}
+
 {% block content %}
 
 <div class="container">
@@ -46,16 +48,27 @@
                         </p>
                         <input type="hidden" name="next" value="{{ next }}" />
                     </form>
-                    <p class="bs-component">
-                        <center>
+                    <p class="bs-component text-center">
                             {# Assumes you setup the password_reset view in your URLconf #}
                             <a href="{% url 'password_reset' %}">Lost password?</a>
-                        </center>
                     </p>
                 </div>
             </div>
         </div>
     </div>
+
+    {% with r='REGISTRATION_OPEN' %}
+    {% if r|settings_value %}
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+                    <p class="bs-component text-center">
+                        If you don't have an account,
+                        <a href="{% url 'django_registration_register' %}">sign up here</a>
+                    </p>
+        </div>
+    </div>
+    {% endif %}
+    {% endwith %}
 </div>
 
 {% endblock %}
