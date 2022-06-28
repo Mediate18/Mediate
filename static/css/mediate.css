@@ -152,9 +152,16 @@ ol li, .page-content ul li {
 
 .panel {
 	font-size: medium;
-	font-weight: 700;
 	text-align: justify;
     text-justify: inter-word;
+}
+
+.panel th {
+    font-weight: 700;
+}
+
+.panel p {
+    font-size: medium;
 }
 
 .panel b {
