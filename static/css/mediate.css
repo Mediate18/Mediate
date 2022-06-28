@@ -444,3 +444,9 @@ h1 {
   		display:block !important;
 	}
 }
+
+.helptext {
+    top: 3px;
+    position: relative;
+    color: rgb(153, 153, 153);
+}
