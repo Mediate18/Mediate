@@ -10,6 +10,11 @@
                     <h3 class="panel-title">Sign up</h3>
                 </div>
                 <div class="panel-body">
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <strong>Your form contains one or more problems. Please review the form.</strong>
+                        </div>
+                    {% endif %}
                     <form method="post" action="{% url 'django_registration_register' %}">
                         {% csrf_token %}
                         <p class="bs-component">

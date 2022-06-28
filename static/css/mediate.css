@@ -457,3 +457,7 @@ h1 {
     position: relative;
     color: rgb(153, 153, 153);
 }
+
+.errorlist {
+    color: #b82b22;
+}
