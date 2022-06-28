@@ -367,7 +367,7 @@ h1 {
 
 /* END TABLE SORTING */
 
-.select2, input[type="text"] {
+.select2, input[type="text"], input[type="email"], input[type="password"]{
   min-width: 100%;
 }
 
