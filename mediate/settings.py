@@ -33,6 +33,7 @@ ADMINS = [
     ('Micha Hulsbosch', 'm.hulsbosch@let.ru.nl')
 ]
 
+DEFAULT_FROM_EMAIL="noreply@mediate-database.cls.ru.nl"
 
 # Application definition
 
