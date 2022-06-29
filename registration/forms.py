@@ -21,6 +21,11 @@ class CustomRegistrationForm(RegistrationForm):
             "password2",
         ]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['first_name'].widget.attrs.update({'autofocus': True})
+        self.fields[User.USERNAME_FIELD].widget.attrs.pop('autofocus')
+
     def clean(self):
         email = self.cleaned_data.get('email')
         if User.objects.filter(email=email).exists():
