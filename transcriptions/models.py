@@ -5,6 +5,8 @@ from django.urls import reverse_lazy
 
 import uuid
 
+from persons.models import Place
+
 from simplemoderation.tools import moderated
 
 
@@ -41,6 +43,14 @@ class Transcription(models.Model):
     def get_absolute_url(self):
         return reverse_lazy('transcription_detail', args=[str(self.uuid)])
 
+
+class ShelfMark(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    place = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True)
+    library = models.ForeignKey('catalogues.Library', on_delete=models.SET_NULL, null=True)
+    shelf_mark = models.CharField(_("Shelf mark"), max_length=128)
+
+
 class DocumentScan(models.Model):
     """
     Document scan
@@ -49,6 +59,7 @@ class DocumentScan(models.Model):
 
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     transcription = models.ForeignKey(Transcription, on_delete=models.SET_NULL, null=True, related_name="scans")
+    shelf_mark = models.ForeignKey(ShelfMark, on_delete=models.SET_NULL, null=True)
     scan = models.FileField(upload_to=DOCUMENT_SCAN_FOLDER)
 
 

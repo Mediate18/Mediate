@@ -11,7 +11,7 @@ from django.core.exceptions import ValidationError
 import uuid
 
 from persons.models import Person, Place
-from transcriptions.models import Transcription
+from transcriptions.models import Transcription, ShelfMark
 from tagme.models import TaggedEntity
 from simplemoderation.tools import moderated
 
@@ -87,6 +87,7 @@ class Collection(models.Model):
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     transcription = models.ForeignKey(Transcription, on_delete=SET_NULL, null=True)
+    shelf_mark = models.ForeignKey(ShelfMark, on_delete=SET_NULL, null=True)
     short_title = models.CharField(_("Short title"), max_length=128, null=True)
     full_title = models.TextField(_("Full title"), null=True)
     preface_and_paratexts = models.TextField(_("Preface or prefatory / concluding text"), null=True)
