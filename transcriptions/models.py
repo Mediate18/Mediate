@@ -48,7 +48,7 @@ class ShelfMark(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     place = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True)
     library = models.ForeignKey('catalogues.Library', on_delete=models.SET_NULL, null=True)
-    shelf_mark = models.CharField(_("Shelf mark"), max_length=128)
+    text = models.CharField(_("Shelf mark"), max_length=128)
 
 
 class DocumentScan(models.Model):
