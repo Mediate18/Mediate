@@ -16,3 +16,8 @@ class SourceMaterialAdmin(SimpleHistoryAdmin):
 @admin.register(Transcription)
 class TranscriptionAdmin(SimpleHistoryAdmin):
     pass
+
+
+@admin.register(ShelfMark)
+class ShelfMarkAdmin(SimpleHistoryAdmin):
+    pass
