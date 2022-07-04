@@ -279,7 +279,7 @@ class ShelfMarkTableView(ListView):
 
         context['action'] = _("add")
         context['object_name_plural'] = ShelfMark._meta.verbose_name_plural
-        # context['add_url'] = reverse_lazy('add_shelfmark')
+        context['add_url'] = reverse_lazy('add_shelfmark')
 
         return context
 
@@ -288,3 +288,40 @@ class ShelfMarkDetailView(DetailView):
     model = ShelfMark
     template_name = 'generic_detail.html'
 
+
+ShelfMarkFormset = inlineformset_factory(ShelfMark, DocumentScan, fields=('scan',), extra=2)
+
+
+class ShelfMarkCreateView(CreateView):
+    model = ShelfMark
+    template_name = 'shelfmark_form.html'
+    form_class = ShelfMarkModelForm
+    success_url = reverse_lazy('shelfmarks')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = _("add")
+        context['object_name'] = ShelfMark._meta.verbose_name
+        if self.request.POST:
+            context['documentscans'] = ShelfMarkFormset(self.request.POST, self.request.FILES)
+        else:
+            context['documentscans'] = ShelfMarkFormset()
+
+        # Remove the option to delete for new objects
+        for form in context['documentscans']:
+            if not form.initial:
+                del form.fields['DELETE']
+
+        return context
+    
+    def form_valid(self, form):
+        context = self.get_context_data()
+        formset = context['documentscans']
+        if formset.is_valid():
+            shelfmark = form.save()
+            formset.instance = shelfmark
+            formset.save()
+        else:
+            return self.render_to_response(self.get_context_data(form=form))
+
+        return redirect(self.success_url)

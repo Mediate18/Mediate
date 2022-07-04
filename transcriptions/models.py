@@ -53,11 +53,12 @@ class ShelfMark(models.Model):
     def __str__(self):
         strs = []
         if self.place:
-            strs.append(_("Place: {}".format(self.place)) )
+            strs.append(_("Place: {}").format(self.place))
         if self.library:
-            strs.append(_("Library: {}".format(self.library)))
-        strs.append(self.text)
-        return ", ".join(strs)
+            strs.append(_("Library: {}").format(self.library))
+        strs.append(_("Text: {}").format(self.text))
+        strs.append(_("Collection(s): {}").format(", ".join(self.collection_set.all())))
+        return "; ".join(strs)
 
 
 class DocumentScan(models.Model):
