@@ -45,4 +45,7 @@ urlpatterns = [
          permission_required('transcriptions.delete_transcription')(TranscriptionDeleteView.as_view()),
          name="delete_transcription"),
 
+    # ShelfMark urls
+    path('shelfmark/', permission_required('global.view_all')(ShelfMarkTableView.as_view()), name='shelfmarks'),
+
 ]
