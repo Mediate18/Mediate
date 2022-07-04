@@ -50,6 +50,15 @@ class ShelfMark(models.Model):
     library = models.ForeignKey('catalogues.Library', on_delete=models.SET_NULL, null=True)
     text = models.CharField(_("Shelf mark"), max_length=128)
 
+    def __str__(self):
+        strs = []
+        if self.place:
+            strs.append(_("Place: {}".format(self.place)) )
+        if self.library:
+            strs.append(_("Library: {}".format(self.library)))
+        strs.append(self.text)
+        return ", ".join(strs)
+
 
 class DocumentScan(models.Model):
     """

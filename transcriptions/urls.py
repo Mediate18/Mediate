@@ -47,5 +47,7 @@ urlpatterns = [
 
     # ShelfMark urls
     path('shelfmark/', permission_required('global.view_all')(ShelfMarkTableView.as_view()), name='shelfmarks'),
+    path(r'shelfmarks/<uuid:pk>', permission_required('global.view_all')(ShelfMarkDetailView.as_view()),
+         name="shelfmark_detail"),
 
 ]

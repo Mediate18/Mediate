@@ -279,7 +279,12 @@ class ShelfMarkTableView(ListView):
 
         context['action'] = _("add")
         context['object_name_plural'] = ShelfMark._meta.verbose_name_plural
-        context['add_url'] = reverse_lazy('add_shelfmark')
+        # context['add_url'] = reverse_lazy('add_shelfmark')
 
         return context
+
+
+class ShelfMarkDetailView(DetailView):
+    model = ShelfMark
+    template_name = 'generic_detail.html'
 
