@@ -318,9 +318,17 @@ class ShelfMarkCreateView(CreateView):
         context = self.get_context_data()
         formset = context['documentscans']
         if formset.is_valid():
+            # Save shelf-mark
             shelfmark = form.save()
+
+            # Save document scans
             formset.instance = shelfmark
             formset.save()
+
+            # Connect shelf-mark to collection(s)
+            for collection in form.cleaned_data['collection']:
+                collection.shelf_mark = shelfmark
+                collection.save()
         else:
             return self.render_to_response(self.get_context_data(form=form))
 

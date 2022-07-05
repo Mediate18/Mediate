@@ -57,7 +57,7 @@ class ShelfMark(models.Model):
         if self.library:
             strs.append(_("Library: {}").format(self.library))
         strs.append(_("Text: {}").format(self.text))
-        strs.append(_("Collection(s): {}").format(", ".join(self.collection_set.all())))
+        strs.append(_("Collection(s): {}").format(", ".join(self.collection_set.values_list('short_title', flat=True))))
         return "; ".join(strs)
 
 
