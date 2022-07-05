@@ -44,15 +44,15 @@ class ShelfMarkModelForm(forms.ModelForm):
         }
 
     def __init__(self, **kwargs):
-        self.datasets = kwargs.pop('datasets', None)
+        self.collection = kwargs.pop('collection', None)
         super().__init__(**kwargs)
         self.add_collection_field()
 
     def add_collection_field(self):
         collection = forms.ModelMultipleChoiceField(
-            queryset=Collection.objects.all(),
+            queryset=self.collection,
             widget=ModelSelect2MultipleWidget(
-                model=Collection,
+                queryset=self.collection,
                 search_fields=['short_title__icontains'],
                 attrs={'data-placeholder': "Select multiple"},
             ),

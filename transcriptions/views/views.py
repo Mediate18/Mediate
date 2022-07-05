@@ -13,6 +13,7 @@ import django_tables2
 
 from simplemoderation.models import Moderation
 
+from catalogues.views.views import get_datasets_for_session
 from ..forms import *
 from ..filters import *
 from ..tables import *
@@ -313,6 +314,11 @@ class ShelfMarkCreateView(CreateView):
                 del form.fields['DELETE']
 
         return context
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['collection'] = Collection.objects.filter(catalogue__dataset__in=get_datasets_for_session(self.request))
+        return kwargs
     
     def form_valid(self, form):
         context = self.get_context_data()
@@ -356,6 +362,11 @@ class ShelfMarkUpdateView(UpdateView):
                 del form.fields['DELETE']
 
         return context
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['collection'] = Collection.objects.filter(catalogue__dataset__in=get_datasets_for_session(self.request))
+        return kwargs
 
     def form_valid(self, form):
         context = self.get_context_data()
