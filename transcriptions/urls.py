@@ -52,6 +52,10 @@ urlpatterns = [
     path(r'shelfmarks/add', permission_required('transcriptions.add_shelfmark')(ShelfMarkCreateView.as_view()),
          name="add_shelfmark"),
     path(r'shelfmarks/edit/<uuid:pk>',
-         permission_required('transcriptions.change_shelfmark')(ShelfMarkUpdateView.as_view()), name="change_shelfmark")
+         permission_required('transcriptions.change_shelfmark')(ShelfMarkUpdateView.as_view()),
+         name="change_shelfmark"),
+    path(r'shelfmarks/delete/<uuid:pk>',
+         permission_required('transcriptions.delete_shelfmark')(ShelfMarkDeleteView.as_view()),
+         name="delete_shelfmark"),
 
 ]

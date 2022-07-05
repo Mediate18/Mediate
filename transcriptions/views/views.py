@@ -376,3 +376,8 @@ class ShelfMarkUpdateView(UpdateView):
             return self.render_to_response(self.get_context_data(form=form))
 
         return redirect(self.success_url)
+
+
+class ShelfMarkDeleteView(DeleteView):
+    model = ShelfMark
+    success_url = reverse_lazy('shelfmarks')
