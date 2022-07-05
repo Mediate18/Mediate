@@ -26,15 +26,6 @@ class TranscriptionModelForm(forms.ModelForm):
 
 
 class ShelfMarkModelForm(forms.ModelForm):
-    collection = forms.ModelMultipleChoiceField(
-        queryset=Collection.objects.all(),
-        widget=ModelSelect2MultipleWidget(
-            model=Collection,
-            search_fields=['short_title__icontains'],
-            attrs={'data-placeholder': "Select multiple"},
-        ),
-    )
-
     class Meta:
         model = ShelfMark
         # fields = ['place', 'library']
@@ -51,4 +42,21 @@ class ShelfMarkModelForm(forms.ModelForm):
                 attrs={'data-placeholder': "Select multiple"},
             ),
         }
+
+    def __init__(self, **kwargs):
+        self.datasets = kwargs.pop('datasets', None)
+        super().__init__(**kwargs)
+        self.add_collection_field()
+
+    def add_collection_field(self):
+        collection = forms.ModelMultipleChoiceField(
+            queryset=Collection.objects.all(),
+            widget=ModelSelect2MultipleWidget(
+                model=Collection,
+                search_fields=['short_title__icontains'],
+                attrs={'data-placeholder': "Select multiple"},
+            ),
+            initial=Collection.objects.filter(shelf_mark=self.instance)
+        )
+        self.fields['collection'] = collection
 
