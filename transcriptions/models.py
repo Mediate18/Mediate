@@ -68,8 +68,8 @@ class DocumentScan(models.Model):
     DOCUMENT_SCAN_FOLDER = 'document_scans'
 
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    transcription = models.ForeignKey(Transcription, on_delete=models.SET_NULL, null=True, related_name="scans")
-    shelf_mark = models.ForeignKey(ShelfMark, on_delete=models.SET_NULL, null=True)
+    transcription = models.ForeignKey(Transcription, on_delete=models.SET_NULL, null=True)
+    shelf_mark = models.ForeignKey(ShelfMark, on_delete=models.SET_NULL, null=True, related_name='scans')
     scan = models.FileField(upload_to=DOCUMENT_SCAN_FOLDER)
 
 
