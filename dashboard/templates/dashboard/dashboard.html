@@ -286,6 +286,17 @@
                 </tr>
                 {% endif %}
 
+
+                {% if perms.transcriptions.change_shelfmark %}
+                <tr>
+                    <td>
+                        <a href="{% url 'shelfmarks' %}">
+                            {{ 'transcriptions__ShelfMark'|get_class_name_plural|capfirst }}
+                        </a>
+                    </td>
+                </tr>
+                {% endif %}
+
             </tbody>
         </table>
     </div>
