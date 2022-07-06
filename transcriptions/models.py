@@ -38,7 +38,7 @@ class Transcription(models.Model):
 
     def __str__(self):
         return _("{} as transcribed by {} ({})").format(self.source_material, self.author,
-                                                      ", ".join([str(scan.scan) for scan in self.scans.all()]))
+                                                      ", ".join([str(scan.scan) for scan in self.documentscan_set.all()]))
 
     def get_absolute_url(self):
         return reverse_lazy('transcription_detail', args=[str(self.uuid)])
