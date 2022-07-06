@@ -32,19 +32,6 @@ urlpatterns = [
          permission_required('transcriptions.delete_sourcematerial')(SourceMaterialDeleteView.as_view()),
          name="delete_sourcematerial"),
 
-    # Transcription urls
-    path('transcriptions/', permission_required('global.view_all')(TranscriptionTableView.as_view()), name='transcriptions'),
-    path(r'transcriptions/<uuid:pk>', permission_required('global.view_all')(TranscriptionDetailView.as_view()),
-         name="transcription_detail"),
-    path(r'transcriptions/add', permission_required('transcriptions.add_transcription')(TranscriptionCreateView.as_view()),
-         name="add_transcription"),
-    path(r'transcriptions/edit/<uuid:pk>',
-         permission_required('transcriptions.change_transcription')(TranscriptionUpdateView.as_view()),
-         name="change_transcription"),
-    path(r'transcriptions/delete/<uuid:pk>',
-         permission_required('transcriptions.delete_transcription')(TranscriptionDeleteView.as_view()),
-         name="delete_transcription"),
-
     # ShelfMark urls
     path('shelfmark/', permission_required('global.view_all')(ShelfMarkTableView.as_view()), name='shelfmarks'),
     path(r'shelfmarks/<uuid:pk>', permission_required('global.view_all')(ShelfMarkDetailView.as_view()),

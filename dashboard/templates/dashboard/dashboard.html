@@ -276,17 +276,6 @@
                 {% endif %}
 
 
-                {% if perms.transcriptions.change_transcription %}
-                <tr>
-                    <td>
-                        <a href="{% url 'transcriptions' %}">
-                            {{ 'transcriptions__Transcription'|get_class_name_plural|capfirst }}
-                        </a>
-                    </td>
-                </tr>
-                {% endif %}
-
-
                 {% if perms.transcriptions.change_shelfmark %}
                 <tr>
                     <td>
