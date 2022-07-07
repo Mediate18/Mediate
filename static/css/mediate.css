@@ -1,3 +1,7 @@
+html * {
+    font-size-adjust: 0.45; !important
+}
+
 body {
 	background-image: url("../img/paper.png");
 	background-position: left top;
