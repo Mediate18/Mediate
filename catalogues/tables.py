@@ -156,6 +156,7 @@ class CollectionCollectionTypeRelationTable(tables.Table):
 class CatalogueTable(tables.Table):
     uuid = ActionColumn('catalogue_detail', 'change_catalogue', 'delete_catalogue', orderable=False)
     collections = tables.Column(empty_values=(), verbose_name="Collection(s)", orderable=False)
+    items = tables.Column(empty_values=(), verbose_name="Items", orderable=False)
 
     class Meta:
         model = Catalogue
@@ -164,6 +165,7 @@ class CatalogueTable(tables.Table):
             'name',
             'dataset',
             'collections',
+            'items',
             'uuid'
         ]
 
@@ -176,6 +178,18 @@ class CatalogueTable(tables.Table):
                 )
                 for collection in record.collection.all()
             ])
+        )
+
+    def render_items(self, record):
+        return format_html(
+            '<a href="{}?{}">'
+            '<span class="glyphicon glyphicon-list" data-toggle="tooltip" '
+            'data-original-title="List the items of {}"></span>'
+            '</a>'.format(
+                reverse_lazy('items'),
+                "&".join(["collection="+str(uuid) for uuid in record.collection.values_list("uuid", flat=True)]),
+                record
+            )
         )
 
 
