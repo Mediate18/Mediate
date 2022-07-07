@@ -398,6 +398,12 @@ class PlaceRankingFilter(QBasedFilterset, PlaceFilter):
         field_name='edition__items__lot__collection',
         lookup_expr='in'
     )
+    collection_short_title = django_filters.Filter(
+        label="Collection short title",
+        lookup_expr='icontains',
+        method='collection_short_title_multiple_words_filter',
+        field_name='edition__items__lot__collection__short_title'
+    )
     collection_publication_year = RangeFilterQ(
         label="Collection publication year",
         widget=RangeWidget(),
@@ -451,6 +457,9 @@ class PlaceRankingFilter(QBasedFilterset, PlaceFilter):
                                        distinct=True)) \
             .order_by('-item_count')
         return self._qs
+
+    def collection_short_title_multiple_words_filter(self, queryset, name, value):
+        return filter_multiple_words(self.filters['collection_short_title'].lookup_expr, queryset, name, value)
 
     def collection_country_of_publication_filter(self, q, name, value):
         if value:

@@ -276,11 +276,11 @@
                 {% endif %}
 
 
-                {% if perms.transcriptions.change_transcription %}
+                {% if perms.transcriptions.change_shelfmark %}
                 <tr>
                     <td>
-                        <a href="{% url 'transcriptions' %}">
-                            {{ 'transcriptions__Transcription'|get_class_name_plural|capfirst }}
+                        <a href="{% url 'shelfmarks' %}">
+                            {{ 'transcriptions__ShelfMark'|get_class_name_plural|capfirst }}
                         </a>
                     </td>
                 </tr>

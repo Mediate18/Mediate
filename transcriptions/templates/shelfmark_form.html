@@ -1,0 +1,70 @@
+{% extends "baselayout.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block extracss %}
+{{ form.media.css }}
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-xs-10">
+        <h1>{% trans action|title %} {% trans object_name %}</h1>
+        <form action="" method="post" enctype="multipart/form-data">
+            <table class="table">
+                {% csrf_token %}
+                {% if form_as == 'p' %}
+                    {{ form.as_p }}
+                {% else %}
+                    {{ form.as_table }}
+                {% endif %}
+            </table>
+
+            <h3>{% trans "Document scans" %}</h3>
+            <table class="table">
+                {{ documentscans.management_form }}
+
+                {% for form in documentscans %}
+                    {% for hidden in form.hidden_fields %}
+                        {{ hidden }}
+                    {% endfor %}
+                    {% if form.initial %}
+                        <tr>
+                            <th>
+                                {% trans "Scan:" %}
+                            </th>
+                            <td>
+                                <a href="{% url 'protected_media' form.scan.value %}">
+                                    <i class="glyphicon glyphicon-file"></i>
+                                    {{ form.scan.value }}
+                                </a>
+                                <br/>
+                                {% trans "Delete:" %}{{ form.DELETE }}
+                            </td>
+                        </tr>
+                    {% else %}
+                        {{ form }}
+                    {% endif %}
+                {% endfor %}
+            </table>
+        <input type="submit" class="btn pull-right" value="{% trans 'Save' %}"/>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    {% if js_variables %}
+        js_variables = {{ js_variables|safe }}
+    {% endif %}
+</script>
+{{ form.media.js }}
+<script>
+$(document).ready(function(){
+        $('.django-select2').djangoSelect2({placeholder: 'Select an option'});
+});
+</script>
+{% endblock %}

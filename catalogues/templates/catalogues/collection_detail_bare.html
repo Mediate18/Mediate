@@ -41,9 +41,19 @@
     <dt>{% trans "Notes" %}</dt>
     <dd>{{ object.notes|linebreaks }}</dd>
 
+    <dt>{% trans "Library" %}</dt>
+    <dd>
+        {{ object.shelf_mark.library.name }}
+    </dd>
+
+    <dt>{% trans "Shelf mark" %}</dt>
+    <dd>
+        {{ object.shelf_mark.text }}
+    </dd>
+
     <dt>{% trans "Scans" %}</dt>
     <dd>
-        {% for scan in object.transcription.scans.all %}
+        {% for scan in object.shelf_mark.scans.all %}
             <a href="{% url 'protected_media' scan.scan.name %}" target="_blank">{{ scan.scan.name }}</a>
         {% endfor %}
     </dd>

@@ -241,7 +241,8 @@ def get_collection_city_chart(request):
         'item_without_city_count': item_without_city_count,
         'percentage_item_without_city_count': round(100 * item_without_city_count
                                                     / (item_without_city_count + item_with_city_count),
-                                                    2)
+                                                    2),
+        'short_title_value': request.GET['short_title']
     }
 
     return render(request, 'catalogues/place_of_publication_pie_chart.html', context=context)

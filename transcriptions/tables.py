@@ -47,3 +47,18 @@ class TranscriptionTable(tables.Table):
         ]
 
 
+# ShelfMark table
+class ShelfMarkTable(tables.Table):
+    uuid = ActionColumn('shelfmark_detail', 'change_shelfmark', 'delete_shelfmark', orderable=False)
+
+    class Meta:
+        model = ShelfMark
+        attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'place',
+            'library',
+            'text',
+            'uuid'
+        ]
+
+

@@ -155,6 +155,7 @@ class CollectionCollectionTypeRelationTable(tables.Table):
 # Catalogue table
 class CatalogueTable(tables.Table):
     uuid = ActionColumn('catalogue_detail', 'change_catalogue', 'delete_catalogue', orderable=False)
+    collections = tables.Column(empty_values=(), verbose_name="Collection(s)", orderable=False)
 
     class Meta:
         model = Catalogue
@@ -162,8 +163,20 @@ class CatalogueTable(tables.Table):
         sequence = [
             'name',
             'dataset',
+            'collections',
             'uuid'
         ]
+
+    def render_collections(self, record):
+        return format_html(
+            ", ".join([
+                '<a href="{}">{}</a>'.format(
+                    reverse_lazy('collection_detail', args=[collection.pk]),
+                    collection
+                )
+                for collection in record.collection.all()
+            ])
+        )
 
 
 # CatalogueYear table

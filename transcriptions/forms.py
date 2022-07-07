@@ -1,6 +1,7 @@
 from django import forms
-from django_select2.forms import Select2Widget
+from django_select2.forms import Select2Widget, ModelSelect2Widget, ModelSelect2MultipleWidget
 from .models import *
+from catalogues.models import Library, Collection
 
 
 class DocumentScanModelForm(forms.ModelForm):
@@ -22,4 +23,40 @@ class TranscriptionModelForm(forms.ModelForm):
         widgets = {
             'source_material': Select2Widget,
         }
+
+
+class ShelfMarkModelForm(forms.ModelForm):
+    class Meta:
+        model = ShelfMark
+        # fields = ['place', 'library']
+        exclude = ['uuid']
+        widgets = {
+            'place': ModelSelect2Widget(
+                model=Place,
+                search_fields=['name__icontains'],
+                attrs={'data-placeholder': "Select multiple"},
+            ),
+            'library': ModelSelect2Widget(
+                model=Library,
+                search_fields=['name__icontains'],
+                attrs={'data-placeholder': "Select multiple"},
+            ),
+        }
+
+    def __init__(self, **kwargs):
+        self.collection = kwargs.pop('collection', None)
+        super().__init__(**kwargs)
+        self.add_collection_field()
+
+    def add_collection_field(self):
+        collection = forms.ModelMultipleChoiceField(
+            queryset=self.collection,
+            widget=ModelSelect2MultipleWidget(
+                queryset=self.collection,
+                search_fields=['short_title__icontains'],
+                attrs={'data-placeholder': "Select multiple"},
+            ),
+            initial=Collection.objects.filter(shelf_mark=self.instance)
+        )
+        self.fields['collection'] = collection
 

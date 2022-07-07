@@ -165,7 +165,7 @@ except ConnectionRefusedError:
 
 CACHE_MIDDLEWARE_ALIAS = 'default'
 CACHE_MIDDLEWARE_KEY_PREFIX = 'mediate'
-CACHE_MIDDLEWARE_SECONDS = 600
+CACHE_MIDDLEWARE_SECONDS = config('CACHE_MIDDLEWARE_SECONDS', cast=int, default=0)  # 0 means no caching
 
 
 # Password validation

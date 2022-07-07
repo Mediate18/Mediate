@@ -5,6 +5,8 @@ from django.urls import reverse_lazy
 
 import uuid
 
+from persons.models import Place
+
 from simplemoderation.tools import moderated
 
 
@@ -36,10 +38,28 @@ class Transcription(models.Model):
 
     def __str__(self):
         return _("{} as transcribed by {} ({})").format(self.source_material, self.author,
-                                                      ", ".join([str(scan.scan) for scan in self.scans.all()]))
+                                                      ", ".join([str(scan.scan) for scan in self.documentscan_set.all()]))
 
     def get_absolute_url(self):
         return reverse_lazy('transcription_detail', args=[str(self.uuid)])
+
+
+class ShelfMark(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    place = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True)
+    library = models.ForeignKey('catalogues.Library', on_delete=models.SET_NULL, null=True)
+    text = models.CharField(_("Shelf mark"), max_length=128)
+
+    def __str__(self):
+        strs = []
+        if self.place:
+            strs.append(_("Place: {}").format(self.place))
+        if self.library:
+            strs.append(_("Library: {}").format(self.library))
+        strs.append(_("Text: {}").format(self.text))
+        strs.append(_("Collection(s): {}").format(", ".join(self.collection_set.values_list('short_title', flat=True))))
+        return "; ".join(strs)
+
 
 class DocumentScan(models.Model):
     """
@@ -48,7 +68,8 @@ class DocumentScan(models.Model):
     DOCUMENT_SCAN_FOLDER = 'document_scans'
 
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    transcription = models.ForeignKey(Transcription, on_delete=models.SET_NULL, null=True, related_name="scans")
+    transcription = models.ForeignKey(Transcription, on_delete=models.SET_NULL, null=True)
+    shelf_mark = models.ForeignKey(ShelfMark, on_delete=models.SET_NULL, null=True, related_name='scans')
     scan = models.FileField(upload_to=DOCUMENT_SCAN_FOLDER)
 
 

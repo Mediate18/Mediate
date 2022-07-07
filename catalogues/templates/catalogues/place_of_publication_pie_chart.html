@@ -5,7 +5,7 @@
 <div class="{{ chart_id }}">
     <div id="{{ chart_id }}__chart"></div>
 </div>
-<a href="{% url 'places_ranking' %}" target="_blank" class="btn btn-default">{% trans 'Full list of places of publication' %}</a>
+<a href="{% url 'places_ranking' %}?collection_short_title={{ short_title_value|urlencode }}" target="_blank" class="btn btn-default">{% trans 'Full list of places of publication' %}</a>
 
 
 <script type="text/javascript">
