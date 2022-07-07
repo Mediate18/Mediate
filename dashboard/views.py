@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.db.models import Count, Q
 
 from items.models import Item, Edition, Work, Language, PersonItemRelation, ItemWorkRelation
@@ -6,8 +6,11 @@ from catalogues.models import Lot, Collection
 from catalogues.views.views import get_collections_for_session
 from persons.models import Place, Person, Country
 
+
 def view_dashboard(request):
-    return render(request, 'dashboard/dashboard.html', {})
+    if request.user.has_perm('catalogues.change_dataset'):
+        return render(request, 'dashboard/dashboard.html', {})
+    return redirect('about')
 
 
 def get_dashboard_stats(request):
