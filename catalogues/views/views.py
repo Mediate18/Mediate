@@ -749,8 +749,7 @@ class CatalogueTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return Catalogue.objects.filter(dataset__in=get_datasets_for_session(self.request))\
-            .annotate(year=Func(F("name"), Value("[0-9]+"), function="REGEXP_SUBSTR")).order_by('year', 'name')
+        return Catalogue.objects.filter(dataset__in=get_datasets_for_session(self.request)).order_by('name')
 
     def get_context_data(self, **kwargs):
         context = super(CatalogueTableView, self).get_context_data(**kwargs)
