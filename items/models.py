@@ -116,8 +116,8 @@ class Item(models.Model):
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     short_title = models.CharField(_("Short title"), max_length=128, null=True)
-    lot = models.ForeignKey(Lot, on_delete=CASCADE, null=True)
-    catalogue = models.ForeignKey(Catalogue, on_delete=CASCADE, null=True, blank=True)
+    lot = models.ForeignKey(Lot, on_delete=SET_NULL, null=True)
+    catalogue = models.ForeignKey(Catalogue, on_delete=SET_NULL, null=True, blank=True)
     number_of_volumes = models.CharField(_("Number of volumes, as listed in the collection"),
                                          max_length=128, null=True, blank=True)
     book_format = models.ForeignKey(BookFormat, on_delete=SET_NULL, null=True, related_name='items', blank=True)
