@@ -1986,7 +1986,8 @@ class WorkTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return Work.objects.all()
+        return Work.objects.filter(items__item__lot__collection_id__in=get_collections_for_session(self.request))\
+            .distinct()
 
     def get_context_data(self, **kwargs):
         context = super(WorkTableView, self).get_context_data(**kwargs)
