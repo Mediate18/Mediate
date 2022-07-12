@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import os
 import socket
-from mediate.decouple import config
+from mediate.decouple import config, Csv
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -27,7 +27,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool)
 
-ALLOWED_HOSTS = [config('ALLOWED_HOSTS')]
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
 ADMINS = [
     ('Micha Hulsbosch', 'm.hulsbosch@let.ru.nl')
