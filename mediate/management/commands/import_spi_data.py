@@ -13,7 +13,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 import sqlite3
 import re
-import collections
+import catalogues
 import items
 import persons
 
@@ -148,11 +148,11 @@ class Command(BaseCommand):
                                                                                           material_details=material_details)
                 item_materialdetails_relations.save()
 
-    def create_lots(self, collection, collection_spi_id, cursor):
-        minimal_lot_id = cursor.execute("SELECT MIN(ID) FROM lot WHERE collection_id={}".format(collection_spi_id))\
+    def create_lots(self, collection, catalogue_id_spi, cursor):
+        minimal_lot_id = cursor.execute("SELECT MIN(ID) FROM lot WHERE catalogue_id={}".format(catalogue_id_spi))\
             .fetchall()[0]['MIN(ID)']
 
-        query = "SELECT * FROM lot WHERE `collection_id` = {}".format(collection_spi_id)
+        query = "SELECT * FROM lot WHERE `catalogue_id` = {}".format(catalogue_id_spi)
         cursor.execute(query)
         resultSet = cursor.fetchall()
         lot_ids = []
@@ -164,7 +164,7 @@ class Command(BaseCommand):
             except:
                 index_in_collection = None
             try:
-                page_in_collection = int(row['page_in_collection'])
+                page_in_collection = int(row['page_in_catalogue'])
             except:
                 page_in_collection = None
 
@@ -182,16 +182,16 @@ class Command(BaseCommand):
                 child = bookseller_category
 
             # Link to Category
-            parent_category, created = collections.models.Category.objects.get_or_create(collection=collection,
+            parent_category, created = catalogues.models.Category.objects.get_or_create(collection=collection,
                                               bookseller_category=parent) if parent else (None, None)
 
-            category, created = collections.models.Category.objects.get_or_create(collection=collection,
+            category, created = catalogues.models.Category.objects.get_or_create(collection=collection,
                                        bookseller_category=child, parent=parent_category)
 
             insert_fields = {
                 'collection': collection,
                 'category': category,
-                'number_in_collection': row['number_in_collection'],
+                'number_in_collection': row['number_in_catalogue'],
                 'lot_as_listed_in_collection': row['entry_text'],
                 'sales_price': row['sales_price'][:128],
                 'page_in_collection': page_in_collection,
@@ -199,7 +199,7 @@ class Command(BaseCommand):
             }
 
             try:
-                lot = collections.models.Lot(**insert_fields)
+                lot = catalogues.models.Lot(**insert_fields)
                 lot.save()
                 self.create_items(lot, row['id'], cursor)
             except Exception as e:
@@ -208,9 +208,9 @@ class Command(BaseCommand):
 
     def create_collections(self, collection_ids, cursor):
         if collection_ids:
-            query = "SELECT * FROM collection WHERE id IN({})".format(",".join(collection_ids))
+            query = "SELECT * FROM catalogue WHERE id IN({})".format(",".join(collection_ids))
         else:
-            query = "SELECT * FROM collection"
+            query = "SELECT * FROM catalogue"
         cursor.execute(query)
         resultSet = cursor.fetchall()
 
@@ -223,17 +223,18 @@ class Command(BaseCommand):
 
             try:
                 # Only use a catalogue that is new or that does not have any collections linked to it.
-                catalogue, created = collections.models.Catalogue.objects.get_or_create(name=row['short_title'])
-                if created:
-                    catalogue.dataset = collections.models.Dataset.objects.get(name=self.dataset_name)
+                if not catalogues.models.Catalogue.objects.filter(name=row['short_title']).exists():
+                    dataset = catalogues.models.Dataset.objects.get(name=self.dataset_name)
+                    catalogue = catalogues.models.Catalogue.objects.create(name=row['short_title'], dataset=dataset)
                     catalogue.save()
                 else:
+                    catalogue = catalogues.models.Catalogue.objects.get(name=row['short_title'])
                     if catalogue.collection_set.count() != 0 and not self.multiple_collections_per_catalogue:
                         raise Exception("Catalogue {} already exists and has collections linked to.".format(catalogue))
 
-                collection = collections.models.Collection(**insert_fields)
-                collection.catalogue.add(catalogue)
+                collection = catalogues.models.Collection(**insert_fields)
                 collection.save()
+                collection.catalogue.add(catalogue)
                 self.create_lots(collection, row['id'], cursor)
             except Exception as e:
                 print(insert_fields)
