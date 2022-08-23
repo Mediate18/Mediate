@@ -9,12 +9,14 @@
 
 {% block content %}
 
-{% if collection.under_moderation %}
-    <span class="glyphicon glyphicon-ban-circle pull-right" title="{% trans 'Collection is being moderated' %}"></span>
-{% else %}
-    <a class="pull-right" href="{% url 'change_collection' object.pk %}?layout=bare&next={{ request.path }}">
-        <span class="glyphicon glyphicon-pencil" title="{% trans 'Change collection' %}"></span>
-    </a>
+{% if change_dataset_perm %}
+    {% if collection.under_moderation %}
+        <span class="glyphicon glyphicon-ban-circle pull-right" title="{% trans 'Collection is being moderated' %}"></span>
+    {% else %}
+        <a class="pull-right" href="{% url 'change_collection' object.pk %}?layout=bare&next={{ request.path }}">
+            <span class="glyphicon glyphicon-pencil" title="{% trans 'Change collection' %}"></span>
+        </a>
+    {% endif %}
 {% endif %}
 
 <dl class="dl-horizontal" style="padding-bottom: 15px;">
@@ -72,18 +74,24 @@
     <tr>
         <td colspan="4" style="padding: 0px;">
             <!--before page {{ lot.page_in_collection }}, before lot index {{ lot.index_in_collection }}-->
-            {% if lot.index_in_collection in first_lot_in_category_dict %}
-                <a href="{% url 'add_lot_before' lot.pk %}?page&category" title="Add lot here">
-                <div style="padding-top: 5px; padding-bottom: 5px;">
-                    <div style="height: 1px; background-color: #ddd;"></div>
-                </div>
-            </a>
+            {% if change_dataset_perm %}
+                {% if lot.index_in_collection in first_lot_in_category_dict %}
+                    <a href="{% url 'add_lot_before' lot.pk %}?page&category" title="Add lot here">
+                        <div style="padding-top: 5px; padding-bottom: 5px;">
+                            <div style="height: 1px; background-color: #ddd;"></div>
+                        </div>
+                    </a>
+                {% else %}
+                    <a href="{% url 'add_lot_before' lot.pk %}?page" title="Add lot here">
+                        <div style="padding-top: 5px; padding-bottom: 5px;">
+                            <div style="height: 1px; background-color: #ddd;"></div>
+                        </div>
+                    </a>
+                {% endif %}
             {% else %}
-                <a href="{% url 'add_lot_before' lot.pk %}?page" title="Add lot here">
                 <div style="padding-top: 5px; padding-bottom: 5px;">
                     <div style="height: 1px; background-color: #ddd;"></div>
                 </div>
-            </a>
             {% endif %}
         </td>
     </tr>
@@ -97,11 +105,17 @@
     <tr>
         <td colspan="4" style="padding: 0px;">
             <!-- before category {{ lot.category.bookseller_category }}, before lot index {{ lot.index_in_collection }}-->
-            <a href="{% url 'add_lot_before' lot.pk %}?category" title="Add lot here">
+            {% if change_dataset_perm %}
+                <a href="{% url 'add_lot_before' lot.pk %}?category" title="Add lot here">
+                    <div style="padding-top: 5px; padding-bottom: 5px;">
+                        <div style="height: 1px; background-color: #ddd;"></div>
+                    </div>
+                </a>
+            {% else %}
                 <div style="padding-top: 5px; padding-bottom: 5px;">
                     <div style="height: 1px; background-color: #ddd;"></div>
                 </div>
-            </a>
+            {% endif %}
         </td>
     </tr>
     <tr>
@@ -114,11 +128,17 @@
     <tr>
         <td colspan="4" style="padding: 0px;">
             <!--before lot index {{ lot.index_in_collection }}-->
-            <a href="{% url 'add_lot_before' lot.pk %}" title="Add lot here">
+            {% if change_dataset_perm %}
+                <a href="{% url 'add_lot_before' lot.pk %}" title="Add lot here">
+                    <div style="padding-top: 5px; padding-bottom: 5px;">
+                        <div style="height: 1px; background-color: #ddd;"></div>
+                    </div>
+                </a>
+            {% else %}
                 <div style="padding-top: 5px; padding-bottom: 5px;">
                     <div style="height: 1px; background-color: #ddd;"></div>
                 </div>
-            </a>
+            {% endif %}
         </td>
     </tr>
     <tr>
@@ -133,30 +153,40 @@
             <i>{{ lot.sales_price }}</i>
         </td>
         <td>
-            {% if lot.under_moderation %}
-                <span class="glyphicon glyphicon-ban-circle" title="{% trans 'Lot is being moderated' %}"></span>
-            {% else %}
-                <a href="{% url 'change_lot' lot.pk %}?layout=bare&next={{ request.path }}">
-                    <span class="glyphicon glyphicon-pencil" title="{% trans 'Change lot' %}"></span>
-                </a>
+            {% if change_dataset_perm %}
+                {% if lot.under_moderation %}
+                    <span class="glyphicon glyphicon-ban-circle" title="{% trans 'Lot is being moderated' %}"></span>
+                {% else %}
+                    <a href="{% url 'change_lot' lot.pk %}?layout=bare&next={{ request.path }}">
+                        <span class="glyphicon glyphicon-pencil" title="{% trans 'Change lot' %}"></span>
+                    </a>
+                {% endif %}
             {% endif %}
             <a href="{% url 'items' %}?lot__uuid={{ lot.pk }}" target="_blank">
                 <span class="glyphicon glyphicon-list" title="{% trans 'Items of this lot' %}"></span>
             </a>
-            <a href="{% url 'expand_lot' lot.pk %}?next={{ request.path }}%23lot__{{ lot.uuid }}">
-                <span class="glyphicon glyphicon-plus" title="{% trans 'Add items to this lot' %}"></span>
-            </a>
+            {% if change_dataset_perm %}
+                <a href="{% url 'expand_lot' lot.pk %}?next={{ request.path }}%23lot__{{ lot.uuid }}">
+                    <span class="glyphicon glyphicon-plus" title="{% trans 'Add items to this lot' %}"></span>
+                </a>
+            {% endif %}
         </td>
     </tr>
 {% endfor %}
     <tr>
         <td colspan="4" style="padding: 0px;">
             <!--before lot index {{ lot.index_in_collection }}-->
-            <a href="{% url 'add_lot_at_end' object.pk %}" title="Add lot here">
+            {% if change_dataset_perm %}
+                <a href="{% url 'add_lot_at_end' object.pk %}" title="Add lot here">
+                    <div style="padding-top: 5px; padding-bottom: 5px;">
+                        <div style="height: 1px; background-color: #ddd;"></div>
+                    </div>
+                </a>
+            {% else %}
                 <div style="padding-top: 5px; padding-bottom: 5px;">
                     <div style="height: 1px; background-color: #ddd;"></div>
                 </div>
-            </a>
+            {% endif %}
         </td>
     </tr>
 </table>

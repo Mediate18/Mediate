@@ -422,6 +422,9 @@ class CollectionDetailView(PermissionRequiredMixin, DetailView):
                 first_lot_in_category_dict[lot['index_in_collection']] = lot['category__bookseller_category']
         context['first_lot_in_category_dict'] = first_lot_in_category_dict
 
+        context['change_dataset_perm'] = self.request.user.has_perm('catalogues.change_dataset',
+                                                                    self.object.catalogue.first().dataset)
+
         return context
 
 
