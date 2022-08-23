@@ -229,7 +229,7 @@ class Command(BaseCommand):
                     catalogue.save()
                 else:
                     catalogue = catalogues.models.Catalogue.objects.get(name=row['short_title'])
-                    if catalogue.collection_set.count() != 0 and not self.multiple_collections_per_catalogue:
+                    if catalogue.collection.count() != 0 and not self.multiple_collections_per_catalogue:
                         raise Exception("Catalogue {} already exists and has collections linked to.".format(catalogue))
 
                 collection = catalogues.models.Collection(**insert_fields)
