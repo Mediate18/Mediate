@@ -34,7 +34,7 @@ from catalogues.models import Dataset
 from persons.forms import PersonModelForm
 from mediate.views import GenericDetailView
 from catalogues.views.views import get_collections_for_session
-from catalogues.tools import get_datasets_for_session
+from catalogues.tools import get_datasets_for_session, get_permitted_datasets_for_session
 from simplemoderation.models import Moderation, ModerationAction
 
 from simplemoderation.tools import moderate
@@ -132,12 +132,7 @@ class ItemTableView(ListView):
             return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # TODO merge next bit with function *get_datasets_for_session* in catalogue/tools.py
-        datasets_session = Dataset.objects.filter(uuid__in=[dataset['uuid']
-                                                            for dataset in self.request.session.get('datasets', [])])
-        datasets_permitted = [dataset for dataset in datasets_session
-                              if self.request.user.has_perm('catalogues.change_dataset', dataset)]
-        # end TODO
+        datasets_permitted = get_permitted_datasets_for_session(self.request)
 
         context = super(ItemTableView, self).get_context_data(**kwargs)
         filter = ItemFilter(self.request.GET, queryset=self.get_queryset())

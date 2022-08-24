@@ -6,6 +6,15 @@ import json
 from catalogues.models import Dataset
 
 
+def get_permitted_datasets_for_session(request):
+    datasets_session = request.session.get('datasets', [])
+    datasets_retrieved = Dataset.objects.filter(uuid__in=[dataset['uuid']
+                                                        for dataset in datasets_session])
+    datasets_permitted = [dataset for dataset in datasets_session
+                          if request.user.has_perm('catalogues.change_dataset', dataset)]
+    return datasets_permitted
+
+
 def get_datasets_for_session(request, extra_dataset=None):
     """
     Gets the dataset for the current user:
@@ -14,11 +23,7 @@ def get_datasets_for_session(request, extra_dataset=None):
     :param request: the current request object
     :return: dataset
     """
-    user = request.user
-    datasets_session = request.session.get('datasets', [])
-    datasets_retrieved = Dataset.objects.filter(uuid__in=[dataset['uuid'] for dataset in datasets_session])
-    datasets_permitted = [dataset for dataset in datasets_retrieved
-                          if user.has_perm('catalogues.change_dataset', dataset)]
+    datasets_permitted = get_permitted_datasets_for_session(request)
     if datasets_permitted:
         return datasets_permitted + [extra_dataset] if extra_dataset else datasets_permitted
 
