@@ -30,7 +30,7 @@ from ..forms import *
 from ..filters import *
 from ..tables import *
 
-from catalogues.models import Category
+from catalogues.models import Dataset
 from persons.forms import PersonModelForm
 from mediate.views import GenericDetailView
 from catalogues.views.views import get_collections_for_session
@@ -143,7 +143,16 @@ class ItemTableView(ListView):
 
         context['action'] = _("add")
         context['object_name'] = "item"
-        context['add_url'] = reverse_lazy('add_item')
+
+        # TODO merge next bit with function *get_datasets_for_session* in catalogue/tools.py
+        datasets_session = Dataset.objects.filter(uuid__in=[dataset['uuid']
+                                                            for dataset in self.request.session.get('datasets', [])])
+        datasets_permitted = [dataset for dataset in datasets_session
+                              if self.request.user.has_perm('catalogues.change_dataset', dataset)]
+        # end TODO
+        
+        context['add_url'] = reverse_lazy('add_item') if datasets_permitted else None
+
         context['map_url'] = reverse_lazy('itemsmap')
 
         context['addanother_person_form'] = PersonModelForm()
@@ -208,7 +217,7 @@ class ItemTableView(ListView):
                 'url': reverse_lazy('add_parisiancategories_to_items'),
                 'form': ItemParisianCategoriesForm
             },
-        ]
+        ] if datasets_permitted else None
 
         context['per_page_choices'] = [25, 50, 100, 500, 1000]
 
