@@ -7,7 +7,7 @@ import itertools
 from .models import *
 from tagme.models import Tag
 
-from mediate.columns import ActionColumn
+from mediate.columns import ActionColumn, render_action_column
 
 
 # BookFormat table
@@ -25,7 +25,7 @@ class BookFormatTable(tables.Table):
 
 # Item table
 class ItemTable(tables.Table):
-    uuid = ActionColumn('item_detail', 'change_item', 'delete_item', orderable=False)
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
     checkbox = tables.CheckBoxColumn(empty_values=(), orderable=False,
                                      attrs={'th__input': {'id': 'checkbox_column', 'title': 'Select/deselect all'}})
     people = tables.Column(empty_values=(), orderable=False)
@@ -68,6 +68,15 @@ class ItemTable(tables.Table):
             'manage_persons',
             'checkbox',
         ]
+
+    def render_uuid(self, record, value):
+        change_dataset_perm = self.request.user.has_perm('catalogues.change_dataset',
+                                                         record.lot.collection.catalogue.first().dataset)
+
+        url_name_change = 'change_item' if change_dataset_perm else None
+        url_name_delete = 'delete_item' if change_dataset_perm else None
+
+        return render_action_column(value, 'item_detail', url_name_change, url_name_delete)
 
     def render_lot(self, record):
         return format_html(
