@@ -132,11 +132,20 @@ class ItemTableView(ListView):
             return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
+        # TODO merge next bit with function *get_datasets_for_session* in catalogue/tools.py
+        datasets_session = Dataset.objects.filter(uuid__in=[dataset['uuid']
+                                                            for dataset in self.request.session.get('datasets', [])])
+        datasets_permitted = [dataset for dataset in datasets_session
+                              if self.request.user.has_perm('catalogues.change_dataset', dataset)]
+        # end TODO
+
         context = super(ItemTableView, self).get_context_data(**kwargs)
         filter = ItemFilter(self.request.GET, queryset=self.get_queryset())
 
         table = ItemTable(filter.qs)
         django_tables2.RequestConfig(self.request, ).configure(table)
+        if not datasets_permitted:
+            table.exclude = ('checkbox', 'manage_works', 'manage_persons')
 
         context['filter'] = filter
         context['table'] = table
@@ -144,13 +153,6 @@ class ItemTableView(ListView):
         context['action'] = _("add")
         context['object_name'] = "item"
 
-        # TODO merge next bit with function *get_datasets_for_session* in catalogue/tools.py
-        datasets_session = Dataset.objects.filter(uuid__in=[dataset['uuid']
-                                                            for dataset in self.request.session.get('datasets', [])])
-        datasets_permitted = [dataset for dataset in datasets_session
-                              if self.request.user.has_perm('catalogues.change_dataset', dataset)]
-        # end TODO
-        
         context['add_url'] = reverse_lazy('add_item') if datasets_permitted else None
 
         context['map_url'] = reverse_lazy('itemsmap')
