@@ -154,7 +154,7 @@ class CollectionCollectionTypeRelationTable(tables.Table):
 
 # Catalogue table
 class CatalogueTable(tables.Table):
-    uuid = ActionColumn('catalogue_detail', 'change_catalogue', 'delete_catalogue', orderable=False)
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
     collections = tables.Column(empty_values=(), verbose_name="Collection(s)", orderable=False)
     items = tables.Column(empty_values=(), verbose_name="Items", orderable=False)
 
@@ -168,6 +168,15 @@ class CatalogueTable(tables.Table):
             'items',
             'uuid'
         ]
+
+    def render_uuid(self, record, value):
+        change_dataset_perm = self.request.user.has_perm('catalogues.change_dataset',
+                                                         record.dataset)
+
+        url_name_change = 'change_catalogue' if change_dataset_perm else None
+        url_name_delete = 'delete_catalogue' if change_dataset_perm else None
+
+        return render_action_column(value, 'catalogue_detail', url_name_change, url_name_delete)
 
     def render_collections(self, record):
         return format_html(
