@@ -2022,6 +2022,8 @@ class WorkRankingTableView(ListView):
         return Work.objects.all()
 
     def get_context_data(self, **kwargs):
+        datasets_permitted = get_permitted_datasets_for_session(self.request)
+
         context = super(WorkRankingTableView, self).get_context_data(**kwargs)
         filter = WorkRankingFilter(self.request.GET, queryset=self.get_queryset(), request=self.request)
 
@@ -2033,7 +2035,7 @@ class WorkRankingTableView(ListView):
 
         context['action'] = _("add")
         context['object_name'] = "work"
-        context['add_url'] = reverse_lazy('add_work')
+        context['add_url'] = reverse_lazy('add_work') if datasets_permitted else None
 
         return context
 
