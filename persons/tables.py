@@ -6,7 +6,7 @@ from django.db.models import Q
 import itertools
 
 from .models import *
-from mediate.columns import ActionColumn
+from mediate.columns import ActionColumn, render_action_column
 from catalogues.models import PersonCollectionRelation, Collection, CollectionPlaceRelation
 from items.models import PersonItemRelation, Edition
 from apiconnectors.cerlapi import cerl_record_url
@@ -17,7 +17,8 @@ from collections import defaultdict
 
 # Person table
 class PersonTable(tables.Table):
-    uuid = ActionColumn('person_detail', 'change_person', 'delete_person', orderable=False)
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False) 
+    #ActionColumn('person_detail', 'change_person', 'delete_person', orderable=False)
     collections = tables.Column(empty_values=())
     roles = tables.Column(empty_values=())
     viaf_id = tables.Column(empty_values=())
@@ -48,6 +49,12 @@ class PersonTable(tables.Table):
             'relations',
             'uuid'
         ]
+
+    def render_uuid(self, record, value):
+        url_name_change = 'change_person' if self.request.user.has_perm('items.change_person') else None
+        url_name_delete = 'delete_person' if self.request.user.has_perm('items.delete_person') else None
+
+        return render_action_column(value, 'person_detail', url_name_change, url_name_delete)
 
     def render_collections(self, record):
         person_collection_relations = PersonCollectionRelation.objects.filter(person=record, role__name="owner")
