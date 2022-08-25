@@ -128,7 +128,7 @@ class PersonRankingTableView(ListView):
 
         context['action'] = _("add")
         context['object_name_plural'] = "person ranking"
-        context['add_url'] = reverse_lazy('add_person')
+        context['add_url'] = reverse_lazy('add_person') if self.request.user.has_perm('persons.add_person') else None
 
         if 'item_roles' not in self.request.GET:
             messages.add_message(self.request, messages.WARNING,

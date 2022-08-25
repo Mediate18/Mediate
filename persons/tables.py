@@ -17,8 +17,7 @@ from collections import defaultdict
 
 # Person table
 class PersonTable(tables.Table):
-    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False) 
-    #ActionColumn('person_detail', 'change_person', 'delete_person', orderable=False)
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
     collections = tables.Column(empty_values=())
     roles = tables.Column(empty_values=())
     viaf_id = tables.Column(empty_values=())
@@ -159,9 +158,10 @@ class PersonRankingTable(PersonTable):
             'date_of_death',
             'collections',
             'viaf_id',
+            '...',
             'uuid'
         ]
-
+        
     def render_row_index(self):
         self.row_index = getattr(self, 'row_index', itertools.count(self.page.start_index()))
         return next(self.row_index)
