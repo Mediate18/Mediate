@@ -23,7 +23,7 @@ from ..tables import *
 from ..filters import *
 
 from ..models import *
-from catalogues.tools import get_datasets_for_session, get_dataset_for_anonymoususer
+from catalogues.tools import get_datasets_for_session, get_dataset_for_anonymoususer, get_permitted_datasets_for_session
 
 from items.models import Item, Edition, Language, BookFormat
 import json
@@ -755,6 +755,8 @@ class CatalogueTableView(ListView):
         return Catalogue.objects.filter(dataset__in=get_datasets_for_session(self.request)).order_by('name')
 
     def get_context_data(self, **kwargs):
+        datasets_permitted = get_permitted_datasets_for_session(self.request)
+
         context = super(CatalogueTableView, self).get_context_data(**kwargs)
         filter = CatalogueFilter(self.request.GET, queryset=self.get_queryset())
 
@@ -766,7 +768,7 @@ class CatalogueTableView(ListView):
 
         context['action'] = _("add")
         context['object_name'] = "catalogue"
-        context['add_url'] = reverse_lazy('add_catalogue')
+        context['add_url'] = reverse_lazy('add_catalogue') if datasets_permitted else None
 
         return context
 
