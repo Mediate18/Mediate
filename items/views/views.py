@@ -1996,6 +1996,8 @@ class WorkTableView(ListView):
             .distinct()
 
     def get_context_data(self, **kwargs):
+        datasets_permitted = get_permitted_datasets_for_session(self.request)
+
         context = super(WorkTableView, self).get_context_data(**kwargs)
         filter = WorkFilter(self.request.GET, queryset=self.get_queryset())
 
@@ -2007,7 +2009,7 @@ class WorkTableView(ListView):
 
         context['action'] = _("add")
         context['object_name'] = "work"
-        context['add_url'] = reverse_lazy('add_work')
+        context['add_url'] = reverse_lazy('add_work') if datasets_permitted else None
 
         return context
 
