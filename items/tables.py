@@ -602,7 +602,7 @@ class SubjectTable(tables.Table):
 
 # Work table
 class WorkTable(tables.Table):
-    uuid = ActionColumn('work_detail', 'change_work', 'delete_work', orderable=False)
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
     viaf_id = tables.Column(empty_values=())
 
     class Meta:
@@ -613,6 +613,12 @@ class WorkTable(tables.Table):
             'viaf_id',
             'uuid'
         ]
+
+    def render_uuid(self, record, value):
+        url_name_change = 'change_work' if self.request.user.has_perm('items.change_work') else None
+        url_name_delete = 'delete_work' if self.request.user.has_perm('items.delete_work') else None
+
+        return render_action_column(value, 'work_detail', url_name_change, url_name_delete)
 
     def render_viaf_id(self, value):
         if value:
