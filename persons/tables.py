@@ -51,8 +51,8 @@ class PersonTable(tables.Table):
         ]
 
     def render_uuid(self, record, value):
-        url_name_change = 'change_person' if self.request.user.has_perm('items.change_person') else None
-        url_name_delete = 'delete_person' if self.request.user.has_perm('items.delete_person') else None
+        url_name_change = 'change_person' if self.request.user.has_perm('persons.change_person') else None
+        url_name_delete = 'delete_person' if self.request.user.has_perm('persons.delete_person') else None
 
         return render_action_column(value, 'person_detail', url_name_change, url_name_delete)
 
