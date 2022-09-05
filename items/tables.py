@@ -148,6 +148,9 @@ class ItemTable(tables.Table):
     def render_languages(self, record):
         return ", ".join(Language.objects.filter(items__item=record).values_list('name', flat=True))
 
+    def render_parisian_category(self, record):
+        return record.parisian_category.name
+
     def render_item_type(self, record):
         return ", ".join(ItemType.objects.filter(itemitemtyperelation__item=record).values_list('name', flat=True))
 
