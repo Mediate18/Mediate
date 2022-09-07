@@ -1,6 +1,7 @@
 import django_tables2 as tables
 from django_tables2.utils import A  # alias for Accessor
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 import itertools
 
@@ -42,6 +43,7 @@ class ItemTable(tables.Table):
          text=format_html('<span class="glyphicon glyphicon-list" data-toggle="tooltip" data-original-title="Manage people"></span>'),
          args=[A('pk')], orderable=False, empty_values=())
     languages = tables.Column(empty_values=(), verbose_name=_("Languages"), orderable=False)
+    parisian_category = tables.Column(empty_values=(), verbose_name="Parisian category")
     item_type = tables.Column(empty_values=(), orderable=False)
     tags = tables.Column(empty_values=(), orderable=False)
 
@@ -68,6 +70,21 @@ class ItemTable(tables.Table):
             'manage_persons',
             'checkbox',
         ]
+
+    def __init__(self, *args, **kwargs):
+        self.add_info_link("parisian_category", 'parisiancategories')
+        super().__init__(*args, **kwargs)
+
+    @classmethod
+    def add_info_link(cls, column_name, link_name):
+        cls.base_columns[column_name].verbose_name = mark_safe(
+            cls.base_columns[column_name].verbose_name +
+            """ <a href="{}" target="_blank">
+                  <span class="glyphicon glyphicon-info-sign"></span>
+                </a>
+            """.format(reverse_lazy(link_name))
+        )
+
 
     def render_uuid(self, record, value):
         change_dataset_perm = self.request.user.has_perm('catalogues.change_dataset',
@@ -149,7 +166,10 @@ class ItemTable(tables.Table):
         return ", ".join(Language.objects.filter(items__item=record).values_list('name', flat=True))
 
     def render_parisian_category(self, record):
-        return record.parisian_category.name
+        try:
+            return record.parisian_category.name
+        except:
+            return ""
 
     def render_item_type(self, record):
         return ", ".join(ItemType.objects.filter(itemitemtyperelation__item=record).values_list('name', flat=True))
