@@ -42,7 +42,7 @@ class ItemTable(AddInfoLinkMixin, tables.Table):
          text=format_html('<span class="glyphicon glyphicon-list" data-toggle="tooltip" data-original-title="Manage people"></span>'),
          args=[A('pk')], orderable=False, empty_values=())
     languages = tables.Column(empty_values=(), verbose_name=_("Languages"), orderable=False)
-    parisian_category = tables.Column(empty_values=(), verbose_name="Parisian category")
+    parisian_category = tables.Column(empty_values=(), verbose_name=_("Parisian category"))
     item_type = tables.Column(empty_values=(), orderable=False)
     tags = tables.Column(empty_values=(), orderable=False)
 
@@ -71,8 +71,8 @@ class ItemTable(AddInfoLinkMixin, tables.Table):
         ]
 
     def __init__(self, *args, **kwargs):
-        self.add_info_link("Parisian category", "parisian_category", 'parisiancategories')
         super().__init__(*args, **kwargs)
+        self.add_info_link("parisian_category", 'parisiancategories')
 
     def render_uuid(self, record, value):
         change_dataset_perm = self.request.user.has_perm('catalogues.change_dataset',

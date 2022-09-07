@@ -67,13 +67,10 @@ def render_action_column(value, url_name_view, url_name_change, url_name_delete)
 
 
 class AddInfoLinkMixin(object):
-    """Adds a classmethod that ad an icon link to the column verbose_name"""
-    @classmethod
-    def add_info_link(cls, column_header, column_name, link_name):
-        cls.base_columns[column_name].verbose_name = mark_safe(
-            column_header +
-            """ <a href="{}" target="_blank">
-                  <span class="glyphicon glyphicon-info-sign"></span>
-                </a>
-            """.format(reverse_lazy(link_name))
-        )
+    """Adds a method that adds an icon link to the column verbose_name"""
+    def add_info_link(self, column_name, link_name):
+        info_link = """ <a href="{}" target="_blank">
+                          <span class="glyphicon glyphicon-info-sign"></span>
+                        </a>
+                    """.format(reverse_lazy(link_name))
+        self.columns[column_name].column.verbose_name = mark_safe(self.columns[column_name].verbose_name + info_link)
