@@ -5,3 +5,4 @@
 /static_root/
 .env*
 /writable/
+.ipynb_checkpoints
