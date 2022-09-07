@@ -1,14 +1,13 @@
 import django_tables2 as tables
 from django_tables2.utils import A  # alias for Accessor
 from django.utils.html import format_html
-from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 import itertools
 
 from .models import *
 from tagme.models import Tag
 
-from mediate.columns import ActionColumn, render_action_column
+from mediate.columns import ActionColumn, render_action_column, AddInfoLinkMixin
 
 
 # BookFormat table
@@ -25,7 +24,7 @@ class BookFormatTable(tables.Table):
 
 
 # Item table
-class ItemTable(tables.Table):
+class ItemTable(AddInfoLinkMixin, tables.Table):
     uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
     checkbox = tables.CheckBoxColumn(empty_values=(), orderable=False,
                                      attrs={'th__input': {'id': 'checkbox_column', 'title': 'Select/deselect all'}})
@@ -74,17 +73,6 @@ class ItemTable(tables.Table):
     def __init__(self, *args, **kwargs):
         self.add_info_link("parisian_category", 'parisiancategories')
         super().__init__(*args, **kwargs)
-
-    @classmethod
-    def add_info_link(cls, column_name, link_name):
-        cls.base_columns[column_name].verbose_name = mark_safe(
-            cls.base_columns[column_name].verbose_name +
-            """ <a href="{}" target="_blank">
-                  <span class="glyphicon glyphicon-info-sign"></span>
-                </a>
-            """.format(reverse_lazy(link_name))
-        )
-
 
     def render_uuid(self, record, value):
         change_dataset_perm = self.request.user.has_perm('catalogues.change_dataset',

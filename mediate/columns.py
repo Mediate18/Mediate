@@ -2,6 +2,7 @@ from django.urls import reverse_lazy
 import django_tables2 as tables
 from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
+from django.utils.safestring import mark_safe
 
 
 class ActionColumn(tables.Column):
@@ -65,3 +66,14 @@ def render_action_column(value, url_name_view, url_name_change, url_name_delete)
     return format_html(links)
 
 
+class AddInfoLinkMixin(object):
+    """Adds a classmethod that ad an icon link to the column verbose_name"""
+    @classmethod
+    def add_info_link(cls, column_name, link_name):
+        cls.base_columns[column_name].verbose_name = mark_safe(
+            cls.base_columns[column_name].verbose_name +
+            """ <a href="{}" target="_blank">
+                  <span class="glyphicon glyphicon-info-sign"></span>
+                </a>
+            """.format(reverse_lazy(link_name))
+        )
