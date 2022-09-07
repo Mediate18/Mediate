@@ -1745,6 +1745,7 @@ class ParisianCategoryTableView(ListView):
         context['action'] = _("add")
         context['object_name_plural'] = self.model._meta.verbose_name_plural
         context['add_url'] = reverse_lazy('add_parisiancategory')
+        context['info_include'] = 'catalogues/parisian_category_info.html'
 
         return context
 

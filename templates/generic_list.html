@@ -51,6 +51,10 @@
                 {{ object_name|title }}s
             {% endif %}
         </h1>
+        {% if info_include %}
+            {% include info_include %}
+            <br/>
+        {% endif %}
         <div class="pull-right">
             {% if add_url %}
                 <a href="{{ add_url }}" class="btn btn-default">
