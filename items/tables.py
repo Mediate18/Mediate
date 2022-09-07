@@ -71,7 +71,7 @@ class ItemTable(AddInfoLinkMixin, tables.Table):
         ]
 
     def __init__(self, *args, **kwargs):
-        self.add_info_link("parisian_category", 'parisiancategories')
+        self.add_info_link("Parisian category", "parisian_category", 'parisiancategories')
         super().__init__(*args, **kwargs)
 
     def render_uuid(self, record, value):

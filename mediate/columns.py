@@ -69,9 +69,9 @@ def render_action_column(value, url_name_view, url_name_change, url_name_delete)
 class AddInfoLinkMixin(object):
     """Adds a classmethod that ad an icon link to the column verbose_name"""
     @classmethod
-    def add_info_link(cls, column_name, link_name):
+    def add_info_link(cls, column_header, column_name, link_name):
         cls.base_columns[column_name].verbose_name = mark_safe(
-            cls.base_columns[column_name].verbose_name +
+            column_header +
             """ <a href="{}" target="_blank">
                   <span class="glyphicon glyphicon-info-sign"></span>
                 </a>
