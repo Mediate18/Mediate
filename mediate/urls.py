@@ -103,7 +103,7 @@ router.register(r'documentscan', DocumentScanViewSet)
 urlpatterns = [
     path(r'', RedirectView.as_view(url='dashboard/'), name='home'),
     path('about/', TemplateView.as_view(template_name="about.html"), name='about'),
-    path('admin/', admin.site.urls),
+    path(settings.ADMIN_URL_NAME+'/', admin.site.urls),
     path('accounts/register/', RegistrationView.as_view(form_class=CustomRegistrationForm),
          name="django_registration_register"),
     path('accounts/', include('django_registration.backends.activation.urls')),
