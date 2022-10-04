@@ -144,7 +144,7 @@ class Item(models.Model):
     def determine_non_book(self):
         original_non_book = self.non_book
         if ItemItemTypeRelation.objects.filter(item=self):
-            if ItemItemTypeRelation.objects.filter(item=self).exclude(type__name__icontains='book:'):
+            if ItemItemTypeRelation.objects.filter(item=self).exclude(type__non_book=False):
                 self.non_book = True
             else:
                 self.non_book = False
@@ -179,6 +179,7 @@ class ItemType(models.Model):
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("Name of the item type"), max_length=128, null=True)
+    non_book = models.BooleanField(_("Is non book type"), default=True)
 
     def __str__(self):
         return self.name
