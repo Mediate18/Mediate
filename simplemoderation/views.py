@@ -5,7 +5,7 @@ from django.db import transaction
 
 # from django.contrib.contenttypes.models import ContentType
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.urls import reverse_lazy
 from django.shortcuts import redirect

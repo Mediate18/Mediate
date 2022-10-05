@@ -7,7 +7,7 @@ from django.forms import inlineformset_factory
 
 from django.contrib.contenttypes.models import ContentType
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.urls import reverse_lazy
 import django_tables2
 

@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import permission_required
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 import os
 import mimetypes
 import json

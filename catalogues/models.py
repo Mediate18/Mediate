@@ -1,7 +1,7 @@
 from django.db import models, transaction
 from django.db.models import ProtectedError, F
 from django.db.models.deletion import CASCADE, SET_NULL
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.urls import reverse_lazy
 from django.contrib.contenttypes.fields import GenericRelation
 from django.dispatch import receiver

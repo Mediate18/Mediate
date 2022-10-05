@@ -9,7 +9,7 @@ from django.forms import formset_factory
 from django_tables2.config import RequestConfig
 from django_tables2.export.export import TableExport
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils.html import escape
 from django.shortcuts import get_object_or_404
 from django.db import transaction

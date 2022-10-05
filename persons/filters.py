@@ -1,7 +1,7 @@
 import django_filters
 from .models import *
 from viapy.api import ViafAPI
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.db.models import Q, IntegerField, Count
 from django.db.models.functions import Cast
 from django_select2.forms import Select2MultipleWidget, ModelSelect2MultipleWidget

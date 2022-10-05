@@ -1,7 +1,7 @@
 from django.urls import reverse_lazy
 import django_tables2 as tables
 from django.utils.html import format_html
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils.safestring import mark_safe
 
 

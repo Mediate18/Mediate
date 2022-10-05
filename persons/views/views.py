@@ -5,7 +5,7 @@ from django.views.generic.detail import DetailView
 from django.db import transaction
 from django.db.models import Count
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils.html import escape
 from django.urls import reverse
 import django_tables2

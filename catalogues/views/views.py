@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html, escape
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
