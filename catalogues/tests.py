@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.test import Client
 from mediate.tools_testing import GenericCRUDTestMixin
+from django.test import tag
 
 from .models import *
 from persons.tests import *
@@ -124,6 +125,7 @@ class CollectionTests(GenericCRUDTestMixin, TestCase):
                                self.get_change_form_data(), follow=True)
         self.assertEqual(response.status_code, 200)
 
+    @tag('todo')  # See https://github.com/Mediate18/Mediate/commit/ccff2bd840bbd47dbcbfa8d8cf2b6a9db6a4b557
     def test_Deletion_of_Editions(self):
         """
         When a Collection is deleted, all linked Editions that are not also linked to another Collection
