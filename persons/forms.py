@@ -4,7 +4,6 @@ from django_select2.forms import Select2Widget, ModelSelect2Widget, ModelSelect2
 from django_date_extensions.fields import ApproximateDateFormField
 from django.forms import inlineformset_factory
 from apiconnectors.widgets import ApiSelectWidget
-from viapy.widgets import ViafWidget
 from .models import *
 
 

@@ -11,8 +11,6 @@ from catalogues.views.views import get_collections_for_session
 from mediate.tools import filter_multiple_words
 from mediate.filters import QBasedFilterset, RangeFilterQ, MultipleChoiceFilterQWithExtraLookups, \
     ModelMultipleChoiceFilterQ
-from viapy.api import ViafAPI
-import six
 
 from django.urls import reverse_lazy
 

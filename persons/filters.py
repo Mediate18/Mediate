@@ -1,6 +1,5 @@
 import django_filters
 from .models import *
-from viapy.api import ViafAPI
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Q, IntegerField, Count
 from django.db.models.functions import Cast
@@ -8,6 +7,7 @@ from django_select2.forms import Select2MultipleWidget, ModelSelect2MultipleWidg
 from django_filters.widgets import RangeWidget
 from django.utils.safestring import mark_safe
 
+from apiconnectors.viafapi import ViafAPI
 from mediate.tools import filter_multiple_words
 from mediate.filters import QBasedFilter, RangeFilterQ, RangeRangeFilterQ, MultipleChoiceFilterQWithExtraLookups, \
     ModelMultipleChoiceFilterQ, ModelMultipleChoiceFilterQWithExtraLookups, QBasedFilterset

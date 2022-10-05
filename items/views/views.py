@@ -30,6 +30,8 @@ from ..forms import *
 from ..filters import *
 from ..tables import *
 
+from apiconnectors.viafapi import ViafAPI
+
 from catalogues.models import Dataset
 from persons.forms import PersonModelForm
 from mediate.views import GenericDetailView
