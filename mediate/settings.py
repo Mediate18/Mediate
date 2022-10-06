@@ -288,3 +288,5 @@ if APPLICATION_INSTANCE_TYPE.lower().startswith('dev'):
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 ADMIN_URL_NAME=config('ADMIN_URL_NAME', 'admin')
+
+X_FRAME_OPTIONS = 'SAMEORIGIN'
