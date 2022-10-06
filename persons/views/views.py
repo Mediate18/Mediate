@@ -203,14 +203,14 @@ class PersonCreateView(CreateView):
 
     def form_invalid(self, form):
         response = super().form_invalid(form)
-        if self.request.is_ajax():
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse(form.errors, status=400)
         else:
             return response
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        if self.request.is_ajax():
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest' :
             data = {
                 'pk': self.object.pk,
                 'short_name': self.object.short_name,
