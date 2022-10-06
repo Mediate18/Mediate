@@ -14,12 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-from django.urls import path
+from django.urls import path, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.decorators import login_required
 
-from django.conf.urls import url, include
+from django.conf.urls import include
 from django.views.generic import RedirectView, TemplateView
 from rest_framework import routers
 
@@ -108,7 +108,7 @@ urlpatterns = [
          name="django_registration_register"),
     path('accounts/', include('django_registration.backends.activation.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
-    path(r'items/', include(items.urls)),
+    re_path(r'items/', include(items.urls)),
     path(r'catalogues/', include(catalogues.urls)),
     path(r'persons/', include(persons.urls)),
     path(r'transcriptions/', include(transcriptions.urls)),
@@ -117,11 +117,10 @@ urlpatterns = [
     path(r'totals/', view_totals, name='totals'),
     path(r'dataset/', login_required(select_dataset), name='select_dataset'),
     path(r'moderation/', include('simplemoderation.urls')),
-    url(r'^api/', include(router.urls)),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^select2/', include('django_select2.urls')),
-    url(r'^viaf/', include(('viapy.urls', 'viapy'), namespace='viaf'), name='viaf'),
-    url(r'protected_media/(?P<filename>.*)$', protected_media, name='protected_media'),
+    re_path(r'^api/', include(router.urls)),
+    re_path(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    re_path(r'^select2/', include('django_select2.urls')),
+    re_path(r'protected_media/(?P<filename>.*)$', protected_media, name='protected_media'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) \
               + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
