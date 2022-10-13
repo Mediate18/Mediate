@@ -3,7 +3,7 @@ django-appconf==1.0.5
 django-autocomplete-light==3.9.4
 django-betterforms==2.0.0
 django-bootstrap3==22.1
--e git+https://github.com/Mediate18/django-date-extensions.git#egg=django-date-extensions
+-e git+https://github.com/Mediate18/django-date-extensions.git@d6d38f1aaa924094e9ebbb8796e5aa4e6eb743ee#egg=django_date_extensions
 django-filter==2.4.0
 django-guardian==2.4.0
 django-leaflet==0.28.3
