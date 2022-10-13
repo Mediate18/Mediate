@@ -64,7 +64,7 @@ cd $WORKING_DIR &&
 . $VIRTUALENV_DIR/bin/activate &&
 
 DB_PASSWORD=$(grep DB_PASSWORD .env | perl -pe 's/.*?=//')
-mysqldump mediatedb_test --quick --host=mysql-mediatedb.science.ru.nl --user=mediatedb_admin --password=$DB_PASSWORD --no-tablespaces > $BACKUP_DIR/$DBBACKUP_FILE 2> >(tee -a $BACKUP_LOG)
+mysqldump --column-statistics=0 mediatedb_test --quick --host=mysql-mediatedb.science.ru.nl --user=mediatedb_admin --password=$DB_PASSWORD --no-tablespaces > $BACKUP_DIR/$DBBACKUP_FILE 2> >(tee -a $BACKUP_LOG)
 gzip $BACKUP_DIR/$DBBACKUP_FILE
 
 # Backup media file
