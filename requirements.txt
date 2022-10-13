@@ -22,6 +22,6 @@ mysqlclient==2.0.3
 numpy==1.23.3
 python-decouple==3.6
 python-fsutil==0.7.0
-PyYAML==5.1.2
+PyYAML==5.4
 sqlparse==0.3.0
 tablib==0.13.0
