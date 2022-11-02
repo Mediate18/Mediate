@@ -5,7 +5,7 @@ from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
-from django.db.models import Count, Min, Max, Q, Func, F, Value
+from django.db.models import Count, Min, Max, Q, Func, F, Value, Avg, FloatField, IntegerField
 from django.db.models.functions import Substr, Length
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, render
@@ -128,6 +128,32 @@ class CollectionStatisticsView(TemplateView):
             ]
         ]
 
+        # Averages
+        # Average number of lots and items
+        averages = filter.qs \
+            .annotate(lot_cnt=Count('lot', distinct=True), item_cnt=Count('lot__item', distinct=True)) \
+            .aggregate(avg_lot_cnt=Avg(F('lot_cnt')), avg_item_cnt=Avg(F('item_cnt')))
+
+        # Average percentage of non-books
+        averages.update(
+            filter.qs \
+                .annotate(pct_non_book=100
+                                * Count('lot__item', filter=Q(lot__item__non_book=True), output_field=FloatField())
+                                / Count('lot__item', filter=Q(lot__item__non_book=False))
+            )
+                .aggregate(avg_pct_non_books=Avg(F('pct_non_book')))
+        )
+
+        # Replace keys with human-readable keys
+        labels = {
+            'avg_lot_cnt': _('Average number of lots'),
+            'avg_item_cnt': _('Average number of items'),
+            'avg_pct_non_books': _('Average percentage of non-books')
+        }
+        averages = dict((labels[key], value) for (key, value) in averages.items())
+
+        context['statistics'] = averages
+
         return context
 
 
@@ -144,7 +170,8 @@ def get_collections_chart(request):
 
     item_count_per_decade = Item.objects \
         .filter(lot__collection__in=filter.qs, edition__year_start__lte=max_publication_year) \
-        .annotate(decade=10 * Substr('edition__year_start', 1, Length('edition__year_start') - 1)) \
+        .annotate(decade=10 * Substr('edition__year_start', 1, Length('edition__year_start') - 1,
+                                     output_field=IntegerField())) \
         .values('decade') \
         .order_by('decade') \
         .annotate(count=Count('decade'))

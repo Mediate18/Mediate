@@ -54,6 +54,21 @@
     </div>
 </div>
 
+{% if statistics %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading text-center">{% trans 'Statistics' %}</div>
+                <div class="panel-body" style="font-size: 16px">
+                    {% for key, value in statistics.items %}
+                        {{ key }}: {{ value }}
+                        {% if not forloop.last %} | {% endif %}
+                    {% endfor %}
+                </div>
+        </div>
+    </div>
+{% endif %}
+
 {% for chart_row in charts %}
     <div class="row">
         {% with chart_row|length as column_size %}
