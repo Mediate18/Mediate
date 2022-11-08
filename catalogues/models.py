@@ -127,7 +127,13 @@ class Collection(models.Model):
 
     def item_count(self):
         from items.models import Item
-        return Item.objects.filter(lot__collection=self).count()
+        item_count = Item.objects.filter(lot__collection=self).count()
+        uncountable_book_items = Item.objects.filter(lot__collection=self, uncountable_book_items=True).count()
+        return item_count + uncountable_book_items
+
+    def has_uncountable_book_items(self):
+        from items.models import Item
+        return Item.objects.filter(lot__collection=self, uncountable_book_items=True).exists()
 
     @property
     def sorted_lot_set(self):

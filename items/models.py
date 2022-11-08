@@ -125,6 +125,7 @@ class Item(models.Model):
     edition = models.ForeignKey('Edition', on_delete=models.PROTECT, related_name="items")  # See also the delete method
     non_book = models.BooleanField(default=False, editable=False)
     parisian_category = models.ForeignKey(ParisianCategory, on_delete=SET_NULL, null=True, blank=True)
+    uncountable_book_items = models.BooleanField(default=False)
 
     tags = GenericRelation(TaggedEntity, related_query_name='items')
 

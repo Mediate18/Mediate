@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 import os
 import socket
 from mediate.decouple import config, Csv
+from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -290,3 +291,12 @@ if APPLICATION_INSTANCE_TYPE.lower().startswith('dev'):
 ADMIN_URL_NAME=config('ADMIN_URL_NAME', 'admin')
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+UNCOUNTABLE_BOOK_ITEMS_MESSAGE = _("The book item count includes books, pamphlets, prints, and maps and atlases. " \
+                                 "Loose prints and maps are indicated separately, but included in the total book " \
+                                 "count, as it is not always possible to determine whether prints were bound " \
+                                 "together or issued as a book. Bundles of books are counted as two items when it " \
+                                 "is unclear how many items were included in the bundle, and the imprecision " \
+                                 "indicated with an (i) on the Collection page, under 'Number of items'. When " \
+                                 "the precise number of items in a bundle is stated, these have been split out and " \
+                                 "counted as separate book items.")

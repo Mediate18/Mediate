@@ -2,6 +2,7 @@ import django_tables2 as tables
 from django_tables2.utils import A  # alias for Accessor
 from django.utils.html import format_html
 from .models import *
+from django.conf import settings
 
 from collections import defaultdict
 
@@ -78,7 +79,17 @@ class CollectionTable(tables.Table):
         return record.lot_set.count()
 
     def render_number_of_items(self, record):
-        return record.item_count()
+        item_count = record.item_count()
+
+        if not record.has_uncountable_book_items():
+            return item_count
+
+        return format_html(
+            '{} <span class="glyphicon glyphicon-info-sign" title="{}"></span>'.format(
+                item_count,
+                settings.UNCOUNTABLE_BOOK_ITEMS_MESSAGE
+            )
+        )
 
     def render_percentage_non_books(self, record):
         item_count = record.item_count()
