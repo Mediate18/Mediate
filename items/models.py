@@ -214,6 +214,15 @@ def set_item_non_book(sender, instance, **kwargs):
         item.save()
 
 
+@receiver(models.signals.post_save, sender=ItemType)
+@receiver(models.signals.post_delete, sender=ItemType)
+def set_item_non_book_for_type(sender, instance, **kwargs):
+    for item in Item.objects.filter(itemitemtyperelation__type=instance):
+        changed = item.determine_non_book()
+        if changed:
+            item.save()
+
+
 class ItemAuthor(models.Model):
     """
     Author of a work
