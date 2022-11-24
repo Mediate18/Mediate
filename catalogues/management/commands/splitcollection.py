@@ -40,6 +40,11 @@ class Command(BaseCommand):
                             help='The index in the old collection of the first lot in the new collection')
         parser.add_argument('-e', '--exclude_index_in_collection', type=str,
                             help='Lots with these indexes are not move to the new collection')
+        parser.add_argument(
+            '--same_catalogue',
+            action='store_true',
+            help='Link the new collection to the same catalogue of the old collection',
+        )
 
     def handle(self, *args, **kwargs):
         # Get the command line arguments
@@ -51,9 +56,18 @@ class Command(BaseCommand):
             return
 
         with transaction.atomic():
-            new_catalogue = Catalogue.objects.create(name=new_collection_name,
+            new_collection = Collection.objects.create(short_title=new_collection_name)
+            if kwargs['same_catalogue']:
+                catalogues = collection.catalogue.all()
+                new_collection.catalogue.set(catalogues)
+            else:
+                catalogue = Catalogue.objects.create(name=new_collection_name,
                                                        dataset=collection.catalogue.first().dataset)
-            new_collection = Collection.objects.create(short_title=new_collection_name, catalogue=new_catalogue)
+                new_collection.catalogue.add(catalogue)
+
+
+            new_collection.save()
+
             print("New collection URL:", new_collection.get_absolute_url())
             lots_to_move = Lot.objects.filter(collection=collection, index_in_collection__gte=lot.index_in_collection)\
                             .exclude(index_in_collection__in=exclude_indexes)
