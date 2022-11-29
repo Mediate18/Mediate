@@ -35,6 +35,7 @@ class Catalogue(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("Name"), max_length=128, unique=True)
     dataset = models.ForeignKey(Dataset, on_delete=models.PROTECT)
+    full_title = models.TextField(_("Full title"), null=True)
 
     def __str__(self):
         return self.name
