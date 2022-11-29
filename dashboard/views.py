@@ -55,6 +55,8 @@ def view_totals(request):
     collections = list(collections_for_session)
     collections_count = collections_for_session.distinct().count()
     book_items = Item.objects.filter(lot__collection__in=collections, non_book=False).count()
+    uncountable_book_items_exist = Item.objects.filter(lot__collection__in=collections,
+                                                       uncountable_book_items=True).exists()
     non_book_items = Item.objects.filter(lot__collection__in=collections, non_book=True).count()
     works = Work.objects.filter(items__item__lot__collection__in=collections).distinct().count()
     persons = Person.objects.filter(personitemrelation__item__lot__collection__in=collections).distinct().count()
@@ -85,7 +87,7 @@ def view_totals(request):
                                           non_book=False).distinct().count()
     items_with_place_of_publication = Item.objects.filter(lot__collection__in=collections, edition__place__isnull=False,
                                                           non_book=False).distinct().count()
-    
+
     persons_with_place_of_birth = Person.objects.filter(city_of_birth__isnull=False).distinct().count()
     persons_with_place_of_death = Person.objects.filter(city_of_death__isnull=False).distinct().count()
 
@@ -95,6 +97,7 @@ def view_totals(request):
     context = {
         'collections': collections_count,
         'book_items': book_items,
+        'uncountable_book_items_exist': uncountable_book_items_exist,
         'non_book_items': non_book_items,
         'percentage_non_book_items': round(100 * non_book_items/book_items, 1),
         'works': works,

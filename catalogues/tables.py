@@ -85,7 +85,7 @@ class CollectionTable(tables.Table):
             return item_count
 
         return format_html(
-            '{} <span class="glyphicon glyphicon-info-sign" title="{}"></span>'.format(
+            '{}+ <span class="glyphicon glyphicon-info-sign" title="{}"></span>'.format(
                 item_count,
                 settings.UNCOUNTABLE_BOOK_ITEMS_MESSAGE
             )
