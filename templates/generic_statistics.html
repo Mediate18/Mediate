@@ -54,43 +54,51 @@
     </div>
 </div>
 
-{% if statistics %}
+{% if filter.qs.count < 1 %}
     <div class="row">
         <div class="col-md-12">
-            <div class="panel panel-default">
-                <div class="panel-heading text-center">{% trans 'Statistics' %}</div>
-                <div class="panel-body" style="font-size: 16px">
-                    {% for key, value in statistics.items %}
-                        {{ key }}: {{ value }}
-                        {% if not forloop.last %} | {% endif %}
-                    {% endfor %}
-                </div>
+            <h3>{% trans "No collections found" %}</h3>
         </div>
     </div>
-{% endif %}
-
-{% for chart_row in charts %}
-    <div class="row">
-        {% with chart_row|length as column_size %}
-        {% for chart in chart_row %}
-            {# Divide 12 by the number of charts in the row #}
-            <div class="col-lg-{% widthratio 12 column_size 1 %}">
-
+{% else %}
+    {% if statistics %}
+        <div class="row">
+            <div class="col-md-12">
                 <div class="panel panel-default">
-                      <div class="panel-heading text-center">{{ chart.title }}</div>
-                      <div class="panel-body">
-                            <div hx-get="{{ chart.url }}?{{ url_params }}" hx-trigger="load">
-                                <img  alt="Loading..." class="htmx-indicator" width="20" src="/static/img/oval.svg"/>
-                                {% trans 'Loading...' %}
-                            </div>
-                      </div>
-                </div>
-
+                    <div class="panel-heading text-center">{% trans 'Statistics' %}</div>
+                    <div class="panel-body" style="font-size: 16px">
+                        {% for key, value in statistics.items %}
+                            {{ key }}: {{ value }}
+                            {% if not forloop.last %} | {% endif %}
+                        {% endfor %}
+                    </div>
             </div>
-        {% endfor %}
-        {% endwith %}
-    </div>
-{% endfor %}
+        </div>
+    {% endif %}
+
+    {% for chart_row in charts %}
+        <div class="row">
+            {% with chart_row|length as column_size %}
+            {% for chart in chart_row %}
+                {# Divide 12 by the number of charts in the row #}
+                <div class="col-lg-{% widthratio 12 column_size 1 %}">
+
+                    <div class="panel panel-default">
+                          <div class="panel-heading text-center">{{ chart.title }}</div>
+                          <div class="panel-body">
+                                <div hx-get="{{ chart.url }}?{{ url_params }}" hx-trigger="load">
+                                    <img  alt="Loading..." class="htmx-indicator" width="20" src="/static/img/oval.svg"/>
+                                    {% trans 'Loading...' %}
+                                </div>
+                          </div>
+                    </div>
+
+                </div>
+            {% endfor %}
+            {% endwith %}
+        </div>
+    {% endfor %}
+{% endif %}
 
 {% block abstracts %}
 {% endblock %}

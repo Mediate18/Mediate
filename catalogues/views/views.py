@@ -194,39 +194,13 @@ def get_collections_chart(request):
     return render(request, 'catalogues/collection_chart.html', context=context)
 
 
-def get_item_counts_for(item_field_name, collection_qs, max_publication_year):
-    """
-    Get item counts
-    :param item_field_name: a field relative to Item (may contain relations with __)
-    :param collection_qs: a Collection queryset to filter items with
-    :param max_publication_year: the maximum publication year of an edition to filter items with
-    :return:
-    """
-    edition_q = Q(edition__isnull=True) | Q(edition__year_start__isnull=True) | Q(edition__year_start__lte=max_publication_year)
-    items = Item.objects.filter(lot__collection__in=collection_qs)
-    items = items.filter(edition_q)
-    items = items.values(item_field_name)
-    targets = [item[item_field_name]
-                           for item in items
-                           if item[item_field_name] is not None]
-    return Counter(targets).items()
-
-
 def get_collection_country_chart(request):
     filter = CollectionFilter(request.GET, queryset=get_collections_for_session(request).distinct())
 
-    max_publication_year = \
-        get_collections_for_session(request).aggregate(Max('lot__collection__year_of_publication'))[
-            'lot__collection__year_of_publication__max']
-    if not max_publication_year:
-        max_publication_year = 0
-
-    edition_q = Q(place__edition__isnull=True) | Q(place__edition__year_start__isnull=True) \
-                | Q(place__edition__year_start__lte=max_publication_year)
     item_count_per_country = [ [escape(country['name']), country['item_count'] ] for country in
         Country.objects \
             .filter(place__edition__items__lot__collection__in=filter.qs) \
-            .annotate(item_count=Count('place__edition__items', edition_q))\
+            .annotate(item_count=Count('place__edition__items'))\
             .order_by('-item_count')\
             .values('name', 'item_count')
     ]
@@ -241,17 +215,9 @@ def get_collection_country_chart(request):
 def get_collection_city_chart(request):
     filter = CollectionFilter(request.GET, queryset=get_collections_for_session(request).distinct())
 
-    max_publication_year = \
-        get_collections_for_session(request).aggregate(Max('lot__collection__year_of_publication'))[
-            'lot__collection__year_of_publication__max']
-    if not max_publication_year:
-        max_publication_year = 0
-
-    edition_q = Q(edition__isnull=True) | Q(edition__year_start__isnull=True) | Q(
-        edition__year_start__lte=max_publication_year)
     cities = Place.objects\
         .filter(edition__items__lot__collection__in=filter.qs) \
-        .annotate(item_count=Count('edition__items', edition_q)) \
+        .annotate(item_count=Count('edition__items')) \
         .filter(item_count__gt=0) \
         .order_by('-item_count') \
         .values('name', 'item_count')
@@ -268,8 +234,8 @@ def get_collection_city_chart(request):
         'item_without_city_count': item_without_city_count,
         'percentage_item_without_city_count': round(100 * item_without_city_count
                                                     / (item_without_city_count + item_with_city_count),
-                                                    2),
-        'short_title_value': request.GET['short_title']
+                                                    2) if (item_without_city_count + item_with_city_count) else 0,
+        'short_title_value': request.GET.get('short_title', '')
     }
 
     return render(request, 'catalogues/place_of_publication_pie_chart.html', context=context)
@@ -278,17 +244,9 @@ def get_collection_city_chart(request):
 def get_collection_language_chart(request):
     filter = CollectionFilter(request.GET, queryset=get_collections_for_session(request).distinct())
 
-    max_publication_year = \
-        get_collections_for_session(request).aggregate(Max('lot__collection__year_of_publication'))[
-            'lot__collection__year_of_publication__max']
-    if not max_publication_year:
-        max_publication_year = 0
-
-    edition_q = Q(items__item__edition__isnull=True) | Q(items__item__edition__year_start__isnull=True) | Q(
-        items__item__edition__year_start__lte=max_publication_year)
     languages = Language.objects.all()
     languages = languages.filter(items__item__lot__collection__in=filter.qs)
-    languages = languages.annotate(item_count=Count('items__item', edition_q))
+    languages = languages.annotate(item_count=Count('items__item'))
     languages = languages.order_by('-item_count')
     languages = languages.values('name', 'item_count')
 
@@ -303,13 +261,11 @@ def get_collection_language_chart(request):
 def get_collection_parisian_category_chart(request):
     filter = CollectionFilter(request.GET, queryset=get_collections_for_session(request).distinct())
 
-    max_publication_year = \
-        get_collections_for_session(request).aggregate(Max('lot__collection__year_of_publication'))[
-            'lot__collection__year_of_publication__max']
-    if not max_publication_year:
-        max_publication_year = 0
-    
-    counts = get_item_counts_for('parisian_category__name', filter.qs, max_publication_year)
+    parisian_categories = ParisianCategory.objects.all()
+    parisian_categories = parisian_categories.filter(item__lot__collection__in=filter.qs)
+    parisian_categories = parisian_categories.annotate(item_count=Count('item'))
+    parisian_categories = parisian_categories.order_by('-item_count')
+    parisian_categories = parisian_categories.values('name', 'item_count')
 
     unclassified_items_count = Item.objects.filter(lot__collection__in=filter.qs, parisian_category__isnull=True).count()
     classified_items_count = Item.objects.filter(lot__collection__in=filter.qs, parisian_category__isnull=False).count()
@@ -317,12 +273,13 @@ def get_collection_parisian_category_chart(request):
     context = {
         'chart_id': 'item_count_per_parisian_category',
         'item_count': json.dumps([
-            [item[0], item[1]] for item in sorted(counts, key=lambda pair: pair[1], reverse=True)
+            [escape(parisian_category['name']), parisian_category['item_count']]
+            for parisian_category in parisian_categories
         ]),
         'unclassified_items_count': unclassified_items_count,
         'percentage_unclassified_items_count': round(100 * unclassified_items_count
                                                      / (unclassified_items_count + classified_items_count),
-                                                     2)
+                                                     2) if (unclassified_items_count + classified_items_count) else 0
     }
 
     return render(request, 'catalogues/parisian_category_pie_chart.html', context=context)
@@ -331,16 +288,8 @@ def get_collection_parisian_category_chart(request):
 def get_collection_format_chart(request):
         filter = CollectionFilter(request.GET, queryset=get_collections_for_session(request).distinct())
 
-        max_publication_year = \
-            get_collections_for_session(request).aggregate(Max('lot__collection__year_of_publication'))[
-                'lot__collection__year_of_publication__max']
-        if not max_publication_year:
-            max_publication_year = 0
-
-        edition_q = Q(items__edition__isnull=True) | Q(items__edition__year_start__isnull=True) | Q(
-            items__edition__year_start__lte=max_publication_year)
         formats = BookFormat.objects.filter(items__lot__collection__in=filter.qs)
-        formats = formats.annotate(item_count=Count('items', edition_q))
+        formats = formats.annotate(item_count=Count('items'))
         formats = formats.order_by('-item_count')
         formats = formats.values('name', 'item_count')
 
@@ -355,22 +304,11 @@ def get_collection_format_chart(request):
 def get_collection_author_gender_chart(request):
     filter = CollectionFilter(request.GET, queryset=get_collections_for_session(request).distinct())
 
-    max_publication_year = \
-        get_collections_for_session(request).aggregate(Max('lot__collection__year_of_publication'))[
-            'lot__collection__year_of_publication__max']
-    if not max_publication_year:
-        max_publication_year = 0
-
-    from functools import reduce
     from collections import defaultdict
 
-    edition_q = Q(personitemrelation__item__edition__isnull=True) \
-                | Q(personitemrelation__item__edition__year_start__isnull=True) \
-                | Q(personitemrelation__item__edition__year_start__lte=max_publication_year)
     sexes = list(Person.objects.annotate(item_count=Count('personitemrelation__item',
                                       filter=Q(personitemrelation__role__name="author",
-                                               personitemrelation__item__lot__collection__in=filter.qs)
-                                             & edition_q,
+                                               personitemrelation__item__lot__collection__in=filter.qs),
                                       distinct=True)) \
                  .values_list('sex', 'item_count'))
 
