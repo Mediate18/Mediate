@@ -34,6 +34,9 @@
 
           <div class="modal-body">
             <!-- batch edit form -->
+            {% if option.message %}
+                {{ option.message }}
+            {% endif %}
             {% if option.form %}
                 <table class="table">
                     {{ option.form.as_table }}

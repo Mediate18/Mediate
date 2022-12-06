@@ -13,7 +13,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.html import escape
 from django.shortcuts import get_object_or_404
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Case, When
 
 import django_tables2
 from guardian.shortcuts import get_objects_for_user, get_perms
@@ -216,6 +216,13 @@ class ItemTableView(ListView):
                 'url': reverse_lazy('add_parisiancategories_to_items'),
                 'form': ItemParisianCategoriesForm
             },
+            {
+                'id': 'toggle_uncountable_book_items',
+                'label': _("Toggle uncountable book items"),
+                'url': reverse_lazy('toggle_uncountable_book_items'),
+                'message': _("The uncountable book items field of the selected items will be toggled."),
+                'form': None,
+            }
         ] if datasets_permitted else None
 
         context['per_page_choices'] = [25, 50, 100, 500, 1000]
@@ -1657,7 +1664,30 @@ def add_parisian_category_to_items(request):
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
     else:
         raise Http404
+    
+    
+def toggle_uncountable_book_items(request):
+    """
+    Toggle the uncountable_book_items
+    :param request: 
+    :return: 
+    """
+    # POST only
+    if request.method != 'POST':
+        raise Http404
 
+    # Check that *entries* are there
+    if 'entries' not in request.POST:
+        messages.add_message(request, messages.WARNING, _("No items selected."))
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+    item_ids = request.POST.getlist('entries')
+    items = Item.objects.filter(uuid__in=item_ids, lot__collection__in=get_collections_for_session(request))
+    if len(item_ids) != items.count():
+        messages.add_message(request, messages.ERROR, _("Some items could not be used for toggling uncountable book"
+                                                        " items because you are not allowed to change the dataset."))
+    items.update(uncountable_book_items=Case(When(uncountable_book_items=True, then=False), default=True))
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 
 def set_publication_place_for_editions(request):

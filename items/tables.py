@@ -64,6 +64,7 @@ class ItemTable(AddInfoLinkMixin, tables.Table):
             'parisian_category',
             'item_type',
             'tags',
+            'uncountable_book_items',
             'uuid',
             'manage_works',
             'manage_persons',

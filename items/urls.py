@@ -47,6 +47,9 @@ urlpatterns = [
     path('items/add_parisiancategories_to_items',
          permission_required('collections.change_category')(add_parisian_category_to_items),
          name='add_parisiancategories_to_items'),
+    path('items/toggle_uncountable_book_items',
+         permission_required('items.change_item')(toggle_uncountable_book_items),
+         name='toggle_uncountable_book_items'),
 
     path('items/item_suggest', permission_required('global.view_all')(ItemSuggest.as_view()), name='item_suggest'),
 
