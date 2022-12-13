@@ -167,6 +167,7 @@ class CollectionCollectionTypeRelationTable(tables.Table):
 class CatalogueTable(tables.Table):
     uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
     collections = tables.Column(empty_values=(), verbose_name="Collection(s)", orderable=False)
+    lots = tables.Column(empty_values=(), verbose_name="Lots", orderable=False)
     items = tables.Column(empty_values=(), verbose_name="Items", orderable=False)
 
     class Meta:
@@ -176,6 +177,7 @@ class CatalogueTable(tables.Table):
             'name',
             'dataset',
             'collections',
+            'lots',
             'items',
             'uuid'
         ]
@@ -201,14 +203,34 @@ class CatalogueTable(tables.Table):
         )
 
     def render_items(self, record):
+        item_count = record.item_count()
+
         return format_html(
             '<a href="{}?{}">'
             '<span class="glyphicon glyphicon-list" data-toggle="tooltip" '
             'data-original-title="List the items of {}"></span>'
-            '</a>'.format(
+            '</a>'
+            ' {}'.format(
                 reverse_lazy('items'),
                 "&".join(["collection="+str(uuid) for uuid in record.collection.values_list("uuid", flat=True)]),
-                record
+                record,
+                item_count  
+            )
+        )
+
+    def render_lots(self, record):
+        lot_count = Lot.objects.filter(collection__catalogue=record).count()
+
+        return format_html(
+            '<a href="{}?{}">'
+            '<span class="glyphicon glyphicon-list" data-toggle="tooltip" '
+            'data-original-title="List the lots of {}"></span>'
+            '</a>'
+            ' {}'.format(
+                reverse_lazy('lots'),
+                "&".join(["collection="+str(uuid) for uuid in record.collection.values_list("uuid", flat=True)]),
+                record,
+                lot_count  
             )
         )
 

@@ -35,13 +35,19 @@ class Catalogue(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("Name"), max_length=128, unique=True)
     dataset = models.ForeignKey(Dataset, on_delete=models.PROTECT)
-    full_title = models.TextField(_("Full title"), null=True)
+    # full_title = models.TextField(_("Full title"), null=True)
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
         return reverse_lazy('catalogue_detail', args=[str(self.uuid)])
+
+    def item_count(self):
+        from items.models import Item
+        item_count = Item.objects.filter(lot__collection__catalogue=self).count()
+        uncountable_book_items = Item.objects.filter(lot__collection__catalogue=self, uncountable_book_items=True).count()
+        return item_count + uncountable_book_items
 
 
 class CatalogueYear(models.Model):

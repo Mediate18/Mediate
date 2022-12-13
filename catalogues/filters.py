@@ -218,7 +218,19 @@ class LibraryFilter(django_filters.FilterSet):
 
 # Lot filter
 class LotFilter(django_filters.FilterSet):
-    collection = django_filters.Filter(field_name='collection__short_title', lookup_expr='icontains')
+    collection__short_title = django_filters.Filter(field_name='collection__short_title', lookup_expr='icontains')
+
+    collection = django_filters.ModelMultipleChoiceFilter(
+        label="Collection",
+        queryset=Collection.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Collection,
+            search_fields=['short_title__icontains', 'full_title__icontains',
+                           'preface_and_paratexts__icontains']
+        ),
+        # method='collection_filter'
+    )
     category = django_filters.Filter(field_name='category__bookseller_category', lookup_expr='icontains')
     number_in_collection = django_filters.RangeFilter(widget=django_filters.widgets.RangeWidget())
     page_in_collection = django_filters.RangeFilter(widget=django_filters.widgets.RangeWidget())
@@ -230,6 +242,17 @@ class LotFilter(django_filters.FilterSet):
     class Meta:
         model = Lot
         exclude = ['uuid']
+        fields = [
+            'collection__short_title',
+            'collection',
+            'number_in_collection',
+            'page_in_collection',
+            'sales_price',
+            'lot_as_listed_in_collection',
+            'index_in_collection',
+            'category',
+            'number_of_items',
+        ]
 
     def number_of_items_filter(self, queryset, name, value):
         if any(value):
