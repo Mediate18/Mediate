@@ -2035,6 +2035,8 @@ class WorkTableView(ListView):
 
         table = WorkTable(filter.qs)
         django_tables2.RequestConfig(self.request, ).configure(table)
+        if not datasets_permitted:
+            table.exclude = ('checkbox')
 
         context['filter'] = filter
         context['table'] = table
@@ -2042,8 +2044,36 @@ class WorkTableView(ListView):
         context['action'] = _("add")
         context['object_name'] = "work"
         context['add_url'] = reverse_lazy('add_work') if datasets_permitted else None
+        context['batch_edit_options'] = [
+            {
+                'id': 'add_parisiancategories',
+                'label': _("Add Parisian categories"),
+                'url': reverse_lazy('add_parisiancategories_to_items_of_works'),
+                'form': ItemParisianCategoriesForm
+            },
+        ] if datasets_permitted else None
 
         return context
+
+
+def add_parisiancategories_to_items_of_works(request):
+    """
+    Add ParisianCategories to items linked to a list of works
+    :param request:
+    :return:
+    """
+    if request.method == 'POST':
+        if 'entries' in request.POST and 'parisian_category' in request.POST:
+            work_ids = request.POST.getlist('entries')
+            items = Item.objects.filter(parisian_category__isnull=True,
+                        works__work_id__in=work_ids, lot__collection__in=get_collections_for_session(request))
+            parisian_category_id = request.POST.get('parisian_category')
+            items.update(parisian_category_id=parisian_category_id)
+        else:
+            messages.add_message(request, messages.WARNING, _("No items and/or no Parisian categories selected."))
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    else:
+        raise Http404
 
 
 class WorkRankingTableView(ListView):

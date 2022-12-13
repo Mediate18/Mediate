@@ -615,6 +615,8 @@ class SubjectTable(tables.Table):
 # Work table
 class WorkTable(tables.Table):
     uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
+    checkbox = tables.CheckBoxColumn(empty_values=(), orderable=False,
+                                     attrs={'th__input': {'id': 'checkbox_column', 'title': 'Select/deselect all'}})
     viaf_id = tables.Column(empty_values=())
 
     class Meta:
@@ -631,6 +633,11 @@ class WorkTable(tables.Table):
         url_name_delete = 'delete_work' if self.request.user.has_perm('items.delete_work') else None
 
         return render_action_column(value, 'work_detail', url_name_change, url_name_delete)
+
+    def render_checkbox(self, record):
+        return format_html(
+            '<input id="{}" class="checkbox" type="checkbox" name="checkbox"/>'.format(record.uuid)
+        )
 
     def render_viaf_id(self, value):
         if value:

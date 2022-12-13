@@ -295,6 +295,9 @@ urlpatterns = [
        name="change_work"),
     path(r'works/delete/<uuid:pk>', permission_required('items.delete_work')(WorkDeleteView.as_view()),
        name="delete_work"),
+    path('works/add_parisiancategories_to_items_of_works',
+         permission_required('items.change_item')(add_parisiancategories_to_items_of_works),
+         name='add_parisiancategories_to_items_of_works'),
     
     # WorkRanking urls
     path(r'works/rank', permission_required('global.view_all')(WorkRankingTableView.as_view()),
