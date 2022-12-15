@@ -1717,6 +1717,7 @@ class ParisianCategoryTableView(ListView):
 
 class ParisianCategoryDetailView(DetailView):
     model = ParisianCategory
+    template_name = 'generic_detail.html'
 
 
 class ParisianCategoryCreateView(CreateView):

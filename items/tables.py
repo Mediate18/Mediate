@@ -1,3 +1,4 @@
+from django.db.models import Count
 import django_tables2 as tables
 from django_tables2.utils import A  # alias for Accessor
 from django.utils.html import format_html
@@ -615,6 +616,7 @@ class SubjectTable(tables.Table):
 # Work table
 class WorkTable(tables.Table):
     uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
+    parisian_category = tables.Column(empty_values=(), verbose_name=_("Parisian category"), orderable=False)
     checkbox = tables.CheckBoxColumn(empty_values=(), orderable=False,
                                      attrs={'th__input': {'id': 'checkbox_column', 'title': 'Select/deselect all'}})
     viaf_id = tables.Column(empty_values=())
@@ -625,6 +627,7 @@ class WorkTable(tables.Table):
         sequence = [
             'title',
             'viaf_id',
+            'parisian_category',
             'uuid'
         ]
 
@@ -633,6 +636,16 @@ class WorkTable(tables.Table):
         url_name_delete = 'delete_work' if self.request.user.has_perm('items.delete_work') else None
 
         return render_action_column(value, 'work_detail', url_name_change, url_name_delete)
+
+    def render_parisian_category(self, record, value):
+        parisian_categories = ParisianCategory.objects.filter(item__works__work=record)\
+            .annotate(item_count=Count("item"))
+        return format_html(
+            " | ".join([
+                f'<a href="{parisian_category.get_absolute_url()}">{parisian_category.name}</a> ({parisian_category.item_count} items)'
+                for parisian_category in parisian_categories
+            ])
+        )
 
     def render_checkbox(self, record):
         return format_html(

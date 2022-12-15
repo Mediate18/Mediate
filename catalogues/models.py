@@ -324,6 +324,9 @@ class ParisianCategory(models.Model):
     def __str__(self):
         return "{} ({})".format(self.name, self.description) if self.description else self.name
 
+    def get_absolute_url(self):
+        return reverse_lazy('parisiancategory_detail', args=[str(self.uuid)])
+
 
 class Category(models.Model):
     """
