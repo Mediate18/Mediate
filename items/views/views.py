@@ -2065,8 +2065,8 @@ def add_parisiancategories_to_items_of_works(request):
     if request.method == 'POST':
         if 'entries' in request.POST and 'parisian_category' in request.POST:
             work_ids = request.POST.getlist('entries')
-            items = Item.objects.filter(parisian_category__isnull=True,
-                        works__work_id__in=work_ids, lot__collection__in=get_collections_for_session(request))
+            items = Item.objects.filter(works__work_id__in=work_ids,
+                                        lot__collection__in=get_collections_for_session(request))
             parisian_category_id = request.POST.get('parisian_category')
             items.update(parisian_category_id=parisian_category_id)
         else:
