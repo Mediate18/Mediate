@@ -1,4 +1,4 @@
-git+git@github.com:vanlummelhuizen/AttrDict.git@master#egg=attrdict
+git+https://github.com/vanlummelhuizen/AttrDict.git@master#egg=attrdict
 Django==4.1.2
 django-appconf==1.0.5
 django-autocomplete-light==3.9.4
