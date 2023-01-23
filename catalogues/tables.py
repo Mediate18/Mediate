@@ -16,7 +16,8 @@ from mediate.columns import ActionColumn, render_action_column
 # Collection table
 class CollectionTable(tables.Table):
     uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)#ActionColumn('collection_detail', 'change_collection', 'delete_collection', orderable=False)
-    types = tables.Column(empty_values=(), verbose_name="Type(s)")
+    full_title = tables.Column(empty_values=(), verbose_name="Catalogue full title(s)")
+    types = tables.Column(empty_values=(), verbose_name="Catalogue type(s)")
     owner = tables.Column(empty_values=(), orderable=False)
     number_of_lots = tables.Column(empty_values=(), orderable=False)
     number_of_items = tables.Column(empty_values=(), orderable=False)
