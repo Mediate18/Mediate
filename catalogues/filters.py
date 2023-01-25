@@ -101,10 +101,15 @@ class CollectionFilter(django_filters.FilterSet):
 
         # The RangeWidget gives a slice, i.e. 'value' is a slice
         if not value.stop:
-            return queryset.filter(year_of_publication__lte=value.start, year_of_publication_end__gte=value.start)
+            return queryset.filter(
+                (Q(year_of_publication__lte=value.start) & Q(year_of_publication_end__gte=value.start))
+                | (Q(year_of_publication=value.start) & Q(year_of_publication_end__isnull=True))
+            )
 
-        start_in_range = Q(year_of_publication__lte=value.start, year_of_publication_end__gte=value.start)
-        end_in_range = Q(year_of_publication__lte=value.stop, year_of_publication_end__gte=value.stop)
+        start_in_range = (Q(year_of_publication__lte=value.start) & Q(year_of_publication_end__gte=value.start)) \
+                         | (Q(year_of_publication=value.start) & Q(year_of_publication_end__isnull=True))
+        end_in_range = (Q(year_of_publication__lte=value.stop) & Q(year_of_publication_end__gte=value.start)) \
+                       | (Q(year_of_publication=value.start) & Q(year_of_publication_end__isnull=True))
 
         return queryset.filter(start_in_range | end_in_range)
 
