@@ -18,6 +18,7 @@ class CollectionTable(tables.Table):
     uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)#ActionColumn('collection_detail', 'change_collection', 'delete_collection', orderable=False)
     full_title = tables.Column(empty_values=(), verbose_name="Catalogue full title(s)")
     types = tables.Column(empty_values=(), verbose_name="Catalogue type(s)")
+    year_of_publication = tables.Column(empty_values=(), verbose_name="Year(s) of publication")
     owner = tables.Column(empty_values=(), orderable=False)
     number_of_lots = tables.Column(empty_values=(), orderable=False)
     number_of_items = tables.Column(empty_values=(), orderable=False)
@@ -65,6 +66,13 @@ class CollectionTable(tables.Table):
                 ]
             )
         )
+
+    def render_year_of_publication(self, record):
+        if not record.year_of_publication_end:
+            return record.year_of_publication
+
+        else:
+            return f"{record.year_of_publication} - {record.year_of_publication_end}"
 
     def render_owner(self, record):
         owners = Person.objects.filter(personcollectionrelation__role__name__iexact="owner",

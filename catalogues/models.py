@@ -98,7 +98,11 @@ class Collection(models.Model):
     short_title = models.CharField(_("Short title"), max_length=128, null=True)
     full_title = models.TextField(_("Full title"), null=True)
     preface_and_paratexts = models.TextField(_("Preface or prefatory / concluding text"), null=True)
+
+    # Year of publication can either a single year or a range.
     year_of_publication = models.IntegerField(_("Year of publication"), null=True)
+    year_of_publication_end = models.IntegerField(_("Year of publication: end of range"), null=True)
+
     terminus_post_quem = models.BooleanField(_("Terminus post quem"), default=False)
     notes = models.TextField(_("Notes for the Mediate project"), null=True)
     bibliography = models.TextField(_("Bibliography"), null=True)

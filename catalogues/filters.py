@@ -17,7 +17,10 @@ class CollectionFilter(django_filters.FilterSet):
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
         method='collection_types_filter'
     )
-    year_of_publication = django_filters.RangeFilter(widget=django_filters.widgets.RangeWidget())
+    year_of_publication = django_filters.RangeFilter(
+        widget=django_filters.widgets.RangeWidget(),
+        method='year_of_publication_filter'
+    )
     terminus_post_quem = django_filters.BooleanFilter(widget=django_filters.widgets.BooleanWidget())
     number_of_items = django_filters.Filter(label='Number of items', method='number_of_items_filter',
                                             widget=django_filters.widgets.RangeWidget())
@@ -91,6 +94,19 @@ class CollectionFilter(django_filters.FilterSet):
             return queryset.filter(collectioncollectiontyperelation__type__in=value)
         else:
             return queryset
+
+    def year_of_publication_filter(self, queryset, name, value):
+        if not value:
+            return queryset
+
+        # The RangeWidget gives a slice, i.e. 'value' is a slice
+        if not value.stop:
+            return queryset.filter(year_of_publication__lte=value.start, year_of_publication_end__gte=value.start)
+
+        start_in_range = Q(year_of_publication__lte=value.start, year_of_publication_end__gte=value.start)
+        end_in_range = Q(year_of_publication__lte=value.stop, year_of_publication_end__gte=value.stop)
+
+        return queryset.filter(start_in_range | end_in_range)
 
     def number_of_items_filter(self, queryset, name, value):
         if any(value):
