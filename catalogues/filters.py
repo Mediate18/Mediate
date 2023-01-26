@@ -106,12 +106,16 @@ class CollectionFilter(django_filters.FilterSet):
                 | (Q(year_of_publication=value.start) & Q(year_of_publication_end__isnull=True))
             )
 
+        year_of_publication_in_slice = (Q(year_of_publication__gte=value.start)
+                                        & Q(year_of_publication__lte=value.stop))
+
         start_in_range = (Q(year_of_publication__lte=value.start) & Q(year_of_publication_end__gte=value.start)) \
                          | (Q(year_of_publication=value.start) & Q(year_of_publication_end__isnull=True))
-        end_in_range = (Q(year_of_publication__lte=value.stop) & Q(year_of_publication_end__gte=value.start)) \
-                       | (Q(year_of_publication=value.start) & Q(year_of_publication_end__isnull=True))
+        end_in_range = (Q(year_of_publication__lte=value.stop) & Q(year_of_publication_end__gte=value.stop)) \
+                       | (Q(year_of_publication=value.stop) & Q(year_of_publication_end__isnull=True))
+        both_outside = (Q(year_of_publication__gte=value.start) & Q(year_of_publication_end__lte=value.stop))
 
-        return queryset.filter(start_in_range | end_in_range)
+        return queryset.filter(year_of_publication_in_slice | start_in_range | end_in_range | both_outside)
 
     def number_of_items_filter(self, queryset, name, value):
         if any(value):
