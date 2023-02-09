@@ -36,6 +36,7 @@ class Catalogue(models.Model):
     name = models.CharField(_("Name"), max_length=128, unique=True)
     dataset = models.ForeignKey(Dataset, on_delete=models.PROTECT)
     # full_title = models.TextField(_("Full title"), null=True)
+    shelf_mark = models.ForeignKey(ShelfMark, on_delete=SET_NULL, null=True)
 
     def __str__(self):
         return self.name
@@ -94,7 +95,6 @@ class Collection(models.Model):
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     transcription = models.ForeignKey(Transcription, on_delete=SET_NULL, null=True)
-    shelf_mark = models.ForeignKey(ShelfMark, on_delete=SET_NULL, null=True)
     short_title = models.CharField(_("Short title"), max_length=128, null=True)
     full_title = models.TextField(_("Full title"), null=True)
     preface_and_paratexts = models.TextField(_("Preface or prefatory / concluding text"), null=True)
