@@ -1,7 +1,7 @@
 from django import forms
 from django_select2.forms import Select2Widget, ModelSelect2Widget, ModelSelect2MultipleWidget
 from .models import *
-from catalogues.models import Library, Collection
+from catalogues.models import Library, Catalogue
 
 
 class DocumentScanModelForm(forms.ModelForm):
@@ -44,19 +44,19 @@ class ShelfMarkModelForm(forms.ModelForm):
         }
 
     def __init__(self, **kwargs):
-        self.collection = kwargs.pop('collection', None)
+        self.catalogue = kwargs.pop('catalogue', None)
         super().__init__(**kwargs)
-        self.add_collection_field()
+        self.add_catalogue_field()
 
-    def add_collection_field(self):
-        collection = forms.ModelMultipleChoiceField(
-            queryset=self.collection,
+    def add_catalogue_field(self):
+        catalogue = forms.ModelMultipleChoiceField(
+            queryset=self.catalogue,
             widget=ModelSelect2MultipleWidget(
-                queryset=self.collection,
+                queryset=self.catalogue,
                 search_fields=['short_title__icontains'],
                 attrs={'data-placeholder': "Select multiple"},
             ),
-            initial=Collection.objects.filter(shelf_mark=self.instance)
+            initial=Catalogue.objects.filter(shelf_mark=self.instance)
         )
-        self.fields['collection'] = collection
+        self.fields['catalogue'] = catalogue
 

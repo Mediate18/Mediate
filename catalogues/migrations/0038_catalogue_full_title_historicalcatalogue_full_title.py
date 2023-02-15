@@ -20,7 +20,7 @@ def copy_full_title_from_collection_to_catalogue(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("catalogues", "0036_add_year_of_publication_end"),
+        ("catalogues", "0037_catalogue_shelf_mark"),
     ]
 
     operations = [

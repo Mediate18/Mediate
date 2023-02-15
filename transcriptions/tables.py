@@ -51,7 +51,7 @@ class TranscriptionTable(tables.Table):
 # ShelfMark table
 class ShelfMarkTable(tables.Table):
     uuid = ActionColumn('shelfmark_detail', 'change_shelfmark', 'delete_shelfmark', orderable=False)
-    collection = tables.Column(empty_values=(), orderable=False, verbose_name=_("Collections"))
+    catalogue = tables.Column(empty_values=(), orderable=False, verbose_name=_("Catalogues"))
 
     class Meta:
         model = ShelfMark
@@ -60,12 +60,12 @@ class ShelfMarkTable(tables.Table):
             'place',
             'library',
             'text',
-            'collection',
+            'catalogue',
             'uuid'
         ]
 
-    def render_collection(self, record):
-        collections = []
-        for collection in record.collection_set.values('short_title', 'uuid'):
-            collections.append("<a href='{}'>{}</a>".format(reverse_lazy('collection_detail', args=[collection['uuid']]), collection['short_title']))
-        return format_html(", ".join(collections))
+    def render_catalogue(self, record):
+        catalogues = []
+        for catalogue in record.catalogue_set.values('name', 'uuid'):
+            catalogues.append("<a href='{}'>{}</a>".format(reverse_lazy('catalogue_detail', args=[catalogue['uuid']]), catalogue['name']))
+        return format_html(", ".join(catalogues))

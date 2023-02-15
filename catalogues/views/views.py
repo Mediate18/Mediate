@@ -740,7 +740,7 @@ class CatalogueTableView(ListView):
 
 class CatalogueDetailView(PermissionRequiredMixin, GenericDetailView):
     model = Catalogue
-    object_fields = ['name', 'dataset']
+    object_fields = ['name', 'dataset', 'shelf_mark']
     template_name = 'generic_detail.html'
 
     # Object permission check by Django Guardian

@@ -317,7 +317,7 @@ class ShelfMarkCreateView(CreateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['collection'] = Collection.objects.filter(catalogue__dataset__in=get_datasets_for_session(self.request))
+        kwargs['catalogue'] = Catalogue .objects.filter(catalogue__dataset__in=get_datasets_for_session(self.request))
         return kwargs
     
     def form_valid(self, form):
@@ -331,10 +331,10 @@ class ShelfMarkCreateView(CreateView):
             formset.instance = shelfmark
             formset.save()
 
-            # Connect shelf-mark to collection(s)
-            for collection in form.cleaned_data['collection']:
-                collection.shelf_mark = shelfmark
-                collection.save()
+            # Connect shelf-mark to catalogue(s)
+            for catalogue in form.cleaned_data['catalogue']:
+                catalogue.shelf_mark = shelfmark
+                catalogue.save()
         else:
             return self.render_to_response(self.get_context_data(form=form))
 
@@ -365,7 +365,7 @@ class ShelfMarkUpdateView(UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['collection'] = Collection.objects.filter(catalogue__dataset__in=get_datasets_for_session(self.request))
+        kwargs['catalogue'] = Catalogue.objects.filter(dataset__in=get_datasets_for_session(self.request))
         return kwargs
 
     def form_valid(self, form):
@@ -380,9 +380,9 @@ class ShelfMarkUpdateView(UpdateView):
             formset.save()
 
             # Connect shelf-mark to collection(s)
-            for collection in form.cleaned_data['collection']:
-                collection.shelf_mark = shelfmark
-                collection.save()
+            for catalogue in form.cleaned_data['catalogue']:
+                catalogue.shelf_mark = shelfmark
+                catalogue.save()
         else:
             return self.render_to_response(self.get_context_data(form=form))
 

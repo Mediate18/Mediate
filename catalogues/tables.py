@@ -186,6 +186,7 @@ class CatalogueTable(tables.Table):
             'name',
             'dataset',
             'collections',
+            'shelf_mark',
             'lots',
             'items',
             'uuid'
