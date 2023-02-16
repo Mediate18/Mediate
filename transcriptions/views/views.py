@@ -317,7 +317,7 @@ class ShelfMarkCreateView(CreateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['catalogue'] = Catalogue .objects.filter(catalogue__dataset__in=get_datasets_for_session(self.request))
+        kwargs['catalogue'] = Catalogue .objects.filter(dataset__in=get_datasets_for_session(self.request))
         return kwargs
     
     def form_valid(self, form):
