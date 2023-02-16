@@ -56,7 +56,7 @@ class ShelfMark(models.Model):
             strs.append(_("Place: {}").format(self.place))
         if self.library:
             strs.append(_("Library: {}").format(self.library))
-        strs.append(_("Text: {}").format(self.text))
+        strs.append(_("Shelf mark: {}").format(self.text))
         strs.append(_("Catalogue(s): {}").format(", ".join(self.catalogue_set.values_list('name', flat=True))))
         return "; ".join(strs)
 
