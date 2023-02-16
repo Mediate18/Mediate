@@ -21,10 +21,46 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-4 col-md-offset-4">
+        <h3 class="text-center">
+            Welcome to the MEDIATE database.
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-md-4 col-md-offset-1">
             <div class="login-panel panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Please Sign In</h3>
+                    <h3 class="panel-title">Register</h3>
+                </div>
+                <div class="panel-body">
+                    {% if 'REGISTRATION_OPEN'|settings_value %}
+                    <h4>
+                        This is a <i>free</i>, Open Access database, but users do need to register by
+                        filling in an e-mail address and confirming
+                        this registration. This is an automated process, that
+                        will take no more than a few seconds.
+                    </h4>
+                    <p class="bs-component text-center">
+                        <a class="btn btn-default" href="{% url 'django_registration_register' %}">
+                            Register
+                        </a>
+                    </p>
+                    {% else %}
+                    <h4>
+                        Registration is not open at the moment.
+                    </h4>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <h4 class="bs-component text-center">
+                or
+            </h4>
+        </div>
+        <div class="col-md-4">
+            <div class="login-panel panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Sign In</h3>
                 </div>
                 <div class="panel-body">
                     <form method="post" action="{% url 'login' %}">
@@ -41,10 +77,8 @@
                                 </tr>
                             </table>
                         </p>
-                        <p class="bs-component">
-                            <center>
-                                <input class="btn btn-basic" type="submit" value="login" />
-                            </center>
+                        <p class="bs-component text-center">
+                            <input class="btn btn-basic" type="submit" value="Log in" />
                         </p>
                         <input type="hidden" name="next" value="{{ next }}" />
                     </form>
@@ -56,17 +90,6 @@
             </div>
         </div>
     </div>
-
-    {% if 'REGISTRATION_OPEN'|settings_value %}
-    <div class="row">
-        <div class="col-md-4 col-md-offset-4">
-                    <p class="bs-component text-center">
-                        If you don't have an account,
-                        <a href="{% url 'django_registration_register' %}">sign up here</a>
-                    </p>
-        </div>
-    </div>
-    {% endif %}
 </div>
 
 {% endblock %}
