@@ -12,6 +12,7 @@ django-leaflet==0.28.3
 django-maintenance-mode==0.16.3
 django-model-utils==3.1.1
 django-extensions==3.1.0
+django-redis
 django-registration==3.2
 django-select2==7.10.1
 django-silk==4.2.0

@@ -135,7 +135,7 @@ DATABASES = {
 # otherwise use a database cache
 socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-REDIS_PORT = config('REDIS_PORT', cast=int)
+REDIS_PORT = config('REDIS_PORT', cast=int, default=6379)
 
 try:
     socket.connect(('127.0.0.1', REDIS_PORT))
