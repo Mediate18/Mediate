@@ -346,7 +346,8 @@ class CollectionLocationMapView(ListView):
         context['object_name'] = "collection"
 
         context['object_list'] = filter.qs
-        context['places'] = Place.objects.filter(related_collections__collection__in=filter.qs)\
+        context['places'] = Place.objects.filter(related_collections__collection__in=filter.qs,
+                                                 latitude__isnull=False, longitude__isnull=False)\
                                 .annotate(object_count=Count('related_collections__collection'))
         context['objects_url_name'] = 'collections'
         context['place_search_field'] = 'place'
