@@ -114,6 +114,7 @@ class PersonFilter(django_filters.FilterSet):
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
         method='nature_of_relation_filter'
     )
+    notes = django_filters.Filter(field_name='notes', lookup_expr='icontains')
 
     class Meta:
         model = Person
@@ -136,7 +137,8 @@ class PersonFilter(django_filters.FilterSet):
             'city_of_residence',
             'country_of_residence',
             'related_to',
-            'nature_of_relation'
+            'nature_of_relation',
+            'notes'
         ]
 
     def short_name_filter(self, queryset, name, value):
