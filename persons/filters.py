@@ -114,7 +114,7 @@ class PersonFilter(django_filters.FilterSet):
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
         method='nature_of_relation_filter'
     )
-    notes = django_filters.Filter(field_name='notes', lookup_expr='icontains')
+    notes = django_filters.Filter(field_name='notes', label='Notes', lookup_expr='icontains')
 
     class Meta:
         model = Person
