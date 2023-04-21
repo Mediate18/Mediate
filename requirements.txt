@@ -29,5 +29,5 @@ python-decouple==3.6
 python-fsutil==0.7.0
 PyYAML==5.4
 rdflib
-sqlparse==0.3.0
+sqlparse==0.4.4
 tablib==0.13.0
