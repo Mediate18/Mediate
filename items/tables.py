@@ -3,6 +3,7 @@ import django_tables2 as tables
 from django_tables2.utils import A  # alias for Accessor
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
+from django.utils.safestring import mark_safe
 import itertools
 
 from .models import *
@@ -153,7 +154,19 @@ class ItemTable(AddInfoLinkMixin, tables.Table):
         return ", ".join(MaterialDetails.objects.filter(items__item=record).values_list('description', flat=True))
 
     def render_languages(self, record):
-        return ", ".join(Language.objects.filter(items__item=record).values_list('name', flat=True))
+        language_links = [
+            '<a href="{}">{}</a>'.format(reverse_lazy('language_detail', args=[language.uuid]),
+                                         format_html(language.name))
+            for language in Language.objects.filter(items__item=record)
+        ]
+        return format_html(
+            '<div class="col-xs-11 expandable-cell collapsed-cell">{}</div>'
+            '<div class="col-xs-1">'
+            '<span class="expand-cell glyphicon glyphicon-chevron-down" title="Expand"></span>'
+            '<span class="collapse-cell glyphicon glyphicon-chevron-up" title="Collapse"></span>'
+            '</div>',
+            mark_safe(", ".join(language_links))
+        )
 
     def render_parisian_category(self, record):
         try:
