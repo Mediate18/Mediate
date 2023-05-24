@@ -1,6 +1,6 @@
 git+https://github.com/vanlummelhuizen/AttrDict.git@master#egg=attrdict
 cached-property
-Django==4.1.7
+Django==4.2.1
 django-appconf==1.0.5
 django-autocomplete-light==3.9.4
 django-betterforms==2.0.0
@@ -29,5 +29,5 @@ python-decouple==3.6
 python-fsutil==0.7.0
 PyYAML==5.4
 rdflib
-sqlparse==0.3.0
+sqlparse==0.4.4
 tablib==0.13.0
