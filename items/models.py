@@ -21,9 +21,9 @@ class Language(models.Model):
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=50)
-    language_code_2char = models.CharField(max_length=7, unique=True, null=False, blank=False, help_text=_(
+    language_code_2char = models.CharField(max_length=7, unique=True, null=True, blank=True, help_text=_(
         """Language code (2 characters long) of a written language. This also includes codes of the form zh-Hans, cf. IETF BCP 47"""))
-    language_code_3char = models.CharField(max_length=3, unique=True, null=False, blank=False, help_text=_(
+    language_code_3char = models.CharField(max_length=3, unique=True, null=True, blank=True, help_text=_(
         """ISO 639-3 language code (3 characters long) of a written language."""))
     description = models.TextField(null=True, blank=True)
 
