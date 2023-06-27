@@ -336,6 +336,21 @@ class Publisher(models.Model):
         return _("{} published {}").format(self.publisher, self.edition)
 
 
+class PublicationPlace(models.Model):
+    """
+    Place of publication
+    """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    edition = models.ForeignKey(Edition, on_delete=CASCADE)
+    place = models.ForeignKey(Place, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = (("edition", "place"),)
+
+    def __str__(self):
+        return _("{} is published in {}").format(self.edition, self.place)
+
+
 class PersonItemRelationRole(models.Model):
     """
     A role for a person-item relation
