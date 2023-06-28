@@ -303,12 +303,16 @@ class Edition(models.Model):
                       if publisher.publisher.short_name]
         if publishers:
             str_elements += publishers
-        year_range_str = "{}".format(self.year_start) if self.year_start else ""
-        year_range_str += " - {}".format(self.year_end) if self.year_end else ""
+        year_range_str = self.get_year_range_str()
         if year_range_str:
             str_elements.append(year_range_str)
         published_str = ", ".join(str_elements)if str_elements else _("Empty edition").format()
         return published_str
+
+    def get_year_range_str(self):
+        year_range_str = "{}".format(self.year_start) if self.year_start else ""
+        year_range_str += " - {}".format(self.year_end) if self.year_end else ""
+        return year_range_str
 
     def clean(self):
         if self.year_start is None and self.year_end is not None:
