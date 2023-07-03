@@ -36,7 +36,7 @@ class ItemTable(AddInfoLinkMixin, tables.Table):
     collection = tables.Column(empty_values=(), order_by='lot__collection__short_title')
     number_of_volumes = tables.Column(empty_values=(), verbose_name=_('Number of volumes'))
     material_details = tables.Column(empty_values=(), orderable=False)
-    edition = tables.LinkColumn()
+    edition = tables.Column(empty_values=(), orderable=False)
     manage_works = tables.LinkColumn('add_workstoitem',
         text=format_html('<span class="glyphicon glyphicon-list" data-toggle="tooltip" data-original-title="Manage works"></span>'),
         args=[A('pk')], orderable=False, empty_values=())
@@ -152,6 +152,14 @@ class ItemTable(AddInfoLinkMixin, tables.Table):
 
     def render_material_details(self, record):
         return ", ".join(MaterialDetails.objects.filter(items__item=record).values_list('description', flat=True))
+
+    def render_edition(self, record):
+        year = record.edition.get_year_range_str()
+        year_str = year + ": " if year else ""
+        places_str = ", ".join(
+            Place.objects.filter(publicationplace__edition=record.edition_id).values_list('name', flat=True)
+        )
+        return year_str + places_str
 
     def render_languages(self, record):
         language_names = [format_html(language.name) for language in Language.objects.filter(items__item=record)]
