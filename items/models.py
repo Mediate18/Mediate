@@ -6,6 +6,9 @@ from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
 from django.contrib.contenttypes.fields import GenericRelation
 
+from computedfields.models import ComputedFieldsModel, computed, precomputed
+from simple_history.models import HistoricalRecords
+
 import uuid
 
 from persons.models import Place, Person
@@ -110,7 +113,7 @@ class WorkAuthor(models.Model):
 
 
 @moderated()
-class Item(models.Model):
+class Item(ComputedFieldsModel):
     """
     Item
     """
@@ -128,6 +131,36 @@ class Item(models.Model):
     uncountable_book_items = models.BooleanField(default=False)
 
     tags = GenericRelation(TaggedEntity, related_query_name='items')
+
+    history = HistoricalRecords(bases=[ComputedFieldsModel])
+
+    @computed(models.IntegerField(null=True), depends=[('lot.collection', ['year_of_publication'])])
+    def collection_year_of_publication(self):
+        try:
+            return self.lot.collection.year_of_publication
+        except:
+            return None
+
+    @computed(models.CharField(max_length=128, null=True), depends=[('lot.collection', ['short_title'])])
+    def collection_short_title(self):
+        try:
+            return self.lot.collection.short_title
+        except:
+            return None
+
+    @computed(models.UUIDField(null=True), depends=[('lot.collection.catalogue.dataset', ['uuid'])])
+    def dataset_uuid(self):
+        try:
+            return self.lot.collection.catalogue.first().dataset.uuid
+        except:
+            return None
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["collection_year_of_publication", "collection_short_title"]),
+            models.Index(fields=["dataset_uuid"]),
+            models.Index(fields=["non_book"])
+        ]
 
     def __str__(self):
         return self.short_title
@@ -155,6 +188,7 @@ class Item(models.Model):
         # Return whether non_book is changed
         return not original_non_book == self.non_book
 
+    @precomputed
     def save(self, *args, **kwargs):
         self.determine_non_book()
         super().save(*args, **kwargs)

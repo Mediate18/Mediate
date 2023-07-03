@@ -111,10 +111,12 @@ class ItemTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
+        #NEW
         items = Item.objects \
-            .filter(lot__collection_id__in=get_collections_for_session(self.request)) \
-            .order_by('lot__collection__year_of_publication', 'lot__collection__short_title',
-                                      'lot__index_in_collection', 'index_in_lot', 'lot__lot_as_listed_in_collection')
+            .filter(dataset_uuid__in=[dataset.uuid for dataset in get_datasets_for_session(self.request)]) \
+            .order_by('collection_year_of_publication', 'collection_short_title',
+                                      'lot__index_in_collection')
+        
         lot_uuid = self.request.GET.get('lot__uuid')
         if lot_uuid:
             items = items.filter(lot__uuid=uuid.UUID(lot_uuid))

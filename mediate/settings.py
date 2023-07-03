@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'simple_history',
     'leaflet',
     'django_registration',
+    'computedfields',
     'simplemoderation',
     'tagme',
     'mediate',
