@@ -155,9 +155,27 @@ class Item(ComputedFieldsModel):
         except:
             return None
 
+    @computed(models.IntegerField(null=True))
+    def lot_index_in_collection(self):
+        try:
+            return self.lot.index_in_collection
+        except:
+            return None
+
+    @computed(models.CharField(max_length=128, null=True))
+    def lot_lot_as_listed_in_collection(self):
+        try:
+            return self.lot.lot_as_listed_in_collection[:128]
+        except:
+            return None
+
     class Meta:
         indexes = [
-            models.Index(fields=["collection_year_of_publication", "collection_short_title"]),
+            models.Index(fields=["collection_year_of_publication",
+                                 "collection_short_title",
+                                 "lot_index_in_collection",
+                                 "index_in_lot",
+                                 "lot_lot_as_listed_in_collection"]),
             models.Index(fields=["dataset_uuid"]),
             models.Index(fields=["non_book"])
         ]

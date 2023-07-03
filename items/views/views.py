@@ -115,8 +115,8 @@ class ItemTableView(ListView):
         items = Item.objects \
             .filter(dataset_uuid__in=[dataset.uuid for dataset in get_datasets_for_session(self.request)]) \
             .order_by('collection_year_of_publication', 'collection_short_title',
-                                      'lot__index_in_collection')
-        
+                                      'lot_index_in_collection', 'index_in_lot', 'lot_lot_as_listed_in_collection')
+
         lot_uuid = self.request.GET.get('lot__uuid')
         if lot_uuid:
             items = items.filter(lot__uuid=uuid.UUID(lot_uuid))
