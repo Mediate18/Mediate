@@ -54,11 +54,10 @@
                     {% endif %}
                 {% endwith %}
 
-                {% with object.personitemrelation_set.all as item_relations %}
-                    {% if item_relations %}
-                        <h3>{% trans "Items" %}</h3>
-                        <ul>
-                        {% for relation in item_relations %}
+                {% if person_item_relations %}
+                    <h3>{% trans "Items" %}</h3>
+                    <ul>
+                        {% for relation in person_item_relations %}
                             <li>
                                 <a href="{{ relation.item.get_absolute_url }}">{{ relation.item }}</a>
                                 ({{ relation.role }})
@@ -70,8 +69,7 @@
                             </li>
                         {% endfor %}
                         </ul>
-                    {% endif %}
-                {% endwith %}
+                {% endif %}
 
                 {% with object.publisher_set.all as publisher_relations %}
                     {% if publisher_relations %}

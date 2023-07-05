@@ -140,6 +140,13 @@ class PersonRankingTableView(ListView):
 class PersonDetailView(DetailView):
     model = Person
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['person_item_relations'] = PersonItemRelation.objects\
+                                            .filter(person=self.get_object())\
+                                            .select_related('item', 'role')
+        return context
+
 
 class PersonCreateView(CreateView):
     model = Person
