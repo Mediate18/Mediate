@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from django import forms
 from django.contrib.contenttypes.models import ContentType
+from django.utils.translation import gettext_lazy as _
 from django_select2.forms import Select2Widget, ModelSelect2Widget, ModelSelect2MultipleWidget
 from apiconnectors.widgets import ApiSelectWidget
 from .models import *
@@ -24,7 +25,7 @@ class ItemModelForm(forms.ModelForm):
         self.lots = kwargs.pop('lots', None)
         super().__init__(*args, **kwargs)
 
-        if self.catalogues:
+        if self.catalogues is not None and self.catalogues.exists():
             self.fields['catalogue'] = forms.ModelChoiceField(
                 queryset=self.catalogues,
                 widget=ModelSelect2Widget(
@@ -33,7 +34,7 @@ class ItemModelForm(forms.ModelForm):
                 ),
             )
 
-        if self.lots:
+        if self.lots is not None and self.lots.exists():
             self.fields['lot'] = forms.ModelChoiceField(
                 queryset=self.lots,
                 widget=ModelSelect2Widget(
@@ -569,6 +570,44 @@ class EditionModelForm(forms.ModelForm):
             ),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.add_publicationplaces_field()
+
+    def add_publicationplaces_field(self):
+        publication_places = forms.ModelMultipleChoiceField(
+            label=_("Real places of publication"),
+            widget=ModelSelect2MultipleWidget(
+                model=Place,
+                search_fields=['name__icontains']
+            ),
+            queryset=Place.objects.all(),
+            required=False,
+            initial=Place.objects.filter(publicationplace__edition=self.instance)
+        )
+        self.fields['publication_places'] = publication_places
+
+    def save_publicationplaces(self):
+        places_in_form = self.cleaned_data['publication_places']
+        existing_places = Place.objects.filter(publicationplace__edition=self.instance)
+
+        # Delete places that were remove in the form
+        places_to_delete = existing_places.exclude(pk__in=places_in_form.values_list('pk', flat=True))
+        for place in places_to_delete:
+            PublicationPlace.objects.get(edition=self.instance, place=place).delete()
+
+        # Add places that were added in the form
+        new_places = places_in_form.exclude(pk__in=existing_places.values_list('pk', flat=True))
+        for place in new_places:
+            PublicationPlace.objects.create(edition=self.instance, place=place)
+
+    def save(self, commit=True):
+        self.instance = super().save(commit=commit)
+        if commit:
+            self.save_publicationplaces()
+
+        return self.instance
+
 
 class PublisherModelForm(forms.ModelForm):
     class Meta:
@@ -658,7 +697,7 @@ class ItemAndEditionForm(MultiModelForm):
         fields = self.fields
         d = self.__dict__
 
-        if self.catalogues:
+        if self.catalogues is not None and self.catalogues.exists():
             self.forms['item'].fields['catalogue'] = forms.ModelChoiceField(
                 queryset=self.catalogues,
                 widget=ModelSelect2Widget(
@@ -667,7 +706,7 @@ class ItemAndEditionForm(MultiModelForm):
                 ),
             )
 
-        if self.lots:
+        if self.lots is not None and self.lots.exists():
             self.forms['item'].fields['lot'] = forms.ModelChoiceField(
                 queryset=self.lots,
                 widget=ModelSelect2Widget(
