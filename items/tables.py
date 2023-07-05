@@ -76,6 +76,18 @@ class ItemTable(AddInfoLinkMixin, tables.Table):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.add_info_link("parisian_category", 'parisiancategories')
+        self.data.data = self.data.data.prefetch_related(
+            'lot',
+            'lot__collection',
+            'lot__collection__catalogue__dataset',
+            'personitemrelation_set__role',
+            'book_format',
+            'works',
+            'works__work',
+            'edition',
+            'parisian_category',
+            'tags',
+        )
 
     def render_uuid(self, record, value):
         change_dataset_perm = self.request.user.has_perm('catalogues.change_dataset',
@@ -93,7 +105,7 @@ class ItemTable(AddInfoLinkMixin, tables.Table):
             '<span class="expand-cell glyphicon glyphicon-chevron-down" title="Expand"></span>'
             '<span class="collapse-cell glyphicon glyphicon-chevron-up" title="Collapse"></span>'
             '</div>',
-            reverse_lazy('change_lot', args=[record.lot.uuid]), record.lot.lot_as_listed_in_collection
+            reverse_lazy('change_lot', args=[record.lot_id]), record.lot.lot_as_listed_in_collection
         )
 
     def render_checkbox(self, record):
@@ -102,7 +114,7 @@ class ItemTable(AddInfoLinkMixin, tables.Table):
         )
 
     def render_people(self, record):
-        person_item_relations = PersonItemRelation.objects.filter(item=record)
+        person_item_relations = record.personitemrelation_set.all() #
         relation_groups = []
         for role in set([relation.role for relation in person_item_relations]):
             role_relations = person_item_relations.filter(role=role)
@@ -125,7 +137,7 @@ class ItemTable(AddInfoLinkMixin, tables.Table):
         return format_html("<br/> ".join(relation_groups))
 
     def render_works(self, record):
-        item_work_relations = ItemWorkRelation.objects.filter(item=record)
+        item_work_relations = record.works.all()
         work_entries = []
         for relation in item_work_relations:
             work = relation.work
@@ -136,11 +148,10 @@ class ItemTable(AddInfoLinkMixin, tables.Table):
             work_entries.append(work_entry)
         return format_html(" | ".join(work_entries))
 
-
     def render_collection(self, record):
         try:
             return format_html('<a href="{}">{}</a>'.format(
-                reverse_lazy('collection_detail', args=[str(record.lot.collection.uuid)]),
+                reverse_lazy('collection_detail', args=[str(record.lot.collection_id)]),
                 str(record.lot.collection))
             )
         except AttributeError:

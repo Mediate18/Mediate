@@ -278,6 +278,7 @@ if SILK:
         INSTALLED_APPS.append('silk')
         MIDDLEWARE.insert(MIDDLEWARE.index('django.contrib.auth.middleware.AuthenticationMiddleware') + 1,
                           'silk.middleware.SilkyMiddleware')
+        SILKY_PYTHON_PROFILER = True
     except ImportError:
         SILK = False
 
