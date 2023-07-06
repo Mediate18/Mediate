@@ -16,24 +16,25 @@ def moderated(relevant_fields_list=[]):
         :return: the extended Model class 
         """
 
-        # First register this model
-        register_model(cls)
+        if not settings.MODERATION_OFF:
+            # First register this model
+            register_model(cls)
 
-        def under_moderation(self):
-            """
-            Method to check whether the object of this class in under moderation
-            :return: boolean: whether the object of this class in under moderation
-            """
-            moderation = Moderation.objects.filter(object_pk=self.pk, state=ModerationState.PENDING.value)
-            if moderation:
-                return True
-            else:
-                return False
-        cls.under_moderation = under_moderation
+            def under_moderation(self):
+                """
+                Method to check whether the object of this class in under moderation
+                :return: boolean: whether the object of this class in under moderation
+                """
+                moderation = Moderation.objects.filter(object_pk=self.pk, state=ModerationState.PENDING.value)
+                if moderation:
+                    return True
+                else:
+                    return False
+            cls.under_moderation = under_moderation
 
-        # Filter relevant fields with existing class fields
-        existing_class_fields = [f.name for f in cls._meta.fields]
-        cls.relevant_fields = [f for f in relevant_fields_list if f in existing_class_fields]
+            # Filter relevant fields with existing class fields
+            existing_class_fields = [f.name for f in cls._meta.fields]
+            cls.relevant_fields = [f for f in relevant_fields_list if f in existing_class_fields]
 
         return cls
     return decorator
