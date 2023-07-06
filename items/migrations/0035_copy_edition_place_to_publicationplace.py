@@ -10,7 +10,7 @@ def copy_edition_place_to_publicationplace(apps, schema_editor):
         PublicationPlace(edition_id=edition.uuid, place_id=edition.place_id)
         for edition in Edition.objects.filter(place__isnull=False)
     ]
-    PublicationPlace.objects.bulk_create(publication_places)
+    PublicationPlace.objects.bulk_create(publication_places, batch_size=10000)
 
 
 class Migration(migrations.Migration):
