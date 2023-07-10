@@ -168,11 +168,11 @@ class ItemTable(AddInfoLinkMixin, tables.Table):
 
     def render_edition(self, record):
         year = record.edition.get_year_range_str()
-        year_str = year + ": " if year else ""
+        year_str = ": " + year if year else ""
         places_str = ", ".join(
             Place.objects.filter(publicationplace__edition=record.edition_id).values_list('name', flat=True)
         )
-        return year_str + places_str
+        return places_str + year_str
 
     def render_languages(self, record):
         language_names = [format_html(language.name) for language in Language.objects.filter(items__item=record)]
