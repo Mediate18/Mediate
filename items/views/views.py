@@ -3,6 +3,7 @@ from django.http import HttpResponseRedirect, Http404
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView, View
 from django.views.generic.detail import DetailView, SingleObjectMixin
+from django.views.decorators.http import require_POST
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.forms import formset_factory
@@ -169,6 +170,12 @@ class ItemTableView(ListView):
                 'label': _("Set publication place"),
                 'url': reverse_lazy('set_editionplace_for_items'),
                 'form': EditionPlaceForm
+            },
+            {
+                'id': 'set_editionplaces',
+                'label': _("Set real publication places"),
+                'url': reverse_lazy('set_editionplaces_for_items'),
+                'form': EditionPlacesForm
             },
             {
                 'id': 'set_publisher',
@@ -1422,6 +1429,52 @@ def set_publication_place_for_items(request):
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
     else:
         raise Http404
+
+@require_POST
+def set_publication_places_for_items(request):
+    """
+    Set the publication places (= Edition.place) for a list of items
+    :param request:
+    :return:
+    """
+    if 'entries' not in request.POST:
+        messages.add_message(request, messages.WARNING, _("No items selected."))
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+    item_ids = request.POST.getlist('entries')
+    publicationplacesform = EditionPlacesForm(request.POST)
+
+    if not publicationplacesform.is_valid():
+        messages.add_message(request, messages.WARNING, _("The Places form was invalid."))
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+    places = publicationplacesform.cleaned_data['publication_places']
+    for item_id in item_ids:
+        item = Item.objects.get(uuid=item_id)
+        if 'change_dataset' not in get_perms(request.user, item.lot.collection.catalogue.first().dataset):
+            messages.add_message(request, messages.ERROR,
+                                 _("Item {} could not be used for setting places of publication"
+                                   " because you are not allowed to change the dataset.".format(item)))
+            return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+        edition = item.edition
+        if not edition:
+            edition = Edition()
+            item.edition = edition
+            item.save()
+
+        # Delete the publication places that are not linked to the given places
+        PublicationPlace.objects.filter(edition=edition).exclude(place__in=places).delete()
+
+        # Add publication places
+        for place in places:
+            try:
+                PublicationPlace.objects.get_or_create(edition=edition, place=place)
+            except IntegrityError as integrity_error:
+                # Probably a duplicate entry
+                pass
+
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 
 def set_bookformat_for_items(request):
