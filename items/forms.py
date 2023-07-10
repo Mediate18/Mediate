@@ -559,6 +559,24 @@ class PersonItemRelationRoleModelForm(forms.ModelForm):
         fields = "__all__"
 
 
+class EditionPlacesForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.add_publicationplaces_field()
+
+    def add_publicationplaces_field(self):
+        publication_places = forms.ModelMultipleChoiceField(
+            label=_("Real places of publication"),
+            widget=ModelSelect2MultipleWidget(
+                model=Place,
+                search_fields=['name__icontains']
+            ),
+            queryset=Place.objects.all(),
+            required=False,
+        )
+        self.fields['publication_places'] = publication_places
+
+
 class EditionModelForm(forms.ModelForm):
     class Meta:
         model = Edition
