@@ -166,12 +166,6 @@ class ItemTableView(ListView):
                 'form_set': PersonItemRelationAddFormSet
             },
             {
-                'id': 'set_editionplace',
-                'label': _("Set publication place"),
-                'url': reverse_lazy('set_editionplace_for_items'),
-                'form': EditionPlaceForm
-            },
-            {
                 'id': 'set_editionplaces',
                 'label': _("Set real publication places"),
                 'url': reverse_lazy('set_editionplaces_for_items'),
@@ -1396,36 +1390,6 @@ def add_person_to_items(request):
                     messages.add_message(request, messages.ERROR,
                                 _("Item {} could not be used for adding a person.".format(item)))
 
-        return HttpResponseRedirect(request.META['HTTP_REFERER'])
-    else:
-        raise Http404
-
-
-def set_publication_place_for_items(request):
-    """
-    Set the publication place (= Edition.place) for a list of items
-    :param request:
-    :return:
-    """
-    if request.method == 'POST':
-        if 'entries' in request.POST:
-            items = request.POST.getlist('entries')
-            publicationplaceform = EditionPlaceForm(data=request.POST)
-            if publicationplaceform.is_valid():
-                for item_id in items:
-                    item = Item.objects.get(uuid=item_id)
-                    if 'change_dataset' in get_perms(request.user, item.lot.collection.catalogue.first().dataset):
-                        if not item.edition:
-                            item.edition = Edition()
-                            item.save()
-                        item.edition.place = publicationplaceform.cleaned_data['place']
-                        item.edition.save()
-                    else:
-                        messages.add_message(request, messages.ERROR,
-                                             _("Item {} could not be used for setting a place of publication"
-                                               " because you are not allowed to change the dataset.".format(item)))
-            else:
-                messages.add_message(request, messages.WARNING, _("The Place form was invalid."))
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
     else:
         raise Http404
