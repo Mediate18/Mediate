@@ -96,6 +96,9 @@ def view_totals(request):
     books_with_language = Item.objects.filter(lot__collection__in=collections, languages__isnull=False, non_book=False)\
         .distinct().count()
 
+    books_with_parisian_category = Item.objects\
+        .filter(lot__collection__in=collections, non_book=False, parisian_category__isnull=False).distinct().count()
+
     context = {
         'collections': collections_count,
         'book_items': book_items,
@@ -124,7 +127,9 @@ def view_totals(request):
         'percentage_persons_with_place_of_death': round(100 * persons_with_place_of_death/persons),
 
         'books_with_language': books_with_language,
-        'percentage_books_with_language': round(100 * books_with_language/book_items)
+        'percentage_books_with_language': round(100 * books_with_language/book_items),
+        'books_with_parisian_category': books_with_parisian_category,
+        'percentage_books_with_parisian_category': round(100 * books_with_parisian_category/book_items)
 
     }
 

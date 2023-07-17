@@ -208,6 +208,20 @@
                 </tr>
                 {% endif %}
 
+                {% if books_with_parisian_category %}
+                <tr>
+                    <td>
+                        {{ books_with_parisian_category }}
+                    </td>
+                    <td>
+                        Books with Parisian category
+                        {% if percentage_books_with_parisian_category %}
+                            ({{percentage_books_with_parisian_category}}% of total number of books)
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+
             </tbody>
         </table>
 
