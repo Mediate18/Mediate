@@ -87,7 +87,8 @@ def view_totals(request):
                                                           item__non_book=False).distinct().count()
     items_with_date = Item.objects.filter(lot__collection__in=collections, edition__year_start__isnull=False,
                                           non_book=False).distinct().count()
-    items_with_place_of_publication = Item.objects.filter(lot__collection__in=collections, edition__place__isnull=False,
+    items_with_place_of_publication = Item.objects.filter(lot__collection__in=collections,
+                                                          edition__publicationplace__place__isnull=False,
                                                           non_book=False).distinct().count()
 
     persons_with_place_of_birth = Person.objects.filter(city_of_birth__isnull=False).distinct().count()
