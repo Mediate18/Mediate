@@ -65,7 +65,8 @@ def view_totals(request):
                                            personitemrelation__item__lot__collection__in=collections)\
                                     .distinct().count()
 
-    cities_of_publication = list(Place.objects.filter(edition__items__lot__collection__in=collections_for_session)
+    cities_of_publication = list(Place.objects
+                                 .filter(publicationplace__edition__items__lot__collection__in=collections)
                                  .distinct().values_list('uuid', flat=True))
     cities_of_birth = list(Place.objects.filter(persons_born__personitemrelation__item__lot__collection__in=collections)
                            .distinct().values_list('uuid', flat=True))
