@@ -15,7 +15,7 @@
   <div class="col-md-4">
     <h4>{% trans "Select a person" %}</h4>
 
-    <form id="person-form" hx-post="/not-working-yet" hx-target="#person-work-correlation-list">
+    <form id="person-form" hx-post='{% url "personworkcorrelationlist" %}' hx-target="#person-work-correlation-list">
         {% csrf_token %}
         {{ form.visible_fields.0 }}
     </form>

@@ -1817,3 +1817,12 @@ def person_work_correlation(request):
     return render(request, 'catalogues/person_work_correlation.html', context=context)
 
 
+from django.views.decorators.http import require_POST
+@require_POST
+def person_work_correlation_list(request):
+    person_id = request.POST.get('person', None)
+    if person_id:
+        person = Person.objects.get(pk=person_id)
+    context = {'person': person}
+    return render(request, 'catalogues/person_work_correlation_list.html', context=context)
+

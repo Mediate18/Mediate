@@ -246,6 +246,7 @@ urlpatterns = [
        name="delete_collectionplacerelationtype"),
 
     # Person-Work correlation
-    path('personworkcorrelation/', person_work_correlation, name="personworkcorrelationautocomplete ")
+    path('personworkcorrelation/', person_work_correlation, name="personworkcorrelation"),
+    path('personworkcorrelationlist/', person_work_correlation_list, name="personworkcorrelationlist"),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
