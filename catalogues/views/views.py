@@ -1817,14 +1817,3 @@ def person_work_correlation(request):
     return render(request, 'catalogues/person_work_correlation.html', context=context)
 
 
-from django.contrib.auth.decorators import login_required
-from dal import autocomplete
-@login_required
-class PersonWorkCorrelationAutocomplete(autocomplete.Select2QuerySetView):
-    def get_queryset(self):
-        if not self.q:
-            return Person.objects.none()
-
-        return Person.objects.filter(name__istartswith=self.q)
-
-

@@ -15,26 +15,16 @@
   <div class="col-md-4">
     <h4>{% trans "Select a person" %}</h4>
 
-    <form id="person-form" hx-post="/not-working-yet">
-
-    {% csrf_token %}
-
-  {{ form.non_field_errors }}
-
-  {% for hidden_field in form.hidden_fields %}
-    {{ hidden_field.errors }}
-    {{ hidden_field }}
-  {% endfor %}
-
-    {% for field in form.visible_fields %}
-{{ field.errors }}
-          {{ field }}
-          {{ field.help_text }}
-    {% endfor %}
+    <form id="person-form" hx-post="/not-working-yet" hx-target="#person-work-correlation-list">
+        {% csrf_token %}
+        {{ form.visible_fields.0 }}
     </form>
 
   </div>
   <div class="col-md-8">
+      <div id="person-work-correlation-list">
+
+      </div>
   </div>
 </div>
 
@@ -50,7 +40,6 @@
 <script>
   window.addEventListener("DOMContentLoaded", (e) => {
     $('select').on('select2:select', function (e) {
-      alert("Changed!");
       htmx.trigger("#person-form", 'submit')
     })
   })
