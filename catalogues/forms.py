@@ -401,3 +401,14 @@ class AddLotAtEndForm(LotModelForm):
             self.fields['index_in_collection'] = forms.IntegerField(widget=forms.HiddenInput(), initial=index)
         if collection:
             self.fields['collection'] = forms.CharField(widget=forms.HiddenInput(), initial=collection.uuid)
+
+
+class PersonWorkCorrelationForm(forms.Form):
+    person = forms.ModelChoiceField(
+        queryset=Person.objects.all(),
+        widget=ModelSelect2Widget(
+            attrs={'data-placeholder': "First select a collection"},
+            queryset=Person.objects.all(),
+            search_fields=['short_name__icontains', 'surname__icontains', 'first_names__icontains']
+        )
+    )

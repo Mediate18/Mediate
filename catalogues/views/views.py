@@ -1810,3 +1810,21 @@ class CollectionPlaceRelationTypeUpdateView(UpdateView):
 class CollectionPlaceRelationTypeDeleteView(DeleteView):
     model = CollectionPlaceRelationType
     success_url = reverse_lazy('collectionplacerelationtypes')
+
+
+def person_work_correlation(request):
+    context = {'form': PersonWorkCorrelationForm()}
+    return render(request, 'catalogues/person_work_correlation.html', context=context)
+
+
+from django.contrib.auth.decorators import login_required
+from dal import autocomplete
+@login_required
+class PersonWorkCorrelationAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        if not self.q:
+            return Person.objects.none()
+
+        return Person.objects.filter(name__istartswith=self.q)
+
+

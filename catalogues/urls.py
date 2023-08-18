@@ -245,4 +245,7 @@ urlpatterns = [
        permission_required('catalogues.delete_collectionplacerelationtype')(CollectionPlaceRelationTypeDeleteView.as_view()),
        name="delete_collectionplacerelationtype"),
 
+    # Person-Work correlation
+    path('personworkcorrelation/', person_work_correlation, name="personworkcorrelationautocomplete ")
+
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

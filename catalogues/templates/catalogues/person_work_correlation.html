@@ -1,0 +1,58 @@
+{% extends "baselayout.html" %}
+{% load i18n %}
+{% load render_table from django_tables2 %}
+{% load static %}
+
+{% block extracss %}
+{{ block.super }}
+<link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" type="text/css" media="screen" rel="stylesheet">
+{% endblock %}
+
+
+{% block content %}
+
+<div class="row">
+  <div class="col-md-4">
+    <h4>{% trans "Select a person" %}</h4>
+
+    <form id="person-form" hx-post="/not-working-yet">
+
+    {% csrf_token %}
+
+  {{ form.non_field_errors }}
+
+  {% for hidden_field in form.hidden_fields %}
+    {{ hidden_field.errors }}
+    {{ hidden_field }}
+  {% endfor %}
+
+    {% for field in form.visible_fields %}
+{{ field.errors }}
+          {{ field }}
+          {{ field.help_text }}
+    {% endfor %}
+    </form>
+
+  </div>
+  <div class="col-md-8">
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+{{ block.super }}
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+{{ form.media.js }}
+
+<script src="/static/js/htmx.min.js" defer></script>
+
+<script>
+  window.addEventListener("DOMContentLoaded", (e) => {
+    $('select').on('select2:select', function (e) {
+      alert("Changed!");
+      htmx.trigger("#person-form", 'submit')
+    })
+  })
+</script>
+{% endblock %}
