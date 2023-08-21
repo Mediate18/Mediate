@@ -1,2 +1,10 @@
 {% load i18n %}
-<h3>{% trans "Correlations for" %} {{ person.first_names }} {{ person.surname }}</h3>
+<h3>{% trans "Correlations for" %} {{ selected_person.first_names }} {{ selected_person.surname }}</h3>
+
+<ul>
+    {% for person, values in results.items %}
+        <li>
+            <a href="{% url 'person_detail' person.uuid %}">{{ person.short_name }}</a>: {{ values.2}}  ({{ values.0 }}/{{ values.1 }})
+        </li>
+    {% endfor %}
+</ul>

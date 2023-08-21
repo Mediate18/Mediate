@@ -302,3 +302,5 @@ UNCOUNTABLE_BOOK_ITEMS_MESSAGE = _("The book item count includes books, pamphlet
                                  "indicated on the Collection page, under 'Number of items'. When the precise number "\
                                  "of items in a bundle is stated, these have been split out and counted as separate "\
                                  "book items.")
+
+MINIMAL_ITEMS_PER_PERSON = 21

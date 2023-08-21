@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html, escape
 from django.views.generic.base import TemplateView
@@ -1822,7 +1823,37 @@ from django.views.decorators.http import require_POST
 def person_work_correlation_list(request):
     person_id = request.POST.get('person', None)
     if person_id:
-        person = Person.objects.get(pk=person_id)
-    context = {'person': person}
+        selected_person = Person.objects.get(pk=person_id)
+
+    persons = Person.objects\
+        .annotate(item_cnt=Count("personitemrelation__item", filter=Q(personitemrelation__role__name='author')))\
+        .filter(item_cnt__gte=settings.MINIMAL_ITEMS_PER_PERSON)\
+        .exclude(pk=person_id).distinct()
+
+    selected_person_collections_set = set(list(
+        Collection.objects.filter(lot__item__personitemrelation__person=selected_person,
+                                  lot__item__personitemrelation__role__name='author').values_list('uuid', flat=True)
+    ))
+
+    data = {}
+    for person in persons:
+        person_collections_set = set(list(Collection.objects.filter(lot__item__personitemrelation__person=person,
+                                  lot__item__personitemrelation__role__name='author').values_list('uuid', flat=True)))
+
+        collection_cnt_both = len(set.intersection(selected_person_collections_set, person_collections_set))
+        collection_cnt_without_selected = len(person_collections_set - selected_person_collections_set)
+
+        try:
+            ratio = collection_cnt_both / collection_cnt_without_selected
+        except ZeroDivisionError as zde:
+            ratio = 0
+
+        data[person] = (collection_cnt_both, collection_cnt_without_selected, ratio)
+
+    from collections import OrderedDict
+
+    context = {'selected_person': selected_person}
+    context['results'] = OrderedDict(sorted(data.items(), key=lambda item: item[1][2], reverse=True))
+
     return render(request, 'catalogues/person_work_correlation_list.html', context=context)
 
