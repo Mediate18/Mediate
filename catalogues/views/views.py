@@ -28,7 +28,7 @@ from catalogues.tools import get_datasets_for_session, get_dataset_for_anonymous
 
 from items.models import Item, Edition, Language, BookFormat
 import json
-from collections import Counter
+from collections import OrderedDict
 
 import django_tables2
 
@@ -1848,12 +1848,12 @@ def person_work_correlation_list(request):
         except ZeroDivisionError as zde:
             ratio = 0
 
-        data[person] = (collection_cnt_both, collection_cnt_without_selected, ratio)
+        data[person] = (collection_cnt_both, collection_cnt_without_selected, ratio, round(ratio, 2))
 
-    from collections import OrderedDict
+    correlations = OrderedDict(sorted(data.items(), key=lambda item: item[1][2], reverse=True))
 
     context = {'selected_person': selected_person}
-    context['results'] = OrderedDict(sorted(data.items(), key=lambda item: item[1][2], reverse=True))
+    context['correlations'] = correlations
 
     return render(request, 'catalogues/person_work_correlation_list.html', context=context)
 

@@ -2,9 +2,10 @@
 <h3>{% trans "Correlations for" %} {{ selected_person.first_names }} {{ selected_person.surname }}</h3>
 
 <ul>
-    {% for person, values in results.items %}
+    {% for person, values in correlations.items %}
         <li>
-            <a href="{% url 'person_detail' person.uuid %}">{{ person.short_name }}</a>: {{ values.2 }}  ({{ values.0 }}/{{ values.1 }})
+            <a href="{% url 'person_detail' person.uuid %}">{{ person.short_name }}</a>:
+            {{ values.3 }}  ({{ values.0 }}/{{ values.1 }})
         </li>
     {% endfor %}
 </ul>

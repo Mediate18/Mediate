@@ -23,12 +23,12 @@
         {{ form.visible_fields.0 }}
     </form>
 
-  </div>
-  <div class="col-md-8">
       <div id="indicator" class="htmx-indicator">
           <img  alt="Loading..." width="20" src="/static/img/oval.svg"/>
           Calculating correlations ...
       </div>
+  </div>
+  <div class="col-md-8">
       <div id="person-work-correlation-list">
 
       </div>
@@ -47,7 +47,8 @@
 <script>
   window.addEventListener("DOMContentLoaded", (e) => {
     $('select').on('select2:select', function (e) {
-      htmx.trigger("#person-form", 'submit')
+      htmx.trigger("#person-form", 'submit');
+      $('#person-work-correlation-list').empty();
     })
   })
 </script>
