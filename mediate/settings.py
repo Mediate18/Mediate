@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'leaflet',
     'django_registration',
     'computedfields',
+    'cachalot',
     'simplemoderation',
     'tagme',
     'mediate',
