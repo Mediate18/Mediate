@@ -1831,8 +1831,10 @@ def person_work_correlation_list(request):
         .exclude(pk=person_id).distinct()
 
     selected_person_collections_set = set(list(
-        Collection.objects.filter(lot__item__personitemrelation__person=selected_person,
-                                  lot__item__personitemrelation__role__name='author').values_list('uuid', flat=True)
+        get_collections_for_session(request)
+        .filter(lot__item__personitemrelation__person=selected_person,
+                lot__item__personitemrelation__role__name='author')
+        .values_list('uuid', flat=True)
     ))
 
     data = {}
@@ -1852,8 +1854,7 @@ def person_work_correlation_list(request):
 
     correlations = OrderedDict(sorted(data.items(), key=lambda item: item[1][2], reverse=True))
 
-    context = {'selected_person': selected_person}
-    context['correlations'] = correlations
+    context = {'selected_person': selected_person, 'correlations': correlations}
 
     return render(request, 'catalogues/person_work_correlation_list.html', context=context)
 
