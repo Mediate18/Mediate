@@ -4,7 +4,7 @@
 <ul>
     {% for person, values in results.items %}
         <li>
-            <a href="{% url 'person_detail' person.uuid %}">{{ person.short_name }}</a>: {{ values.2}}  ({{ values.0 }}/{{ values.1 }})
+            <a href="{% url 'person_detail' person.uuid %}">{{ person.short_name }}</a>: {{ values.2 }}  ({{ values.0 }}/{{ values.1 }})
         </li>
     {% endfor %}
 </ul>
