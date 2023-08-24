@@ -1839,7 +1839,7 @@ def person_work_correlation_list(request):
     ))
 
     data = {}
-    for person in persons[:100]:
+    for person in persons:
         person_collections_set = set(list(
             Collection.objects.filter(lot__item__personitemrelation__person=person,
                                       lot__item__personitemrelation__role__name__in=settings.PERSON_ITEM_ROLES)
