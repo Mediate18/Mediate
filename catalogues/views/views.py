@@ -1856,7 +1856,7 @@ def person_work_correlation_list(request):
     correlations = OrderedDict(correlation_list)
 
     # Chart
-    chart_data = ['correlations'] + [correlation[1][3] for correlation in correlation_list[:50]]
+    chart_data = ['correlation'] + [correlation[1][3] for correlation in correlation_list[:50]]
 
     context = {'selected_person': selected_person, 'correlations': correlations, 'chart_data': json.dumps(chart_data)}
 

@@ -13,7 +13,7 @@
 {% block content %}
 
 <div class="row">
-  <div class="col-md-4">
+  <div class="col-md-8">
     <h4>{% trans "Select a person" %}</h4>
 
     <form id="person-form"
@@ -31,7 +31,7 @@
 
       <div id="correlation-chart"></div>
   </div>
-  <div class="col-md-8">
+  <div class="col-md-4">
       <div id="person-work-correlation-list">
 
       </div>
@@ -53,6 +53,7 @@
     $('select').on('select2:select', function (e) {
       htmx.trigger("#person-form", 'submit');
       $('#person-work-correlation-list').empty();
+      $('#correlation-chart').empty();
     })
   })
 </script>

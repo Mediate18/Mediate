@@ -12,6 +12,11 @@
 
 <script type="text/javascript">
     var data = {{ chart_data|safe }};
+    var names = [
+        {% for person, values in correlations.items %}
+            "{{ person.short_name }}",
+        {% endfor %}
+    ];
     var x = ['x'].concat(Array.from({ length: data.length - 1 }, (value, index) => index + 1));
 
     var chart = c3.generate({
@@ -26,6 +31,13 @@
         },
         legend: {
             show: false
+        },
+        tooltip: {
+            format: {
+                title: function(x, index) {
+                    return names[index];
+                },
+            },
         },
     });
 
