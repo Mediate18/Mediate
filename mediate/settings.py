@@ -304,4 +304,6 @@ UNCOUNTABLE_BOOK_ITEMS_MESSAGE = _("The book item count includes books, pamphlet
                                  "of items in a bundle is stated, these have been split out and counted as separate "\
                                  "book items.")
 
+# Person Work correlation
 MINIMAL_ITEMS_PER_PERSON = 21
+PERSON_ITEM_ROLES = ['author', 'editor', 'translator']

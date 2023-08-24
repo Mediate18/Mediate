@@ -1826,21 +1826,25 @@ def person_work_correlation_list(request):
         selected_person = Person.objects.get(pk=person_id)
 
     persons = Person.objects\
-        .annotate(item_cnt=Count("personitemrelation__item", filter=Q(personitemrelation__role__name='author')))\
+        .annotate(item_cnt=Count("personitemrelation__item",
+                                 filter=Q(personitemrelation__role__name__in=settings.PERSON_ITEM_ROLES)))\
         .filter(item_cnt__gte=settings.MINIMAL_ITEMS_PER_PERSON)\
         .exclude(pk=person_id).distinct()
 
     selected_person_collections_set = set(list(
         get_collections_for_session(request)
         .filter(lot__item__personitemrelation__person=selected_person,
-                lot__item__personitemrelation__role__name='author')
+                lot__item__personitemrelation__role__name__in=settings.PERSON_ITEM_ROLES)
         .values_list('uuid', flat=True)
     ))
 
     data = {}
-    for person in persons:
-        person_collections_set = set(list(Collection.objects.filter(lot__item__personitemrelation__person=person,
-                                  lot__item__personitemrelation__role__name='author').values_list('uuid', flat=True)))
+    for person in persons[:100]:
+        person_collections_set = set(list(
+            Collection.objects.filter(lot__item__personitemrelation__person=person,
+                                      lot__item__personitemrelation__role__name__in=settings.PERSON_ITEM_ROLES)
+            .values_list('uuid', flat=True)
+        ))
 
         collection_cnt_both = len(set.intersection(selected_person_collections_set, person_collections_set))
         collection_cnt_without_selected = len(person_collections_set - selected_person_collections_set)
