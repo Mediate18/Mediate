@@ -1,8 +1,6 @@
 {% load i18n %}
 <h3>{% trans "Correlations for" %} {{ selected_person.first_names }} {{ selected_person.surname }}</h3>
 
-<div id="correlation-chart"></div>
-
 <ol>
     {% for person, values in correlations.items %}
         <li>
