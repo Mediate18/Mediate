@@ -1,11 +1,34 @@
 {% load i18n %}
 <h3>{% trans "Correlations for" %} {{ selected_person.first_names }} {{ selected_person.surname }}</h3>
 
-<ul>
+<div id="correlation-chart"></div>
+
+<ol>
     {% for person, values in correlations.items %}
         <li>
             <a href="{% url 'person_detail' person.uuid %}">{{ person.short_name }}</a>:
             {{ values.3 }}  ({{ values.0 }}/{{ values.1 }})
         </li>
     {% endfor %}
-</ul>
+</ol>
+
+<script type="text/javascript">
+    var data = {{ chart_data|safe }};
+    var x = ['x'].concat(Array.from({ length: data.length - 1 }, (value, index) => index + 1));
+
+    var chart = c3.generate({
+        bindto: '#correlation-chart',
+        data: {
+            x: 'x',
+            columns: [
+                x,
+                data
+            ],
+            type: 'bar'
+        },
+        legend: {
+            show: false
+        },
+    });
+
+</script>

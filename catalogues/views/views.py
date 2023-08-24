@@ -1852,9 +1852,13 @@ def person_work_correlation_list(request):
 
         data[person] = (collection_cnt_both, collection_cnt_without_selected, ratio, round(ratio, 2))
 
-    correlations = OrderedDict(sorted(data.items(), key=lambda item: item[1][2], reverse=True))
+    correlation_list = sorted(data.items(), key=lambda item: item[1][2], reverse=True)
+    correlations = OrderedDict(correlation_list)
 
-    context = {'selected_person': selected_person, 'correlations': correlations}
+    # Chart
+    chart_data = ['correlations'] + [correlation[1][3] for correlation in correlation_list[:50]]
+
+    context = {'selected_person': selected_person, 'correlations': correlations, 'chart_data': json.dumps(chart_data)}
 
     return render(request, 'catalogues/person_work_correlation_list.html', context=context)
 
