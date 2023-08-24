@@ -29,7 +29,9 @@
           Calculating correlations ...
       </div>
 
-      <div id="correlation-chart"></div>
+      <div id="person-work-correlation-text"></div>
+
+      <div id="correlation-chart" class="empty-during-htmx-request"></div>
   </div>
   <div class="col-md-4">
       <div id="person-work-correlation-list">
@@ -52,8 +54,7 @@
   window.addEventListener("DOMContentLoaded", (e) => {
     $('select').on('select2:select', function (e) {
       htmx.trigger("#person-form", 'submit');
-      $('#person-work-correlation-list').empty();
-      $('#correlation-chart').empty();
+      $('.empty-during-htmx-request').empty()
     })
   })
 </script>

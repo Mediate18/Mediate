@@ -1,14 +1,26 @@
 {% load i18n %}
-<h3>{% trans "Correlations for" %} {{ selected_person.first_names }} {{ selected_person.surname }}</h3>
 
-<ol>
-    {% for person, values in correlations.items %}
-        <li>
-            <a href="{% url 'person_detail' person.uuid %}">{{ person.short_name }}</a>:
-            {{ values.3 }}  ({{ values.0 }}/{{ values.1 }})
-        </li>
-    {% endfor %}
-</ol>
+<div id="person-work-correlation-list-response" class="empty-during-htmx-request">
+    <h3>{% trans "Correlations for" %} {{ selected_person.first_names }} {{ selected_person.surname }}</h3>
+    <ol>
+        {% for person, values in correlations.items %}
+            <li>
+                <a href="{% url 'person_detail' person.uuid %}">{{ person.short_name }}</a>:
+                {{ values.3 }}  ({{ values.0 }}/{{ values.1 }})
+            </li>
+        {% endfor %}
+    </ol>
+</div>
+
+<div id="person-work-correlation-text" hx-swap-oob="true" class="empty-during-htmx-request">
+    {% blocktranslate %}
+        This chart lists the other authors, editors and translators who are reported significantly more frequently in
+        collections containing works by the selected person. The first number in the brackets is the number of
+        collections containing works by the selected person that also list works by the person (author, editor or
+        translator) in red. The second figure in brackets is the number of collections lacking works by the selected
+        person that list works by the person (author, editor or translator) in red.
+    {% endblocktranslate %}
+</div>
 
 <script type="text/javascript">
     var data = {{ chart_data|safe }};
