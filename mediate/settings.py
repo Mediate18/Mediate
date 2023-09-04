@@ -237,7 +237,7 @@ SITE_ID = 1
 DJANGO_TABLES2_TEMPLATE = 'django_tables2/bootstrap-responsive.html'
 
 BOOTSTRAP3 = {
-    'jquery_url': '//code.jquery.com/jquery-2.x-git.min.js'
+    'jquery_url': f"{STATIC_URL}js/jquery-2.2.4.min.js"
 }
 
 MODERATED_OBJECT_PK = "use_uuid"
