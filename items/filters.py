@@ -226,6 +226,12 @@ class ItemFilter(django_filters.FilterSet):
         ),
         method='person_filter'
     )
+    sex = django_filters.MultipleChoiceFilter(
+        label='Person gender',
+        choices=Person.SEX_CHOICES,
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
+        method='person_sex_filter'
+    )
     role = django_filters.ModelMultipleChoiceFilter(
         label='Role',
         queryset=PersonItemRelationRole.objects.all(),
@@ -500,6 +506,11 @@ class ItemFilter(django_filters.FilterSet):
     def person_filter(self, queryset, name, value):
         if value:
             return queryset.filter(personitemrelation__person__in=value).distinct()
+        return queryset
+
+    def person_sex_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(personitemrelation__person__sex__in=value).distinct()
         return queryset
 
     def role_filter(self, queryset, name, value):
