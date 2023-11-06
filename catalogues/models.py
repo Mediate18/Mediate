@@ -101,7 +101,7 @@ class Collection(models.Model):
 
     # Year of publication can either a single year or a range.
     year_of_publication = models.IntegerField(_("Year of publication"), null=True)
-    year_of_publication_end = models.IntegerField(_("Year of publication: end of range"), null=True)
+    year_of_publication_end = models.IntegerField(_("Year of publication: end of range"), null=True, blank=True)
 
     terminus_post_quem = models.BooleanField(_("Terminus post quem"), default=False)
     notes = models.TextField(_("Notes for the Mediate project"), null=True)
