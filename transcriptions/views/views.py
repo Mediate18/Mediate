@@ -332,9 +332,8 @@ class ShelfMarkCreateView(CreateView):
             formset.save()
 
             # Connect shelf-mark to catalogue(s)
-            for catalogue in form.cleaned_data['catalogue']:
-                catalogue.shelf_mark = shelfmark
-                catalogue.save()
+            catalogues = form.cleaned_data['catalogue']
+            catalogues.update(shelf_mark=shelfmark)
         else:
             return self.render_to_response(self.get_context_data(form=form))
 
@@ -380,9 +379,8 @@ class ShelfMarkUpdateView(UpdateView):
             formset.save()
 
             # Connect shelf-mark to collection(s)
-            for catalogue in form.cleaned_data['catalogue']:
-                catalogue.shelf_mark = shelfmark
-                catalogue.save()
+            catalogues = form.cleaned_data['catalogue']
+            catalogues.update(shelf_mark=shelfmark)
         else:
             return self.render_to_response(self.get_context_data(form=form))
 

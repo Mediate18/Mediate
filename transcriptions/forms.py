@@ -34,12 +34,12 @@ class ShelfMarkModelForm(forms.ModelForm):
             'place': ModelSelect2Widget(
                 model=Place,
                 search_fields=['name__icontains'],
-                attrs={'data-placeholder': "Select multiple"},
+                attrs={'data-placeholder': "Select a place"},
             ),
             'library': ModelSelect2Widget(
                 model=Library,
                 search_fields=['name__icontains'],
-                attrs={'data-placeholder': "Select multiple"},
+                attrs={'data-placeholder': "Select a library"},
             ),
         }
 
@@ -53,7 +53,7 @@ class ShelfMarkModelForm(forms.ModelForm):
             queryset=self.catalogue,
             widget=ModelSelect2MultipleWidget(
                 queryset=self.catalogue,
-                search_fields=['short_title__icontains'],
+                search_fields=['name__icontains'],
                 attrs={'data-placeholder': "Select multiple"},
             ),
             initial=Catalogue.objects.filter(shelf_mark=self.instance)
