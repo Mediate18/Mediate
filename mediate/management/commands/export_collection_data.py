@@ -40,7 +40,7 @@ class Command(BaseCommand):
             writer.writerow(["Short title", "People VIAF", "Work VIAF", "Lot", "Index in lot", "Collection",
                              "Number of volumes", "Book format", "Material details", "Edition", "Languages",
                              "Parisian category", "Item type", "Tags"])
-            for item in Item.objects.filter(lot__collection_id=collection_uuid)[:10]:
+            for item in Item.objects.filter(lot__collection_id=collection_uuid):
                 writer.writerow([
                     item.short_title,
                     "; ".join(Person.objects.filter(personitemrelation__item=item).values_list('viaf_id', flat=True)),
