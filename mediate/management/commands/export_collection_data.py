@@ -43,8 +43,8 @@ class Command(BaseCommand):
             for item in Item.objects.filter(lot__collection_id=collection_uuid):
                 writer.writerow([
                     item.short_title,
-                    "; ".join(Person.objects.filter(personitemrelation__item=item).values_list('viaf_id', flat=True)),
-                    "; ".join(relation.work.viaf_id for relation in item.works.all()),
+                    "; ".join(Person.objects.exclude(viaf_id__isnull=True).filter(personitemrelation__item=item).values_list('viaf_id', flat=True)),
+                    "; ".join(relation.work.viaf_id for relation in item.works.all() if relation.work.viaf_id),
                     item.lot.lot_as_listed_in_collection,
                     item.index_in_lot,
                     item.lot.collection.short_title,
