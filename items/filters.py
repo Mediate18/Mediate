@@ -448,7 +448,9 @@ class ItemFilter(django_filters.FilterSet):
         """
         if value:
             return queryset
-        return queryset.exclude(non_book=True)
+        return queryset.filter(Q(non_book=False) |
+                               Q(itemitemtyperelation__type__name="maps and charts (loose)") |
+                               Q(itemitemtyperelation__type__name="prints and etchings (loose)"))
 
     def item_type_filter(self, queryset, name, value):
         if value:
