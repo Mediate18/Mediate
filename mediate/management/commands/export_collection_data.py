@@ -37,15 +37,14 @@ class Command(BaseCommand):
         model = kwargs.get('model', "").lower()
 
         writer = csv.writer(sys.stdout)
-        match model:
-            case "items":
-                self.write_items(collection_uuids, writer)
-            case "persons" | "people":
-                self.write_people(collection_uuids, writer)
-            case "lots":
-                pass
-            case _:
-                print("Please give a model to output, either items, persons or lots.")
+        if model == "items":
+            self.write_items(collection_uuids, writer)
+        elif model == "persons" or model == "people":
+            self.write_people(collection_uuids, writer)
+        elif model == "lots":
+            pass
+        else:
+            print("Please give a model to output, either items, persons or lots.")
 
     def write_items(self, collection_uuids, writer):
         writer.writerow(["Short title", "People VIAF", "Work VIAF", "Lot", "Index in lot", "Collection",
