@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 import csv
 import sys
-from items.models import Item, MaterialDetails, Language, ItemType
+from items.models import Item, MaterialDetails, Language, ItemType, PersonItemRelation
 from persons.models import Person, Place
 
 
@@ -14,6 +14,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         # Positional
+        parser.add_argument('model', type=str, help='items, persons or lots')
         parser.add_argument('collection', type=str, nargs='*', help='Collection UUID')
 
         # Optional
@@ -33,13 +34,25 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         collection_uuids = kwargs.get('collection', [])
+        model = kwargs.get('model', "").lower()
 
         writer = csv.writer(sys.stdout)
+        match model:
+            case "items":
+                self.write_items(collection_uuids, writer)
+            case "persons" | "people":
+                self.write_people(collection_uuids, writer)
+            case "lots":
+                pass
+            case _:
+                print("Please give a model to output, either items, persons or lots.")
+
+    def write_items(self, collection_uuids, writer):
+        writer.writerow(["Short title", "People VIAF", "Work VIAF", "Lot", "Index in lot", "Collection",
+                         "Number of volumes", "Book format", "Material details", "Edition", "Languages",
+                         "Parisian category", "Item type", "Tags"])
         for collection_uuid in collection_uuids:
             # Items
-            writer.writerow(["Short title", "People VIAF", "Work VIAF", "Lot", "Index in lot", "Collection",
-                             "Number of volumes", "Book format", "Material details", "Edition", "Languages",
-                             "Parisian category", "Item type", "Tags"])
             for item in Item.objects.filter(lot__collection_id=collection_uuid):
                 writer.writerow([
                     item.short_title,
@@ -57,3 +70,19 @@ class Command(BaseCommand):
                     "; ".join(ItemType.objects.filter(itemitemtyperelation__item=item).values_list('name', flat=True)),
                     ", ".join([str(taggedentity.tag) for taggedentity in item.tags.all()])
                 ])
+
+    def write_people(self, collection_uuids, writer):
+        writer.writerow(["Short name", "Name", "Birth", "Death", "Sex", "Notes", "Bibilograpy"])
+        for collection_uuid in collection_uuids:
+            for person in Person.objects.filter(personitemrelation__item__catalogue__collection__uuid=collection_uuid)\
+                    .distinct():
+                writer.writerow([
+                    person.short_name,
+                    f'{person.first_names} {person.surname}',
+                    person.date_of_birth,
+                    person.date_of_death,
+                    person.sex,
+                    person.notes,
+                    person.bibliography
+                ])
+
