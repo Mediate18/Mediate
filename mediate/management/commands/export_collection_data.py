@@ -56,7 +56,7 @@ class Command(BaseCommand):
             for item in Item.objects.filter(lot__collection_id=collection_uuid):
                 writer.writerow([
                     item.short_title,
-                    "; ".join(Person.objects.filter(personitemrelation__item=item).values_list('viaf_id', flat=True)),
+                    self.get_persons(item),
                     "; ".join(relation.work.viaf_id for relation in item.works.all()),
                     item.lot.lot_as_listed_in_collection,
                     item.index_in_lot,
@@ -70,6 +70,24 @@ class Command(BaseCommand):
                     "; ".join(ItemType.objects.filter(itemitemtyperelation__item=item).values_list('name', flat=True)),
                     ", ".join([str(taggedentity.tag) for taggedentity in item.tags.all()])
                 ])
+
+    def get_persons(self, item):
+        person_item_relations = item.personitemrelation_set.all()  #
+        relation_groups = []
+        for role in set([relation.role for relation in person_item_relations]):
+            role_relations = person_item_relations.filter(role=role)
+            persons = []
+            for relation in role_relations:
+                person = relation.person
+                name = person.short_name
+                viaf = person.viaf_id
+                person_entry = name
+                if viaf:
+                    person_entry += f" ({viaf})"
+                persons.append(person_entry)
+
+            relation_groups.append(role.name.capitalize() + ": " + "; ".join(persons))
+        return " - ".join(relation_groups)
 
     def write_people(self, collection_uuids, writer):
         writer.writerow(["Short name", "Name", "Birth", "Death", "Sex", "Notes", "Bibilograpy"])
