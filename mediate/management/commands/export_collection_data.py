@@ -57,7 +57,7 @@ class Command(BaseCommand):
                 writer.writerow([
                     item.short_title,
                     self.get_persons(item),
-                    "; ".join(relation.work.viaf_id for relation in item.works.all()),
+                    "; ".join(relation.work.viaf_id for relation in item.works.all() if relation.work.viaf_id),
                     item.lot.lot_as_listed_in_collection,
                     item.index_in_lot,
                     item.lot.collection.short_title,
