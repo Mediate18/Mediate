@@ -106,12 +106,13 @@ class Command(BaseCommand):
                 ])
 
     def write_lots(self):
-        self.writer.writerow(["Collection", "Number in collection", "Page in collection", "Index", "Category",
+        self.writer.writerow(["Text", "Collection", "Number in collection", "Page in collection", "Index", "Category",
                               "Parisian category"])
         for collection_uuid in self.collection_uuids:
             for lot in Lot.objects.filter(collection_id=collection_uuid)\
                     .select_related('category',  'category__parisian_category').order_by('index_in_collection'):
                 self.writer.writerow([
+                    lot.lot_as_listed_in_collection,
                     lot.collection.short_title,
                     lot.number_in_collection,
                     lot.page_in_collection,
