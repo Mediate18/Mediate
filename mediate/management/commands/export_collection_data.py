@@ -11,6 +11,8 @@ class Command(BaseCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.dry_run = False
+        self.collection_uuids = []
+        self.writer = csv.writer(sys.stdout)
 
     def add_arguments(self, parser):
         # Positional
@@ -33,27 +35,26 @@ class Command(BaseCommand):
         return f'{places_str}{": " if places_str else ""}{publishers_str}{", " if publishers_str and year_str else ""}{year_str}'
 
     def handle(self, *args, **kwargs):
-        collection_uuids = kwargs.get('collection', [])
+        self.collection_uuids = kwargs.get('collection', [])
         model = kwargs.get('model', "").lower()
 
-        writer = csv.writer(sys.stdout)
         if model == "items":
-            self.write_items(collection_uuids, writer)
+            self.write_items()
         elif model == "persons" or model == "people":
-            self.write_people(collection_uuids, writer)
+            self.write_people()
         elif model == "lots":
             pass
         else:
             print("Please give a model to output, either items, persons or lots.")
 
-    def write_items(self, collection_uuids, writer):
-        writer.writerow(["Short title", "People VIAF", "Work VIAF", "Lot", "Index in lot", "Collection",
-                         "Number of volumes", "Book format", "Material details", "Edition", "Languages",
-                         "Parisian category", "Item type", "Tags"])
-        for collection_uuid in collection_uuids:
+    def write_items(self):
+        self.writer.writerow(["Short title", "People VIAF", "Work VIAF", "Lot", "Index in lot", "Collection",
+                              "Number of volumes", "Book format", "Material details", "Edition", "Languages",
+                              "Parisian category", "Item type", "Tags"])
+        for collection_uuid in self.collection_uuids:
             # Items
             for item in Item.objects.filter(lot__collection_id=collection_uuid):
-                writer.writerow([
+                self.writer.writerow([
                     item.short_title,
                     self.get_persons(item),
                     "; ".join(relation.work.viaf_id for relation in item.works.all() if relation.work.viaf_id),
@@ -88,12 +89,12 @@ class Command(BaseCommand):
             relation_groups.append(role.name.capitalize() + ": " + "; ".join(persons))
         return " - ".join(relation_groups)
 
-    def write_people(self, collection_uuids, writer):
-        writer.writerow(["Short name", "Name", "Birth", "Death", "Sex", "Notes", "Bibilograpy"])
-        for collection_uuid in collection_uuids:
+    def write_people(self):
+        self.writer.writerow(["Short name", "Name", "Birth", "Death", "Sex", "Notes", "Bibliography"])
+        for collection_uuid in self.collection_uuids:
             for person in Person.objects.filter(personitemrelation__item__catalogue__collection__uuid=collection_uuid)\
                     .distinct():
-                writer.writerow([
+                self.writer.writerow([
                     person.short_name,
                     f'{person.first_names} {person.surname}',
                     person.date_of_birth,
