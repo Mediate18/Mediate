@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 import csv
 import sys
 from items.models import Item, MaterialDetails, Language, ItemType, PersonItemRelation
+from catalogues.models import Lot
 from persons.models import Person, Place
 
 
@@ -43,7 +44,7 @@ class Command(BaseCommand):
         elif model == "persons" or model == "people":
             self.write_people()
         elif model == "lots":
-            pass
+            self.write_lots()
         else:
             print("Please give a model to output, either items, persons or lots.")
 
@@ -104,3 +105,17 @@ class Command(BaseCommand):
                     person.bibliography
                 ])
 
+    def write_lots(self):
+        self.writer.writerow(["Collection", "Number in collection", "Page in collection", "Index", "Category",
+                              "Parisian category"])
+        for collection_uuid in self.collection_uuids:
+            for lot in Lot.objects.filter(collection_id=collection_uuid)\
+                    .select_related('category',  'category__parisian_category').order_by('index_in_collection'):
+                self.writer.writerow([
+                    lot.collection.short_title,
+                    lot.number_in_collection,
+                    lot.page_in_collection,
+                    lot.index_in_collection,
+                    lot.category.bookseller_category if lot.category else "",
+                    lot.category.parisian_category.name if lot.category and lot.category.parisian_category else ""
+                ])
