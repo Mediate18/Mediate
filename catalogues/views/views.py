@@ -96,7 +96,7 @@ class CollectionStatisticsView(TemplateView):
             [
                 {
                     'id': 'collection_country_chart',
-                    'title': _('Number of items per country (stated place of publication, including false imprints)'),
+                    'title': _('Number of items per country (real place of publication, including false imprints)'),
                     'url': reverse_lazy('get_collection_country_chart')
                 },
                 {
@@ -200,8 +200,8 @@ def get_collection_country_chart(request):
 
     item_count_per_country = [ [escape(country['name']), country['item_count'] ] for country in
         Country.objects \
-            .filter(place__edition__items__lot__collection__in=filter.qs) \
-            .annotate(item_count=Count('place__edition__items'))\
+            .filter(place__publicationplace__edition__items__lot__collection__in=filter.qs) \
+            .annotate(item_count=Count('place__publicationplace__edition__items'))\
             .order_by('-item_count')\
             .values('name', 'item_count')
     ]
@@ -217,8 +217,8 @@ def get_collection_city_chart(request):
     filter = CollectionFilter(request.GET, queryset=get_collections_for_session(request).distinct())
 
     cities = Place.objects\
-        .filter(edition__items__lot__collection__in=filter.qs) \
-        .annotate(item_count=Count('edition__items')) \
+        .filter(publicationplace__edition__items__lot__collection__in=filter.qs) \
+        .annotate(item_count=Count('publicationplace__edition__items')) \
         .filter(item_count__gt=0) \
         .order_by('-item_count') \
         .values('name', 'item_count')
