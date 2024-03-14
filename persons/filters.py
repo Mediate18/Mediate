@@ -271,10 +271,14 @@ class PersonRankingFilter(QBasedFilterset):
         request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
         self.request = request
+        self.fields_with_errors = []
 
     # Override method
     @property
     def qs(self):
+        if hasattr(self, '_qs') and self._qs:
+            return self._qs
+
         qs = super().qs
         self._qs = qs.distinct() \
             .annotate(item_count=Count('personitemrelation__item',
@@ -292,27 +296,30 @@ class PersonRankingFilter(QBasedFilterset):
         """
         Filters on text fields containing year data using a range value.
         The name of the filter should reflect the field name in the model.
-        :param queryset: the queryset to alter 
+        :param queryset: the queryset to alter
         :param name: the name of the filter
         :param value: the value from the form
         :return: 
         """
-        if value:
-            if value[0] and value[1]:
-                queryset = queryset.filter(**{name+'__regex': r'^[0-9]{3,4}$'}) \
-                    .annotate(**{name+'_int': Cast(name, IntegerField())})\
-                    .filter(**{name+'_int__range': (value[0], value[1])})
-            else:
-                if value[0]:
-                    queryset = queryset.filter(**{name+'__regex': r'^[0-9]{3,4}$'}) \
-                        .annotate(**{name+'_int': Cast(name, IntegerField())})\
-                        .filter(**{name+'_int__gte': value[0]})
-                if value[1]:
-                    queryset = queryset.filter(**{name+'__regex': r'^[0-9]{3,4}$'}) \
-                        .annotate(**{name+'_int': Cast(name, IntegerField())})\
-                        .filter(**{name+'_int__lte': value[1]})
+        if not (isinstance(value, list) and any(value)):
+            return queryset
 
-        return queryset
+        try:
+            year_range = [int(year) if year else None for year in value]
+        except ValueError as ve:
+            self.form.add_error(name, "Invalid input. Use only integers.")
+            self.fields_with_errors.append(name)
+            return queryset
+
+        if year_range[0] and year_range[1]:
+            int_filter = {name+'_int__range': (year_range[0], year_range[1])}
+        elif value[0]:
+            int_filter = {name+'_int__gte': year_range[0]}
+        elif value[1]:
+            int_filter = {name+'_int__lte': year_range[1]}
+        return queryset.filter(**{name + '__regex': r'^[0-9]{3,4}$'}) \
+            .annotate(**{name + '_int': Cast(name, IntegerField())}) \
+            .filter(**int_filter)
 
 
 # PersonPersonRelation filter

@@ -134,6 +134,12 @@ class PersonRankingTableView(ListView):
             messages.add_message(self.request, messages.WARNING,
                                  _("Please select a item role in the filter below."))
 
+
+        if filter.fields_with_errors:
+            fields_with_errors_str = ", ".join([filter.form.fields[name].label for name in filter.fields_with_errors])
+            messages.add_message(self.request, messages.ERROR,
+                                 f"The following filter fields have errors: {fields_with_errors_str}")
+
         return context
 
 
