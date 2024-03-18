@@ -5,7 +5,7 @@ from .models import *
 register(Country)
 register(Place)
 register(Religion)
-register(Person)
+#register(Person)
 register(ReligiousAffiliation)
 register(Residence)
 register(Profession)

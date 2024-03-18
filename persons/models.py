@@ -3,7 +3,12 @@ from django.utils.translation import gettext_lazy as _
 from django_date_extensions.fields import ApproximateDateField
 from django.urls import reverse_lazy
 
+from computedfields.models import ComputedFieldsModel, computed
+from simple_history.models import HistoricalRecords
+
 import requests
+
+import mediate.tools
 from apiconnectors.cerlapi import cerl_record_url_api
 
 import uuid
@@ -87,7 +92,7 @@ class Religion(models.Model):
 
 
 @moderated()
-class Person(models.Model):
+class Person(ComputedFieldsModel):
     """
     A person
     """
@@ -119,6 +124,16 @@ class Person(models.Model):
     city_of_death = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True, blank=True, related_name='persons_died')
     notes = models.TextField(_("Notes"), null=True, blank=True)
     bibliography = models.TextField(_("Bibliography"), null=True, blank=True)
+
+    history = HistoricalRecords(bases=[ComputedFieldsModel])
+
+    @computed(models.SmallIntegerField(null=True), depends=[('self', ['date_of_birth'])])
+    def normalised_date_of_birth(self):
+        return mediate.tools.date_of_x_text_to_int(self.date_of_birth)
+
+    @computed(models.SmallIntegerField(null=True), depends=[('self', ['date_of_death'])])
+    def normalised_date_of_death(self):
+        return mediate.tools.date_of_x_text_to_int(self.date_of_death)
 
     class Meta:
         ordering = ['short_name']

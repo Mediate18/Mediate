@@ -116,3 +116,27 @@ def receiver_with_multiple_senders(signal, senders, **kwargs):
         return receiver_func
 
     return decorator
+
+
+def date_of_x_text_to_int(text):
+    if not text:
+        return None
+
+    # Strip everything until the first digit and trailing spaces
+    text = re.sub(r'^[^\d]*', '', text)
+    text = re.sub(r'\s*$', '', text)
+
+    # Match options
+    if re.match(r'^\d{1,4}$', text):
+        return int(text)
+    if m := re.match(r'^(\d\d)([xX]{2}|\.\.)$', text):
+        return int(m[1]) * 100 + 50
+    if m := re.match(r'^(\d\d\d)([xX]|\.|\?)$', text):
+        return int(m[1]) * 10 + 5
+    if m := re.match(r'(\d+)(th|nd)?\s*(century|c\.?)', text, re.IGNORECASE):
+        return (int(m[1]) - 1) * 100 + 50
+    if m := re.match(r'^(\d*)\s*bce$', text, re.IGNORECASE):
+        return 0 - int(m[1])
+    if m := re.match(r'(\d+)\-(\d+)', text):
+        return int((int(m[1]) + int(m[2])) / 2)
+    return None
