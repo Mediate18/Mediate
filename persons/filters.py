@@ -312,14 +312,11 @@ class PersonRankingFilter(QBasedFilterset):
             return queryset
 
         if year_range[0] and year_range[1]:
-            int_filter = {name+'_int__range': (year_range[0], year_range[1])}
+            return queryset.filter(**{'normalised_' + name + '__range': (year_range[0], year_range[1])})
         elif value[0]:
-            int_filter = {name+'_int__gte': year_range[0]}
+            return queryset.filter(**{'normalised_' + name + '__gte': year_range[0]})
         elif value[1]:
-            int_filter = {name+'_int__lte': year_range[1]}
-        return queryset.filter(**{name + '__regex': r'^[0-9]{3,4}$'}) \
-            .annotate(**{name + '_int': Cast(name, IntegerField())}) \
-            .filter(**int_filter)
+            return queryset.filter(**{'normalised_' + name + '__lte': year_range[1]})
 
 
 # PersonPersonRelation filter
