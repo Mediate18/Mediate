@@ -8,7 +8,7 @@ from collections import OrderedDict
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.forms.models import model_to_dict
-from catalogues.models import Catalogue, Collection, Lot, Category
+from catalogues.models import Catalogue, Collection, Lot, Category, Dataset
 from items.models import Item, Edition, BookFormat
 from persons.models import Place
 
@@ -23,6 +23,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         # Positional
         parser.add_argument('transcription', type=str, nargs='+', help='Text transcription file')
+        parser.add_argument('dataset', type=str, help='Dataset name')
 
         # Optional
         parser.add_argument('-d', '--dry_run', action='store_true', help='Do not save to database.')
@@ -32,8 +33,15 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         # Get the command line arguments
         transcription_files = kwargs['transcription']
+        dataset_name = kwargs['dataset']
         dry_run = kwargs["dry_run"]
         verbose = kwargs["verbose"]
+
+        try:
+            dataset = Dataset.objects.get(name=dataset_name)
+        except Dataset.DoesNotExist as dne:
+            print(f"Dataset '{dataset_name}' does not exist.")
+            return
 
         markers = OrderedDict({
             "TITLE": "TIT@",
@@ -75,6 +83,8 @@ class Command(BaseCommand):
         def print_obj(obj):
             if verbose:
                 print("{}: {}".format(obj.__class__.__name__, model_to_dict(obj)))
+            else:
+                print(".", end="")
 
         def fill_slots(fields):
             slots = {}
@@ -91,7 +101,7 @@ class Command(BaseCommand):
             try:
                 with open(file, 'r', encoding='utf-8') as transcription_file:
                     with transaction.atomic():
-                        catalogue = Catalogue(name=collection_short_title)
+                        catalogue = Catalogue(name=collection_short_title, dataset=dataset)
                         print_obj(catalogue)
                         catalogue.save()
 
@@ -102,6 +112,15 @@ class Command(BaseCommand):
                         page = 0
                         index_in_collection = 1
                         collection = None
+
+                        def get_collection(collection):
+                            if not collection:
+                                print("Creating a new collection")
+                                collection =  Collection.objects.create(short_title=collection_short_title,
+                                                                        full_title=collection_short_title)
+                                collection.catalogue.add(catalogue)
+                            return collection
+
                         category = None
                         for record in records:
                             if verbose:
@@ -123,6 +142,7 @@ class Command(BaseCommand):
                             if "CATEGORY" in fields:
                                 # print(fields)
                                 category_books = fields["CATEGORY"]
+                                collection = get_collection(collection)
                                 category = Category(collection=collection, bookseller_category=category_books)
                                 print_obj(category)
                                 category.save()
@@ -131,6 +151,7 @@ class Command(BaseCommand):
                                 page_in_collection = page if page else None
 
                                 # Lot
+                                collection = get_collection(collection)
                                 lot, created = Lot.objects.get_or_create(collection=collection,
                                           number_in_collection=fields.get("ITEM_NUMBER", '-1'),
                                           page_in_collection=page_in_collection,
@@ -189,6 +210,7 @@ class Command(BaseCommand):
                                 item.save()
 
                             if "PREFACE" in fields:
+                                collection = get_collection(collection)
                                 if not collection.preface_and_paratexts:
                                     collection.preface_and_paratexts = fields.get("PREFACE")
                                 else:
