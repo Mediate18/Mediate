@@ -87,11 +87,12 @@
                 </a>
               </li>
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i>{% trans "About" %}</i> <span class="caret"></span></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="line-height: 19px"><i>{% trans "About" %}</i> <span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         <li><a href="{% url 'about' %}">{% trans "About" %}</a></li>
                         <li><a href="{% url 'totals' %}">{% trans "Database totals" %}</a></li>
                         <li><a href="http://www.mediate18.nl">{% trans "MEDIATE website and publications" %}</a></li>
+                        <li><a href="https://heurist.huma-num.fr/heurist/?db=radboud_BIBLIO&website&id=890&pageid=884">{% trans "BIBLIO database" %}</a></li>
                     </ul>
                 </li>
               {% if perms.persons.change_person or perms.global.view_all %}
