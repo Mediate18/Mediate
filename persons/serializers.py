@@ -2,6 +2,12 @@ from .models import *
 from rest_framework import serializers
 
 
+class CountrySerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Country
+        fields = "__all__"
+
+
 class PlaceSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Place

@@ -18,3 +18,8 @@ class DocumentScanSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = DocumentScan
         fields = "__all__"
+
+class ShelfmarkSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = ShelfMark
+        fields = "__all__"

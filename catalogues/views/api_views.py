@@ -2,6 +2,12 @@ from rest_framework import viewsets
 from ..serializers import *
 
 
+class DatasetViewSet(viewsets.ModelViewSet):
+    queryset = Dataset.objects.all()
+    serializer_class = DatasetSerializer
+    http_method_names = ['get']
+
+
 class CollectionViewSet(viewsets.ModelViewSet):
     queryset = Collection.objects.all()
     serializer_class = CollectionSerializer

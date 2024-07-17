@@ -48,6 +48,7 @@ router = routers.DefaultRouter()
 # router.register(r'groups', views.GroupViewSet)
 
 # Collections app
+router.register(r'dataset', DatasetViewSet)
 router.register(r'catalogue', CatalogueViewSet)
 router.register(r'catalogueyear', CatalogueYearViewSet)
 router.register(r'collectiontype', CollectionTypeViewSet)
@@ -83,6 +84,7 @@ router.register(r'personitemrelationrole', PersonItemRelationRoleViewSet)
 router.register(r'personitemrelation', PersonItemRelationViewSet)
 
 # Persons app
+router.register(r'country', CountryViewSet)
 router.register(r'place', PlaceViewSet)
 router.register(r'religion', ReligionViewSet)
 router.register(r'person', PersonViewSet)
@@ -92,12 +94,12 @@ router.register(r'profession', ProfessionViewSet)
 router.register(r'personprofession', PersonProfessionViewSet)
 router.register(r'personpersonrelationtype', PersonPersonRelationTypeViewSet)
 router.register(r'personpersonrelation', PersonPersonRelationViewSet)
-router.register(r'languages', items.views.LanguageViewSet)
 
 # Transcription app
 router.register(r'sourcematerial', SourceMaterialViewSet)
 router.register(r'transcription', TranscriptionViewSet)
 router.register(r'documentscan', DocumentScanViewSet)
+router.register(r'shelfmark', ShelfmarkViewSet)
 
 
 urlpatterns = [

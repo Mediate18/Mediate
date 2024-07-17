@@ -18,3 +18,9 @@ class DocumentScanViewSet(viewsets.ModelViewSet):
     queryset = DocumentScan.objects.all()
     serializer_class = DocumentScanSerializer
     http_method_names = ['get']
+
+
+class ShelfmarkViewSet(viewsets.ModelViewSet):
+    queryset = ShelfMark.objects.all()
+    serializer_class = ShelfmarkSerializer
+    http_method_names = ['get']

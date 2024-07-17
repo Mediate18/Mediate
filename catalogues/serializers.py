@@ -2,6 +2,12 @@ from .models import *
 from rest_framework import serializers
 
 
+class DatasetSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Dataset
+        fields = "__all__"
+
+
 class CollectionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Collection

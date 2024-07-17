@@ -2,6 +2,12 @@ from rest_framework import viewsets
 from ..serializers import *
 
 
+class CountryViewSet(viewsets.ModelViewSet):
+    queryset = Country.objects.all()
+    serializer_class = CountrySerializer
+    http_method_names = ['get']
+
+
 class PlaceViewSet(viewsets.ModelViewSet):
     queryset = Place.objects.all()
     serializer_class = PlaceSerializer
