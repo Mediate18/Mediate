@@ -194,6 +194,16 @@ class ItemFilter(django_filters.FilterSet):
         ),
         method='edition_place_filter'
     )
+    real_place_of_publication = django_filters.ModelMultipleChoiceFilter(
+        label="Real place of publication",
+        queryset=Place.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=Place,
+            search_fields=['name__icontains']
+        ),
+        method='real_place_of_publication_filter'
+    )
     edition_year = django_filters.RangeFilter(label="Date of publication", widget=RangeWidget(),
                                               field_name='edition__year', method='year_filter')
     edition_year_tag = django_filters.Filter(
@@ -397,6 +407,7 @@ class ItemFilter(django_filters.FilterSet):
             'edition_isnull',
             'edition_isempty',
             'edition_place',
+            'real_place_of_publication',
             'edition_year',
             'edition_year_tag',
             'material_details',
@@ -481,6 +492,11 @@ class ItemFilter(django_filters.FilterSet):
     def edition_place_filter(self, queryset, name, value):
         if value:
             return queryset.filter(edition__place__in=value)
+        return queryset
+
+    def real_place_of_publication_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(edition__publicationplace__place__in=value)
         return queryset
 
     def year_filter(self, queryset, name, value):
