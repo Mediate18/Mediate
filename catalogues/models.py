@@ -36,7 +36,7 @@ class Catalogue(models.Model):
     name = models.CharField(_("Name"), max_length=128, unique=True)
     dataset = models.ForeignKey(Dataset, on_delete=models.PROTECT)
     # full_title = models.TextField(_("Full title"), null=True)
-    shelf_mark = models.ForeignKey(ShelfMark, on_delete=SET_NULL, null=True)
+    shelf_mark = models.ForeignKey(ShelfMark, on_delete=SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.name
