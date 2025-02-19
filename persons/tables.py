@@ -6,6 +6,7 @@ from django.db.models import Q
 import itertools
 
 from .models import *
+from mediate.tools import round_to_n
 from mediate.columns import ActionColumn, render_action_column
 from catalogues.models import PersonCollectionRelation, Collection, CollectionPlaceRelation
 from items.models import PersonItemRelation, Edition
@@ -49,6 +50,21 @@ class PersonTable(tables.Table):
             'uuid'
         ]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.data.data = self.data.data.prefetch_related(
+            'city_of_birth',
+            'city_of_death',
+            'relations_when_first',
+            'relations_when_second',
+            'personcollectionrelation_set',
+            'personcollectionrelation_set__role',
+            'works',
+            'publisher_set',
+            'personitemrelation_set',
+            'personitemrelation_set__role',
+        )
+
     def render_uuid(self, record, value):
         url_name_change = 'change_person' if self.request.user.has_perm('persons.change_person') else None
         url_name_delete = 'delete_person' if self.request.user.has_perm('persons.delete_person') else None
@@ -56,10 +72,10 @@ class PersonTable(tables.Table):
         return render_action_column(value, 'person_detail', url_name_change, url_name_delete)
 
     def render_collections(self, record):
-        person_collection_relations = PersonCollectionRelation.objects.filter(person=record, role__name="owner")
+        person_collection_relations = [relation for relation in record.personcollectionrelation_set.all() if relation.role.name == "owner"]
         relation_groups = []
         for role in set([relation.role for relation in person_collection_relations]):
-            role_relations = person_collection_relations.filter(role=role)
+            role_relations = [relation for relation in person_collection_relations if relation.role == role]
             collections = []
             for relation in role_relations:
                 collection = relation.collection
@@ -73,15 +89,12 @@ class PersonTable(tables.Table):
     def render_roles(self, record):
         roles_dict = {}
 
-        # Collections
-        collection_roles = list(PersonCollectionRelation.objects.filter(person=record).distinct()
-                               .values_list('role__name', flat=True))
+        collection_roles = [collection.role.name for collection in record.personcollectionrelation_set.all()]
         if collection_roles:
             roles_dict['collections'] = collection_roles
 
         # Items
-        item_roles = list(PersonItemRelation.objects.filter(person=record).distinct()
-                          .values_list('role__name', flat=True))
+        item_roles = list({item.role.name for item in record.personitemrelation_set.all()})
         if item_roles:
             roles_dict['items'] = item_roles
 
@@ -165,6 +178,36 @@ class PersonRankingTable(PersonTable):
     def render_row_index(self):
         self.row_index = getattr(self, 'row_index', itertools.count(self.page.start_index()))
         return next(self.row_index)
+
+
+class PersonWeightedRankingTable(PersonRankingTable):
+    row_index = tables.Column(empty_values=(), orderable=False, verbose_name="")
+    weight = tables.Column(empty_values=())
+
+    class Meta:
+        model = Person
+        attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'row_index',
+            'weight',
+            'short_name',
+            'first_names',
+            'surname',
+            'sex',
+            'roles',
+            'city_of_birth',
+            'date_of_birth',
+            'city_of_death',
+            'date_of_death',
+            'collections',
+            'viaf_id',
+            '...',
+            'uuid'
+        ]
+
+    def render_weight(self, value):
+        new_value = round(value) if value > 10.0 else round_to_n(value, 2) if value != 0.0 else value
+        return f'{new_value}%'
 
 
 # PersonPersonRelation table

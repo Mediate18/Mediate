@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django_date_extensions.fields import ApproximateDateField
 from django.urls import reverse_lazy
@@ -125,7 +126,7 @@ class Person(ComputedFieldsModel):
     notes = models.TextField(_("Notes"), null=True, blank=True)
     bibliography = models.TextField(_("Bibliography"), null=True, blank=True)
 
-    history = HistoricalRecords(bases=[ComputedFieldsModel])
+    history = HistoricalRecords(bases=[ComputedFieldsModel], excluded_fields=['weight'])
 
     @computed(models.SmallIntegerField(null=True), depends=[('self', ['date_of_birth'])])
     def normalised_date_of_birth(self):
@@ -134,6 +135,25 @@ class Person(ComputedFieldsModel):
     @computed(models.SmallIntegerField(null=True), depends=[('self', ['date_of_death'])])
     def normalised_date_of_death(self):
         return mediate.tools.date_of_x_text_to_int(self.date_of_death)
+
+    @computed(models.FloatField(null=True), depends=[('personitemrelation_set.item.edition', ['year_start']),
+                                                     ('personitemrelation_set.item.lot', ['collection'])])
+    def weight(self):
+        from items.models import Edition
+        from catalogues.models import Collection
+        earliest_edition = (Edition.objects.filter(items__personitemrelation__person=self, year_start__isnull=False)
+                            .order_by('year_start').first())
+        if not earliest_edition:
+            return None
+        collections = Collection.objects.filter(catalogue__dataset__name=settings.DATASET_NAME_FOR_ANONYMOUSUSER)
+        collection_count = collections.filter(lot__item__personitemrelation__person=self).count()
+        potential_collection_count = collections.filter(year_of_publication__gte=earliest_edition.year_start).count()
+        if not potential_collection_count:
+            return None
+        return 100 * collection_count / potential_collection_count
+
+
+
 
     class Meta:
         ordering = ['short_name']

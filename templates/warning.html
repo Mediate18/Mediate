@@ -1,0 +1,24 @@
+{% extends "baselayout.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-xs-6 col-xs-offset-3 text-center">
+        <div class="alert alert-warning">
+            <h3>{% if messages %}
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                {% else %}
+                    {% trans "Something went wrong. Sorry." %}
+                {% endif %}
+            </h3>
+            <p>
+                {% trans "Perhaps you could start again from" %} <a href="{% url 'home' %}">Home</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

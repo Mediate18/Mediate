@@ -31,6 +31,8 @@ urlpatterns = [
     # PersonRanking urls
     path(r'persons/rank', permission_required('global.view_all')(PersonRankingTableView.as_view()),
          name='persons_ranking'),
+    path(r'persons/weighted_rank', permission_required('global.view_all')(PersonWeightedRankingTableView.as_view()),
+         name='persons_weighted_rank'),
 
     # PersonPersonRelation urls
     path('personpersonrelations/', permission_required('global.view_all')(PersonPersonRelationTableView.as_view()),

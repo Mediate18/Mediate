@@ -1,7 +1,7 @@
 import django_filters
 from .models import *
 from django.utils.translation import gettext_lazy as _
-from django.db.models import Q, IntegerField, Count
+from django.db.models import Q, IntegerField, Count, FloatField, F, OuterRef, Subquery, Value
 from django.db.models.functions import Cast
 from django_select2.forms import Select2MultipleWidget, ModelSelect2MultipleWidget
 from django_filters.widgets import RangeWidget
@@ -317,6 +317,17 @@ class PersonRankingFilter(QBasedFilterset):
             return queryset.filter(**{'normalised_' + name + '__gte': year_range[0]})
         elif value[1]:
             return queryset.filter(**{'normalised_' + name + '__lte': year_range[1]})
+
+
+class PersonWeightedRankingFilter(PersonRankingFilter):
+    @property
+    def qs(self):
+        if hasattr(self, '_qs') and self._qs:
+            return self._qs
+
+        qs = super().qs
+        self._qs = qs.exclude(weight=None).distinct().order_by('-weight')
+        return self._qs
 
 
 # PersonPersonRelation filter

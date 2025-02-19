@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db.models import Q, Func, Count
 import re
+from math import log10, floor
 
 
 def normalize_query(query_string,
@@ -140,3 +141,7 @@ def date_of_x_text_to_int(text):
     if m := re.match(r'(\d+)\-(\d+)', text):
         return int((int(m[1]) + int(m[2])) / 2)
     return None
+
+
+def round_to_n(value, n):
+    return round(value, -int(floor(log10(value))) + (n - 1))

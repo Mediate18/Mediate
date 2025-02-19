@@ -1,9 +1,11 @@
 from django.contrib import messages
+from django.shortcuts import render
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.detail import DetailView
 from django.db import transaction
 from django.db.models import Count
+# from silk.profiling.profiler import silk_profile
 
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import escape
@@ -20,6 +22,7 @@ from apiconnectors.cerlapi import CerlSuggest, cerl_record_url
 from simplemoderation.tools import moderate, ModeratedCreateView
 from mediate.views import GenericDetailView
 
+from catalogues.tools import get_datasets_for_session
 from ..forms import *
 from ..filters import *
 from ..tables import *
@@ -109,18 +112,20 @@ class PlacesOfDeathMapView(ListView):
 class PersonRankingTableView(ListView):
     model = Person
     template_name = 'generic_list.html'
+    filter_class = PersonRankingFilter
+    table_class = PersonRankingTable
 
     def get_queryset(self):
         return Person.objects.all()
 
     def get_context_data(self, **kwargs):
         context = super(PersonRankingTableView, self).get_context_data(**kwargs)
-        filter = PersonRankingFilter(self.request.GET, queryset=self.get_queryset(), request=self.request)
+        filter = self.filter_class(self.request.GET, queryset=self.get_queryset(), request=self.request)
 
         if not filter.form.is_valid():
             filter._qs = filter.queryset.none()
 
-        table = PersonRankingTable(filter.qs)
+        table = self.table_class(filter.qs)
         django_tables2.RequestConfig(self.request, ).configure(table)
 
         context['filter'] = filter
@@ -141,6 +146,18 @@ class PersonRankingTableView(ListView):
                                  f"The following filter fields have errors: {fields_with_errors_str}")
 
         return context
+
+
+class PersonWeightedRankingTableView(PersonRankingTableView):
+    filter_class = PersonWeightedRankingFilter
+    table_class = PersonWeightedRankingTable
+
+    def get(self, request):
+        datasets = get_datasets_for_session(request)
+        if len(datasets) == 1 and datasets[0].name == settings.DATASET_NAME_FOR_ANONYMOUSUSER:
+            return super().get(request)
+        messages.error(request, f"Select only dataset {settings.DATASET_NAME_FOR_ANONYMOUSUSER} to view this page.")
+        return render(request, 'warning.html', {})
 
 
 class PersonDetailView(DetailView):
