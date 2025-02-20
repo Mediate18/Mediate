@@ -139,24 +139,25 @@ class Person(ComputedFieldsModel):
     @computed(models.FloatField(null=True), depends=[('personitemrelation_set.item.edition', ['year_start']),
                                                      ('personitemrelation_set.item.lot', ['collection'])])
     def weight(self):
-        from items.models import Edition
-        from catalogues.models import Collection
+        from items.models import Edition  # TODO circular import
+        from catalogues.models import Collection  # TODO circular import
         earliest_edition = (Edition.objects.filter(items__personitemrelation__person=self, year_start__isnull=False)
                             .order_by('year_start').first())
         if not earliest_edition:
             return None
         collections = Collection.objects.filter(catalogue__dataset__name=settings.DATASET_NAME_FOR_ANONYMOUSUSER)
-        collection_count = collections.filter(lot__item__personitemrelation__person=self).count()
-        potential_collection_count = collections.filter(year_of_publication__gte=earliest_edition.year_start).count()
+        collection_count = collections.filter(lot__item__personitemrelation__person=self).distinct().count()
+        potential_collection_count = (collections.filter(year_of_publication__gte=earliest_edition.year_start).
+                                      distinct().count())
         if not potential_collection_count:
             return None
         return 100 * collection_count / potential_collection_count
 
-
-
-
     class Meta:
         ordering = ['short_name']
+        indexes = [
+            models.Index(fields=["weight"], name="weight_idx"),
+        ]
 
     def __str__(self):
         return self.short_name
