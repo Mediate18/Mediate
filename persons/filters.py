@@ -2,6 +2,7 @@ import django_filters
 from .models import *
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Q, IntegerField, Count, FloatField, F, OuterRef, Subquery, Value
+from django.db.models.functions import Coalesce
 from django.db.models.functions import Cast
 from django_select2.forms import Select2MultipleWidget, ModelSelect2MultipleWidget
 from django_filters.widgets import RangeWidget
@@ -276,11 +277,15 @@ class PersonRankingFilter(QBasedFilterset):
     # Override method
     @property
     def qs(self):
-        if hasattr(self, '_qs') and self._qs:
+        if hasattr(self, '_qs') and self._qs is not None:
             return self._qs
 
         qs = super().qs
-        self._qs = qs.distinct() \
+        self._qs = self.annotate_queryset(qs)
+        return self._qs
+
+    def annotate_queryset(self, qs):
+        return qs.distinct() \
             .annotate(item_count=Count('personitemrelation__item',
                                        filter=Q(personitemrelation__item__lot__collection__in=
                                          get_collections_for_session(self.request)),
@@ -290,7 +295,6 @@ class PersonRankingFilter(QBasedFilterset):
                                          get_collections_for_session(self.request)),
                                         distinct=True)) \
             .order_by('-item_count')
-        return self._qs
 
     def year_text_range_filter(self, queryset, name, value):
         """
@@ -320,14 +324,38 @@ class PersonRankingFilter(QBasedFilterset):
 
 
 class PersonWeightedRankingFilter(PersonRankingFilter):
-    @property
-    def qs(self):
-        if hasattr(self, '_qs') and self._qs:
-            return self._qs
+    def annotate_queryset(self, qs):
+        collections = self.filter_collections(get_collections_for_session(self.request))
+        sub_query = (collections.filter(year_of_publication__gt=OuterRef('earliest_edition_year'))
+                     .annotate(one=Value(1)).values('one')
+                     .annotate(collection_count=Count('one'))
+                     .values('collection_count')[:1])
+        qs = qs.annotate(collection_count=Count('personitemrelation__item__lot__collection',
+                                                filter=Q(personitemrelation__item__lot__collection__in=collections),
+                                                distinct=True))
+        qs = qs.annotate(potential_collection_count=Coalesce(Subquery(sub_query,output_field=IntegerField()), 0))
+        qs = qs.annotate(dynamic_weight=100.0 * F('collection_count') / F('potential_collection_count'))
+        return qs.distinct().order_by('-dynamic_weight')
 
-        qs = super().qs
-        self._qs = qs.exclude(weight=None).distinct().order_by('-weight')
-        return self._qs
+    def filter_collections(self, collection_qs):
+        cleaned_data = self.form.cleaned_data
+        if collection_year_slice := cleaned_data['collection_year']:
+            print('collection_year_slice', collection_year_slice)
+            collection_qs = collection_qs.filter(year_of_publication__range=[collection_year_slice.start,
+                                                                             collection_year_slice.stop])
+        if collection_publication_country := cleaned_data['collection_publication_country']:
+            print('collection_publication_country', collection_publication_country)
+            collection_qs = collection_qs.filter(related_places__place__country__in=collection_publication_country)
+        if collection_owner_sex := cleaned_data['collection_owner_sex']:
+            print('collection_owner_sex', collection_owner_sex)
+            collection_qs = collection_qs.filter(personcollectionrelation__person__sex__in=collection_owner_sex,
+                                                 personcollectionrelation__role__name='owner')
+        if collection_owner_religion := cleaned_data['collection_owner_religion']:
+            print('collection_owner_religion', collection_owner_religion)
+            collection_qs = collection_qs.filter(personcollectionrelation__person__religiousaffiliation__religion__in
+                                                                                            =collection_owner_religion,
+                                                 personcollectionrelation__role__name='owner')
+        return collection_qs
 
 
 # PersonPersonRelation filter

@@ -182,7 +182,10 @@ class PersonRankingTable(PersonTable):
 
 class PersonWeightedRankingTable(PersonRankingTable):
     row_index = tables.Column(empty_values=(), orderable=False, verbose_name="")
-    weight = tables.Column(empty_values=())
+    weight = tables.Column(empty_values=(), verbose_name="Percentage of collections (precalculated)")
+    dynamic_weight = tables.Column(empty_values=(), verbose_name="Percentage of collections (dynamic)")
+    collection_count = tables.Column(empty_values=())
+    potential_collection_count = tables.Column(empty_values=())
 
     class Meta:
         model = Person
@@ -190,6 +193,9 @@ class PersonWeightedRankingTable(PersonRankingTable):
         sequence = [
             'row_index',
             'weight',
+            'dynamic_weight',
+            'collection_count',
+            'potential_collection_count',
             'short_name',
             'first_names',
             'surname',
@@ -206,6 +212,14 @@ class PersonWeightedRankingTable(PersonRankingTable):
         ]
 
     def render_weight(self, value):
+        if not value:
+            return '-'
+        new_value = round(value) if value > 10.0 else round_to_n(value, 2) if value != 0.0 else value
+        return f'{new_value}%'
+
+    def render_dynamic_weight(self, value):
+        if not value:
+            return '-'
         new_value = round(value) if value > 10.0 else round_to_n(value, 2) if value != 0.0 else value
         return f'{new_value}%'
 

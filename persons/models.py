@@ -126,7 +126,7 @@ class Person(ComputedFieldsModel):
     notes = models.TextField(_("Notes"), null=True, blank=True)
     bibliography = models.TextField(_("Bibliography"), null=True, blank=True)
 
-    history = HistoricalRecords(bases=[ComputedFieldsModel], excluded_fields=['weight'])
+    history = HistoricalRecords(bases=[ComputedFieldsModel], excluded_fields=['weight', 'earliest_edition_year'])
 
     @computed(models.SmallIntegerField(null=True), depends=[('self', ['date_of_birth'])])
     def normalised_date_of_birth(self):
@@ -153,10 +153,20 @@ class Person(ComputedFieldsModel):
             return None
         return 100 * collection_count / potential_collection_count
 
+    @computed(models.IntegerField(null=True), depends=[('personitemrelation_set.item.edition', ['year_start']),
+                                                     ('personitemrelation_set.item.lot', ['collection'])])
+    def earliest_edition_year(self):
+        from items.models import Edition  # TODO circular import
+        if earliest_edition := (Edition.objects.filter(items__personitemrelation__person=self, year_start__isnull=False)
+                .order_by('year_start').first()):
+            return earliest_edition.year_start
+        return None
+
     class Meta:
         ordering = ['short_name']
         indexes = [
             models.Index(fields=["weight"], name="weight_idx"),
+            models.Index(fields=["earliest_edition_year"], name="earliest_edition_year_idx"),
         ]
 
     def __str__(self):
