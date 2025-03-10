@@ -43,7 +43,6 @@ class PersonFilter(django_filters.FilterSet):
         queryset=Country.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
         field_name='city_of_birth__country',
-        lookup_expr='in'
     )
     city_of_death = django_filters.ModelMultipleChoiceFilter(
         label=mark_safe(_("Place of death") + place_help.format(city_of_death_text)),
@@ -55,28 +54,24 @@ class PersonFilter(django_filters.FilterSet):
         queryset=Country.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
         field_name='city_of_death__country',
-        lookup_expr='in'
     )
     profession = django_filters.ModelMultipleChoiceFilter(
         label="Profession",
         queryset=Profession.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
         field_name='personprofession__profession',
-        lookup_expr='in'
     )
     collection_roles = django_filters.ModelMultipleChoiceFilter(
         label="Collection roles",
         queryset=PersonCollectionRelationRole.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
         field_name='personcollectionrelation__role',
-        lookup_expr='in'
     )
     item_roles = django_filters.ModelMultipleChoiceFilter(
         label="Item roles",
         queryset=PersonItemRelationRole.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
         field_name='personitemrelation__role',
-        lookup_expr='in'
     )
     work_author = django_filters.BooleanFilter(label="Work author", field_name='works', lookup_expr='isnull',
                                                exclude=True)
@@ -87,21 +82,18 @@ class PersonFilter(django_filters.FilterSet):
         queryset=Religion.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
         field_name='religiousaffiliation__religion',
-        lookup_expr='in'
     )
     city_of_residence = django_filters.ModelMultipleChoiceFilter(
         label=mark_safe(_("Place of residence") + place_help.format(city_of_residence_text)),
         queryset=Place.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
         field_name='residence__place',
-        lookup_expr='in'
     )
     country_of_residence = django_filters.ModelMultipleChoiceFilter(
         label="Country of residence",
         queryset=Country.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
         field_name='residence__place__country',
-        lookup_expr='in'
     )
     related_to = django_filters.ModelMultipleChoiceFilter(
         label="Related to",
