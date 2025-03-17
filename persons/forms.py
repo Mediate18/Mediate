@@ -14,11 +14,6 @@ class PersonModelForm(forms.ModelForm):
         model = Person
         fields = "__all__"
         widgets = {
-            'viaf_id': ApiSelectWidget(
-                url=reverse_lazy('person_viaf_suggest'),
-                attrs={'data-html': True,
-                       'data-placeholder': "Search for a person"},
-            ),
             'publisher_cerl_id': ApiSelectWidget(
                 url='cerl_suggest_person',
                 attrs={'data-html': True,
@@ -40,7 +35,7 @@ class PersonModelForm(forms.ModelForm):
         }
 
     class Media:
-        js = ('js/viaf_select.js',)
+        js = ()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

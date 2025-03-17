@@ -3,7 +3,6 @@ from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext_lazy as _
 from django_select2.forms import Select2Widget, ModelSelect2Widget, ModelSelect2MultipleWidget
-from apiconnectors.widgets import ApiSelectWidget
 from .models import *
 from catalogues.models import Category, ParisianCategory
 from catalogues.views.views import get_collections_for_session
@@ -360,16 +359,9 @@ class ItemWorkRelationAddForm(forms.ModelForm):
     class Meta:
         model = Work
         fields = ['viaf_id', 'title']
-        widgets = {
-            'viaf_id': ApiSelectWidget(
-                url='workandviaf_suggest',
-                attrs={'data-html': True, 'data-placeholder': "Search for a work - <i>italic: works in the local database</i>"},
-            ),
-        }
 
     class Media:
-        js = ('js/viaf_select.js',)
-
+        js = ()
 
 
 class LanguageModelForm(forms.ModelForm):
@@ -655,16 +647,6 @@ class WorkModelForm(forms.ModelForm):
     class Meta:
         model = Work
         fields = ['viaf_id', 'title']
-        widgets = {
-            'viaf_id': ApiSelectWidget(
-                url=reverse_lazy('work_viaf_suggest'),
-                attrs={'data-html': True,
-                       'data-placeholder': "Search for a work"},
-            ),
-        }
-
-    class Media:
-        js = ('js/viaf_select.js',)
 
 
 class WorkAuthorModelForm(forms.ModelForm):
