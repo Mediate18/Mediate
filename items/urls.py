@@ -296,6 +296,8 @@ urlpatterns = [
     # WorkRanking urls
     path(r'works/rank', permission_required('global.view_all')(WorkRankingTableView.as_view()),
          name='works_ranking'),
+    path(r'works/weighted_rank', permission_required('global.view_all')(WorkWeightedRankingTableView.as_view()),
+         name='works_weighted_rank'),
 
     # WorkAuthor urls
     path('workauthors/', permission_required('global.view_all')(WorkAuthorTableView.as_view()), name='workauthors'),

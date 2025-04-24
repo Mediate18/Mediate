@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.safestring import mark_safe
 import itertools
 
+from mediate.tools import round_to_n
 from .models import *
 from tagme.models import Tag
 
@@ -661,6 +662,7 @@ class WorkTable(tables.Table):
             'parisian_category',
             'uuid'
         ]
+        exclude = ['earliest_edition_year']
 
     def render_uuid(self, record, value):
         url_name_change = 'change_work' if self.request.user.has_perm('items.change_work') else None
@@ -708,12 +710,43 @@ class WorkRankingTable(WorkTable):
             'collection_count',
             'title',
             'viaf_id',
-            'uuid'
+            '...',
+            'uuid',
+            'checkbox'
         ]
+        exclude = ['earliest_edition_year', 'parisian_category']
 
     def render_row_index(self):
         self.row_index = getattr(self, 'row_index', itertools.count(self.page.start_index()))
         return next(self.row_index)
+
+
+class WorkWeightedRankingTable(WorkRankingTable):
+    dynamic_weight = tables.Column(empty_values=(), verbose_name="Percentage of collection (dynamic)")
+    collection_count = tables.Column(empty_values=())
+    potential_collection_count = tables.Column(empty_values=())
+
+    class Meta:
+        model = Work
+        attrs = {'class': 'table table-sortable'}
+        sequence = [
+            'row_index',
+            'dynamic_weight',
+            'collection_count',
+            'potential_collection_count',
+            'title',
+            'viaf_id',
+            'uuid',
+            'checkbox'
+        ]
+        exclude = ['item_count', 'earliest_edition_year', 'parisian_category']
+
+    def render_dynamic_weight(self, record, value):
+        print('render_dynamic_weight')
+        if not value:
+            return '-'
+        new_value = round(value) if value > 10.0 else round_to_n(value, 2) if value != 0.0 else value
+        return f'{new_value}%'
 
 
 # WorkAuthor table

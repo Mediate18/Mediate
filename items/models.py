@@ -70,7 +70,7 @@ class Subject(models.Model):
         return self.name
 
 
-class Work(models.Model):
+class Work(ComputedFieldsModel):
     """
     A title of a work
     """
@@ -78,8 +78,21 @@ class Work(models.Model):
     title = models.TextField(_("Title of a work"))
     viaf_id = models.CharField(_("VIAF ID of a work"), max_length=128, null=True, blank=True, unique=True)
 
+    history = HistoricalRecords(bases=[ComputedFieldsModel], excluded_fields=['earliest_edition_year'])
+
+    @computed(models.IntegerField(null=True), depends=[('items.item.edition', ['year_start']),
+                                                       ('items.item.lot', ['collection'])])
+    def earliest_edition_year(self):
+        if earliest_edition := (Edition.objects.filter(items__works__work=self, year_start__isnull=False)
+                .order_by('year_start').first()):
+            return earliest_edition.year_start
+        return None
+
     class Meta:
         ordering = ['title']
+        indexes = [
+            models.Index(fields=["earliest_edition_year"], name="work_earliest_edition_year_idx")
+        ]
 
     def __str__(self):
         return self.title

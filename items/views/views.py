@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.conf import settings
 from django.http import HttpResponseRedirect, Http404
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView, View
@@ -12,7 +13,7 @@ from django_tables2.export.export import TableExport
 
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import escape
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.db import transaction
 from django.db.models import Case, When
 
@@ -26,7 +27,7 @@ from django.http import JsonResponse
 import re
 import json
 
-
+from catalogues.tools import get_datasets_for_session
 from ..forms import *
 from ..filters import *
 from ..tables import *
@@ -2030,6 +2031,8 @@ def add_parisiancategories_to_items_of_works(request):
 class WorkRankingTableView(ListView):
     model = Work
     template_name = 'generic_list.html'
+    filter_class = WorkRankingFilter
+    table_class = WorkRankingTable
 
     def get_queryset(self):
         return Work.objects.all()
@@ -2038,9 +2041,9 @@ class WorkRankingTableView(ListView):
         datasets_permitted = get_permitted_datasets_for_session(self.request)
 
         context = super(WorkRankingTableView, self).get_context_data(**kwargs)
-        filter = WorkRankingFilter(self.request.GET, queryset=self.get_queryset(), request=self.request)
+        filter = self.filter_class(self.request.GET, queryset=self.get_queryset(), request=self.request)
 
-        table = WorkRankingTable(filter.qs)
+        table = self.table_class(filter.qs)
         django_tables2.RequestConfig(self.request, ).configure(table)
 
         context['filter'] = filter
@@ -2052,6 +2055,17 @@ class WorkRankingTableView(ListView):
 
         return context
 
+
+class WorkWeightedRankingTableView(WorkRankingTableView):
+    filter_class = WorkWeightedRankingFilter
+    table_class = WorkWeightedRankingTable
+
+    def get(self, request):
+        datasets = get_datasets_for_session(request)
+        if len(datasets) == 1 and datasets[0].name == settings.DATASET_NAME_FOR_ANONYMOUSUSER:
+            return super().get(request)
+        messages.error(request, f"Select only dataset {settings.DATASET_NAME_FOR_ANONYMOUSUSER} to view this page.")
+        return render(request, 'warning.html', {})
 
 
 class WorkDetailView(GenericDetailView):

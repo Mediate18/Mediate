@@ -112,6 +112,7 @@ class Collection(models.Model):
 
     class Meta:
         ordering = ['year_of_publication', 'short_title']
+        indexes = [models.Index(fields=["year_of_publication"], name="year_of_publication_idx")]
 
     def __str__(self):
         return "{0}".format(self.short_title)
