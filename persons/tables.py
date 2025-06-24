@@ -119,6 +119,9 @@ class PersonTable(tables.Table):
         else:
             return format_html('-')
 
+    def value_viaf_id(self, value):
+        return value
+
     def render_publisher_cerl_id(self, value):
         if value:
             url = cerl_record_url + value

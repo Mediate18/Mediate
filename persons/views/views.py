@@ -135,7 +135,7 @@ class PersonRankingTableView(ListView):
         export_format = request.GET.get('_export', None)
         if TableExport.is_valid_format(export_format):
             filter, table = self.create_filtered_table()
-            exporter = TableExport(export_format, table, exclude_columns=('uuid', 'weight'))
+            exporter = TableExport(export_format, table, exclude_columns=('uuid', 'roles', 'weight'))
             return exporter.response('table.{}'.format(export_format))
         else:
             return super().get(request, *args, **kwargs)
