@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.html import escape
 from django.urls import reverse
 import django_tables2
+from django_tables2.export.export import TableExport
 
 from django.http import JsonResponse
 import re
@@ -118,8 +119,8 @@ class PersonRankingTableView(ListView):
     def get_queryset(self):
         return Person.objects.all()
 
-    def get_context_data(self, **kwargs):
-        context = super(PersonRankingTableView, self).get_context_data(**kwargs)
+
+    def create_filtered_table(self):
         filter = self.filter_class(self.request.GET, queryset=self.get_queryset(), request=self.request)
 
         if not filter.form.is_valid():
@@ -127,6 +128,22 @@ class PersonRankingTableView(ListView):
 
         table = self.table_class(filter.qs)
         django_tables2.RequestConfig(self.request, ).configure(table)
+        return filter, table
+
+    def get(self, request, *args, **kwargs):
+        # Handle the _export query
+        export_format = request.GET.get('_export', None)
+        if TableExport.is_valid_format(export_format):
+            filter, table = self.create_filtered_table()
+            exporter = TableExport(export_format, table, exclude_columns=('uuid', 'weight'))
+            return exporter.response('table.{}'.format(export_format))
+        else:
+            return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(PersonRankingTableView, self).get_context_data(**kwargs)
+
+        filter, table = self.create_filtered_table()
 
         context['filter'] = filter
         context['table'] = table
