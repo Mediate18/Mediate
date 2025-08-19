@@ -3,6 +3,7 @@
 /logs/
 /venv/
 /static_root/
+/staticfiles/
 .env*
 /writable/
 .ipynb_checkpoints

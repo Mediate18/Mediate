@@ -137,16 +137,17 @@ DATABASES = {
 # otherwise use a database cache
 socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+REDIS_HOST = config('REDIS_HOST', default='127.0.0.1')
 REDIS_PORT = config('REDIS_PORT', cast=int, default=6379)
 
 try:
-    socket.connect(('127.0.0.1', REDIS_PORT))
+    socket.connect((REDIS_HOST, REDIS_PORT))
     socket.close()
     print("Starting with Redis cache (port: {})".format(REDIS_PORT))
     CACHES = {
         "default": {
             "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": "redis://127.0.0.1:{}/1".format(REDIS_PORT),
+            "LOCATION": "redis://{}:{}/1".format(REDIS_HOST, REDIS_PORT),
             "OPTIONS": {
                 "CLIENT_CLASS": "django_redis.client.DefaultClient"
             },
@@ -215,7 +216,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 
-STATIC_ROOT = os.path.join(BASE_DIR, "static_root")
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'

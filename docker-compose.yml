@@ -1,0 +1,38 @@
+services:
+  web:
+    image: ${DOCKER_IMAGE}
+    command: >
+        bash -c "
+          python manage.py migrate --noinput &&
+          python manage.py collectstatic --noinput &&
+          gunicorn ${WSGI_APP} --bind 0.0.0.0:${DJANGO_PORT} --log-level debug --workers=${NUMBER_OF_WORKERS:-4}
+        "
+    volumes:
+      - static_volume:/home/app/web/staticfiles
+      - tmp_volume:/home/app/web/tmp
+      - writable_volume:/home/app/web/writable
+    env_file:
+      - ./.env
+    depends_on:
+      redis:
+        condition: service_started
+    restart: unless-stopped
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+  nginx:
+    image: nginx:1.25
+    volumes:
+      - static_volume:/home/app/web/staticfiles
+      - writable_volume:/home/app/web/writable
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - 80:80
+    depends_on:
+      - web
+    restart: unless-stopped
+
+volumes:
+  static_volume:
+  tmp_volume:
+  writable_volume:
