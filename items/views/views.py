@@ -2233,17 +2233,17 @@ class ItemAndEditionCreateView(CreateView):
     def form_valid(self, form):
         # Save the edition first, because the item needs a edition before it
         # can be saved.
-        edition = form['edition'].save()
-        item = form['item'].save(commit=False)
+        edition = form.forms['edition'].save()
+        item = form.forms['item'].save(commit=False)
         item.edition = edition
         item.save()
 
         # Because Item form was not saved (commit=False)
-        form['item'].save_tags()
-        form['item'].save_languages()
-        form['item'].save_publishers()
-        form['item'].save_material_details()
-        form['item'].save_itemtypes()
+        form.forms['item'].save_tags()
+        form.forms['item'].save_languages()
+        form.forms['item'].save_publishers()
+        form.forms['item'].save_material_details()
+        form.forms['item'].save_itemtypes()
 
         messages.add_message(self.request, messages.SUCCESS, self.success_msg)
         return HttpResponseRedirect(self.success_url)
