@@ -8,7 +8,6 @@ from catalogues.models import Category, ParisianCategory
 from catalogues.views.views import get_collections_for_session
 
 from tagme.models import Tag
-from betterforms.multiform import MultiModelForm
 from dal import autocomplete
 
 
@@ -683,19 +682,60 @@ class ItemModelForm2(ItemModelForm):
         }
 
 
-class ItemAndEditionForm(MultiModelForm):
+class CombinedFormBase(forms.Form):
+    form_classes = OrderedDict([])
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.forms = {}
+        for name, form_class in self.form_classes.items():
+            form = form_class(*args, **kwargs)
+            self.forms[name] = form
+            self.initial.update(form.initial)
+
+    @property
+    def fields(self):
+        fields = {}
+        for name, form in self.forms.items():
+            fields.update(form.fields)
+        return fields
+
+    @fields.setter
+    def fields(self, new_fields):
+        pass
+
+    def is_valid(self):
+        isValid = True
+        for name, form in self.forms.items():
+            if not form.is_valid():
+                isValid = False
+        # is_valid will trigger clean method
+        # so it should be called after all other forms is_valid are called
+        # otherwise clean_data will be empty
+        if not super().is_valid() :
+            isValid = False
+        for name, form in self.forms.items():
+            self.errors.update(form.errors)
+        return isValid
+
+    def clean(self):
+        cleaned_data = super().clean()
+        for name, form in self.forms.items():
+            cleaned_data.update(form.cleaned_data)
+        return cleaned_data
+
+
+class ItemAndEditionForm(CombinedFormBase):
     form_classes = OrderedDict([
         ('item', ItemModelForm2),
         ('edition', EditionModelForm)
     ])
 
     def __init__(self, *args, **kwargs):
+        kwargs.pop('instance', None)
         self.catalogues = kwargs.pop('catalogues', None)
         self.lots = kwargs.pop('lots', None)
         super().__init__(*args, **kwargs)
-
-        fields = self.fields
-        d = self.__dict__
 
         if self.catalogues is not None and self.catalogues.exists():
             self.forms['item'].fields['catalogue'] = forms.ModelChoiceField(
