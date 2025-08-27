@@ -257,6 +257,7 @@ WRITABLE_FOLDER = os.path.normpath(os.path.join(BASE_DIR, config('WRITABLE_FOLDE
 MEDIA_ROOT = os.path.join(WRITABLE_FOLDER, 'media')
 MEDIA_URL = '/protected_media/'
 XSENDFILE = config('XSENDFILE', True, cast=bool)
+XSENDFILE_HEADER = config('XSENDFILE_HEADER', 'X-Sendfile')
 FILE_UPLOAD_PERMISSIONS = 0o640
 
 LOG_LEVEL = config('LOG_LEVEL', 'INFO')

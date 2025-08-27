@@ -50,7 +50,7 @@ def protected_media(request, filename):
     # Construct the response
     response = HttpResponse(content_type=mime_type)
     response['Content-Disposition'] = 'inline;filename='+base_name
-    response['X-Sendfile'] = full_path
+    response[settings.XSENDFILE_HEADER] = full_path
 
     return response
 
