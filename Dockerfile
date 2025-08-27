@@ -45,11 +45,17 @@ USER app
 
 # create the appropriate directories
 ENV APP_HOME=/home/app/web
-RUN mkdir -p $APP_HOME/writable/media
-RUN mkdir $APP_HOME/writable/log
+RUN mkdir -p $APP_HOME/writable
 RUN mkdir $APP_HOME/staticfiles
 RUN mkdir $APP_HOME/tmp
 WORKDIR $APP_HOME
 
 # copy project
 COPY . $APP_HOME
+
+USER root
+COPY ./entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+USER app
+
+ENTRYPOINT ["/entrypoint.sh"]
