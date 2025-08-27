@@ -5,7 +5,7 @@ services:
         bash -c "
           python manage.py migrate --noinput &&
           python manage.py collectstatic --noinput &&
-          gunicorn ${WSGI_APP} --bind 0.0.0.0:${DJANGO_PORT} --log-level debug --workers=${NUMBER_OF_WORKERS:-4}
+          gunicorn ${WSGI_APP} --bind 0.0.0.0:${DJANGO_PORT} --log-level debug --workers=${NUMBER_OF_WORKERS:-4} --timeout 900
         "
     volumes:
       - static_volume:/home/app/web/staticfiles
@@ -21,7 +21,7 @@ services:
     image: redis:latest
     restart: unless-stopped
   nginx:
-    image: nginx:1.25
+    image: nginx:latest
     volumes:
       - static_volume:/home/app/web/staticfiles
       - writable_volume:/home/app/web/writable
