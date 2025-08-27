@@ -2,7 +2,7 @@
 # BUILDER #
 ###########
 
-ARG PYTHON_DOCKER_TAG=3.11-slim-bookworm
+ARG PYTHON_DOCKER_TAG=3.13-slim-trixie
 
 # pull official base image
 FROM python:${PYTHON_DOCKER_TAG} AS builder
