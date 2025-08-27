@@ -258,6 +258,29 @@ MEDIA_URL = '/protected_media/'
 XSENDFILE = config('XSENDFILE', True, cast=bool)
 FILE_UPLOAD_PERMISSIONS = 0o640
 
+LOG_LEVEL = config('LOG_LEVEL', 'INFO')
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "file": {
+            "level": LOG_LEVEL,
+            "class": "logging.handlers.TimedRotatingFileHandler",
+            "filename": os.path.join(WRITABLE_FOLDER, "log", "django.log"),
+            "when": "midnight",
+            "backupCount": 100,
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["file"],
+            "level": LOG_LEVEL,
+            "propagate": True,
+        },
+    },
+}
+
+
 # The next bit find all '.*layout.html' files in the main template directory
 # and extracts the first parts
 LAYOUT_SUFFIX = 'layout.html'

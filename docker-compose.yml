@@ -3,6 +3,7 @@ services:
     image: ${DOCKER_IMAGE}
     command: >
         bash -c "
+          mkdir -p /home/app/web/writable/{media,log} &&
           python manage.py migrate --noinput &&
           python manage.py collectstatic --noinput &&
           gunicorn ${WSGI_APP} --bind 0.0.0.0:${DJANGO_PORT} --log-level debug --workers=${NUMBER_OF_WORKERS:-4} --timeout 900

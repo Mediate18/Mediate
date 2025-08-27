@@ -46,6 +46,7 @@ USER app
 # create the appropriate directories
 ENV APP_HOME=/home/app/web
 RUN mkdir -p $APP_HOME/writable/media
+RUN mkdir $APP_HOME/writable/log
 RUN mkdir $APP_HOME/staticfiles
 RUN mkdir $APP_HOME/tmp
 WORKDIR $APP_HOME
