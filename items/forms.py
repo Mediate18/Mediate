@@ -686,10 +686,11 @@ class CombinedFormBase(forms.Form):
     form_classes = OrderedDict([])
 
     def __init__(self, *args, **kwargs):
+        instance = kwargs.pop('instance', None)
         super().__init__(*args, **kwargs)
         self.forms = {}
         for name, form_class in self.form_classes.items():
-            form = form_class(*args, **kwargs)
+            form = form_class(*args, **kwargs, instance=instance.get(name, None))
             self.forms[name] = form
             self.initial.update(form.initial)
 
@@ -732,7 +733,6 @@ class ItemAndEditionForm(CombinedFormBase):
     ])
 
     def __init__(self, *args, **kwargs):
-        kwargs.pop('instance', None)
         self.catalogues = kwargs.pop('catalogues', None)
         self.lots = kwargs.pop('lots', None)
         super().__init__(*args, **kwargs)
