@@ -686,7 +686,7 @@ class CombinedFormBase(forms.Form):
     form_classes = OrderedDict([])
 
     def __init__(self, *args, **kwargs):
-        instance = kwargs.pop('instance', None)
+        instance = kwargs.pop('instance', None) or {}
         super().__init__(*args, **kwargs)
         self.forms = {}
         for name, form_class in self.form_classes.items():
