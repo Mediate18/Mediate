@@ -578,6 +578,7 @@ class EditionModelForm(forms.ModelForm):
                 search_fields=['name__icontains']
             ),
         }
+        labels = {'place': _("Stated place of publication")}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
