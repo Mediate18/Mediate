@@ -225,6 +225,12 @@ class ItemTableView(ListView):
                 'url': reverse_lazy('toggle_uncountable_book_items'),
                 'message': _("The uncountable book items field of the selected items will be toggled."),
                 'form': None,
+            },
+            {
+                'id': 'set_stated_place_of_publication_to_items',
+                'label': _("Set stated place of publication"),
+                'url': reverse_lazy('set_stated_place_of_publication_to_items'),
+                'form': EditionPlaceForm
             }
         ] if datasets_permitted else None
 
@@ -1638,6 +1644,23 @@ def toggle_uncountable_book_items(request):
         messages.add_message(request, messages.ERROR, _("Some items could not be used for toggling uncountable book"
                                                         " items because you are not allowed to change the dataset."))
     items.update(uncountable_book_items=Case(When(uncountable_book_items=True, then=False), default=True))
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+
+@require_POST
+def set_stated_place_of_publication_to_items(request):
+    # Check that *entries* are there
+    if 'entries' not in request.POST:
+        messages.add_message(request, messages.WARNING, _("No items selected."))
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+    item_ids = request.POST.getlist('entries')
+    items = Item.objects.filter(uuid__in=item_ids, lot__collection__in=get_collections_for_session(request))
+    if len(item_ids) != items.count():
+        messages.add_message(request, messages.ERROR, _("Some items could not be used for setting stated place of "
+                                                        "publication because you are not allowed to change the dataset."))
+    place_id = request.POST.get('place')
+    Edition.objects.filter(items__in=items).update(place_id=place_id)
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 

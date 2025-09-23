@@ -50,6 +50,9 @@ urlpatterns = [
     path('items/toggle_uncountable_book_items',
          permission_required('items.change_item')(toggle_uncountable_book_items),
          name='toggle_uncountable_book_items'),
+    path('items/set_stated_place_of_publication',
+         permission_required('items.change_edition')(set_stated_place_of_publication_to_items),
+         name='set_stated_place_of_publication_to_items'),
 
     path('items/item_suggest', permission_required('global.view_all')(ItemSuggest.as_view()), name='item_suggest'),
 
