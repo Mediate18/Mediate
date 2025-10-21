@@ -75,7 +75,9 @@
                     <thead >
                         <tr>
                             <th>Publisher</th>
-                            <th>Edition</th>
+                            <th>Date</th>
+                            <th>Work</th>
+                            <th>Item</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -83,14 +85,48 @@
                         {% regroup objects by publisher as publisher_set %}
                         {% for person, publishers in publisher_set %}
                             {% for publisher in publishers %}
-                                <tr>
+                                <tr {% if forloop.first %}style="border-top: 2px solid #ddd"{% endif %}>
                                     {% if forloop.first %}
                                         <td rowspan="{{ publishers|length }}">
                                             <a href="{{ person.get_absolute_url }}">{{ person }}</a>
+                                            {% if person.publisher_cerl_id %}
+                                                <br/>
+                                                <a href="http://thesaurus.cerl.org/record/{{ person.publisher_cerl_id }}" target="_blank">
+                                                    <span class="glyphicon glyphicon-new-window"></span> CERL
+                                                </a>
+                                            {% endif %}
+                                            {% if person.viaf_id %}
+                                                <br/>
+                                                <a href="{{ person.viaf_id }}" target="_blank">
+                                                    <span class="glyphicon glyphicon-new-window"></span> VIAF
+                                                </a>
+                                            {% endif %}
                                         </td>
                                     {% endif %}
+                                    <td class="text-nowrap">
+                                        {{ publisher.edition.year_start|default:'' }}
+                                        {% if publisher.edition.year_end %}
+                                            - {{ publisher.edition.year_end }}
+                                        {% endif %}
+                                    </td>
                                     <td>
-                                        <a href="{{ publisher.edition.get_absolute_url }}">{{ publisher.edition.list_view_str }}</a>
+                                        {% for item in publisher.edition.items.all %}
+                                            {% for work in item.works.all %}
+                                                <a href="{% url 'work_detail' work.work.pk %}">
+                                                    {{ work.work.title }}
+                                                </a>
+                                                {% if not forloop.last %}<br/>{% endif %}
+                                            {% endfor %}
+                                            {% if not forloop.last %}<br/>{% endif %}
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        {% for item in publisher.edition.items.all %}
+                                            <a href="{% url 'item_detail' item.pk %}">
+                                                {{ item.short_title }}
+                                            </a>
+                                            {% if not forloop.last %}<br/>{% endif %}
+                                        {% endfor %}
                                     </td>
                                     {% if forloop.first %}
                                         <td rowspan="{{ publishers|length }}">

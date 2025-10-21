@@ -361,12 +361,6 @@ class Edition(models.Model):
         published_str = ", ".join(str_elements)if str_elements else _("Empty edition").format()
         return published_str
 
-    def list_view_str(self):
-        items = Item.objects.filter(edition=self).values_list('short_title', flat=True)
-        works = Work.objects.filter(items__item__edition=self).values_list('title', flat=True)
-        place = self.place if self.place else ''
-        return f'{", ".join(items)}; {", ".join(works)}; {place} {self.get_year_range_str()}'
-
 
     def get_year_range_str(self):
         year_range_str = "{}".format(self.year_start) if self.year_start else ""
