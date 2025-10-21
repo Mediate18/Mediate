@@ -32,7 +32,7 @@ FROM python:${PYTHON_DOCKER_TAG}
 # install dependencies
 RUN echo "deb http://deb.debian.org/debian/ unstable main contrib non-free" > /etc/apt/sources.list
 RUN apt-get update
-RUN apt-get install -y --no-install-recommends gdal-bin libgdal-dev
+RUN apt-get install -y --no-install-recommends default-mysql-client gdal-bin
 
 COPY --from=builder /usr/src/django_app/wheels /wheels
 RUN pip install --no-cache /wheels/*
