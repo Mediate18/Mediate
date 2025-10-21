@@ -134,6 +134,9 @@
                     </ul>
                 </li>
               {% endif %}
+              {% if perms.persons.change_item or perms.global.view_all %}
+                <li class="{% if url_name == 'publishers' %}active{% endif %}"><a href="{% url 'publishers' %}">{% trans "Publishers" %}</a></li>
+              {% endif %}
           </ul>
           <ul class="nav navbar-nav navbar-right">
             {% include 'registration/accounts_menu.html' %}
