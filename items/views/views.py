@@ -1886,7 +1886,11 @@ class PublisherTableView(ListView):
         filter = PublisherFilter(self.request.GET, queryset=self.get_queryset())
         context['filter'] = filter
 
-        publishers = filter.qs.order_by('publisher__short_name', 'publisher__pk', 'edition__year_start')
+        context["sort_order_publisher"] = self.request.GET.get('sort_publisher', 'publisher__short_name')
+        context["sort_order"] = self.request.GET.get('sort', 'edition__year_start')
+
+        publishers = filter.qs.order_by(context["sort_order_publisher"], context["sort_order"])
+
         paginator = Paginator(publishers, 25)
         page_number = self.request.GET.get('page', 1)
         page_object = paginator.get_page(page_number)

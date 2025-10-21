@@ -74,10 +74,61 @@
                 <table class="table table-sortable">
                     <thead >
                         <tr>
-                            <th>Publisher</th>
-                            <th>Date</th>
-                            <th>Work</th>
-                            <th>Item</th>
+                            {% if sort_order_publisher == 'publisher__short_name' %}
+                                <th class="asc orderable">
+                                    <a href="?{% query_transform sort_publisher='-publisher__short_name' %}">Publisher</a>
+                                </th>
+                            {% elif sort_order_publisher == '-publisher__short_name' %}
+                                <th class="desc orderable">
+                                    <a href="?{% query_transform sort_publisher='publisher__short_name' %}">Publisher</a>
+                                </th>
+                            {% else %}
+                                <th class="orderable">
+                                    <a href="?{% query_transform sort_publisher='publisher__short_name' %}">Publisher</a>
+                                </th>
+                            {% endif %}
+
+                            {% if sort_order == 'edition__year_start' %}
+                                <th class="asc orderable">
+                                    <a href="?{% query_transform sort='-edition__year_start' %}">Date</a>
+                                </th>
+                            {% elif sort_order == '-edition__year_start' %}
+                                <th class="desc orderable">
+                                    <a href="?{% query_transform sort='edition__year_start' %}">Date</a>
+                                </th>
+                            {% else %}
+                                <th class="orderable">
+                                    <a href="?{% query_transform sort='edition__year_start' %}">Date</a>
+                                </th>
+                            {% endif %}
+
+                            {% if sort_order == 'edition__items__works__work__title' %}
+                                <th class="asc orderable">
+                                    <a href="?{% query_transform sort='-edition__items__works__work__title' %}">Work</a>
+                                </th>
+                            {% elif sort_order == '-edition__items__works__work__title' %}
+                                <th class="desc orderable">
+                                    <a href="?{% query_transform sort='edition__items__works__work__title' %}">Work</a>
+                                </th>
+                            {% else %}
+                                <th class="orderable">
+                                    <a href="?{% query_transform sort='edition__items__works__work__title' %}">Work</a>
+                                </th>
+                            {% endif %}
+
+                            {% if sort_order == 'edition__items__short_title' %}
+                                <th class="asc orderable">
+                                    <a href="?{% query_transform sort='-edition__items__short_title' %}">Item</a>
+                                </th>
+                            {% elif sort_order == '-edition__items__short_title' %}
+                                <th class="desc orderable">
+                                    <a href="?{% query_transform sort='edition__items__short_title' %}">Item</a>
+                                </th>
+                            {% else %}
+                                <th class="orderable">
+                                    <a href="?{% query_transform sort='edition__items__short_title' %}">Item</a>
+                                </th>
+                            {% endif %}
                             <th></th>
                         </tr>
                     </thead>
