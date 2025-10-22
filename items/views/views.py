@@ -7,6 +7,7 @@ from django.views.decorators.http import require_POST
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.forms import formset_factory
+from django.core.paginator import Paginator
 from django_tables2.config import RequestConfig
 from django_tables2.export.export import TableExport
 
@@ -1875,7 +1876,7 @@ class EditionDeleteView(DeleteView):
 # Publisher views
 class PublisherTableView(ListView):
     model = Publisher
-    template_name = 'generic_list.html'
+    template_name = 'publisher_list.html'
 
     def get_queryset(self):
         return Publisher.objects.all()
@@ -1883,12 +1884,18 @@ class PublisherTableView(ListView):
     def get_context_data(self, **kwargs):
         context = super(PublisherTableView, self).get_context_data(**kwargs)
         filter = PublisherFilter(self.request.GET, queryset=self.get_queryset())
-
-        table = PublisherTable(filter.qs)
-        django_tables2.RequestConfig(self.request, ).configure(table)
-
         context['filter'] = filter
-        context['table'] = table
+
+        context["sort_order_publisher"] = self.request.GET.get('sort_publisher', 'publisher__short_name')
+        context["sort_order"] = self.request.GET.get('sort', 'edition__year_start')
+
+        publishers = filter.qs.order_by(context["sort_order_publisher"], context["sort_order"])
+
+        paginator = Paginator(publishers, 25)
+        page_number = self.request.GET.get('page', 1)
+        page_object = paginator.get_page(page_number)
+        page_object.adjusted_elided_pages = paginator.get_elided_page_range(page_number, on_ends=1)
+        context['objects'] = page_object
 
         context['action'] = _("add")
         context['object_name'] = "publisher"

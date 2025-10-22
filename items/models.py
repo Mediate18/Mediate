@@ -361,6 +361,7 @@ class Edition(models.Model):
         published_str = ", ".join(str_elements)if str_elements else _("Empty edition").format()
         return published_str
 
+
     def get_year_range_str(self):
         year_range_str = "{}".format(self.year_start) if self.year_start else ""
         year_range_str += " - {}".format(self.year_end) if self.year_end else ""

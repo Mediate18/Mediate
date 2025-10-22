@@ -1,0 +1,292 @@
+{% extends "baselayout.html" %}
+{% load i18n %}
+{% load render_table from django_tables2 %}
+{% load static %}
+
+{% load url_filters %}
+
+{% block extracss %}
+<link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" type="text/css" media="screen" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+              <h4 class="panel-title">
+                <a data-toggle="collapse" href="#collapse1">Filter <span class="glyphicon glyphicon-chevron-down"></span></a>
+              </h4>
+            </div>
+            <div id="collapse1" class="panel-collapse collapse">
+              <div class="panel-body">
+                <form action="" method="get">
+                    <table class="table">
+                    {{ filter.form.as_table }}
+                    </table>
+                    <div class="pull-right">
+                        {% if per_page_choices and table %}
+                            <select name="per_page">
+                                {% for per_page in per_page_choices %}
+                                    <option value="{{ per_page }}" {% if per_page == table.paginator.per_page %}selected{% endif %}>{{ per_page }}</option>
+                                {% endfor %}
+                            </select>
+                            results per page {{ current_per_page }}
+                        {% endif %}
+                        <input type="submit" class="btn"/>
+                        <a href='{{ request.path }}' class="btn btn-default">Clear</a>
+                    </div>
+                </form>
+              </div>
+            </div>
+          </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12">
+        <h1>
+            {% if object_name_plural %}
+                {{ object_name_plural|title }}
+            {% else %}
+                {{ object_name|title }}s
+            {% endif %}
+        </h1>
+        {% if info_include %}
+            {% include info_include %}
+            <br/>
+        {% endif %}
+        <div class="pull-right">
+            {% if add_url %}
+                <a href="{{ add_url }}" class="btn btn-default">
+                  <span class="glyphicon glyphicon-plus"></span> New
+                </a>
+            {% endif %}
+        </div>
+        <div class="small">Displaying {{ filter.qs.count }} of {{ filter.queryset.count }}</div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        {% if objects %}
+            <div class="table-container table-responsive">
+                <table class="table table-sortable">
+                    <thead >
+                        <tr>
+                            {% if sort_order_publisher == 'publisher__short_name' %}
+                                <th class="asc orderable">
+                                    <a href="?{% query_transform sort_publisher='-publisher__short_name' %}">Publisher</a>
+                                </th>
+                            {% elif sort_order_publisher == '-publisher__short_name' %}
+                                <th class="desc orderable">
+                                    <a href="?{% query_transform sort_publisher='publisher__short_name' %}">Publisher</a>
+                                </th>
+                            {% else %}
+                                <th class="orderable">
+                                    <a href="?{% query_transform sort_publisher='publisher__short_name' %}">Publisher</a>
+                                </th>
+                            {% endif %}
+
+                            {% if sort_order == 'edition__year_start' %}
+                                <th class="asc orderable">
+                                    <a href="?{% query_transform sort='-edition__year_start' %}">Date</a>
+                                </th>
+                            {% elif sort_order == '-edition__year_start' %}
+                                <th class="desc orderable">
+                                    <a href="?{% query_transform sort='edition__year_start' %}">Date</a>
+                                </th>
+                            {% else %}
+                                <th class="orderable">
+                                    <a href="?{% query_transform sort='edition__year_start' %}">Date</a>
+                                </th>
+                            {% endif %}
+
+                            {% if sort_order == 'edition__items__works__work__title' %}
+                                <th class="asc orderable">
+                                    <a href="?{% query_transform sort='-edition__items__works__work__title' %}">Work</a>
+                                </th>
+                            {% elif sort_order == '-edition__items__works__work__title' %}
+                                <th class="desc orderable">
+                                    <a href="?{% query_transform sort='edition__items__works__work__title' %}">Work</a>
+                                </th>
+                            {% else %}
+                                <th class="orderable">
+                                    <a href="?{% query_transform sort='edition__items__works__work__title' %}">Work</a>
+                                </th>
+                            {% endif %}
+
+                            {% if sort_order == 'edition__items__short_title' %}
+                                <th class="asc orderable">
+                                    <a href="?{% query_transform sort='-edition__items__short_title' %}">Item</a>
+                                </th>
+                            {% elif sort_order == '-edition__items__short_title' %}
+                                <th class="desc orderable">
+                                    <a href="?{% query_transform sort='edition__items__short_title' %}">Item</a>
+                                </th>
+                            {% else %}
+                                <th class="orderable">
+                                    <a href="?{% query_transform sort='edition__items__short_title' %}">Item</a>
+                                </th>
+                            {% endif %}
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% regroup objects by publisher as publisher_set %}
+                        {% for person, publishers in publisher_set %}
+                            {% for publisher in publishers %}
+                                <tr {% if forloop.first %}style="border-top: 2px solid #ddd"{% endif %}>
+                                    {% if forloop.first %}
+                                        <td rowspan="{{ publishers|length }}">
+                                            <a href="{{ person.get_absolute_url }}">{{ person }}</a>
+                                            {% if person.publisher_cerl_id %}
+                                                <br/>
+                                                <a href="http://thesaurus.cerl.org/record/{{ person.publisher_cerl_id }}" target="_blank">
+                                                    <span class="glyphicon glyphicon-new-window"></span> CERL
+                                                </a>
+                                            {% endif %}
+                                            {% if person.viaf_id %}
+                                                <br/>
+                                                <a href="{{ person.viaf_id }}" target="_blank">
+                                                    <span class="glyphicon glyphicon-new-window"></span> VIAF
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
+                                    <td class="text-nowrap">
+                                        {{ publisher.edition.year_start|default:'' }}
+                                        {% if publisher.edition.year_end %}
+                                            - {{ publisher.edition.year_end }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% for item in publisher.edition.items.all %}
+                                            {% for work in item.works.all %}
+                                                <a href="{% url 'work_detail' work.work.pk %}">
+                                                    {{ work.work.title }}
+                                                </a>
+                                                {% if not forloop.last %}<br/>{% endif %}
+                                            {% endfor %}
+                                            {% if not forloop.last %}<br/>{% endif %}
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        {% for item in publisher.edition.items.all %}
+                                            <a href="{% url 'item_detail' item.pk %}">
+                                                {{ item.short_title }}
+                                            </a>
+                                            {% if not forloop.last %}<br/>{% endif %}
+                                        {% endfor %}
+                                    </td>
+                                    {% if forloop.first %}
+                                        <td rowspan="{{ publishers|length }}">
+                                            <div class="text-nowrap">
+                                                <a href="{% url 'publisher_detail' publisher.pk %}">
+                                                    <span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-original-title="View"></span>
+                                                </a>
+                                                <a href="{% url 'change_publisher' publisher.pk %}">
+                                                    <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-original-title="Change"></span>
+                                                    </a>
+                                                <a class="delete-entry" href="" data-toggle="modal" data-target="#deleteModal" modal_url="{% url 'change_publisher' publisher.pk %}">
+                                                    <span class="glyphicon glyphicon-remove" data-toggle="tooltip" data-original-title="Delete"></span>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <nav aria-label="Table navigation">
+                    <ul class="pagination">
+                        {% if objects.has_previous %}
+                            <li class="previous">
+                                <a href="?{% query_transform page=objects.previous_page_number %}">
+                                    <span aria-hidden="true">«</span>
+                                    previous
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% for page_number in objects.adjusted_elided_pages %}
+                            <li class="{% if page_number == objects.number %}active{% endif %}">
+                                {% if page_number == objects.paginator.ELLIPSIS %}
+                                    <a href="#">
+                                        {{ page_number }}
+                                    </a>
+                                {% else %}
+                                    <a href="?{% query_transform page=page_number %}">
+                                        {{ page_number }}
+                                    </a>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                        {% if objects.has_next %}
+                        <li class="next">
+                            <a href="?{% query_transform page=objects.next_page_number %}">
+                                next
+                                <span aria-hidden="true">»</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        {% else %}
+            <div>No {{ object_name}}s.</div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div id="deleteModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-warning-sign"></span> {% trans "Warning" %}</h4>
+      </div>
+      <div class="modal-body">
+        <p>{% trans "Are you sure you want to delete this entry?" %}</p>
+      </div>
+      <div class="modal-footer">
+        <!-- Since the confirmation is done in this modal, the deletion is done using a POST.
+        A GET would trigger a confirm page. -->
+        <form id="delete-form" method="POST" action="">
+           {% csrf_token %}
+        </form>
+        <a class="btn btn-danger" href="" id="delete-link"
+               onclick="document.getElementById('delete-form').submit(); return false;">{% trans "Yes" %}</a>
+        <button type="button" class="btn btn-success" data-dismiss="modal">{% trans "No" %}</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+{% block abstracts %}
+{% endblock %}
+
+{% endblock %}
+
+{% block extrajs %}
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.full.js"></script>
+<script>
+$(document).ready(function(){
+    $('.delete-entry').on('click', function() {
+        var url = $(this).attr('modal_url');
+        $('#delete-form').attr('action', url);
+        $('#delete-link').attr('href', url);
+    });
+
+    $('[data-toggle="tooltip"]').tooltip({
+        placement : 'bottom'
+    });
+});
+</script>
+{% endblock %}

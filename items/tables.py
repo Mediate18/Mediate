@@ -616,21 +616,6 @@ class EditionRankingTable(EditionTable):
         return next(self.row_index)
 
 
-# Publisher table
-class PublisherTable(tables.Table):
-    uuid = ActionColumn('publisher_detail', 'change_publisher', 'delete_publisher', orderable=False)
-    publisher = tables.RelatedLinkColumn()
-    edition = tables.RelatedLinkColumn()
-
-    class Meta:
-        model = Publisher
-        attrs = {'class': 'table table-sortable'}
-        sequence = [
-            'publisher',
-            'edition',
-        ]
-
-
 # Subject table
 class SubjectTable(tables.Table):
     uuid = ActionColumn('subject_detail', 'change_subject', 'delete_subject', orderable=False)
