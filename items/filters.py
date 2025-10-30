@@ -899,7 +899,14 @@ class EditionRankingFilter(EditionFilter):
 # Publisher filter
 class PublisherFilter(django_filters.FilterSet):
     publisher = django_filters.Filter(field_name='publisher__short_name', lookup_expr='icontains')
-    edition = django_filters.Filter(field_name='edition__item__short_title', lookup_expr='icontains')
+    publisher_gender = django_filters.MultipleChoiceFilter(
+        label='Publisher gender',
+        choices=Person.SEX_CHOICES,
+        widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
+        method='publisher_sex_filter'
+    )
+    edition = django_filters.Filter(field_name='edition__item__short_title', lookup_expr='icontains',
+                                    label="Edition short title contains")
     edition__place = django_filters.ModelMultipleChoiceFilter(
         queryset=Place.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},)
@@ -907,7 +914,12 @@ class PublisherFilter(django_filters.FilterSet):
 
     class Meta:
         model = Publisher
-        exclude = ['uuid']
+        fields = ["publisher", "publisher_gender", "edition", "edition__place"]
+
+    def publisher_sex_filter(self, queryset, name, value):
+        if value:
+            return queryset.filter(publisher__sex__in=value).distinct()
+        return queryset
 
 
 # Subject filter
