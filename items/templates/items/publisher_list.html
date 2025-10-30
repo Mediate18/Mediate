@@ -129,6 +129,7 @@
                                     <a href="?{% query_transform sort='edition__items__short_title' %}">Item</a>
                                 </th>
                             {% endif %}
+                            <th>Collection</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -175,6 +176,14 @@
                                         {% for item in publisher.edition.items.all %}
                                             <a href="{% url 'item_detail' item.pk %}">
                                                 {{ item.short_title }}
+                                            </a>
+                                            {% if not forloop.last %}<br/>{% endif %}
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        {% for item in publisher.edition.items.all %}
+                                            <a href="{% url 'collection_detail' item.lot.collection_id %}">
+                                                {{ item.lot.collection }}
                                             </a>
                                             {% if not forloop.last %}<br/>{% endif %}
                                         {% endfor %}
