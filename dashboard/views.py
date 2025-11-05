@@ -90,6 +90,7 @@ def view_totals(request):
     items_with_place_of_publication = Item.objects.filter(lot__collection__in=collections,
                                                           edition__publicationplace__place__isnull=False,
                                                           non_book=False).distinct().count()
+    items_with_publisher = Item.objects.filter(edition__publisher__isnull=False).distinct().count()
 
     persons_with_place_of_birth = Person.objects.filter(city_of_birth__isnull=False).distinct().count()
     persons_with_place_of_death = Person.objects.filter(city_of_death__isnull=False).distinct().count()
@@ -121,6 +122,8 @@ def view_totals(request):
         'percentage_items_with_date': round(100 * items_with_date/book_items),
         'items_with_place_of_publication': items_with_place_of_publication,
         'percentage_items_with_place_of_publication': round(100 * items_with_place_of_publication/book_items),
+        'items_with_publisher': items_with_publisher,
+        'percentage_items_with_publisher': round(100 * items_with_publisher/book_items),
 
         'persons_with_place_of_birth': persons_with_place_of_birth,
         'percentage_persons_with_place_of_birth': round(100 * persons_with_place_of_birth / persons),

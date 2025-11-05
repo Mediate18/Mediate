@@ -166,6 +166,20 @@
                 </tr>
                 {% endif %}
 
+                {% if items_with_publisher %}
+                <tr>
+                    <td>
+                        {{ items_with_publisher }}
+                    </td>
+                    <td>
+                        Items with <a href="{% url 'publishers' %}">publisher</a>
+                        {% if percentage_items_with_publisher %}
+                            ({{percentage_items_with_publisher}}% of total number of book Items)
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+
                 {% if persons_with_place_of_birth %}
                 <tr>
                     <td>
