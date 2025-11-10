@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'request',
     'bootstrap3',
     'rest_framework',
     'guardian',
@@ -87,6 +88,7 @@ MIDDLEWARE = [
     'maintenance_mode.middleware.MaintenanceModeMiddleware',
     'django.middleware.cache.FetchFromCacheMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
+    'request.middleware.RequestMiddleware',
 ]
 
 ROOT_URLCONF = 'mediate.urls'
@@ -334,3 +336,12 @@ UNCOUNTABLE_BOOK_ITEMS_MESSAGE = _("The book item count includes books, pamphlet
 # Person Work correlation
 MINIMAL_ITEMS_PER_PERSON = 21
 PERSON_ITEM_ROLES = ['author', 'editor', 'translator']
+
+REQUEST_TRAFFIC_MODULES = (
+    'request.traffic.UniqueVisitor',
+    'request.traffic.UniqueVisit',
+    'request.traffic.Hit',
+    'request.traffic.Search',
+    'request.traffic.User',
+    'request.traffic.UniqueUser'
+)
