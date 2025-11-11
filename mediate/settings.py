@@ -88,6 +88,7 @@ MIDDLEWARE = [
     'maintenance_mode.middleware.MaintenanceModeMiddleware',
     'django.middleware.cache.FetchFromCacheMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
+    'mediate.middleware.SetRemoteAddrMiddleware',
     'request.middleware.RequestMiddleware',
 ]
 
