@@ -103,7 +103,7 @@ router.register(r'shelfmark', ShelfmarkViewSet)
 
 
 urlpatterns = [
-    path(r'', RedirectView.as_view(url='dashboard/'), name='home'),
+    path(r'', RedirectView.as_view(url='about/'), name='home'),
     path('about/', TemplateView.as_view(template_name="about.html"), name='about'),
     path(settings.ADMIN_URL_NAME+'/', admin.site.urls),
     path('accounts/register/', RegistrationView.as_view(form_class=CustomRegistrationForm),
