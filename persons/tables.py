@@ -1,28 +1,16 @@
 import django_tables2 as tables
-from django_tables2.utils import A  # alias for Accessor
 from django.utils.html import format_html, format_html_join
-from django.utils.safestring import mark_safe
 from django.db.models import Q
 import itertools
 
 from .models import *
-from mediate.tools import round_to_n
-from mediate.columns import ActionColumn, render_action_column
-from catalogues.models import PersonCollectionRelation, Collection, CollectionPlaceRelation
-from items.models import PersonItemRelation, Edition
+from mediate.tools import round_to_n, UUIDRenderMixin
+from catalogues.models import CollectionPlaceRelation
+from items.models import Edition
 from apiconnectors.cerlapi import cerl_record_url
 from django.utils.translation import gettext_lazy as _
 
 from collections import defaultdict
-
-
-class UUIDRenderMixin:
-    def render_uuid(self, record, value):
-        model_name = self._meta.model.__name__.lower()
-        url_name_change = f'change_{model_name}' if self.request.user.has_perm(f'persons.change_{model_name}') else None
-        url_name_delete = f'delete_{model_name}' if self.request.user.has_perm(f'persons.delete_{model_name}') else None
-        return render_action_column(value, f'{model_name}_detail', url_name_change, url_name_delete)
-
 
 
 # Person table

@@ -61,7 +61,7 @@
                   <span class="glyphicon glyphicon-plus"></span> New
                 </a>
             {% endif %}
-            {% if batch_edit_options %}
+            {% if batch_edit_options and perms.global.view_all %}
                 {% if batch_edit_options|length > 1 %}
                     <span class="dropdown">
                       <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">

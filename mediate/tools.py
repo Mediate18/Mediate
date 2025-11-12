@@ -3,6 +3,8 @@ from django.db.models import Q, Func, Count
 import re
 from math import log10, floor
 
+from mediate.columns import render_action_column
+
 
 def normalize_query(query_string,
     findterms=re.compile(r'"([^"]+)"|(\S+)').findall,
@@ -145,3 +147,18 @@ def date_of_x_text_to_int(text):
 
 def round_to_n(value, n):
     return round(value, -int(floor(log10(value))) + (n - 1))
+
+
+class UUIDRenderMixin:
+    """
+    Mixin to add the **render_uuid** method for rendering the UUID column in tables in ListViews.
+    It uses the name of the model in Meta.
+    It needs the following class member set:
+
+    `uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)`
+    """
+    def render_uuid(self, record, value):
+        model_name = self._meta.model.__name__.lower()
+        url_name_change = f'change_{model_name}' if self.request.user.has_perm(f'persons.change_{model_name}') else None
+        url_name_delete = f'delete_{model_name}' if self.request.user.has_perm(f'persons.delete_{model_name}') else None
+        return render_action_column(value, f'{model_name}_detail', url_name_change, url_name_delete)

@@ -10,11 +10,12 @@ from .models import *
 from tagme.models import Tag
 
 from mediate.columns import ActionColumn, render_action_column, AddInfoLinkMixin
+from mediate.tools import UUIDRenderMixin
 
 
 # BookFormat table
-class BookFormatTable(tables.Table):
-    uuid = ActionColumn('bookformat_detail', 'change_bookformat', 'delete_bookformat', orderable=False)
+class BookFormatTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = BookFormat
@@ -371,8 +372,8 @@ class ItemTagRankingTable(tables.Table):
 
 
 # ItemAuthor table
-class ItemAuthorTable(tables.Table):
-    uuid = ActionColumn('itemauthor_detail', 'change_itemauthor', 'delete_itemauthor', orderable=False)
+class ItemAuthorTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = ItemAuthor
@@ -385,9 +386,8 @@ class ItemAuthorTable(tables.Table):
 
 
 # ItemItemTypeRelation table
-class ItemItemTypeRelationTable(tables.Table):
-    uuid = ActionColumn('itemitemtyperelation_detail', 'change_itemitemtyperelation', 'delete_itemitemtyperelation',
-                        orderable=False)
+class ItemItemTypeRelationTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = ItemItemTypeRelation
@@ -400,9 +400,8 @@ class ItemItemTypeRelationTable(tables.Table):
 
 
 # ItemLanguageRelation table
-class ItemLanguageRelationTable(tables.Table):
-    uuid = ActionColumn('itemlanguagerelation_detail', 'change_itemlanguagerelation', 'delete_itemlanguagerelation',
-                        orderable=False)
+class ItemLanguageRelationTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = ItemLanguageRelation
@@ -415,9 +414,8 @@ class ItemLanguageRelationTable(tables.Table):
 
 
 # ItemMaterialDetailsRelation table
-class ItemMaterialDetailsRelationTable(tables.Table):
-    uuid = ActionColumn('itemmaterialdetailsrelation_detail', 'change_itemmaterialdetailsrelation',
-                        'delete_itemmaterialdetailsrelation', orderable=False)
+class ItemMaterialDetailsRelationTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = ItemMaterialDetailsRelation
@@ -430,8 +428,8 @@ class ItemMaterialDetailsRelationTable(tables.Table):
 
 
 # ItemType table
-class ItemTypeTable(tables.Table):
-    uuid = ActionColumn('itemtype_detail', 'change_itemtype', 'delete_itemtype', orderable=False)
+class ItemTypeTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = ItemType
@@ -443,9 +441,8 @@ class ItemTypeTable(tables.Table):
 
 
 # ItemWorkRelation table
-class ItemWorkRelationTable(tables.Table):
-    uuid = ActionColumn('itemworkrelation_detail', 'change_itemworkrelation', 'delete_itemworkrelation',
-                        orderable=False)
+class ItemWorkRelationTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = ItemWorkRelation
@@ -458,11 +455,10 @@ class ItemWorkRelationTable(tables.Table):
 
 
 # Language table
-class LanguageTable(tables.Table):
+class LanguageTable(UUIDRenderMixin, tables.Table):
     row_index = tables.Column(empty_values=(), orderable=False, verbose_name="")
     item_count = tables.Column(empty_values=(), verbose_name=_("# items"))
-    uuid = ActionColumn('language_detail', 'change_language', 'delete_language',
-                        orderable=False)
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = Language
@@ -489,9 +485,8 @@ class LanguageTable(tables.Table):
 
 
 # MaterialDetails table
-class MaterialDetailsTable(tables.Table):
-    uuid = ActionColumn('materialdetails_detail', 'change_materialdetails', 'delete_materialdetails',
-                        orderable=False)
+class MaterialDetailsTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = MaterialDetails
@@ -503,9 +498,8 @@ class MaterialDetailsTable(tables.Table):
 
 
 # PersonItemRelation table
-class PersonItemRelationTable(tables.Table):
-    uuid = ActionColumn('personitemrelation_detail', 'change_personitemrelation',
-                        'delete_personitemrelation', orderable=False)
+class PersonItemRelationTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = PersonItemRelation
@@ -518,9 +512,8 @@ class PersonItemRelationTable(tables.Table):
 
 
 # PersonItemRelationRole table
-class PersonItemRelationRoleTable(tables.Table):
-    uuid = ActionColumn('personitemrelationrole_detail', 'change_personitemrelationrole',
-                        'delete_personitemrelationrole', orderable=False)
+class PersonItemRelationRoleTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = PersonItemRelationRole
@@ -532,8 +525,8 @@ class PersonItemRelationRoleTable(tables.Table):
 
 
 # Edition table
-class EditionTable(tables.Table):
-    uuid = ActionColumn('edition_detail', 'change_edition', 'delete_edition', orderable=False)
+class EditionTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
     checkbox = tables.CheckBoxColumn(empty_values=(), orderable=False,
                                      attrs={'th__input': {'id': 'checkbox_column', 'title': 'Select/deselect all'}})
     items = tables.Column(empty_values=(), verbose_name=_("Items"))
@@ -617,8 +610,8 @@ class EditionRankingTable(EditionTable):
 
 
 # Subject table
-class SubjectTable(tables.Table):
-    uuid = ActionColumn('subject_detail', 'change_subject', 'delete_subject', orderable=False)
+class SubjectTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = Subject
@@ -630,7 +623,7 @@ class SubjectTable(tables.Table):
 
 
 # Work table
-class WorkTable(tables.Table):
+class WorkTable(UUIDRenderMixin, tables.Table):
     uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
     parisian_category = tables.Column(empty_values=(), verbose_name=_("Parisian category"), orderable=False)
     checkbox = tables.CheckBoxColumn(empty_values=(), orderable=False,
@@ -646,12 +639,6 @@ class WorkTable(tables.Table):
             'parisian_category',
             'uuid'
         ]
-
-    def render_uuid(self, record, value):
-        url_name_change = 'change_work' if self.request.user.has_perm('items.change_work') else None
-        url_name_delete = 'delete_work' if self.request.user.has_perm('items.delete_work') else None
-
-        return render_action_column(value, 'work_detail', url_name_change, url_name_delete)
 
     def render_parisian_category(self, record, value):
         parisian_categories = ParisianCategory.objects.filter(item__works__work=record)\
@@ -702,8 +689,8 @@ class WorkRankingTable(WorkTable):
 
 
 # WorkAuthor table
-class WorkAuthorTable(tables.Table):
-    uuid = ActionColumn('workauthor_detail', 'change_workauthor', 'delete_workauthor', orderable=False)
+class WorkAuthorTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = WorkAuthor
@@ -716,8 +703,8 @@ class WorkAuthorTable(tables.Table):
 
 
 # WorkSubject table
-class WorkSubjectTable(tables.Table):
-    uuid = ActionColumn('worksubject_detail', 'change_worksubject', 'delete_worksubject', orderable=False)
+class WorkSubjectTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = WorkSubject

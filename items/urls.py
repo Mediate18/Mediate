@@ -9,8 +9,8 @@ urlpatterns = [
     path(r'', RedirectView.as_view(url='items/')),
 
     # BookFormat urls
-    path('bookformats/', permission_required('global.view_all')(BookFormatTableView.as_view()), name='bookformats'),
-    path(r'bookformats/<uuid:pk>', permission_required('global.view_all')(BookFormatDetailView.as_view()),
+    path('bookformats/', BookFormatTableView.as_view(), name='bookformats'),
+    path(r'bookformats/<uuid:pk>', BookFormatDetailView.as_view(),
        name="bookformat_detail"),
     path(r'bookformats/add', permission_required('items.add_bookformat')(BookFormatCreateView.as_view()),
        name="add_bookformat"),
@@ -22,15 +22,15 @@ urlpatterns = [
        name="delete_bookformat"),
 
     # Item urls
-    path('items/', permission_required('global.view_all')(ItemTableView.as_view()), name='items'),
-    path(r'items/<uuid:pk>', permission_required('global.view_all')(ItemDetailView.as_view()), name="item_detail"),
+    path('items/', ItemTableView.as_view(), name='items'),
+    path(r'items/<uuid:pk>', ItemDetailView.as_view(), name="item_detail"),
     path(r'items/add', permission_required('items.add_item')(ItemAndEditionCreateView.as_view()),
        name="add_item"),
     path(r'items/edit/<uuid:pk>', permission_required('items.change_item')(ItemAndEditionUpdateView.as_view()),
        name="change_item"),
     path(r'items/delete/<uuid:pk>', permission_required('items.delete_item')(ItemDeleteView.as_view()),
        name="delete_item"),
-    path('items/map', permission_required('global.view_all')(ItemLocationMapView.as_view()), name='itemsmap'),
+    path('items/map', ItemLocationMapView.as_view(), name='itemsmap'),
     path('items/set_bookformat', permission_required('items.change_item')(set_bookformat_for_items),
          name='set_bookformat'),
     path('items/add_language_to_items', permission_required('items.add_itemlanguagerelation')(add_language_to_items),
@@ -54,18 +54,18 @@ urlpatterns = [
          permission_required('items.change_edition')(set_stated_place_of_publication_to_items),
          name='set_stated_place_of_publication_to_items'),
 
-    path('items/item_suggest', permission_required('global.view_all')(ItemSuggest.as_view()), name='item_suggest'),
+    path('items/item_suggest', ItemSuggest.as_view(), name='item_suggest'),
 
     # Tagged Item urls
     path('taggeditems/', login_required(TaggedItemTableView.as_view()), name='taggeditems'),
 
     # TagRanking urls
-    path(r'tags/rank', permission_required('global.view_all')(ItemTagRankingTableView.as_view()),
+    path(r'tags/rank', ItemTagRankingTableView.as_view(),
          name='tags_ranking'),
 
     # ItemAuthor urls
-    path('itemauthors/', permission_required('global.view_all')(ItemAuthorTableView.as_view()), name='itemauthors'),
-    path(r'itemauthors/<uuid:pk>', permission_required('global.view_all')(ItemAuthorDetailView.as_view()),
+    path('itemauthors/', ItemAuthorTableView.as_view(), name='itemauthors'),
+    path(r'itemauthors/<uuid:pk>', ItemAuthorDetailView.as_view(),
        name="itemauthor_detail"),
     path(r'itemauthors/add', permission_required('items.add_itemauthor')(ItemAuthorCreateView.as_view()),
        name="add_itemauthor"),
@@ -77,9 +77,9 @@ urlpatterns = [
        name="delete_itemauthor"),
 
     # ItemItemTypeRelation urls
-    path('itemitemtyperelations/', permission_required('global.view_all')(ItemItemTypeRelationTableView.as_view()),
+    path('itemitemtyperelations/', ItemItemTypeRelationTableView.as_view(),
        name='itemitemtyperelations'),
-    path(r'itemitemtyperelations/<uuid:pk>', permission_required('global.view_all')(ItemItemTypeRelationDetailView.as_view()),
+    path(r'itemitemtyperelations/<uuid:pk>', ItemItemTypeRelationDetailView.as_view(),
        name="itemitemtyperelation_detail"),
     path(r'itemitemtyperelations/add',
        permission_required('items.add_itemitemtyperelation')(ItemItemTypeRelationCreateView.as_view()),
@@ -94,9 +94,9 @@ urlpatterns = [
        name="delete_itemitemtyperelation"),
 
     # ItemLanguageRelation urls
-    path('itemlanguagerelations/', permission_required('global.view_all')(ItemLanguageRelationTableView.as_view()),
+    path('itemlanguagerelations/', ItemLanguageRelationTableView.as_view(),
        name='itemlanguagerelations'),
-    path(r'itemlanguagerelations/<uuid:pk>', permission_required('global.view_all')(ItemLanguageRelationDetailView.as_view()),
+    path(r'itemlanguagerelations/<uuid:pk>', ItemLanguageRelationDetailView.as_view(),
        name="itemlanguagerelation_detail"),
     path(r'itemlanguagerelations/add',
        permission_required('items.add_itemlanguagerelation')(ItemLanguageRelationCreateView.as_view()),
@@ -111,10 +111,10 @@ urlpatterns = [
        name="delete_itemlanguagerelation"),
 
     # ItemMaterialDetailsRelation urls
-    path('itemmaterialdetailsrelations/', permission_required('global.view_all')(ItemMaterialDetailsRelationTableView.as_view()),
+    path('itemmaterialdetailsrelations/', ItemMaterialDetailsRelationTableView.as_view(),
        name='itemmaterialdetailsrelations'),
     path(r'itemmaterialdetailsrelations/<uuid:pk>',
-       permission_required('global.view_all')(ItemMaterialDetailsRelationDetailView.as_view()),
+       ItemMaterialDetailsRelationDetailView.as_view(),
        name="itemmaterialdetailsrelation_detail"),
     path(r'itemmaterialdetailsrelations/add',
        permission_required('items.add_itemmaterialdetailsrelation')(
@@ -130,8 +130,8 @@ urlpatterns = [
        name="delete_itemmaterialdetailsrelation"),
 
     # ItemType urls
-    path('itemtypes/', permission_required('global.view_all')(ItemTypeTableView.as_view()), name='itemtypes'),
-    path(r'itemtypes/<uuid:pk>', permission_required('global.view_all')(ItemTypeDetailView.as_view()), name="itemtype_detail"),
+    path('itemtypes/', ItemTypeTableView.as_view(), name='itemtypes'),
+    path(r'itemtypes/<uuid:pk>', ItemTypeDetailView.as_view(), name="itemtype_detail"),
     path(r'itemtypes/add', permission_required('items.add_itemtype')(ItemTypeCreateView.as_view()),
        name="add_itemtype"),
     path(r'itemtypes/edit/<uuid:pk>',
@@ -142,9 +142,9 @@ urlpatterns = [
        name="delete_itemtype"),
 
     # ItemWorkRelation urls
-    path('itemworkrelations/', permission_required('global.view_all')(ItemWorkRelationTableView.as_view()),
+    path('itemworkrelations/', ItemWorkRelationTableView.as_view(),
        name='itemworkrelations'),
-    path(r'itemworkrelations/<uuid:pk>', permission_required('global.view_all')(ItemWorkRelationDetailView.as_view()),
+    path(r'itemworkrelations/<uuid:pk>', ItemWorkRelationDetailView.as_view(),
        name="itemworkrelation_detail"),
     path(r'itemworkrelations/add',
        permission_required('items.add_itemworkrelation')(ItemWorkRelationCreateView.as_view()),
@@ -162,8 +162,8 @@ urlpatterns = [
          name="add_workstoitem"),
 
     # Language urls
-    path('languages/', permission_required('global.view_all')(LanguageTableView.as_view()), name='languages'),
-    path(r'languages/<uuid:pk>', permission_required('global.view_all')(LanguageDetailView.as_view()), name="language_detail"),
+    path('languages/', LanguageTableView.as_view(), name='languages'),
+    path(r'languages/<uuid:pk>', LanguageDetailView.as_view(), name="language_detail"),
     path(r'languages/add', permission_required('items.add_language')(LanguageCreateView.as_view()),
        name="add_language"),
     path(r'languages/edit/<uuid:pk>',
@@ -174,9 +174,9 @@ urlpatterns = [
        name="delete_language"),
 
     # MaterialDetails urls
-    path('materialdetails/', permission_required('global.view_all')(MaterialDetailsTableView.as_view()),
+    path('materialdetails/', MaterialDetailsTableView.as_view(),
        name='materialdetails'),
-    path(r'materialdetails/<uuid:pk>', permission_required('global.view_all')(MaterialDetailsDetailView.as_view()),
+    path(r'materialdetails/<uuid:pk>', MaterialDetailsDetailView.as_view(),
        name="materialdetails_detail"),
     path(r'materialdetails/add',
        permission_required('items.add_materialdetails')(MaterialDetailsCreateView.as_view()),
@@ -189,9 +189,9 @@ urlpatterns = [
        name="delete_materialdetails"),
 
     # PersonItemRelation urls
-    path('personitemrelations/', permission_required('global.view_all')(PersonItemRelationTableView.as_view()),
+    path('personitemrelations/', PersonItemRelationTableView.as_view(),
        name='personitemrelations'),
-    path(r'personitemrelations/<uuid:pk>', permission_required('global.view_all')(PersonItemRelationDetailView.as_view()),
+    path(r'personitemrelations/<uuid:pk>', PersonItemRelationDetailView.as_view(),
        name="personitemrelation_detail"),
     path(r'personitemrelations/add',
        permission_required('items.add_personitemrelation')(PersonItemRelationCreateView.as_view()),
@@ -214,9 +214,9 @@ urlpatterns = [
          name="add_persontoitems"),
 
     # PersonItemRelationRole urls
-    path('personitemrelationroles/', permission_required('global.view_all')(PersonItemRelationRoleTableView.as_view()),
+    path('personitemrelationroles/', PersonItemRelationRoleTableView.as_view(),
        name='personitemrelationroles'),
-    path(r'personitemrelationroles/<uuid:pk>', permission_required('global.view_all')(PersonItemRelationRoleDetailView.as_view()),
+    path(r'personitemrelationroles/<uuid:pk>', PersonItemRelationRoleDetailView.as_view(),
        name="personitemrelationrole_detail"),
     path(r'personitemrelationroles/add', permission_required('items.add_personitemrelationrole')(
       PersonItemRelationRoleCreateView.as_view()),
@@ -230,12 +230,12 @@ urlpatterns = [
            PersonItemRelationRoleDeleteView.as_view()),
        name="delete_personitemrelationrole"),
 
-    path(r'personroleautoresponse', permission_required('global.view_all')(PersonAndRoleAutocompleteView.as_view()),
+    path(r'personroleautoresponse', PersonAndRoleAutocompleteView.as_view(),
          name='personroleautoresponse'),
 
     # Edition urls
-    path('editions/', permission_required('global.view_all')(EditionTableView.as_view()), name='editions'),
-    path(r'editions/<uuid:pk>', permission_required('global.view_all')(EditionDetailView.as_view()),
+    path('editions/', EditionTableView.as_view(), name='editions'),
+    path(r'editions/<uuid:pk>', EditionDetailView.as_view(),
          name="edition_detail"),
     path(r'editions/add',
          permission_required('items.add_edition')(ItemAndEditionCreateView.as_view()),
@@ -256,12 +256,12 @@ urlpatterns = [
          name="set_publisher_for_editions"),
 
     # EditionRanking urls
-    path(r'editions/rank', permission_required('global.view_all')(EditionRankingTableView.as_view()),
+    path(r'editions/rank', EditionRankingTableView.as_view(),
          name='editions_ranking'),
 
     # Publisher urls
-    path('publishers/', permission_required('global.view_all')(PublisherTableView.as_view()), name='publishers'),
-    path(r'publishers/<uuid:pk>', permission_required('global.view_all')(PublisherDetailView.as_view()), name="publisher_detail"),
+    path('publishers/', PublisherTableView.as_view(), name='publishers'),
+    path(r'publishers/<uuid:pk>', PublisherDetailView.as_view(), name="publisher_detail"),
     path(r'publishers/add', permission_required('items.add_publisher')(PublisherCreateView.as_view()),
        name="add_publisher"),
     path(r'publishers/edit/<uuid:pk>',
@@ -272,8 +272,8 @@ urlpatterns = [
        name="delete_publisher"),
 
     # Subject urls
-    path('subjects/', permission_required('global.view_all')(SubjectTableView.as_view()), name='subjects'),
-    path(r'subjects/<uuid:pk>', permission_required('global.view_all')(SubjectDetailView.as_view()), name="subject_detail"),
+    path('subjects/', SubjectTableView.as_view(), name='subjects'),
+    path(r'subjects/<uuid:pk>', SubjectDetailView.as_view(), name="subject_detail"),
     path(r'subjects/add', permission_required('items.add_subject')(SubjectCreateView.as_view()),
        name="add_subject"),
     path(r'subjects/edit/<uuid:pk>',
@@ -284,8 +284,8 @@ urlpatterns = [
        name="delete_subject"),
 
     # Work urls
-    path('works/', permission_required('global.view_all')(WorkTableView.as_view()), name='works'),
-    path(r'works/<uuid:pk>', permission_required('global.view_all')(WorkDetailView.as_view()), name="work_detail"),
+    path('works/', WorkTableView.as_view(), name='works'),
+    path(r'works/<uuid:pk>', WorkDetailView.as_view(), name="work_detail"),
     path(r'works/add', permission_required('items.add_work')(WorkCreateView.as_view()),
        name="add_work"),
     path(r'works/edit/<uuid:pk>', permission_required('items.change_work')(WorkUpdateView.as_view()),
@@ -297,12 +297,12 @@ urlpatterns = [
          name='add_parisiancategories_to_items_of_works'),
     
     # WorkRanking urls
-    path(r'works/rank', permission_required('global.view_all')(WorkRankingTableView.as_view()),
+    path(r'works/rank', WorkRankingTableView.as_view(),
          name='works_ranking'),
 
     # WorkAuthor urls
-    path('workauthors/', permission_required('global.view_all')(WorkAuthorTableView.as_view()), name='workauthors'),
-    path(r'workauthors/<uuid:pk>', permission_required('global.view_all')(WorkAuthorDetailView.as_view()),
+    path('workauthors/', WorkAuthorTableView.as_view(), name='workauthors'),
+    path(r'workauthors/<uuid:pk>', WorkAuthorDetailView.as_view(),
        name="workauthor_detail"),
     path(r'workauthors/add', permission_required('items.add_workauthor')(WorkAuthorCreateView.as_view()),
        name="add_workauthor"),
@@ -314,8 +314,8 @@ urlpatterns = [
        name="delete_workauthor"),
 
     # WorkSubject urls
-    path('worksubjects/', permission_required('global.view_all')(WorkSubjectTableView.as_view()), name='worksubjects'),
-    path(r'worksubjects/<uuid:pk>', permission_required('global.view_all')(WorkSubjectDetailView.as_view()),
+    path('worksubjects/', WorkSubjectTableView.as_view(), name='worksubjects'),
+    path(r'worksubjects/<uuid:pk>', WorkSubjectDetailView.as_view(),
        name="worksubject_detail"),
     path(r'worksubjects/add',
        permission_required('items.add_worksubject')(WorkSubjectCreateView.as_view()),

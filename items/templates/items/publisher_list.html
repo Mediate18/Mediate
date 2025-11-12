@@ -58,7 +58,7 @@
             <br/>
         {% endif %}
         <div class="pull-right">
-            {% if add_url %}
+            {% if add_url and perms.global.view_all %}
                 <a href="{{ add_url }}" class="btn btn-default">
                   <span class="glyphicon glyphicon-plus"></span> New
                 </a>
@@ -194,12 +194,14 @@
                                                 <a href="{% url 'publisher_detail' publisher.pk %}">
                                                     <span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-original-title="View"></span>
                                                 </a>
+                                                {% if perms.global.view_all %}
                                                 <a href="{% url 'change_publisher' publisher.pk %}">
                                                     <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-original-title="Change"></span>
                                                     </a>
                                                 <a class="delete-entry" href="" data-toggle="modal" data-target="#deleteModal" modal_url="{% url 'change_publisher' publisher.pk %}">
                                                     <span class="glyphicon glyphicon-remove" data-toggle="tooltip" data-original-title="Delete"></span>
                                                 </a>
+                                                {% endif %}
                                             </div>
                                         </td>
                                     {% endif %}
