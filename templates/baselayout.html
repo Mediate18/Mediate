@@ -95,7 +95,6 @@
                         <li><a href="https://heurist.huma-num.fr/heurist/?db=radboud_BIBLIO&website&id=890&pageid=884">{% trans "BIBLIO database" %}</a></li>
                     </ul>
                 </li>
-              {% if perms.persons.change_person or perms.global.view_all %}
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Persons" %} <span class="caret"></span></a>
                     <ul class="dropdown-menu">
@@ -105,8 +104,6 @@
                         <li><a href="{% url 'personworkcorrelation' %}">{% trans "Show correlations" %}</a></li>
                     </ul>
                 </li>
-              {% endif %}
-              {% if perms.persons.change_place or perms.global.view_all %}
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Places" %} <span class="caret"></span></a>
                     <ul class="dropdown-menu">
@@ -115,17 +112,9 @@
                         <li><a href="{% url 'countries_ranking' %}">{% trans "Rank countries by item count" %}</a></li>
                     </ul>
                 </li>
-              {% endif %}
-              {% if perms.persons.change_collection or perms.global.view_all %}
                 <li class="{% if url_name == 'catalogues' %}active{% endif %}"><a href="{% url 'catalogues' %}">{% trans "Catalogues" %}</a></li>
-              {% endif %}
-              {% if perms.persons.change_collection or perms.global.view_all %}
                 <li class="{% if url_name == 'collections' %}active{% endif %}"><a href="{% url 'collections' %}">{% trans "Collections" %}</a></li>
-              {% endif %}
-              {% if perms.persons.change_item or perms.global.view_all %}
                 <li class="{% if url_name == 'items' %}active{% endif %}"><a href="{% url 'items' %}">{% trans "Items" %}</a></li>
-              {% endif %}
-              {% if perms.persons.change_work or perms.global.view_all %}
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Works" %} <span class="caret"></span></a>
                     <ul class="dropdown-menu">
@@ -133,10 +122,7 @@
                         <li><a href="{% url 'works_ranking' %}">{% trans "Rank by item count" %}</a></li>
                     </ul>
                 </li>
-              {% endif %}
-              {% if perms.persons.change_item or perms.global.view_all %}
                 <li class="{% if url_name == 'publishers' %}active{% endif %}"><a href="{% url 'publishers' %}">{% trans "Publishers" %}</a></li>
-              {% endif %}
           </ul>
           <ul class="nav navbar-nav navbar-right">
             {% include 'registration/accounts_menu.html' %}
