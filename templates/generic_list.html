@@ -56,7 +56,7 @@
             <br/>
         {% endif %}
         <div class="pull-right">
-            {% if add_url %}
+            {% if add_url and perms.global.view_all %}
                 <a href="{{ add_url }}" class="btn btn-default">
                   <span class="glyphicon glyphicon-plus"></span> New
                 </a>

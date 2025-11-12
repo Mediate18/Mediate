@@ -16,8 +16,17 @@ from django.utils.translation import gettext_lazy as _
 from collections import defaultdict
 
 
+class UUIDRenderMixin:
+    def render_uuid(self, record, value):
+        model_name = self._meta.model.__name__.lower()
+        url_name_change = f'change_{model_name}' if self.request.user.has_perm(f'persons.change_{model_name}') else None
+        url_name_delete = f'delete_{model_name}' if self.request.user.has_perm(f'persons.delete_{model_name}') else None
+        return render_action_column(value, f'{model_name}_detail', url_name_change, url_name_delete)
+
+
+
 # Person table
-class PersonTable(tables.Table):
+class PersonTable(UUIDRenderMixin, tables.Table):
     uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
     collections = tables.Column(empty_values=())
     roles = tables.Column(empty_values=())
@@ -47,6 +56,7 @@ class PersonTable(tables.Table):
             'notes',
             'bibliography',
             'relations',
+            '...',
             'uuid'
         ]
 
@@ -64,12 +74,6 @@ class PersonTable(tables.Table):
             'personitemrelation_set',
             'personitemrelation_set__role',
         )
-
-    def render_uuid(self, record, value):
-        url_name_change = 'change_person' if self.request.user.has_perm('persons.change_person') else None
-        url_name_delete = 'delete_person' if self.request.user.has_perm('persons.delete_person') else None
-
-        return render_action_column(value, 'person_detail', url_name_change, url_name_delete)
 
     def render_collections(self, record):
         person_collection_relations = [relation for relation in record.personcollectionrelation_set.all() if relation.role.name == "owner"]
@@ -228,9 +232,8 @@ class PersonWeightedRankingTable(PersonRankingTable):
 
 
 # PersonPersonRelation table
-class PersonPersonRelationTable(tables.Table):
-    uuid = ActionColumn('personpersonrelation_detail', 'change_personpersonrelation', 'delete_personpersonrelation',
-                        orderable=False)
+class PersonPersonRelationTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = PersonPersonRelation
@@ -246,9 +249,8 @@ class PersonPersonRelationTable(tables.Table):
 
 
 # PersonPersonRelationType table
-class PersonPersonRelationTypeTable(tables.Table):
-    uuid = ActionColumn('personpersonrelationtype_detail', 'change_personpersonrelationtype',
-                        'delete_personpersonrelationtype', orderable=False)
+class PersonPersonRelationTypeTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = PersonPersonRelationType
@@ -261,9 +263,8 @@ class PersonPersonRelationTypeTable(tables.Table):
 
 
 # PersonProfession table
-class PersonProfessionTable(tables.Table):
-    uuid = ActionColumn('personprofession_detail', 'change_personprofession', 'delete_personprofession',
-                        orderable=False)
+class PersonProfessionTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = PersonProfession
@@ -276,9 +277,8 @@ class PersonProfessionTable(tables.Table):
 
 
 # Country table
-class CountryTable(tables.Table):
-    uuid = ActionColumn('country_detail', 'change_country', 'delete_country',
-                        orderable=False)
+class CountryTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = Country
@@ -312,9 +312,8 @@ class CountryRankingTable(CountryTable):
 
 
 # Place table
-class PlaceTable(tables.Table):
-    uuid = ActionColumn('place_detail', 'change_place', 'delete_place',
-                        orderable=False)
+class PlaceTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = Place
@@ -393,9 +392,8 @@ class PlaceRankingTable(PlaceTable):
 
 
 # Place links table
-class PlaceLinksTable(tables.Table):
-    uuid = ActionColumn('place_detail', 'change_place', 'delete_place',
-                        orderable=False)
+class PlaceLinksTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
     collections = tables.Column(empty_values=(), verbose_name="Collections",
                         orderable=False)
     editions = tables.Column(empty_values=(), verbose_name="Editions",
@@ -467,8 +465,8 @@ class PlaceLinksTable(tables.Table):
 
 
 # Profession table
-class ProfessionTable(tables.Table):
-    uuid = ActionColumn('profession_detail', 'change_profession', 'delete_profession', orderable=False)
+class ProfessionTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = Profession
@@ -481,8 +479,8 @@ class ProfessionTable(tables.Table):
 
 
 # Religion table
-class ReligionTable(tables.Table):
-    uuid = ActionColumn('religion_detail', 'change_religion', 'delete_religion', orderable=False)
+class ReligionTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = Religion
@@ -495,9 +493,8 @@ class ReligionTable(tables.Table):
 
 
 # ReligiousAffiliation table
-class ReligiousAffiliationTable(tables.Table):
-    uuid = ActionColumn('religiousaffiliation_detail', 'change_religiousaffiliation', 'delete_religiousaffiliation',
-                        orderable=False)
+class ReligiousAffiliationTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = ReligiousAffiliation
@@ -510,9 +507,8 @@ class ReligiousAffiliationTable(tables.Table):
 
 
 # Residence table
-class ResidenceTable(tables.Table):
-    uuid = ActionColumn('residence_detail', 'change_residence', 'delete_residence',
-                        orderable=False)
+class ResidenceTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = Residence
