@@ -50,6 +50,7 @@
         </div>
     </div>
     <div class="col-md-2">
+        {% if perms.global.view_all %}
         <h3>Actions</h3>
         <ul>
             <li>
@@ -62,6 +63,7 @@
                 <a href="{% url 'add_personstoitem' object.pk %}">{% trans "Manage people" %}</a>
             </li>
         </ul>
+        {% endif %}
     </div>
 </div>
 

@@ -101,11 +101,13 @@
         </div>
     </div>
     <div class="col-xs-3">
+        {% if perms.global.view_all %}
         <div>
             <a href="{% url 'change_person' object.uuid %}" class="btn btn-default">
                 <span class="glyphicon glyphicon-pencil"></span> {% trans "Edit" %}
             </a>
         </div>
+        {% endif %}
     </div>
 </div>
 

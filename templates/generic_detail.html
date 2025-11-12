@@ -27,11 +27,13 @@
         </div>
     </div>
     <div class="col-xs-2">
+        {% if perms.global.view_all %}
         <div>
             <a href="{{ edit_url }}" class="btn btn-default">
                 <span class="glyphicon glyphicon-plus"></span> {% trans "Edit" %}
             </a>
         </div>
+        {% endif %}
     </div>
 </div>
 

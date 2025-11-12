@@ -27,6 +27,7 @@ from catalogues.tools import get_datasets_for_session
 from ..forms import *
 from ..filters import *
 from ..tables import *
+from items.models import PersonItemRelation
 
 
 # Person views
