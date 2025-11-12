@@ -8,28 +8,28 @@ from .views.views import *
 urlpatterns = [
     path(r'', RedirectView.as_view(url='collections/')),
 
-    path(r'collections/statistics', permission_required('global.view_all')(CollectionStatisticsView.as_view()),
+    path(r'collections/statistics', CollectionStatisticsView.as_view(),
          name='collection_statistics'),
-    path(r'collections/chart', permission_required('global.view_all')(get_collections_chart), name='get_collection_chart'),
-    path(r'collections/country_chart', permission_required('global.view_all')(get_collection_country_chart),
+    path(r'collections/chart', get_collections_chart, name='get_collection_chart'),
+    path(r'collections/country_chart', get_collection_country_chart,
          name='get_collection_country_chart'),
-    path(r'collections/language_chart', permission_required('global.view_all')(get_collection_language_chart),
+    path(r'collections/language_chart', get_collection_language_chart,
          name='get_collection_language_chart'),
-    path(r'collections/parisian_category_chart', permission_required('global.view_all')(get_collection_parisian_category_chart),
+    path(r'collections/parisian_category_chart', get_collection_parisian_category_chart,
          name='get_collection_parisian_category_chart'),
-    path(r'collections/format_chart', permission_required('global.view_all')(get_collection_format_chart),
+    path(r'collections/format_chart', get_collection_format_chart,
          name='get_collection_format_chart'),
-    path(r'collections/author_gender_chart', permission_required('global.view_all')(get_collection_author_gender_chart),
+    path(r'collections/author_gender_chart', get_collection_author_gender_chart,
          name='get_collection_author_gender_chart'),
-    path(r'collections/city_chart', permission_required('global.view_all')(get_collection_city_chart),
+    path(r'collections/city_chart', get_collection_city_chart,
          name='get_collection_city_chart'),
 
 
     # Collection urls
-    path('collections/', permission_required('global.view_all')(CollectionTableView.as_view()), name='collections'),
-    path(r'collections/<uuid:pk>', permission_required('global.view_all')(CollectionDetailView.as_view()),
+    path('collections/', CollectionTableView.as_view(), name='collections'),
+    path(r'collections/<uuid:pk>', CollectionDetailView.as_view(),
        name="collection_detail"),
-    path(r'collections/bare/<uuid:pk>', permission_required('global.view_all')(CollectionDetailBareView.as_view()),
+    path(r'collections/bare/<uuid:pk>', CollectionDetailBareView.as_view(),
        name="collection_detail_bare"),
     path(r'collections/add', permission_required('catalogues.add_collection')(CollectionCreateView.as_view()),
        name="add_collection"),
@@ -39,15 +39,15 @@ urlpatterns = [
     path(r'collections/delete/<uuid:pk>',
        permission_required('catalogues.delete_collection')(CollectionDeleteView.as_view()),
        name="delete_collection"),
-    path('collections/map', permission_required('global.view_all')(CollectionLocationMapView.as_view()),
+    path('collections/map', CollectionLocationMapView.as_view(),
          name='collectionsmap'),
-    path(r'previouslot/<uuid:pk>/<int:index>', permission_required('global.view_all')(previous_lot_view),
+    path(r'previouslot/<uuid:pk>/<int:index>', previous_lot_view,
          name='get_previous_lot'),
 
 
     # CollectionHeldBy urls
-    path('collectionheldbys/', permission_required('global.view_all')(CollectionHeldByTableView.as_view()), name='collectionheldbys'),
-    path(r'collectionheldbys/<uuid:pk>', permission_required('global.view_all')(CollectionHeldByDetailView.as_view()),
+    path('collectionheldbys/', CollectionHeldByTableView.as_view(), name='collectionheldbys'),
+    path(r'collectionheldbys/<uuid:pk>', CollectionHeldByDetailView.as_view(),
        name="collectionheldby_detail"),
     path(r'collectionheldbys/add', permission_required('catalogues.add_collectionheldby')(CollectionHeldByCreateView.as_view()),
        name="add_collectionheldby"),
@@ -60,8 +60,8 @@ urlpatterns = [
 
 
     # CollectionType urls
-    path('collectiontypes/', permission_required('global.view_all')(CollectionTypeTableView.as_view()), name='collectiontypes'),
-    path(r'collectiontypes/<uuid:pk>', permission_required('global.view_all')(CollectionTypeDetailView.as_view()),
+    path('collectiontypes/', CollectionTypeTableView.as_view(), name='collectiontypes'),
+    path(r'collectiontypes/<uuid:pk>', CollectionTypeDetailView.as_view(),
        name="collectiontype_detail"),
     path(r'collectiontypes/add', permission_required('catalogues.add_collectiontype')(CollectionTypeCreateView.as_view()),
        name="add_collectiontype"),
@@ -74,10 +74,10 @@ urlpatterns = [
 
 
     # CollectionCollectionTypeRelation urls
-    path('collectioncollectiontyperelations/', permission_required('global.view_all')(CollectionCollectionTypeRelationTableView.as_view()),
+    path('collectioncollectiontyperelations/', CollectionCollectionTypeRelationTableView.as_view(),
          name='collectioncollectiontyperelations'),
     path(r'collectioncollectiontyperelations/<uuid:pk>',
-         permission_required('global.view_all')(CollectionCollectionTypeRelationDetailView.as_view()),
+         CollectionCollectionTypeRelationDetailView.as_view(),
        name="collectioncollectiontyperelation_detail"),
     path(r'collectioncollectiontyperelations/add', permission_required('catalogues.add_collectioncollectiontyperelation')(CollectionCollectionTypeRelationCreateView.as_view()),
        name="add_collectioncollectiontyperelation"),
@@ -90,8 +90,8 @@ urlpatterns = [
 
 
     # Catalogue urls
-    path('catalogues/', permission_required('global.view_all')(CatalogueTableView.as_view()), name='catalogues'),
-    path(r'catalogues/<uuid:pk>', permission_required('global.view_all')(CatalogueDetailView.as_view()),
+    path('catalogues/', CatalogueTableView.as_view(), name='catalogues'),
+    path(r'catalogues/<uuid:pk>', CatalogueDetailView.as_view(),
        name="catalogue_detail"),
     path(r'catalogues/add', permission_required('catalogues.add_catalogue')(CatalogueCreateView.as_view()),
        name="add_catalogue"),
@@ -104,8 +104,8 @@ urlpatterns = [
 
 
     # CatalogueYear urls
-    path('catalogueyears/', permission_required('global.view_all')(CatalogueYearTableView.as_view()), name='catalogueyears'),
-    path(r'catalogueyears/<uuid:pk>', permission_required('global.view_all')(CatalogueYearDetailView.as_view()),
+    path('catalogueyears/', CatalogueYearTableView.as_view(), name='catalogueyears'),
+    path(r'catalogueyears/<uuid:pk>', CatalogueYearDetailView.as_view(),
        name="catalogueyear_detail"),
     path(r'catalogueyears/add', permission_required('catalogues.add_catalogueyear')(CatalogueYearCreateView.as_view()),
        name="add_catalogueyear"),
@@ -118,8 +118,8 @@ urlpatterns = [
 
 
     # Library urls
-    path('libraries/', permission_required('global.view_all')(LibraryTableView.as_view()), name='libraries'),
-    path(r'libraries/<uuid:pk>', permission_required('global.view_all')(LibraryDetailView.as_view()),
+    path('libraries/', LibraryTableView.as_view(), name='libraries'),
+    path(r'libraries/<uuid:pk>', LibraryDetailView.as_view(),
        name="library_detail"),
     path(r'libraries/add', permission_required('catalogues.add_library')(LibraryCreateView.as_view()),
        name="add_library"),
@@ -132,8 +132,8 @@ urlpatterns = [
 
 
     # Lot urls
-    path('lots/', permission_required('global.view_all')(LotTableView.as_view()), name='lots'),
-    path(r'lots/<uuid:pk>', permission_required('global.view_all')(LotDetailView.as_view()),
+    path('lots/', LotTableView.as_view(), name='lots'),
+    path(r'lots/<uuid:pk>', LotDetailView.as_view(),
        name="lot_detail"),
     path(r'lots/add', permission_required('catalogues.add_lot')(LotCreateView.as_view()),
        name="add_lot"),
@@ -149,8 +149,8 @@ urlpatterns = [
 
 
     # PersonCollectionRelation urls
-    path('personcollectionrelations/', permission_required('global.view_all')(PersonCollectionRelationTableView.as_view()), name='personcollectionrelations'),
-    path(r'personcollectionrelations/<uuid:pk>', permission_required('global.view_all')(PersonCollectionRelationDetailView.as_view()),
+    path('personcollectionrelations/', PersonCollectionRelationTableView.as_view(), name='personcollectionrelations'),
+    path(r'personcollectionrelations/<uuid:pk>', PersonCollectionRelationDetailView.as_view(),
        name="personcollectionrelation_detail"),
     path(r'personcollectionrelations/add', permission_required('catalogues.add_personcollectionrelation')(PersonCollectionRelationCreateView.as_view()),
        name="add_personcollectionrelation"),
@@ -163,8 +163,8 @@ urlpatterns = [
 
 
     # PersonCollectionRelationRole urls
-    path('personcollectionrelationroles/', permission_required('global.view_all')(PersonCollectionRelationRoleTableView.as_view()), name='personcollectionrelationroles'),
-    path(r'personcollectionrelationroles/<uuid:pk>', permission_required('global.view_all')(PersonCollectionRelationRoleDetailView.as_view()),
+    path('personcollectionrelationroles/', PersonCollectionRelationRoleTableView.as_view(), name='personcollectionrelationroles'),
+    path(r'personcollectionrelationroles/<uuid:pk>', PersonCollectionRelationRoleDetailView.as_view(),
        name="personcollectionrelationrole_detail"),
     path(r'personcollectionrelationroles/add', permission_required('catalogues.add_personcollectionrelationrole')(PersonCollectionRelationRoleCreateView.as_view()),
        name="add_personcollectionrelationrole"),
@@ -177,8 +177,8 @@ urlpatterns = [
 
 
     # PersonCatalogueRelation urls
-    path('personcataloguerelations/', permission_required('global.view_all')(PersonCatalogueRelationTableView.as_view()), name='personcataloguerelations'),
-    path(r'personcataloguerelations/<uuid:pk>', permission_required('global.view_all')(PersonCatalogueRelationDetailView.as_view()),
+    path('personcataloguerelations/', PersonCatalogueRelationTableView.as_view(), name='personcataloguerelations'),
+    path(r'personcataloguerelations/<uuid:pk>', PersonCatalogueRelationDetailView.as_view(),
        name="personcataloguerelation_detail"),
     path(r'personcataloguerelations/add', permission_required('catalogues.add_personcataloguerelation')(PersonCatalogueRelationCreateView.as_view()),
        name="add_personcataloguerelation"),
@@ -191,8 +191,8 @@ urlpatterns = [
 
 
     # CollectionPlaceRelation urls
-    path('collectionplacerelations/', permission_required('global.view_all')(CollectionPlaceRelationTableView.as_view()), name='collectionplacerelations'),
-    path(r'collectionplacerelations/<uuid:pk>', permission_required('global.view_all')(CollectionPlaceRelationDetailView.as_view()),
+    path('collectionplacerelations/', CollectionPlaceRelationTableView.as_view(), name='collectionplacerelations'),
+    path(r'collectionplacerelations/<uuid:pk>', CollectionPlaceRelationDetailView.as_view(),
          name="collectionplacerelation_detail"),
     path(r'collectionplacerelations/add', permission_required('catalogues.add_collectionplacerelation')(CollectionPlaceRelationCreateView.as_view()),
          name="add_collectionplacerelation"),
@@ -205,8 +205,8 @@ urlpatterns = [
 
 
     # Category urls
-    path('categories/', permission_required('global.view_all')(CategoryTableView.as_view()), name='categories'),
-    path(r'categories/<uuid:pk>', permission_required('global.view_all')(CategoryDetailView.as_view()),
+    path('categories/', CategoryTableView.as_view(), name='categories'),
+    path(r'categories/<uuid:pk>', CategoryDetailView.as_view(),
        name="category_detail"),
     path(r'categories/add', permission_required('catalogues.add_category')(CategoryCreateView.as_view()),
        name="add_category"),
@@ -219,8 +219,8 @@ urlpatterns = [
 
 
     # ParisianCategory urls
-    path('parisiancategories/', permission_required('global.view_all')(ParisianCategoryTableView.as_view()), name='parisiancategories'),
-    path(r'parisiancategories/<uuid:pk>', permission_required('global.view_all')(ParisianCategoryDetailView.as_view()),
+    path('parisiancategories/', ParisianCategoryTableView.as_view(), name='parisiancategories'),
+    path(r'parisiancategories/<uuid:pk>', ParisianCategoryDetailView.as_view(),
        name="parisiancategory_detail"),
     path(r'parisiancategories/add', permission_required('catalogues.add_parisiancategory')(ParisianCategoryCreateView.as_view()),
        name="add_parisiancategory"),
@@ -233,8 +233,8 @@ urlpatterns = [
 
 
     # CollectionPlaceRelationType urls
-    path('collectionplacerelationtypes/', permission_required('global.view_all')(CollectionPlaceRelationTypeTableView.as_view()), name='collectionplacerelationtypes'),
-    path(r'collectionplacerelationtypes/<uuid:pk>', permission_required('global.view_all')(CollectionPlaceRelationTypeDetailView.as_view()),
+    path('collectionplacerelationtypes/', CollectionPlaceRelationTypeTableView.as_view(), name='collectionplacerelationtypes'),
+    path(r'collectionplacerelationtypes/<uuid:pk>', CollectionPlaceRelationTypeDetailView.as_view(),
        name="collectionplacerelationtype_detail"),
     path(r'collectionplacerelationtypes/add', permission_required('catalogues.add_collectionplacerelationtype')(CollectionPlaceRelationTypeCreateView.as_view()),
        name="add_collectionplacerelationtype"),

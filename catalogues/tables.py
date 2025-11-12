@@ -6,16 +6,17 @@ from django.conf import settings
 
 from collections import defaultdict
 
+from mediate.tools import UUIDRenderMixin
 
 from catalogues.models import PersonCollectionRelation
 from items.models import Item
 from persons.models import Country
-from mediate.columns import ActionColumn, render_action_column
+from mediate.columns import render_action_column
 
 
 # Collection table
 class CollectionTable(tables.Table):
-    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)#ActionColumn('collection_detail', 'change_collection', 'delete_collection', orderable=False)
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
     full_title = tables.Column(empty_values=(), verbose_name="Catalogue full title(s)")
     types = tables.Column(empty_values=(), verbose_name="Catalogue type(s)")
     year_of_publication = tables.Column(empty_values=(), verbose_name="Year(s) of publication")
@@ -131,8 +132,8 @@ class CollectionTable(tables.Table):
 
 
 # CollectionHeldBy table
-class CollectionHeldByTable(tables.Table):
-    uuid = ActionColumn('collectionheldby_detail', 'change_collectionheldby', 'delete_collectionheldby', orderable=False)
+class CollectionHeldByTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = CollectionHeldBy
@@ -145,8 +146,8 @@ class CollectionHeldByTable(tables.Table):
 
 
 # CollectionType table
-class CollectionTypeTable(tables.Table):
-    uuid = ActionColumn('collectiontype_detail', 'change_collectiontype', 'delete_collectiontype', orderable=False)
+class CollectionTypeTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = CollectionType
@@ -158,9 +159,8 @@ class CollectionTypeTable(tables.Table):
 
 
 # CollectionCollectionTypeRelation table
-class CollectionCollectionTypeRelationTable(tables.Table):
-    uuid = ActionColumn('collectioncollectiontyperelation_detail', 'change_collectioncollectiontyperelation',
-                        'delete_collectioncollectiontyperelation', orderable=False)
+class CollectionCollectionTypeRelationTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = CollectionCollectionTypeRelation
@@ -246,8 +246,8 @@ class CatalogueTable(tables.Table):
 
 
 # CatalogueYear table
-class CatalogueYearTable(tables.Table):
-    uuid = ActionColumn('catalogueyear_detail', 'change_catalogueyear', 'delete_catalogueyear', orderable=False)
+class CatalogueYearTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = CatalogueYear
@@ -260,8 +260,8 @@ class CatalogueYearTable(tables.Table):
 
 
 # Library table
-class LibraryTable(tables.Table):
-    uuid = ActionColumn('library_detail', 'change_library', 'delete_library', orderable=False)
+class LibraryTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = Library
@@ -273,8 +273,8 @@ class LibraryTable(tables.Table):
 
 
 # Lot table
-class LotTable(tables.Table):
-    uuid = ActionColumn('lot_detail', 'change_lot', 'delete_lot', orderable=False)
+class LotTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
     collection = tables.RelatedLinkColumn()
     category = tables.RelatedLinkColumn()
 
@@ -293,9 +293,8 @@ class LotTable(tables.Table):
 
 
 # PersonCollectionRelation table
-class PersonCollectionRelationTable(tables.Table):
-    uuid = ActionColumn('personcollectionrelation_detail', 'change_personcollectionrelation',
-                        'delete_personcollectionrelation', orderable=False)
+class PersonCollectionRelationTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = PersonCollectionRelation
@@ -309,9 +308,8 @@ class PersonCollectionRelationTable(tables.Table):
 
 
 # PersonCollectionRelationRole table
-class PersonCollectionRelationRoleTable(tables.Table):
-    uuid = ActionColumn('personcollectionrelationrole_detail', 'change_personcollectionrelationrole',
-                        'delete_personcollectionrelationrole', orderable=False)
+class PersonCollectionRelationRoleTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = PersonCollectionRelationRole
@@ -323,9 +321,8 @@ class PersonCollectionRelationRoleTable(tables.Table):
 
 
 # PersonCatalogueRelation table
-class PersonCatalogueRelationTable(tables.Table):
-    uuid = ActionColumn('personcataloguerelation_detail', 'change_personcataloguerelation',
-                        'delete_personcataloguerelation', orderable=False)
+class PersonCatalogueRelationTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = PersonCatalogueRelation
@@ -338,9 +335,8 @@ class PersonCatalogueRelationTable(tables.Table):
 
 
 # CollectionPlaceRelation table
-class CollectionPlaceRelationTable(tables.Table):
-    uuid = ActionColumn('collectionplacerelation_detail', 'change_collectionplacerelation',
-                        'delete_collectionplacerelation', orderable=False)
+class CollectionPlaceRelationTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = CollectionPlaceRelation
@@ -353,8 +349,8 @@ class CollectionPlaceRelationTable(tables.Table):
         ]
 
 # Category table
-class CategoryTable(tables.Table):
-    uuid = ActionColumn('category_detail', 'change_category', 'delete_category', orderable=False)
+class CategoryTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
     parent = tables.LinkColumn(verbose_name="Parent category")
 
     class Meta:
@@ -370,8 +366,8 @@ class CategoryTable(tables.Table):
 
 
 # ParisianCategory table
-class ParisianCategoryTable(tables.Table):
-    uuid = ActionColumn('parisiancategory_detail', 'change_parisiancategory', 'delete_parisiancategory', orderable=False)
+class ParisianCategoryTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = ParisianCategory
@@ -384,8 +380,8 @@ class ParisianCategoryTable(tables.Table):
 
 
 # CollectionPlaceRelationType table
-class CollectionPlaceRelationTypeTable(tables.Table):
-    uuid = ActionColumn('collectionplacerelationtype_detail', 'change_collectionplacerelationtype', 'delete_collectionplacerelationtype', orderable=False)
+class CollectionPlaceRelationTypeTable(UUIDRenderMixin, tables.Table):
+    uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
 
     class Meta:
         model = CollectionPlaceRelationType

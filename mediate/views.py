@@ -14,6 +14,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from mediate.forms import SelectDatasetForm
 from catalogues.models import Dataset
 from catalogues.tools import get_dataset_for_anonymoususer
+from transcriptions.models import DocumentScan
 
 # When a user logs in, he/she should choose a Dataset.
 # To make this happen, set dataset in session to None after login.
@@ -23,7 +24,6 @@ def login_handler(sender, user, request, **kwargs):
 user_logged_in.connect(login_handler)
 
 
-@permission_required('global.view_all')
 def protected_media(request, filename):
     """
     View to send file via X-Sendfile
@@ -31,6 +31,15 @@ def protected_media(request, filename):
     :param filename: the filename, extracted from the url
     :return: a HttpResponse object
     """
+    # Check permission
+    try:
+        dataset = DocumentScan.objects.get(scan=filename).shelf_mark.catalogue_set.first().dataset
+    except:
+       return HttpResponse(_("We can not determine whether you are authorized to view this scan."), status=500)
+
+    if not request.user.has_perm('catalogues.view_dataset', dataset):
+        return HttpResponse(_("You do not have permission to view this scan."), status=401)
+
     # Construct full path and base name
     full_path = os.path.join(settings.MEDIA_ROOT, filename)
     base_name = os.path.basename(filename)
