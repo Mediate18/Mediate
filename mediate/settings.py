@@ -346,3 +346,5 @@ REQUEST_TRAFFIC_MODULES = (
     'request.traffic.User',
     'request.traffic.UniqueUser'
 )
+
+REQUEST_ANONYMOUS_IP = True
