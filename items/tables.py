@@ -106,7 +106,7 @@ class ItemTable(AddInfoLinkMixin, tables.Table):
             '<span class="expand-cell glyphicon glyphicon-chevron-down" title="Expand"></span>'
             '<span class="collapse-cell glyphicon glyphicon-chevron-up" title="Collapse"></span>'
             '</div>',
-            reverse_lazy('change_lot', args=[record.lot_id]), record.lot.lot_as_listed_in_collection
+            reverse_lazy('lot_detail', args=[record.lot_id]), record.lot.lot_as_listed_in_collection
         )
 
     def render_checkbox(self, record):
@@ -143,7 +143,7 @@ class ItemTable(AddInfoLinkMixin, tables.Table):
         for relation in item_work_relations:
             work = relation.work
             viaf = work.viaf_id
-            work_entry = "<a href='{}'>{}</a>".format(reverse_lazy('change_work', args=[work.pk]), work.title)
+            work_entry = "<a href='{}'>{}</a>".format(reverse_lazy('work_detail', args=[work.pk]), work.title)
             if viaf:
                 work_entry += " (<a target='blank' href='{}'>VIAF</a>)".format(viaf)
             work_entries.append(work_entry)
