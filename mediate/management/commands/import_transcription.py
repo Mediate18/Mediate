@@ -28,6 +28,8 @@ class Command(BaseCommand):
         # Optional
         parser.add_argument('-d', '--dry_run', action='store_true', help='Do not save to database.')
         parser.add_argument('-vv', '--verbose', action='store_true', help='Print the data.')
+        parser.add_argument('-n', '--newline_splitter', action='store_true',
+                            help='Use newline as splitter instead of special string "<%%>".')
 
     @transaction.atomic
     def handle(self, *args, **kwargs):
@@ -36,6 +38,7 @@ class Command(BaseCommand):
         dataset_name = kwargs['dataset']
         dry_run = kwargs["dry_run"]
         verbose = kwargs["verbose"]
+        newline_splitter = kwargs["newline_splitter"]
 
         try:
             dataset = Dataset.objects.get(name=dataset_name)
@@ -108,7 +111,8 @@ class Command(BaseCommand):
                         transcription = transcription_file.read().replace(u'\ufeff', '')
                         transcription_with_field_markers = add_field_marker(transcription)
                         # print(transcription_with_field_markers)
-                        records = [record.strip() for record in transcription_with_field_markers.split("<%%>")]
+                        splitter = "\n" if newline_splitter else "<%%>"
+                        records = [record.strip() for record in transcription_with_field_markers.split(splitter)]
                         page = 0
                         index_in_collection = 1
                         collection = None
@@ -135,10 +139,10 @@ class Command(BaseCommand):
                                     print("Page", page)
                             if "TITLE" in fields:
                                 title = fields["TITLE"]
-                                collection = Collection(short_title=collection_short_title, full_title=title,
-                                                       catalogue=catalogue)
+                                collection = Collection(short_title=collection_short_title, full_title=title)
                                 print_obj(collection)
                                 collection.save()
+                                collection.catalogue.add(catalogue)
                             if "CATEGORY" in fields:
                                 # print(fields)
                                 category_books = fields["CATEGORY"]
@@ -184,6 +188,10 @@ class Command(BaseCommand):
                                     except:
                                         year = None
                                         year_tag = fields.get("YEAR")
+                                elif match := re.search(r'\d{4}', fields["FULL_ITEM_DESC"]):
+                                    year = int(match[0])
+                                    year = year if year <= 1850 else None
+                                    year_tag = ""
                                 else:
                                     year = None
                                     year_tag = ""
