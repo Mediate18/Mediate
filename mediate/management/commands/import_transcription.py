@@ -142,7 +142,8 @@ class Command(BaseCommand):
 
                             fields = fill_slots(record.split(FIELD_MARKER))
                             if "PAGE" in fields:
-                                page += 1
+                                page_str = fields["PAGE"].strip()
+                                page = int(page_str) if page_str.isdigit() else None
                                 if verbose:
                                     print("Page", page)
                             if "TITLE" in fields:
