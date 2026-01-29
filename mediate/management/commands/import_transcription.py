@@ -230,6 +230,7 @@ class Command(BaseCommand):
                                 # Item
                                 item = Item(short_title=fields.get("FULL_ITEM_DESC")[:128],
                                             lot=lot,
+                                            catalogue=catalogue,
                                             number_of_volumes=fields.get("VOLUME", None),
                                             book_format=book_format,
                                             index_in_lot=1,
