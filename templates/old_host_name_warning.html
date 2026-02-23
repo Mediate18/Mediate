@@ -1,0 +1,23 @@
+{% extends "barelayout.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-xs-6 col-xs-offset-3 text-center">
+        <div class="alert alert-warning">
+            <h3>
+                New URL
+            </h3>
+            <p>
+                The MEDIATE database now has a new URL, <a href="{{ base_url }}">{{ base_url}}</a>,
+                so please change this in your favourites/bookmarks list.
+            </p>
+            <p>
+                The page you requested can be found at <a href="{{ new_url }}">{{ new_url }}</a>.
+            </p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
