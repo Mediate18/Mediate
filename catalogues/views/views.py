@@ -355,6 +355,8 @@ class CollectionLocationMapView(ListView):
                              .annotate(object_count=Count('published_collections__collection')))
         context['objects_url_name'] = 'collections'
         context['place_search_field'] = 'place'
+        context['info'] = _('Places displayed include both places of publication '
+                            'and places of distribution of the catalogues.')
 
         return context
 
