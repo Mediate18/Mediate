@@ -189,7 +189,7 @@ class PersonRankingFilter(QBasedFilterset):
         label="Collection country",
         queryset=Country.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"}, ),
-        field_name='personitemrelation__item__lot__collection__related_places__place__country',
+        field_name='personitemrelation__item__lot__collection__publication_places__place__country',
         lookup_expr='in',
     )
     sex = MultipleChoiceFilterQWithExtraLookups(
@@ -337,7 +337,7 @@ class PersonWeightedRankingFilter(PersonRankingFilter):
                                                                              collection_year_slice.stop])
         if collection_publication_country := cleaned_data['collection_publication_country']:
             print('collection_publication_country', collection_publication_country)
-            collection_qs = collection_qs.filter(related_places__place__country__in=collection_publication_country)
+            collection_qs = collection_qs.filter(publication_places__place__country__in=collection_publication_country)
         if collection_owner_sex := cleaned_data['collection_owner_sex']:
             print('collection_owner_sex', collection_owner_sex)
             collection_qs = collection_qs.filter(personcollectionrelation__person__sex__in=collection_owner_sex,
@@ -500,8 +500,7 @@ class PlaceRankingFilter(QBasedFilterset, PlaceFilter):
 
     def collection_country_of_publication_filter(self, q, name, value):
         if value:
-            q &= Q(edition__items__lot__collection__related_places__type__name='publication',
-                   edition__items__lot__collection__related_places__place__country__in=value)
+            q &= Q(edition__items__lot__collection__publication_places__place__country__in=value)
         return q
 
     def collection_tag_filter(self, q, name, value):

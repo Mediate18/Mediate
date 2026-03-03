@@ -106,8 +106,7 @@ class ItemTagRankingFilter(QBasedFilterset):
 
     def collection_country_of_publication_filter(self, q, name, value):
         if value:
-            q &= Q(taggedentity__items__lot__collection__related_places__type__name='publication',
-                   taggedentity__items__lot__collection__related_places__place__country__in=value)
+            q &= Q(taggedentity__items__lot__collection__publication_places__place__country__in=value)
         return q
 
     def collection_tag_filter(self, q, name, value):
@@ -592,12 +591,12 @@ class ItemFilter(django_filters.FilterSet):
 
     def collection_country_of_publication_filter(self, queryset, name, value):
         if value:
-            return queryset.filter(lot__collection__related_places__place__country__in=value).distinct()
+            return queryset.filter(lot__collection__publication_places__place__country__in=value).distinct()
         return queryset
 
     def collection_city_of_publication_filter(self, queryset, name, value):
         if value:
-            return queryset.filter(lot__collection__related_places__place__in=value).distinct()
+            return queryset.filter(lot__collection__publication_places__place__in=value).distinct()
         return queryset
 
     def collection_tag_filter(self, queryset, name, value):
@@ -723,8 +722,7 @@ class LanguageFilter(QBasedFilterset):
 
     def collection_country_of_publication_filter(self, q, name, value):
         if value:
-            q &= Q(items__item__lot__collection__related_places__type__name='publication',
-                   items__item__lot__collection__related_places__place__country__in=value)
+            q &= Q(items__item__lot__collection__publication_places__place__country__in=value)
         return q
 
     def collection_tag_filter(self, q, name, value):
@@ -939,14 +937,14 @@ class WorkFilter(QBasedFilterset):
         label="Collection country",
         queryset=Country.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
-        field_name='items__item__lot__collection__related_places__place__country',
+        field_name='items__item__lot__collection__publication_places__place__country',
         lookup_expr='in'
     )
     collection_city = ModelMultipleChoiceFilterQ(
         label="Collection city",
         queryset=Place.objects.all(),
         widget=Select2MultipleWidget(attrs={'data-placeholder': "Select multiple"},),
-        field_name='items__item__lot__collection__related_places__place',
+        field_name='items__item__lot__collection__publication_places__place',
         lookup_expr='in'
     )
     collection_owner_gender = MultipleChoiceFilterQWithExtraLookups(

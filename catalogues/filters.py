@@ -155,12 +155,13 @@ class CollectionFilter(django_filters.FilterSet):
 
     def place_filter(self, queryset, name, value):
         if value:
-            return queryset.filter(related_places__place__in=value)
+            return queryset.filter(Q(related_places__place__in=value) | Q(publication_places__place__in=value))
         return queryset
 
     def country_filter(self, queryset, name, value):
         if value:
-            return queryset.filter(related_places__place__country__in=value)
+            return queryset.filter(Q(related_places__place__country__in=value) |
+                                   Q(publication_places__place__country__in=value))
         return queryset
 
     def tag_filter(self, queryset, name, value):

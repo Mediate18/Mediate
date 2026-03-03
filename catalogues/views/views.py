@@ -6,7 +6,7 @@ from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
-from django.db.models import Count, Min, Max, Q, Func, F, Value, Avg, FloatField, IntegerField
+from django.db.models import Count, Min, Max, Q, Func, F, Value, Avg, FloatField, IntegerField, Sum
 from django.db.models.functions import Substr, Length
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, render
@@ -334,8 +334,10 @@ class CollectionLocationMapView(ListView):
     template_name = 'generic_location_map.html'
 
     def get_queryset(self):
-        collections = get_collections_for_session(self.request).filter(related_places__place__latitude__isnull=False,
-                                                                     related_places__place__longitude__isnull=False)
+        collections = get_collections_for_session(self.request).filter(
+            Q(related_places__place__latitude__isnull=False, related_places__place__longitude__isnull=False) |
+            Q(publication_places__place__latitude__isnull=False, publication_places__place__longitude__isnull=False)
+        )
         return collections
 
     def get_context_data(self, **kwargs):
@@ -347,9 +349,10 @@ class CollectionLocationMapView(ListView):
         context['object_name'] = "collection"
 
         context['object_list'] = filter.qs
-        context['places'] = Place.objects.filter(related_collections__collection__in=filter.qs,
-                                                 latitude__isnull=False, longitude__isnull=False)\
-                                .annotate(object_count=Count('related_collections__collection'))
+        context['places'] = (Place.objects.filter(Q(published_collections__collection__in=filter.qs) |
+                                                  Q(related_collections__collection__in=filter.qs),
+                                                  latitude__isnull=False, longitude__isnull=False)
+                             .annotate(object_count=Count('published_collections__collection')))
         context['objects_url_name'] = 'collections'
         context['place_search_field'] = 'place'
 

@@ -311,6 +311,21 @@ class CollectionPlaceRelation(models.Model):
     type = models.ForeignKey(CollectionPlaceRelationType, on_delete=SET_NULL, null=True)
 
     def __str__(self):
+        return _("{} is {} place of collection '{}'").format(self.place, self.type, self.collection)
+
+
+class CollectionPublicationPlace(models.Model):
+    """
+    Publication place for collections
+    """
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    place = models.ForeignKey(Place, on_delete=CASCADE, related_name='published_collections')
+    collection = models.ForeignKey(Collection, on_delete=CASCADE, related_name='publication_places')
+
+    class Meta:
+        unique_together = (("place", "collection"),)
+
+    def __str__(self):
         return _("{} is published in {}").format(self.collection, self.place)
 
 

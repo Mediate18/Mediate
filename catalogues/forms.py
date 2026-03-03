@@ -35,6 +35,7 @@ class CollectionModelForm(forms.ModelForm):
         self.content_type = ContentType.objects.get_for_model(self.instance)
         self.add_types_field()
         self.add_related_places_field()
+        self.add_publicationplaces_field()
         self.add_tag_field()
 
     def add_types_field(self):
@@ -66,6 +67,19 @@ class CollectionModelForm(forms.ModelForm):
             )
             self.fields[self.get_collectionplacerelationtype_id(type)] = places
 
+    def add_publicationplaces_field(self):
+        publication_places = forms.ModelMultipleChoiceField(
+            widget=ModelSelect2MultipleWidget(
+                model=Place,
+                search_fields=['name__icontains'],
+            ),
+            queryset=Place.objects.all(),
+            required=False,
+            initial=Place.objects.filter(published_collections__collection=self.instance)
+        )
+        self.fields['publication_places'] = publication_places
+
+
     def add_tag_field(self):
         tag = forms.ModelMultipleChoiceField(
             widget=ModelSelect2MultipleWidget(
@@ -84,6 +98,7 @@ class CollectionModelForm(forms.ModelForm):
         if commit:
             self.save_types()
             self.save_relation_places()
+            self.save_publication_places()
             self.save_tags()
         return super(CollectionModelForm, self).save(commit=commit)
 
@@ -123,6 +138,28 @@ class CollectionModelForm(forms.ModelForm):
                 collection_place_relation = CollectionPlaceRelation(collection=self.instance,
                                                                    place=new_related_place, type=type)
                 collection_place_relation.save()
+
+    def save_publication_places(self):
+        submitted_publicaton_places = self.cleaned_data.get('publication_places')
+        if not submitted_publicaton_places:
+            return
+
+        # Delete places that are not in the submitted places
+        publication_places_to_delete = (CollectionPublicationPlace.objects
+                                        .filter(collection=self.instance)
+                                        .exclude(place__in=submitted_publicaton_places))
+        for place in publication_places_to_delete:
+            place.delete()
+
+        # Add submitted places that are not in the existing places
+        new_publication_places = (set(submitted_publicaton_places)
+                                  - set(Place.objects.filter(published_collections__collection=self.instance)))
+        for new_related_place in new_publication_places:
+            collection_place_relation = CollectionPublicationPlace(collection=self.instance, place=new_related_place)
+            collection_place_relation.save()
+
+
+
 
     def save_tags(self):
         tags_in_form = self.cleaned_data['tag']

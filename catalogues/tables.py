@@ -25,7 +25,7 @@ class CollectionTable(tables.Table):
     number_of_items = tables.Column(empty_values=(), orderable=False)
     percentage_non_books = tables.Column(empty_values=(), orderable=False)
     related_places = tables.Column(empty_values=(), verbose_name="Related places", orderable=False)
-    countries = tables.Column(empty_values=(), verbose_name="Publication countries", orderable=False)
+    country = tables.Column(empty_values=(), verbose_name="Publication country", orderable=False)
 
     class Meta:
         model = Collection
@@ -40,7 +40,7 @@ class CollectionTable(tables.Table):
             'number_of_items',
             'percentage_non_books',
             'related_places',
-            'countries'
+            'country'
         ]
 
     def render_uuid(self, record, value):
@@ -120,14 +120,13 @@ class CollectionTable(tables.Table):
                 ]) for type, places in type_dict.items()
             ]))
 
-    def render_countries(self, record):
-        countries = Country.objects.filter(place__related_collections__collection=record).distinct()
-        return format_html(", ".join(
-            [
-                '<a href="{}">{}</a>'.format(reverse_lazy('country_detail', args=[country.pk]), country)
-                for country in countries
-            ]
-        ))
+    def render_country(self, record):
+        country = Country.objects.filter(place__published_collections__collection=record).first()
+        if country:
+            return format_html('<a href="{}">{}</a>',
+                               reverse_lazy('country_detail', args=[country.pk]),
+                               country)
+        return ''
 
 
 
