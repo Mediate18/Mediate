@@ -2008,8 +2008,9 @@ class WorkTableView(ListView):
     template_name = 'generic_list.html'
 
     def get_queryset(self):
-        return Work.objects.filter(items__item__lot__collection_id__in=get_collections_for_session(self.request))\
-            .distinct()
+        dataset_uuids = [dataset.uuid for dataset in get_datasets_for_session(self.request)]
+        work_uuids = Work.objects.filter(items__item__dataset_uuid__in=dataset_uuids).values_list('uuid', flat=True)
+        return Work.objects.filter(pk__in=work_uuids)
 
     def get_context_data(self, **kwargs):
         datasets_permitted = get_permitted_datasets_for_session(self.request)
