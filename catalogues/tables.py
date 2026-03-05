@@ -1,6 +1,6 @@
 import django_tables2 as tables
 from django_tables2.utils import A  # alias for Accessor
-from django.utils.html import format_html
+from django.utils.html import format_html, mark_safe
 from .models import *
 from django.conf import settings
 
@@ -108,17 +108,25 @@ class CollectionTable(tables.Table):
         return "{}%".format(percentage)
 
     def render_related_places(self, record):
-        relations = CollectionPlaceRelation.objects.filter(collection=record).prefetch_related('type')
+        publication_place = Place.objects.filter(published_collections__collection=record).first()
+        publication_place_html = '' if not publication_place else (
+            format_html('Publication: <a href="{}">{}</a>',
+                        reverse_lazy('place_detail',  args=[publication_place.pk]),
+                        publication_place)
+        )
+
         type_dict = defaultdict(list)
-        for relation in relations:
+        for relation in CollectionPlaceRelation.objects.filter(collection=record).prefetch_related('type', 'place'):
             type_dict[relation.type.name].append(relation.place)
 
-        return format_html("<br/>".join([
-            type.capitalize() + ": " + ", ".join([
-                    '<a href="{}">{}</a>'.format(reverse_lazy('place_detail', args=[place.pk]), place)
+        related_place_html = format_html("<br/>".join([
+            format_html('{}: ', type.capitalize()) + ", ".join([
+                    format_html('<a href="{}">{}</a>', reverse_lazy('place_detail', args=[place.pk]), place)
                     for place in places
                 ]) for type, places in type_dict.items()
             ]))
+
+        return mark_safe(f'{publication_place_html}<br/>{related_place_html}')
 
     def render_country(self, record):
         country = Country.objects.filter(place__published_collections__collection=record).first()
