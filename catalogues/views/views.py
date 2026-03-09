@@ -34,10 +34,10 @@ import django_tables2
 
 
 def get_collections_for_session(request, extra_collection=None):
-    return Collection.objects.filter(
-        Q(catalogue__dataset__in=get_datasets_for_session(request))
-        | Q(pk=extra_collection.pk if extra_collection else None)
-    )
+    filter = Q(catalogue__dataset__in=get_datasets_for_session(request))
+    if extra_collection:
+        filter = filter & Q(pk=extra_collection.pk)
+    return Collection.objects.filter(filter)
 
 
 # Collection views
