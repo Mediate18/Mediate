@@ -155,14 +155,14 @@ class Item(ComputedFieldsModel):
         except:
             return None
 
-    @computed(models.IntegerField(null=True))
+    @computed(models.IntegerField(null=True), depends=[('lot', ['index_in_collection'])])
     def lot_index_in_collection(self):
         try:
             return self.lot.index_in_collection
         except:
             return None
 
-    @computed(models.CharField(max_length=128, null=True))
+    @computed(models.CharField(max_length=128, null=True), depends=[('lot', ['lot_as_listed_in_collection'])])
     def lot_lot_as_listed_in_collection(self):
         try:
             return self.lot.lot_as_listed_in_collection[:128]
