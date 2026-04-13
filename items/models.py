@@ -211,6 +211,10 @@ class Item(ComputedFieldsModel):
         self.determine_non_book()
         super().save(*args, **kwargs)
 
+        # A non-book item cannot have a language
+        if self.non_book:
+            ItemLanguageRelation.objects.filter(item=self).delete()
+
     def get_absolute_url(self):
         return reverse_lazy('item_detail', args=[str(self.uuid)])
 
