@@ -145,6 +145,16 @@ class ItemFilter(django_filters.FilterSet):
         ),
         method='item_type_filter'
     )
+    exclude_item_type = django_filters.ModelMultipleChoiceFilter(
+        label="Exclude Item Type",
+        queryset=ItemType.objects.all(),
+        widget=ModelSelect2MultipleWidget(
+            attrs={'data-placeholder': "Select multiple"},
+            model=ItemType,
+            search_fields=['name__icontains']
+        ),
+        method='exclude_item_type_filter'
+    )
     collection = django_filters.ModelMultipleChoiceFilter(
         label="Collection",
         queryset=Collection.objects.all(),
@@ -399,6 +409,7 @@ class ItemFilter(django_filters.FilterSet):
             'book_format',
             'non_book',
             'item_type',
+            'exclude_item_type',
             'collection',
             'collection_publication_year',
             'parisian_category',
@@ -464,7 +475,12 @@ class ItemFilter(django_filters.FilterSet):
 
     def item_type_filter(self, queryset, name, value):
         if value:
-            return queryset.filter(itemitemtyperelation__type__name__in=value)
+            return queryset.filter(itemitemtyperelation__type__in=value)
+        return queryset
+
+    def exclude_item_type_filter(self, queryset, name, value):
+        if value:
+            return queryset.exclude(itemitemtyperelation__type__in=value)
         return queryset
 
     def parisian_category_filter(self, queryset, name, value):
