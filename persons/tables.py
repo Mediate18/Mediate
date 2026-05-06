@@ -32,6 +32,7 @@ class PersonTable(UUIDRenderMixin, tables.Table):
             'short_name',
             'first_names',
             'surname',
+            'birth_name',
             'sex',
             'roles',
             'city_of_birth',

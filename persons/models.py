@@ -118,6 +118,7 @@ class Person(ComputedFieldsModel):
     publisher_cerl_id = models.CharField(_("Publisher CERL ID"), max_length=32, null=True, blank=True)
     surname = models.CharField(_("Surname"), max_length=128)
     first_names = models.CharField(_("First names"), max_length=512)
+    birth_name = models.CharField(_("Birth name"), max_length=128, blank=True)
     date_of_birth = models.CharField(_("Date of birth"), max_length=64, blank=True, null=True)
     date_of_death = models.CharField(_("Date of death"), max_length=64, blank=True, null=True)
     sex = models.CharField(_("Sex"), choices=SEX_CHOICES, max_length=7)
