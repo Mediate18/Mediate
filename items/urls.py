@@ -31,6 +31,8 @@ urlpatterns = [
     path(r'items/delete/<uuid:pk>', permission_required('items.delete_item')(ItemDeleteView.as_view()),
        name="delete_item"),
     path('items/map', ItemLocationMapView.as_view(), name='itemsmap'),
+    path('items/set_stated_publisher_for_items', permission_required('items.change_item')(set_stated_publisher_for_items),
+         name='set_stated_publisher_for_items'),
     path('items/set_bookformat', permission_required('items.change_item')(set_bookformat_for_items),
          name='set_bookformat'),
     path('items/add_language_to_items', permission_required('items.add_itemlanguagerelation')(add_language_to_items),

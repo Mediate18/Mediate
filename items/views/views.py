@@ -167,14 +167,14 @@ class ItemTableView(ListView):
                 'form_set': PersonItemRelationAddFormSet
             },
             {
-                'id': 'set_editionplaces',
-                'label': _("Set real publication places"),
-                'url': reverse_lazy('set_editionplaces_for_items'),
-                'form': EditionPlacesForm
+                'id': 'set_stated_publisher',
+                'label': _("Set stated publisher"),
+                'url': reverse_lazy('set_stated_publisher_for_items'),
+                'form': ItemStatedPublisherForm
             },
             {
                 'id': 'set_publisher',
-                'label': _("Set publisher"),
+                'label': _("Set real publisher"),
                 'url': reverse_lazy('set_publisher_for_items'),
                 'form': PublisherForm
             },
@@ -232,7 +232,13 @@ class ItemTableView(ListView):
                 'label': _("Set stated place of publication"),
                 'url': reverse_lazy('set_stated_place_of_publication_to_items'),
                 'form': EditionPlaceForm
-            }
+            },
+            {
+                'id': 'set_editionplaces',
+                'label': _("Set real place(s) of publication"),
+                'url': reverse_lazy('set_editionplaces_for_items'),
+                'form': EditionPlacesForm
+            },
         ] if datasets_permitted else None
 
         context['per_page_choices'] = [25, 50, 100, 500, 1000]
@@ -1377,6 +1383,28 @@ def set_publication_places_for_items(request):
                 # Probably a duplicate entry
                 pass
 
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+
+@require_POST
+def set_stated_publisher_for_items(request):
+    if 'entries' not in request.POST:
+        messages.add_message(request, messages.WARNING, _("No items selected."))
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+    item_stated_publisher_form = ItemStatedPublisherForm(data=request.POST)
+    if not item_stated_publisher_form.is_valid():
+        messages.add_message(request, messages.WARNING, _("The Stated Publisher form was invalid."))
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+    for item in Item.objects.filter(uuid__in=request.POST.getlist('entries')):
+        if 'change_dataset' in get_perms(request.user, item.lot.collection.catalogue.first().dataset):
+            item.stated_publisher = item_stated_publisher_form.cleaned_data['stated_publisher']
+            item.save()
+        else:
+            messages.add_message(request, messages.ERROR,
+                                 _("Item {} could not be used for setting a stated publisher"
+                                   " because you are not allowed to change the dataset.".format(item)))
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 

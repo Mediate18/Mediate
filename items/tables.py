@@ -37,7 +37,8 @@ class ItemTable(AddInfoLinkMixin, tables.Table):
     collection = tables.Column(empty_values=(), order_by='lot__collection__short_title')
     number_of_volumes = tables.Column(empty_values=(), verbose_name=_('Number of volumes'))
     material_details = tables.Column(empty_values=(), orderable=False)
-    edition = tables.Column(empty_values=(), orderable=False)
+    stated_edition = tables.Column(empty_values=(), orderable=False)
+    edition = tables.Column(empty_values=(), verbose_name=_('Real edition'), orderable=False)
     manage_works = tables.LinkColumn('add_workstoitem',
         text=format_html('<span class="glyphicon glyphicon-list" data-toggle="tooltip" data-original-title="Manage works"></span>'),
         args=[A('pk')], orderable=False, empty_values=())
@@ -62,6 +63,7 @@ class ItemTable(AddInfoLinkMixin, tables.Table):
             'number_of_volumes',
             'book_format',
             'material_details',
+            'stated_edition',
             'edition',
             'languages',
             'parisian_category',
@@ -164,6 +166,14 @@ class ItemTable(AddInfoLinkMixin, tables.Table):
 
     def render_material_details(self, record):
         return ", ".join(MaterialDetails.objects.filter(items__item=record).values_list('description', flat=True))
+
+    def render_stated_edition(self, record):
+        stated_place_of_publication = record.edition.place if record.edition and record.edition.place else ''
+        stated_publisher = record.stated_publisher or ''
+        year = record.edition.get_year_range_str()
+        year_str = f'{", " if stated_publisher and year else ""}{year}'
+        colon = ': ' if stated_place_of_publication and (stated_publisher or year) else ''
+        return f'{stated_place_of_publication}{colon}{stated_publisher}{year_str}'
 
     def render_edition(self, record):
         year = record.edition.get_year_range_str()

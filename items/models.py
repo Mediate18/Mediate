@@ -129,6 +129,7 @@ class Item(ComputedFieldsModel):
     non_book = models.BooleanField(default=False, editable=False)
     parisian_category = models.ForeignKey(ParisianCategory, on_delete=SET_NULL, null=True, blank=True)
     uncountable_book_items = models.BooleanField(default=False)
+    stated_publisher = models.CharField(max_length=128, null=True, blank=True)
 
     tags = GenericRelation(TaggedEntity, related_query_name='items')
 

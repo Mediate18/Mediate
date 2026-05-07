@@ -43,9 +43,9 @@ class ItemModelForm(forms.ModelForm):
         
         super().__init__(**kwargs)
         self.content_type = ContentType.objects.get_for_model(self.instance)
+        self.add_publishers_field()
         self.add_tag_field()
         self.add_languages_field()
-        self.add_publishers_field()
         self.add_material_details_field()
         self.add_itemtype_field()
 
@@ -83,7 +83,8 @@ class ItemModelForm(forms.ModelForm):
             ),
             queryset=Person.objects.all(),
             required=False,
-            initial=Person.objects.filter(publisher__edition__items=self.instance)
+            initial=Person.objects.filter(publisher__edition__items=self.instance),
+            label=_("Real publisher(s)")
         )
         self.fields['publishers'] = publishers
         
@@ -448,6 +449,12 @@ class EditionPlaceForm(forms.ModelForm):
         }
 
 
+class ItemStatedPublisherForm(forms.ModelForm):
+    class Meta:
+        model = Item
+        fields = ['stated_publisher']
+
+
 class ItemFormatForm(forms.ModelForm):
     class Meta:
         model = Item
@@ -571,7 +578,14 @@ class EditionPlacesForm(forms.Form):
 class EditionModelForm(forms.ModelForm):
     class Meta:
         model = Edition
-        fields = "__all__"
+        fields = [
+            'year_start',
+            'year_end',
+            'year_tag',
+            'terminus_post_quem',
+            'url',
+            'place',
+        ]
         widgets = {
             'place': ModelSelect2Widget(
                 model=Place,
@@ -586,7 +600,7 @@ class EditionModelForm(forms.ModelForm):
 
     def add_publicationplaces_field(self):
         publication_places = forms.ModelMultipleChoiceField(
-            label=_("Real places of publication"),
+            label=_("Real place(s) of publication"),
             widget=ModelSelect2MultipleWidget(
                 model=Place,
                 search_fields=['name__icontains']
@@ -674,7 +688,17 @@ class WorkSubjectModelForm(forms.ModelForm):
 class ItemModelForm2(ItemModelForm):
     class Meta:
         model = Item
-        exclude = ['edition']
+        fields = [
+            'short_title',
+            'lot',
+            'catalogue',
+            'number_of_volumes',
+            'book_format',
+            'index_in_lot',
+            'parisian_category',
+            'uncountable_book_items',
+            'stated_publisher',
+        ]
         widgets = {
             'book_format': Select2Widget,
             'binding_material_details': Select2Widget,
