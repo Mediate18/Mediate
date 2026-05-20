@@ -122,7 +122,7 @@ class ItemTableView(ListView):
         lot_uuid = self.request.GET.get('lot__uuid')
         if lot_uuid:
             items = items.filter(lot__uuid=uuid.UUID(lot_uuid))
-        return items
+        return items.distinct()
 
     def get(self, request, *args, **kwargs):
         # Handle the _export query
