@@ -282,8 +282,8 @@ class LibraryTable(UUIDRenderMixin, tables.Table):
 # Lot table
 class LotTable(UUIDRenderMixin, tables.Table):
     uuid = tables.Column(empty_values=(), verbose_name="", orderable=False)
-    collection = tables.RelatedLinkColumn()
-    category = tables.RelatedLinkColumn()
+    collection = tables.Column(linkify=True)
+    category = tables.Column(linkify=True)
 
     class Meta:
         model = Lot

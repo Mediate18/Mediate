@@ -6,8 +6,6 @@
 # and that both databases have the same credentials.
 #
 # Running Django tests:
-#     pip install django-test-without-migrations
-#     pip install django-nose
 #     ./manage.py test --keepdb --nomigrations --setting=mediate.settings_tests
 
 # Settings

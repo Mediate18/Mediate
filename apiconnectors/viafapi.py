@@ -7,7 +7,7 @@ import logging
 import time
 
 from attrdict import AttrMap
-from cached_property import cached_property
+from functools import cached_property
 import requests
 import rdflib
 from rdflib.namespace import Namespace

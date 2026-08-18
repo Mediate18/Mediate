@@ -540,7 +540,7 @@ class EditionTable(UUIDRenderMixin, tables.Table):
     checkbox = tables.CheckBoxColumn(empty_values=(), orderable=False,
                                      attrs={'th__input': {'id': 'checkbox_column', 'title': 'Select/deselect all'}})
     items = tables.Column(empty_values=(), verbose_name=_("Items"))
-    place = tables.RelatedLinkColumn()
+    place = tables.Column(linkify=True)
     url = tables.Column(linkify=lambda record: record.url)
     publisher = tables.Column(verbose_name=_("Publisher"), empty_values=())
     year_of_publication = tables.Column(empty_values=(), verbose_name=_("Year of publication"))

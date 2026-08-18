@@ -54,7 +54,6 @@ INSTALLED_APPS = [
     'dal_select2',
     'django_extensions',
     'maintenance_mode',
-    'test_without_migrations',
     'simple_history',
     'leaflet',
     'simplemoderation',
@@ -264,5 +263,3 @@ AVAILABLE_LAYOUTS = [
 ]
 
 MAINTENANCE_MODE = config('MAINTENANCE_MODE', False, cast=bool)
-
-TEST_WITHOUT_MIGRATIONS_COMMAND = 'django_nose.management.commands.test.Command'
