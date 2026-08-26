@@ -68,4 +68,4 @@ class ShelfMarkTable(tables.Table):
         catalogues = []
         for catalogue in record.catalogue_set.values('name', 'uuid'):
             catalogues.append("<a href='{}'>{}</a>".format(reverse_lazy('catalogue_detail', args=[catalogue['uuid']]), catalogue['name']))
-        return format_html(", ".join(catalogues))
+        return format_html(", ".join(catalogues), None)

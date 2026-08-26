@@ -1,6 +1,7 @@
 import django_tables2 as tables
 from django_tables2.utils import A  # alias for Accessor
-from django.utils.html import format_html, mark_safe
+from django.utils.html import format_html, mark_safe, format_html_join
+
 from .models import *
 from django.conf import settings
 
@@ -52,21 +53,14 @@ class CollectionTable(tables.Table):
         return render_action_column(value, 'collection_detail', url_name_change, url_name_delete)
 
     def render_full_title(self, record, value):
-        return format_html('<a href="{}">{}</a>'.format(reverse_lazy('collection_detail', args=[record.pk]),
-                                                        value[:50] + "..." if len(value) > 50 else value))
+        return format_html('<a href="{}">{}</a>', reverse_lazy('collection_detail', args=[record.pk]),
+                           (value[:50] + "..." if len(value) > 50 else value))
 
     def render_types(self, record):
-        return format_html(
-            ", ".join(
-                [
-                    '<a href="{}">{}</a>'.format(
-                        reverse_lazy('change_collectioncollectiontyperelation', args=[relation.pk]),
-                        relation.type
-                    )
-                    for relation in record.collectioncollectiontyperelation_set.all()
-                ]
-            )
-        )
+        return format_html_join(
+            ", ", '<a href="{}">{}</a>',
+            [(reverse_lazy('change_collectioncollectiontyperelation', args=[relation.pk]), relation.type)
+             for relation in record.collectioncollectiontyperelation_set.all()])
 
     def render_year_of_publication(self, record):
         if not record.year_of_publication_end:
@@ -78,12 +72,8 @@ class CollectionTable(tables.Table):
     def render_owner(self, record):
         owners = Person.objects.filter(personcollectionrelation__role__name__iexact="owner",
                                        personcollectionrelation__collection=record)
-        return format_html(", ".join(
-            [
-                '<a href="{}">{}</a>'.format(reverse_lazy('change_person', args=[owner.pk]), owner)
-                for owner in owners
-            ]
-        ))
+        return format_html_join(", ", '<a href="{}">{}</a>',
+                                [(reverse_lazy('change_person', args=[owner.pk]), owner) for owner in owners])
 
     def render_number_of_lots(self, record):
         return record.lot_set.count()
@@ -95,10 +85,9 @@ class CollectionTable(tables.Table):
             return item_count
 
         return format_html(
-            '{}+ <span class="glyphicon glyphicon-info-sign" title="{}"></span>'.format(
-                item_count,
-                settings.UNCOUNTABLE_BOOK_ITEMS_MESSAGE
-            )
+            '{}+ <span class="glyphicon glyphicon-info-sign" title="{}"></span>',
+            item_count,
+            settings.UNCOUNTABLE_BOOK_ITEMS_MESSAGE
         )
 
     def render_percentage_non_books(self, record):
@@ -119,12 +108,15 @@ class CollectionTable(tables.Table):
         for relation in CollectionPlaceRelation.objects.filter(collection=record).prefetch_related('type', 'place'):
             type_dict[relation.type.name].append(relation.place)
 
-        related_place_html = format_html("<br/>".join([
-            format_html('{}: ', type.capitalize()) + ", ".join([
-                    format_html('<a href="{}">{}</a>', reverse_lazy('place_detail', args=[place.pk]), place)
-                    for place in places
-                ]) for type, places in type_dict.items()
-            ]))
+        related_place_html = format_html_join(
+            "<br/>",
+            '{}: {}',
+            [(type.capitalize(), format_html_join(
+                ", ",
+                '<a href="{}">{}</a>',
+                [(reverse_lazy('place_detail', args=[place.pk]), place) for place in places]
+            )) for type, places in type_dict.items()]
+        )
 
         return mark_safe(f'{publication_place_html}<br/>{related_place_html}')
 
@@ -209,15 +201,9 @@ class CatalogueTable(tables.Table):
         return render_action_column(value, 'catalogue_detail', url_name_change, url_name_delete)
 
     def render_collections(self, record):
-        return format_html(
-            ", ".join([
-                '<a href="{}">{}</a>'.format(
-                    reverse_lazy('collection_detail', args=[collection.pk]),
-                    collection
-                )
-                for collection in record.collection.all()
-            ])
-        )
+        return format_html_join(", ", "<a href='{}'>{}</a>",
+                             [(reverse_lazy('collection_detail', args=[collection.pk]), collection)
+                              for collection in record.collection.all()])
 
     def render_items(self, record):
         item_count = record.item_count()
@@ -227,12 +213,11 @@ class CatalogueTable(tables.Table):
             '<span class="glyphicon glyphicon-list" data-toggle="tooltip" '
             'data-original-title="List the items of {}"></span>'
             '</a>'
-            ' {}'.format(
-                reverse_lazy('items'),
-                "&".join(["collection="+str(uuid) for uuid in record.collection.values_list("uuid", flat=True)]),
-                record,
-                item_count  
-            )
+            ' {}',
+            reverse_lazy('items'),
+            "&".join(["collection="+str(uuid) for uuid in record.collection.values_list("uuid", flat=True)]),
+            record,
+            item_count
         )
 
     def render_lots(self, record):
@@ -243,12 +228,11 @@ class CatalogueTable(tables.Table):
             '<span class="glyphicon glyphicon-list" data-toggle="tooltip" '
             'data-original-title="List the lots of {}"></span>'
             '</a>'
-            ' {}'.format(
-                reverse_lazy('lots'),
-                "&".join(["collection="+str(uuid) for uuid in record.collection.values_list("uuid", flat=True)]),
-                record,
-                lot_count  
-            )
+            ' {}',
+            reverse_lazy('lots'),
+            "&".join(["collection="+str(uuid) for uuid in record.collection.values_list("uuid", flat=True)]),
+            record,
+            lot_count
         )
 
 

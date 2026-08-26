@@ -11,6 +11,21 @@ services:
       redis:
         condition: service_started
     restart: unless-stopped
+  db:
+    image: mysql:latest
+    restart: unless-stopped
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - mysql_dumps:/mysql_dumps
+    environment:
+      MYSQL_ROOT_PASSWORD: '2Xl1A61MCq'
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      test: ["CMD", "mysql", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}", "-e", "SELECT 1"]
+      timeout: 20s
+      retries: 10
   redis:
     image: redis:latest
     restart: unless-stopped
@@ -30,3 +45,5 @@ volumes:
   static_volume:
   tmp_volume:
   writable_volume:
+  mysql_data:
+  mysql_dumps:

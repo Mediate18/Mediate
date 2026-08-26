@@ -27,7 +27,7 @@ class ModerationTable(tables.Table):
         moderation = record
         if moderation.state == ModerationState.PENDING.value and \
                 (moderation.master is None or moderation.master.state != ModerationState.PENDING.value):
-            return format_html('<a title="{}" href="{}"><span class="glyphicon glyphicon-pencil"></a>'
-                               .format(_("Moderate"), reverse_lazy('change_moderation', args=[record.id])))
+            return format_html('<a title="{}" href="{}"><span class="glyphicon glyphicon-pencil"></a>',
+                               _("Moderate"), reverse_lazy('change_moderation', args=[record.id]))
         else:
             return ""

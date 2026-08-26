@@ -1,7 +1,7 @@
 from django.db.models import Count
 import django_tables2 as tables
 from django_tables2.utils import A  # alias for Accessor
-from django.utils.html import format_html
+from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _
 from django.utils.safestring import mark_safe
 import itertools
@@ -40,10 +40,10 @@ class ItemTable(AddInfoLinkMixin, tables.Table):
     stated_edition = tables.Column(empty_values=(), orderable=False)
     edition = tables.Column(empty_values=(), verbose_name=_('Real edition'), orderable=False)
     manage_works = tables.LinkColumn('add_workstoitem',
-        text=format_html('<span class="glyphicon glyphicon-list" data-toggle="tooltip" data-original-title="Manage works"></span>'),
+        text=format_html('<span class="glyphicon glyphicon-list" data-toggle="tooltip" data-original-title="Manage works"></span>', None),
         args=[A('pk')], orderable=False, empty_values=())
     manage_persons = tables.LinkColumn('add_personstoitem',
-         text=format_html('<span class="glyphicon glyphicon-list" data-toggle="tooltip" data-original-title="Manage people"></span>'),
+         text=format_html('<span class="glyphicon glyphicon-list" data-toggle="tooltip" data-original-title="Manage people"></span>', None),
          args=[A('pk')], orderable=False, empty_values=())
     languages = tables.Column(empty_values=(), verbose_name=_("Languages"), orderable=False)
     parisian_category = tables.Column(empty_values=(), verbose_name=_("Parisian category"))
@@ -112,9 +112,7 @@ class ItemTable(AddInfoLinkMixin, tables.Table):
         )
 
     def render_checkbox(self, record):
-        return format_html(
-            '<input id="{}" class="checkbox" type="checkbox" name="checkbox"/>'.format(record.uuid)
-        )
+        return format_html('<input id="{}" class="checkbox" type="checkbox" name="checkbox"/>', record.uuid)
 
     def render_people(self, record):
         person_item_relations = record.personitemrelation_set.all() #
@@ -137,7 +135,7 @@ class ItemTable(AddInfoLinkMixin, tables.Table):
             relation_groups.append(
                 role.name.capitalize() + ": " + ", ".join(persons)
             )
-        return format_html("<br/> ".join(relation_groups))
+        return format_html("<br/> ".join(relation_groups), args=None    )
 
     def render_works(self, record):
         item_work_relations = record.works.all()
@@ -149,20 +147,20 @@ class ItemTable(AddInfoLinkMixin, tables.Table):
             if viaf:
                 work_entry += " (<a target='blank' href='{}'>VIAF</a>)".format(viaf)
             work_entries.append(work_entry)
-        return format_html(" | ".join(work_entries))
+        return format_html(" | ".join(work_entries), args=None)
 
     def render_collection(self, record):
         try:
-            return format_html('<a href="{}">{}</a>'.format(
+            return format_html('<a href="{}">{}</a>',
                 reverse_lazy('collection_detail', args=[str(record.lot.collection_id)]),
-                str(record.lot.collection))
+                str(record.lot.collection)
             )
         except AttributeError:
             # Record has not lot or lot has no collection
             return ''
 
     def render_number_of_volumes(self, record):
-        return record.number_of_volumes or format_html("&mdash;")
+        return record.number_of_volumes or format_html("&mdash;", args=None)
 
     def render_material_details(self, record):
         return ", ".join(MaterialDetails.objects.filter(items__item=record).values_list('description', flat=True))
@@ -187,7 +185,7 @@ class ItemTable(AddInfoLinkMixin, tables.Table):
         return f'{places_str}{": " if places_str else ""}{publishers_str}{", " if publishers_str and year_str else ""}{year_str}'
 
     def render_languages(self, record):
-        language_names = [format_html(language.name) for language in Language.objects.filter(items__item=record)]
+        language_names = [format_html(language.name, args=None) for language in Language.objects.filter(items__item=record)]
         return format_html(
             '<div class="col-xs-11 expandable-cell collapsed-cell">{}</div>'
             '<div class="col-xs-1">'
@@ -295,7 +293,7 @@ class TaggedItemTable(tables.Table):
             relation_groups.append(
                 role.name.capitalize() + ": " + ", ".join(persons)
             )
-        return format_html("<br/> ".join(relation_groups))
+        return format_html("<br/> ".join(relation_groups), None)
 
     def render_works(self, record):
         item_work_relations = ItemWorkRelation.objects.filter(item=record)
@@ -307,16 +305,16 @@ class TaggedItemTable(tables.Table):
             if viaf:
                 work_entry += " (<a target='blank' href='{}'>VIAF</a>)".format(viaf)
             work_entries.append(work_entry)
-        return format_html(" | ".join(work_entries))
+        return format_html(" | ".join(work_entries), None)
 
     def render_collection(self, record):
-        return format_html(str(record.lot.collection))
+        return format_html(str(record.lot.collection), None)
 
     def render_sales_price(self, record):
         return record.lot.sales_price
 
     def render_number_of_volumes(self, record):
-        return record.number_of_volumes or format_html("&mdash;")
+        return record.number_of_volumes or format_html("&mdash;", None)
 
     def render_material_details(self, record):
         return ", ".join(MaterialDetails.objects.filter(items__item=record).values_list('description', flat=True))
@@ -489,7 +487,7 @@ class LanguageTable(UUIDRenderMixin, tables.Table):
 
     def render_item_count(self, record):
         return format_html(
-            '<a href="{}?language={}">{}</a>'.format(reverse_lazy('items'), record.uuid, record.item_count)
+            '<a href="{}?language={}">{}</a>', reverse_lazy('items'), record.uuid, record.item_count
         )
 
 
@@ -563,24 +561,16 @@ class EditionTable(UUIDRenderMixin, tables.Table):
 
     def render_items(self, record):
         items = Item.objects.filter(edition=record).distinct()
-        return format_html(
-            ", ".join(
-                ['<a href="{}">{}</a>'.format(item.get_absolute_url(), item) for item in items]
-            )
-        )
+        return format_html_join(", ", '<a href="{}">{}</a>',
+                             [(item.get_absolute_url(), item) for item in items])
 
     def render_publisher(self, record):
         publishers = Person.objects.filter(publisher__edition=record).distinct()
-        return format_html(
-            ", ".join(
-                ['<a href="{}">{}</a>'.format(publisher.get_absolute_url(), publisher) for publisher in publishers]
-            )
-        )
+        return format_html_join(", ", '<a href="{}">{}</a>',
+                             [(publisher.get_absolute_url(), publisher) for publisher in publishers])
 
     def render_checkbox(self, record):
-        return format_html(
-            '<input id="{}" class="checkbox" type="checkbox" name="checkbox"/>'.format(record.uuid)
-        )
+        return format_html('<input id="{}" class="checkbox" type="checkbox" name="checkbox"/>', record.uuid)
     
     def render_year_of_publication(self, record):
         year_range_str = "{}".format(record.year_start) if record.year_start else "?"
@@ -653,25 +643,22 @@ class WorkTable(UUIDRenderMixin, tables.Table):
     def render_parisian_category(self, record, value):
         parisian_categories = ParisianCategory.objects.filter(item__works__work=record)\
             .annotate(item_count=Count("item"))
-        return format_html(
-            " | ".join([
-                f'<a href="{parisian_category.get_absolute_url()}">{parisian_category.name}</a> ({parisian_category.item_count} items)'
-                for parisian_category in parisian_categories
-            ])
-        )
+
+        return format_html_join(
+            " | ", '<a href="{}">{}</a> ({} items)',
+            [(parisian_category.get_absolute_url(), parisian_category.name, parisian_category.item_count)
+             for parisian_category in parisian_categories])
 
     def render_checkbox(self, record):
         return format_html(
-            '<input id="{}" class="checkbox" type="checkbox" name="checkbox"/>'.format(record.uuid)
+            '<input id="{}" class="checkbox" type="checkbox" name="checkbox"/>', record.uuid
         )
 
     def render_viaf_id(self, value):
         if value:
-            return format_html('<a target="blank" href="{}">{}</a>'.format(
-                value, value
-            ))
+            return format_html('<a target="blank" href="{}">{}</a>', value, value)
         else:
-            return format_html('-')
+            return '-'
 
 
 # WorkRanking table

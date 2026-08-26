@@ -26,14 +26,13 @@ class ActionColumn(tables.Column):
                     <span class="glyphicon glyphicon-remove" data-toggle="tooltip" data-original-title="{}"></span>
                 </a>
             </div>
-            """.format(
-                reverse_lazy(self.url_name_view, kwargs={'pk': value}),
-                _('View'),
-                reverse_lazy(self.url_name_change, kwargs={'pk': value}),
-                _('Change'),
-                reverse_lazy(self.url_name_delete, kwargs={'pk': value}),
-                _('Delete'),
-            )
+            """,
+            reverse_lazy(self.url_name_view, kwargs={'pk': value}),
+            _('View'),
+            reverse_lazy(self.url_name_change, kwargs={'pk': value}),
+            _('Change'),
+            reverse_lazy(self.url_name_delete, kwargs={'pk': value}),
+            _('Delete'),
         )
         return html
 
@@ -63,7 +62,7 @@ def render_action_column(value, url_name_view, url_name_change, url_name_delete)
     links += """
     </div>
     """
-    return format_html(links)
+    return mark_safe(links)
 
 
 class AddInfoLinkMixin(object):

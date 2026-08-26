@@ -1,8 +1,8 @@
 git+https://github.com/vanlummelhuizen/AttrDict.git@master#egg=attrdict
-Django==5.2
+Django==6.1
 django-autocomplete-light==5
 django-bootstrap3==26.2
-django-cachalot==2.9
+django-cachalot==2.9.1
 django-computedfields==0.3.6
 git+https://github.com/Mediate18/django-date-extensions.git@d6d38f1aaa924094e9ebbb8796e5aa4e6eb743ee#egg=django_date_extensions
 django-filter==26.1

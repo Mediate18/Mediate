@@ -3,6 +3,8 @@ from django.utils.html import format_html, format_html_join
 from django.db.models import Q
 import itertools
 
+from django.utils.safestring import mark_safe
+
 from .models import *
 from mediate.tools import round_to_n, UUIDRenderMixin
 from catalogues.models import CollectionPlaceRelation
@@ -73,11 +75,11 @@ class PersonTable(UUIDRenderMixin, tables.Table):
             for relation in role_relations:
                 collection = relation.collection
                 title = collection.short_title
-                collection_entry = "<a href='{}'>{}</a>".format(reverse_lazy('collection_detail', args=[collection.pk]), title)
+                collection_entry = format_html("<a href='{}'>{}</a>", reverse_lazy('collection_detail', args=[collection.pk]), title)
                 collections.append(collection_entry)
 
             relation_groups.append(", ".join(collections))
-        return format_html("<br/> ".join(relation_groups))
+        return mark_safe("<br/> ".join(relation_groups))
 
     def render_roles(self, record):
         roles_dict = {}
@@ -102,15 +104,13 @@ class PersonTable(UUIDRenderMixin, tables.Table):
             roles_dict['works'] = ['author']
 
         text = "<br/>".join(["{}: {}".format(k.capitalize(), ", ".join(v)) for k, v in roles_dict.items()])
-        return format_html('<a href="{}">{}</a>'.format(reverse_lazy('person_detail', args=[record.pk]), text))
+        return format_html('<a href="{}">{}</a>', reverse_lazy('person_detail', args=[record.pk]), text)
 
     def render_viaf_id(self, value):
         if value:
-            return format_html('<a target="blank" href="{}">{}</a>'.format(
-                value, value
-            ))
+            return format_html('<a target="blank" href="{}">{}</a>', value, value)
         else:
-            return format_html('-')
+            return '-'
 
     def value_viaf_id(self, value):
         return value
@@ -118,11 +118,9 @@ class PersonTable(UUIDRenderMixin, tables.Table):
     def render_publisher_cerl_id(self, value):
         if value:
             url = cerl_record_url + value
-            return format_html('<a target="blank" href="{}">{}</a>'.format(
-                url, value
-            ))
+            return format_html('<a target="blank" href="{}">{}</a>', url, value)
         else:
-            return format_html('-')
+            return '-'
 
     def render_relations(self, record):
         person = record
@@ -130,13 +128,13 @@ class PersonTable(UUIDRenderMixin, tables.Table):
         relations = []
         for relation in person.relations_when_first.all():
             relation_of_str = '' if relation.type.name.endswith(of_str) else of_str
-            relation_str = format_html(_('{}{} <a href="{}">{}</a>'), str(relation.type).capitalize(), relation_of_str,
+            relation_str = format_html('{}{} <a href="{}">{}</a>', str(relation.type).capitalize(), relation_of_str,
                                      relation.second_person.get_absolute_url(), relation.second_person)
             relations.append(relation_str)
         for relation in person.relations_when_second.all():
             type = str(relation.type)
             type_without_of = type[:-len(of_str)] if type.endswith(of_str) else type
-            relation_str = format_html(_('{}: <a href="{}">{}</a>'), type_without_of.capitalize(),
+            relation_str = format_html('{}: <a href="{}">{}</a>', type_without_of.capitalize(),
                                      relation.first_person.get_absolute_url(), relation.first_person)
             relations.append(relation_str)
         return format_html_join('\n', '{}<br/>', ((rel,) for rel in relations))
@@ -413,44 +411,35 @@ class PlaceLinksTable(UUIDRenderMixin, tables.Table):
         for relation in relations:
             type_dict[relation.type.name].append(relation.collection)
 
-        return format_html("<br/>".join([
-            type.capitalize() + ": " + ", ".join([
-                '<a href="{}">{}</a>'.format(reverse_lazy('collection_detail', args=[collection.pk]), collection)
-                for collection in collections
-            ]) for type, collections in type_dict.items()
-        ]))
+        return format_html_join(
+            "<br/>",
+            '{}: {}',
+            [(type.capitalize(), format_html_join(", ",
+                                                 '<a href="{}">{}</a>',
+                                                 [(reverse_lazy('collection_detail', args=[collection.pk]), collection)
+                                                  for collection in collections]))
+            for type, collections in type_dict.items()]
+        )
 
     def render_editions(self, record):
-        editions = Edition.objects.filter(place=record)
-        return format_html(", ".join(
-            ['<a href="{}">{}</a>'.format(reverse_lazy('edition_detail', args=[edition.pk]),
-                                          edition)
-                for edition in editions]
-        ))
+        return self.join_object_links(Edition.objects.filter(place=record), 'edition_detail')
 
     def render_people_born(self, record):
-        persons = Person.objects.filter(city_of_birth=record)
-        return format_html(", ".join(
-            ['<a href="{}">{}</a>'.format(reverse_lazy('person_detail', args=[person.pk]),
-                                          person)
-                for person in persons]
-        ))
+        return self.join_object_links(Person.objects.filter(city_of_birth=record), 'person_detail')
 
     def render_people_died(self, record):
-        persons = Person.objects.filter(city_of_death=record)
-        return format_html(", ".join(
-            ['<a href="{}">{}</a>'.format(reverse_lazy('person_detail', args=[person.pk]),
-                                          person)
-                for person in persons]
-        ))
+        return self.join_object_links(Person.objects.filter(city_of_death=record), 'person_detail')
 
     def render_residences(self, record):
-        persons = Person.objects.filter(residence__place=record)
-        return format_html(", ".join(
-            ['<a href="{}">{}</a>'.format(reverse_lazy('person_detail', args=[person.pk]),
-                                          person)
-                for person in persons]
-        ))
+        return self.join_object_links(Person.objects.filter(residence__place=record), 'person_detail')
+
+    def join_object_links(self, objects, view_name):
+        """Creates a comma separated string of links to objects"""
+        return format_html_join(
+            ", ",
+            '<a href="{}">{}</a>',
+            [(reverse_lazy(view_name, args=[obj.pk]), obj) for obj in objects]
+        )
 
 
 # Profession table

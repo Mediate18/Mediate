@@ -444,8 +444,8 @@ class CollectionUpdateView(PermissionRequiredMixin, UpdateView):
         kwargs['datasets'] = [collection.catalogue.first().dataset]
         if collection.catalogue.first().dataset not in get_datasets_for_session(self.request):
             messages.warning(self.request,
-                             format_html(_("The dataset this Collection belongs to, <i>{}</i>, is "
-                                           "currently not selected."),
+                             format_html("The dataset this Collection belongs to, <i>{}</i>, is "
+                                         "currently not selected.",
                                          collection.catalogue.first().dataset))
 
         return kwargs
@@ -693,8 +693,8 @@ class CollectionCollectionTypeRelationUpdateView(PermissionRequiredMixin, Update
         )
         if relation.collection.catalogue.first().dataset not in get_datasets_for_session(self.request):
             messages.warning(self.request,
-                             format_html(_("The dataset this CollectionCollectionTypeRelation belongs to, <i>{}</i>, is "
-                                           "currently not selected."),
+                             format_html("The dataset this CollectionCollectionTypeRelation belongs to, <i>{}</i>, is "
+                                         "currently not selected.",
                                          relation.collection.catalogue.first().dataset))
 
         return kwargs
@@ -1017,8 +1017,8 @@ class LotUpdateView(PermissionRequiredMixin, UpdateView):
         )
         if lot.collection.catalogue.first().dataset not in get_datasets_for_session(self.request):
             messages.warning(self.request,
-                             format_html(_("The dataset this Lot belongs to, <i>{}</i>, is "
-                                           "currently not selected."),
+                             format_html("The dataset this Lot belongs to, <i>{}</i>, is "
+                                         "currently not selected.",
                                          lot.collection.catalogue.first().dataset))
         return kwargs
 
@@ -1301,8 +1301,8 @@ class PersonCollectionRelationUpdateView(PermissionRequiredMixin, UpdateView):
         )
         if personcollectionrelation.collection.catalogue.first().dataset not in get_datasets_for_session(self.request):
             messages.warning(self.request,
-                             format_html(_("The dataset this PersonCollectionRelation belongs to, <i>{}</i>, is "
-                                           "currently not selected."),
+                             format_html("The dataset this PersonCollectionRelation belongs to, <i>{}</i>, is "
+                                         "currently not selected.",
                                          personcollectionrelation.collection.catalogue.first().dataset))
         return kwargs
 
@@ -1462,8 +1462,8 @@ class PersonCatalogueRelationUpdateView(PermissionRequiredMixin, UpdateView):
         )
         if personcataloguerelation.catalogue.dataset not in get_datasets_for_session(self.request):
             messages.warning(self.request,
-                             format_html(_("The dataset this PersonCatalogueRelation belongs to, <i>{}</i>, is "
-                                           "currently not selected."),
+                             format_html("The dataset this PersonCatalogueRelation belongs to, <i>{}</i>, is "
+                                         "currently not selected.",
                                          personcataloguerelation.catalogue.dataset))
 
         return kwargs
@@ -1564,8 +1564,8 @@ class CollectionPlaceRelationUpdateView(PermissionRequiredMixin, UpdateView):
         )
         if relation.collection.catalogue.first().dataset not in get_datasets_for_session(self.request):
             messages.warning(self.request,
-                             format_html(_("The dataset this CollectionPlaceRelation belongs to, <i>{}</i>, is "
-                                           "currently not selected."),
+                             format_html("The dataset this CollectionPlaceRelation belongs to, <i>{}</i>, is "
+                                         "currently not selected.",
                                          relation.collection.catalogue.first().dataset))
 
         return kwargs
@@ -1672,8 +1672,8 @@ class CategoryUpdateView(PermissionRequiredMixin, UpdateView):
         )
         if category.collection.catalogue.first().dataset not in get_datasets_for_session(self.request):
             messages.warning(self.request,
-                             format_html(_("The dataset this Category belongs to, <i>{}</i>, is "
-                                           "currently not selected."),
+                             format_html("The dataset this Category belongs to, <i>{}</i>, is "
+                                         "currently not selected.",
                                          category.collection.catalogue.first().dataset))
         return kwargs
 
