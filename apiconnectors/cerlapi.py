@@ -2,6 +2,7 @@
 from dal import autocomplete
 from django.http import JsonResponse
 import requests
+from requests import JSONDecodeError
 
 cerl_search_url = 'https://data.cerl.org/thesaurus/_search'
 cerl_record_url = 'http://thesaurus.cerl.org/record/'
@@ -12,9 +13,11 @@ def cerl_suggest(query, cerl_search_field="name"):
     response = requests.get(cerl_search_url,
                             params={'query': cerl_search_field+':'+query+'*'},
                             headers={'accept': 'application/json'})
-    if response.status_code == requests.codes.ok:
+    if response.status_code != requests.codes.ok:
+        return []
+    try:
         return response.json().get('rows', None) or []
-    else:
+    except JSONDecodeError:
         return []
 
 def get_names(item, cerl_search_field):
