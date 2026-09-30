@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from django import forms
 from django.contrib.contenttypes.models import ContentType
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django_select2.forms import Select2Widget, ModelSelect2Widget, ModelSelect2MultipleWidget
 from .models import *
@@ -408,11 +409,11 @@ class PersonItemRelationModelForm(forms.ModelForm):
 class AddAnotherWidget(ModelSelect2Widget):
     def render(self, *args, **kwargs):
         output = super(AddAnotherWidget, self).render(*args, **kwargs)
-        output += '&nbsp;&nbsp;' \
-                  '<a href="#" data-toggle="modal" data-target="#addanotherModal">' \
-                  '<span class="glyphicon glyphicon-plus" data-toggle="tooltip" data-original-title="Add another">' \
-                  '</span>' \
-                  '</a>'
+        output += mark_safe('&nbsp;&nbsp;'
+                  '<a href="#" data-toggle="modal" data-target="#addanotherModal">'
+                  '<span class="glyphicon glyphicon-plus" data-toggle="tooltip" data-original-title="Add another">'
+                  '</span>'
+                  '</a>')
         return output
 
 
