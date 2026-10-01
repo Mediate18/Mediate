@@ -23,7 +23,7 @@ from django.conf.urls import include
 from django.views.generic import RedirectView, TemplateView
 from rest_framework import routers
 
-from .views import protected_media
+from .views import protected_media, FillFieldsView
 
 import items.urls
 import catalogues.urls
@@ -123,6 +123,8 @@ urlpatterns = [
     re_path(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     re_path(r'^select2/', include('django_select2.urls')),
     re_path(r'protected_media/(?P<filename>.*)$', protected_media, name='protected_media'),
+    re_path('wikidata/', include('wikidata.urls')),
+    re_path('fill_fields/(?P<fill_field_name>.*)/', FillFieldsView.as_view(), name='fill_fields'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) \
               + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

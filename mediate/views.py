@@ -1,20 +1,30 @@
+import re
+
+import requests
 from django.contrib.auth.decorators import permission_required
 from django.utils.translation import gettext_lazy as _
 import os
 import mimetypes
 import json
 from django.conf import settings
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 from django.shortcuts import render, redirect
 from django.contrib.auth.signals import user_logged_in
 from django.core.exceptions import ObjectDoesNotExist
+from django_select2.views import AutoResponseView
 
 from mediate.forms import SelectDatasetForm
 from catalogues.models import Dataset
 from catalogues.tools import get_dataset_for_anonymoususer
+from persons.models import Country, Person, Place
 from transcriptions.models import DocumentScan
+from wikidata.utils import get_nested_object
+from wikidata.views import get_wikidata_label_translations, get_option_from_wikidata_property, \
+    get_wikidata_label_for_property
+from wikidata.wikidata_api import get_wikidata_statements, get_wikidata_label
+
 
 # When a user logs in, he/she should choose a Dataset.
 # To make this happen, set dataset in session to None after login.
@@ -107,3 +117,60 @@ def select_dataset(request):
         form = SelectDatasetForm(request=request)
 
     return render(request, 'generic_form.html', {'form': form})
+
+
+class FillFieldsView(AutoResponseView):
+    def get(self, request, fill_field_name, *args, **kwargs):
+        method = f'get_{fill_field_name}_fillfield_response'
+        if hasattr(self, method) and callable(getattr(self, method)):
+            return JsonResponse(getattr(self, method)(request))
+        return JsonResponse({})
+
+    @staticmethod
+    def get_country_wikidata_fillfield_response(request):
+        api_id = request.GET.get('api_id', "")
+        field_values = get_wikidata_label_translations(api_id, "modern_country")
+        return field_values
+
+    @staticmethod
+    def get_place_wikidata_fillfield_response(request):
+        api_id = request.GET.get('api_id', "")
+        field_values = get_wikidata_label_translations(api_id, "name")
+
+        if data := get_wikidata_statements(api_id):
+            field_values['modern_country'] = get_option_from_wikidata_property(data, 'P17', Country)
+            field_values['latitude'] = round(get_nested_object(data, ('statements', 'P625', 0, 'value', 'content', 'latitude')), 6)
+            field_values['longitude'] = round(get_nested_object(data, ('statements', 'P625', 0, 'value', 'content', 'longitude')), 6)
+
+        return field_values
+
+    @staticmethod
+    def get_person_wikidata_fillfield_response(request):
+        api_id = request.GET.get('api_id', "")
+        field_values = {}
+        if data := get_wikidata_statements(api_id):
+            response, request_failed = get_wikidata_label(api_id)
+            field_values['short_name'] = response.json() \
+                                            if (not request_failed and response.status_code == requests.codes.ok) \
+                                            else ''
+            field_values['first_names'] = get_wikidata_label_for_property(data, 'P735')
+            field_values['surname'] = get_wikidata_label_for_property(data, 'P734')
+            field_values['birth_name'] = get_wikidata_label_for_property(data, 'P1477')
+
+            for event, prop in [('birth', 'P569'), ('death', 'P570')]:
+                dates = get_nested_object(data, ('statements', prop), None)
+                if not dates:
+                    continue
+                date_index = next((index for index, date in enumerate(dates) if date['rank'] == 'preferred'), 0)
+                date = get_nested_object(dates, (date_index, 'value', 'content', 'time', slice(1, 11)), '')
+                field_values[f'date_of_{event}'] = next(iter(re.findall(r"^(\d{4})", date)), '')
+                # field_values[f'alternative_{event}_date'] = date
+
+            sex = get_wikidata_label_for_property(data, 'P21')
+            field_values['sex'] = sex.upper()
+
+            field_values['city_of_birth'] = get_option_from_wikidata_property(data, 'P19', Place)
+            field_values['city_of_death'] = get_option_from_wikidata_property(data, 'P20', Place)
+
+        return {k:v for k,v in field_values.items() if v}  # Leave out items with empty values
+

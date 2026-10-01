@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'cachalot',
     'simplemoderation',
     'tagme',
+    'wikidata',
     'mediate',
     'global',
     'items',
@@ -202,6 +203,10 @@ AUTHENTICATION_BACKENDS = (
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
+
+LANGUAGES = [
+    ("en", _("English")),
+]
 
 TIME_ZONE = 'UTC'
 
@@ -349,3 +354,9 @@ REQUEST_TRAFFIC_MODULES = (
 )
 
 REQUEST_ANONYMOUS_IP = True
+
+WIKIDATA_API_KEY = config('WIKIDATA_API_KEY', default="")
+WIKIDATA_LABEL_URL = 'https://www.wikidata.org/w/rest.php/wikibase/v1/entities/items/{}/labels/{}'
+WIKIDATA_URL = 'https://www.wikidata.org/wiki/{}'
+WIKIDATA_SUGGEST_URL = 'https://www.wikidata.org/w/rest.php/wikibase/v1/suggest/items'
+WIKIDATA_STATEMENTS_URL = 'https://www.wikidata.org/w/rest.php/wikibase/v1/entities/items/{}?_fields=statements'

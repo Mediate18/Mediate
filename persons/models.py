@@ -15,9 +15,10 @@ from apiconnectors.cerlapi import cerl_record_url_api
 import uuid
 
 from simplemoderation.tools import moderated
+from wikidata.models import Wikidata
 
 
-class Country(models.Model):
+class Country(Wikidata, models.Model):
     """
     A country
     """
@@ -35,7 +36,7 @@ class Country(models.Model):
         return reverse_lazy('country_detail', args=[str(self.uuid)])
 
 
-class Place(models.Model):
+class Place(Wikidata, models.Model):
     """
     A geographical place
     """
@@ -93,7 +94,7 @@ class Religion(models.Model):
 
 
 @moderated()
-class Person(ComputedFieldsModel):
+class Person(Wikidata, ComputedFieldsModel):
     """
     A person
     """

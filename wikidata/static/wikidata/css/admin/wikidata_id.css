@@ -1,0 +1,12 @@
+#select2-id_wikidata_id-container .select2-selection__clear {
+    position: absolute;
+    color: transparent;
+}
+
+.select2-selection:has(> #select2-id_wikidata_id-container) {
+    height: 60px;
+}
+
+.select2-search {
+    padding: 6px 1px 6px 1px !important;
+}
