@@ -26,13 +26,17 @@ def get_names(item, cerl_search_field):
     return ""
 
 def get_record(id):
+    display_text_if_error = "- no data -"
     response = requests.get(cerl_record_url_api+id, headers={'accept': 'application/json'})
-    if response.status_code == requests.codes.ok:
+    if response.status_code != requests.codes.ok:
+        return display_text_if_error
+    try:
         parts = response.json().get('data').get('heading')[0].get('part')
         names = [list(part.values())[0] for part in parts]
         return "{}, {}".format("".join(names[:1]), " ".join(names[1:]))
-    else:
-        return "- no data -"
+    except JSONDecodeError:
+        return display_text_if_error
+
 
 class CerlSuggest(autocomplete.Select2ListView):
     cerl_search_field = "placeName"
