@@ -1937,6 +1937,7 @@ class PublisherTableView(ListView):
 
 class PublisherDetailView(DetailView):
     model = Publisher
+    template_name = 'generic_detail.html'
 
 
 class PublisherCreateView(CreateView):
