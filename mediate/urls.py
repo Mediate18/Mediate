@@ -116,7 +116,7 @@ urlpatterns = [
     path(r'transcriptions/', include(transcriptions.urls)),
     path(r'dashboard/', login_required(view_dashboard), name='dashboard'),
     path(r'dashboard_stats/', login_required(get_dashboard_stats), name='get_dashboard_stats'),
-    path(r'totals/', view_totals, name='totals'),
+    path(r'totals/', include('dashboard.urls')),
     path(r'dataset/', login_required(select_dataset), name='select_dataset'),
     path(r'moderation/', include('simplemoderation.urls')),
     re_path(r'^api/', include(router.urls)),
