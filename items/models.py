@@ -12,7 +12,7 @@ from simple_history.models import HistoricalRecords
 import uuid
 
 from persons.models import Place, Person
-from catalogues.models import Catalogue, Lot, ParisianCategory
+from catalogues.models import Catalogue, Lot, ParisianCategory, Collection
 from tagme.models import TaggedEntity
 
 from simplemoderation.tools import moderated
@@ -425,7 +425,7 @@ class PersonItemRelationRole(models.Model):
 
 
 @moderated()
-class PersonItemRelation(models.Model):
+class PersonItemRelation(ComputedFieldsModel):
     """
     A person-item relation (e.g. author, translator, illustrator, owner)
     Note that the publisher relation is handled by the Edition/Publisher models.
@@ -435,6 +435,15 @@ class PersonItemRelation(models.Model):
     item = models.ForeignKey(Item, on_delete=CASCADE)
     role = models.ForeignKey(PersonItemRelationRole, on_delete=CASCADE)
     notes = models.TextField(_("Notes"), null=True, blank=True)
+    
+    history = HistoricalRecords(bases=[ComputedFieldsModel])
+
+    @computed(models.ForeignKey(Collection, on_delete=SET_NULL, null=True), depends=[('item.lot', ['collection'])])
+    def collection(self):
+        try:
+            return self.item.lot.collection
+        except:
+            return None
 
     class Meta:
         unique_together = (("person", "item", "role"),)
