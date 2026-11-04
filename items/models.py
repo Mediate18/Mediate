@@ -178,7 +178,8 @@ class Item(ComputedFieldsModel):
                                  "index_in_lot",
                                  "lot_lot_as_listed_in_collection"]),
             models.Index(fields=["dataset_uuid"]),
-            models.Index(fields=["non_book"])
+            models.Index(fields=["non_book"]),
+            models.Index(fields=["uncountable_book_items"])
         ]
 
     def __str__(self):
