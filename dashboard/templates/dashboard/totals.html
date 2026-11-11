@@ -141,13 +141,25 @@
 
                 <tr>
                     <td>
-                        <div hx-get="{% url  'itemswithplaceofpublication_count' %}" hx-trigger="load">
+                        <div hx-get="{% url 'itemswithrealplaceofpublication_count' %}" hx-trigger="load">
                             <img  alt="Loading..." class="htmx-indicator" width="20" src="/static/img/oval.svg"/>
                         </div>
                     </td>
                     <td>
-                        Items with <a href="{% url 'itemsmap' %}    ">place of publication</a>
-                        <span id="percentage_items_with_place_of_publication"></span>
+                        Items with <a href="{% url 'itemsmap' %}">real place of publication</a>
+                        <span id="percentage_items_with_real_place_of_publication"></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <div hx-get="{% url 'itemswithstatedplaceofpublication_count' %}" hx-trigger="load">
+                            <img  alt="Loading..." class="htmx-indicator" width="20" src="/static/img/oval.svg"/>
+                        </div>
+                    </td>
+                    <td>
+                        Items with stated place of publication
+                        <span id="percentage_items_with_stated_place_of_publication"></span>
                     </td>
                 </tr>
 

@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.db.models import Count, Q
 from django.template import Template, Context
+from gprof2dot import percentage
 
 from items.models import Item, Edition, Work, Language, PersonItemRelation, ItemWorkRelation
 from catalogues.models import Lot, Collection
@@ -54,16 +55,7 @@ def view_totals(request):
     :param request:
     :return:
     """
-    # books_with_parisian_category = Item.objects\
-    #     .filter(lot__collection__in=collections, non_book=False, parisian_category__isnull=False).distinct().count()
-
-    context = {
-        # 'books_with_parisian_category': books_with_parisian_category,
-        # 'percentage_books_with_parisian_category': round(100 * books_with_parisian_category/book_items)
-
-    }
-
-    return render(request, 'dashboard/totals.html', context)
+    return render(request, 'dashboard/totals.html', {})
 
 def collection_count(request):
     collections_for_session = get_collections_for_session(request)
@@ -215,21 +207,40 @@ def itemswithdate_count(request):
     return HttpResponse(template.render(context))
 
 
-def itemswithplaceofpublication_count(request):
+def itemswithrealplaceofpublication_count(request):
     collection_ids = list(get_collections_for_session(request).values_list('uuid', flat=True))
-    items_with_place_of_publication = Item.objects.filter(lot__collection_id__in=collection_ids,
+    items_with_real_place_of_publication = Item.objects.filter(lot__collection_id__in=collection_ids,
                                                           edition__publicationplace__place__isnull=False,
                                                           non_book=False).distinct().count()
     book_items, _ = get_bookitems_count(collection_ids)
-    percentage_items_with_place_of_publication = round(100 * items_with_place_of_publication/book_items)
+    percentage_items_with_real_place_of_publication = round(100 * items_with_real_place_of_publication/book_items)
 
     template = Template("""
-                    <span>{{ items_with_place_of_publication }}</span>
-                    <span id="percentage_items_with_place_of_publication" hx-swap-oob="true">({{percentage_items_with_place_of_publication}}% of total number of book Items)</span>
+                    <span>{{ items_with_real_place_of_publication }}</span>
+                    <span id="percentage_items_with_real_place_of_publication" hx-swap-oob="true">({{percentage_items_with_real_place_of_publication}}% of total number of book Items)</span>
                 """)
     context = Context({
-        'items_with_place_of_publication': items_with_place_of_publication,
-        'percentage_items_with_place_of_publication': percentage_items_with_place_of_publication,
+        'items_with_real_place_of_publication': items_with_real_place_of_publication,
+        'percentage_items_with_real_place_of_publication': percentage_items_with_real_place_of_publication,
+    })
+    return HttpResponse(template.render(context))
+
+
+def itemswithstatedplaceofpublication_count(request):
+    collection_ids = list(get_collections_for_session(request).values_list('uuid', flat=True))
+    items_with_stated_place_of_publication = Item.objects.filter(lot__collection_id__in=collection_ids,
+                                                                 edition__place__isnull=False,
+                                                                 non_book=False).distinct().count()
+    book_items, _ = get_bookitems_count(collection_ids)
+    percentage_items_with_stated_place_of_publication = round(100 * items_with_stated_place_of_publication/book_items)
+
+    template = Template("""
+                        <span>{{ items_with_stated_place_of_publication }}</span>
+                        <span id="percentage_items_with_stated_place_of_publication" hx-swap-oob="true">({{percentage_items_with_stated_place_of_publication}}% of total number of book Items)</span>
+                    """)
+    context = Context({
+        'items_with_stated_place_of_publication': items_with_stated_place_of_publication,
+        'percentage_items_with_stated_place_of_publication': percentage_items_with_stated_place_of_publication,
     })
     return HttpResponse(template.render(context))
 

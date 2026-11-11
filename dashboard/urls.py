@@ -2,8 +2,9 @@ from django.urls import path
 
 from dashboard.views import view_totals, collection_count, bookitems_count, work_count, person_count, \
     country_city_count, language_count, itempersonrelation_count, itemworkrelation_count, itemswithdate_count, \
-    itemswithplaceofpublication_count, itemswithpublisher_count, personswithplaceofbirth_count, \
-    personswithplaceofdeath_count, bookswithlanguage_count, bookswithparisiancategory_count
+    itemswithrealplaceofpublication_count, itemswithpublisher_count, personswithplaceofbirth_count, \
+    personswithplaceofdeath_count, bookswithlanguage_count, bookswithparisiancategory_count, \
+    itemswithstatedplaceofpublication_count
 
 urlpatterns = [
     path(r'', view_totals, name='totals'),
@@ -16,7 +17,8 @@ urlpatterns = [
     path(r'itempersonrelation_count', itempersonrelation_count, name='itempersonrelation_count'),
     path(r'itemworkrelation_count', itemworkrelation_count, name='itemworkrelation_count'),
     path(r'itemswithdate_count', itemswithdate_count, name='itemswithdate_count'),
-    path(r'itemswithplaceofpublication_count', itemswithplaceofpublication_count, name='itemswithplaceofpublication_count'),
+    path(r'itemswithrealplaceofpublication_count', itemswithrealplaceofpublication_count, name='itemswithrealplaceofpublication_count'),
+    path(r'itemswithstatedplaceofpublication_count', itemswithstatedplaceofpublication_count, name='itemswithstatedplaceofpublication_count'),
     path(r'itemswithpublisher_count', itemswithpublisher_count, name='itemswithpublisher_count'),
     path(r'personswithplaceofbirth_count', personswithplaceofbirth_count, name='personswithplaceofbirth_count'),
     path(r'personswithplaceofdeath_count', personswithplaceofdeath_count, name='personswithplaceofdeath_count'),
