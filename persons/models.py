@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django_date_extensions.fields import ApproximateDateField
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 
 from computedfields.models import ComputedFieldsModel, computed
 from simple_history.models import HistoricalRecords
@@ -53,7 +53,7 @@ class Place(models.Model):
         return str(self.name)
 
     def get_absolute_url(self):
-        return reverse_lazy('place_detail', args=[str(self.uuid)])
+        return reverse('place_detail', args=[str(self.uuid)])
 
     def get_lat_long(self, overwrite=False):
         if self.cerl_id and (overwrite or (not self.latitude or not self.longitude)):
@@ -174,7 +174,7 @@ class Person(ComputedFieldsModel):
         return self.short_name
 
     def get_absolute_url(self):
-        return reverse_lazy('person_detail', args=[str(self.uuid)])
+        return reverse('person_detail', args=[str(self.uuid)])
 
 
 class AlternativePersonName(models.Model):

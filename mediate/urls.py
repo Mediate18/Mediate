@@ -23,6 +23,7 @@ from django.conf.urls import include
 from django.views.generic import RedirectView, TemplateView
 from rest_framework import routers
 
+from .api import api
 from .views import protected_media
 
 import items.urls
@@ -123,6 +124,9 @@ urlpatterns = [
     re_path(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     re_path(r'^select2/', include('django_select2.urls')),
     re_path(r'protected_media/(?P<filename>.*)$', protected_media, name='protected_media'),
+
+    # API
+    path("api/v1/", api.urls),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) \
               + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

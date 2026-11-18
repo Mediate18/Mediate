@@ -3,7 +3,7 @@ from django.dispatch import receiver
 from django.db.models.deletion import CASCADE, SET_NULL
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.contrib.contenttypes.fields import GenericRelation
 
 from computedfields.models import ComputedFieldsModel, computed, precomputed
@@ -83,6 +83,9 @@ class Work(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse("work_detail", kwargs={"pk": self.pk})
 
 
 class WorkSubject(models.Model):
